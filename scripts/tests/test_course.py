@@ -83,6 +83,22 @@ class ValidationTests(unittest.TestCase):
         lessons = lesson_schema.collect_lessons()
         self.assertGreaterEqual(len(lessons), 1)
 
+    def test_spine_slug_drift_detected(self):
+        drifted = lesson_schema.Lesson(
+            path=Path("day-26-ultrasonic.yml"),
+            data={"day": 26, "lessonCode": "TSK-DAY26-ULTRASONIC", "slug": "day-26-wrong"},
+        )
+        errors = lesson_schema.validate_against_course([drifted], COURSE)
+        self.assertTrue(any("does not match the spine slug" in e for e in errors), errors)
+
+    def test_day_not_in_spine_detected(self):
+        ghost = lesson_schema.Lesson(
+            path=Path("day-31-x.yml"),
+            data={"day": 31, "lessonCode": "TSK-DAY31-X", "slug": "day-31-x"},
+        )
+        errors = lesson_schema.validate_against_course([ghost], COURSE)
+        self.assertTrue(any("not in the course spine" in e for e in errors), errors)
+
 
 class ReferencedTopicsTests(unittest.TestCase):
     def test_inline_and_explain_topics_found(self):

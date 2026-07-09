@@ -633,7 +633,9 @@ def render_course_index(course: dict, lessons: list[Lesson]) -> str:
             lesson = published.get(n)
             if lesson:
                 mins = lesson.get("estimatedTimeMinutes", "")
-                tiles.append(f"""          <a class="day-tile is-ready" href="{esc(day['slug'])}/" data-day="{n}">
+                # link by the lesson's own slug — that's where the page was written
+                slug = lesson.get("slug", day["slug"])
+                tiles.append(f"""          <a class="day-tile is-ready" href="{esc(slug)}/" data-day="{n}">
             <span class="day-tile-num">Day {n}</span>
             <span class="day-tile-tick" aria-hidden="true"></span>
             <span class="day-tile-title">{esc(lesson.get('title', day['title']))}</span>

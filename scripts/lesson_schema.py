@@ -261,6 +261,30 @@ def validate_corpus(lessons: list[Lesson]) -> list[str]:
     return errors
 
 
+def validate_against_course(lessons: list[Lesson], course: dict) -> list[str]:
+    """Every lesson's (day, slug) must match its entry in the course spine.
+
+    The course map links tiles by spine day; the page is written at the lesson
+    slug. If they drift, the map would 404 — catch it at build time.
+    """
+    errors: list[str] = []
+    spine: dict[int, str] = {}
+    for arc in course.get("arcs") or []:
+        for day in arc.get("days") or []:
+            spine[day.get("day")] = day.get("slug")
+    for lesson in lessons:
+        day = lesson.data.get("day")
+        slug = lesson.data.get("slug")
+        code = lesson.data.get("lessonCode", lesson.path.name)
+        if day not in spine:
+            errors.append(f"{code}: day {day} is not in the course spine (_course.yml)")
+        elif spine[day] != slug:
+            errors.append(
+                f"{code}: slug {slug!r} does not match the spine slug {spine[day]!r} for day {day}"
+            )
+    return errors
+
+
 def collect_lessons() -> list[Lesson]:
     """Load and fully validate every lesson; raise LessonError on any problem."""
     glossary = load_glossary()
@@ -271,6 +295,7 @@ def collect_lessons() -> list[Lesson]:
     for lesson in lessons:
         problems.extend(validate_lesson(lesson.data, glossary_keys))
     problems.extend(validate_corpus(lessons))
+    problems.extend(validate_against_course(lessons, load_course()))
 
     if problems:
         raise LessonError(
