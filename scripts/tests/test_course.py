@@ -69,6 +69,22 @@ class ValidationTests(unittest.TestCase):
         errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
         self.assertTrue(any("source.page" in e for e in errors), errors)
 
+    def test_wiring_is_optional(self):
+        # Setup and onboard-LED days have no circuit; a day with no wiring
+        # block must validate (the renderer skips the section and its rail entry).
+        lesson = load_day26()
+        del lesson["wiring"]
+        errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
+        self.assertEqual([e for e in errors if "wiring" in e], [],
+                         f"a diagram-less day should not raise wiring errors: {errors}")
+
+    def test_partial_wiring_still_validated(self):
+        # But a wiring block that IS present must still be complete.
+        lesson = load_day26()
+        del lesson["wiring"]["pins"]
+        errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
+        self.assertTrue(any("wiring.pins" in e for e in errors), errors)
+
     def test_unresolved_glossary_key_fails(self):
         lesson = load_day26()
         lesson["parts"]["items"][0]["explain"] = "does-not-exist"

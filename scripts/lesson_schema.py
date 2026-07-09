@@ -202,24 +202,27 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
             _require(errors, _nonempty(part.get(field)),
                      f"{code}: {where}.{field} is required")
 
-    # Wiring — diagram carries alt + source; pins have from/to/why
-    wiring = _as_dict(lesson.get("wiring"))
-    diagram = _as_dict(wiring.get("diagram"))
-    for field in ("image", "alt", "caption"):
-        _require(errors, _nonempty(diagram.get(field)),
-                 f"{code}: wiring.diagram.{field} is required")
-    src = _as_dict(diagram.get("source"))
-    for field in ("pdf", "chapter", "page"):
-        _require(errors, src.get(field) not in (None, ""),
-                 f"{code}: wiring.diagram.source.{field} is required")
-    pins = _as_list(wiring.get("pins"))
-    _require(errors, len(pins) > 0, f"{code}: wiring.pins must be non-empty")
-    for i, pin in enumerate(pins):
-        if not _require_mapping(pin, f"wiring.pins[{i}]"):
-            continue
-        for field in ("from", "to", "why"):
-            _require(errors, _nonempty(pin.get(field)),
-                     f"{code}: wiring.pins[{i}].{field} is required")
+    # Wiring — optional (setup/onboard-LED days have no circuit), but complete
+    # when present: diagram carries alt + source; pins have from/to/why. The
+    # renderer already skips an absent wiring block and its rail entry.
+    if lesson.get("wiring") is not None:
+        wiring = _as_dict(lesson.get("wiring"))
+        diagram = _as_dict(wiring.get("diagram"))
+        for field in ("image", "alt", "caption"):
+            _require(errors, _nonempty(diagram.get(field)),
+                     f"{code}: wiring.diagram.{field} is required when a wiring block is present")
+        src = _as_dict(diagram.get("source"))
+        for field in ("pdf", "chapter", "page"):
+            _require(errors, src.get(field) not in (None, ""),
+                     f"{code}: wiring.diagram.source.{field} is required when a wiring block is present")
+        pins = _as_list(wiring.get("pins"))
+        _require(errors, len(pins) > 0, f"{code}: wiring.pins must be non-empty when a wiring block is present")
+        for i, pin in enumerate(pins):
+            if not _require_mapping(pin, f"wiring.pins[{i}]"):
+                continue
+            for field in ("from", "to", "why"):
+                _require(errors, _nonempty(pin.get(field)),
+                         f"{code}: wiring.pins[{i}].{field} is required")
 
     # Steps
     steps = _as_list(_as_dict(lesson.get("steps")).get("items"))
@@ -288,8 +291,8 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
     # while the renderer iterates the raw value and crashes.)
     list_fields = [
         ("parts.items", _as_dict(lesson.get("parts")).get("items")),
-        ("wiring.pins", wiring.get("pins")),
-        ("wiring.safety", wiring.get("safety")),
+        ("wiring.pins", _as_dict(lesson.get("wiring")).get("pins")),
+        ("wiring.safety", _as_dict(lesson.get("wiring")).get("safety")),
         ("steps.items", _as_dict(lesson.get("steps")).get("items")),
         ("code.arduino.notes", arduino.get("notes")),
         ("code.micropython.notes", micro.get("notes")),
@@ -310,7 +313,7 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
 
     # Lists of mappings — each item must be a mapping with its required fields.
     mapping_specs = {
-        "wiring.safety": (_as_list(wiring.get("safety")), ("label", "body")),
+        "wiring.safety": (_as_list(_as_dict(lesson.get("wiring")).get("safety")), ("label", "body")),
         "code.arduino.notes": (_as_list(arduino.get("notes")), ("code", "text")),
         "code.micropython.notes": (_as_list(micro.get("notes")), ("code", "text")),
         "test.checks": (_as_list(test.get("checks")), ("symptom", "fix")),
