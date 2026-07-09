@@ -93,7 +93,7 @@ wiring:
       13, Echo to GPIO 14, and GND to ground on the ESP32-S3 GPIO extension board.
     caption: Official Freenove circuit — C Tutorial, Chapter 19, page 172. Production lessons keep this source and attribution.
     zoomCaption: Official Freenove circuit, C Tutorial Chapter 19, page 172.
-    source: { pdf: C_Tutorial.pdf, chapter: 19, page: 172 }
+    source: { pdf: C_Tutorial.pdf, chapter: 19, chapterTitle: Ultrasonic Ranging, page: 172 }
   pins:
     - { from: VCC,  to: 5V,      why: Powers the ultrasonic sensor.,          explain: vcc }
     - { from: Trig, to: GPIO 13, why: The board sends a short "start" pulse here., explain: trig }
@@ -167,6 +167,7 @@ code:
 
 theory:
   title: Physics of a ping
+  summary: Send a ping, wait for the echo, measure the time, and convert time into distance.
   intro: >
     The whole day is one loop, running many times a second. It's the same idea as
     counting the seconds between lightning and thunder.

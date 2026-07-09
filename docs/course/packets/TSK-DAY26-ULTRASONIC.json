@@ -12,7 +12,7 @@
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
     "officialPdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
-    "chapter": "Chapter 19",
+    "chapter": "Chapter 19 Ultrasonic Ranging",
     "page": 172,
     "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_19.1_Ultrasonic_Ranging/Sketch_19.1_Ultrasonic_Ranging.ino",
     "arduinoVariant": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_19.2_Ultrasonic_Ranging/Sketch_19.2_Ultrasonic_Ranging.ino",
@@ -118,7 +118,7 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "Trig fires; It bounces; Echo holds HIGH; Time → distance",
+    "plainLanguage": "Send a ping, wait for the echo, measure the time, and convert time into distance.",
     "formula": "distance = speed of sound × echo time ÷ 2",
     "notes": [
       {

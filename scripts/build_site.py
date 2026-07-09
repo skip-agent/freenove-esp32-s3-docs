@@ -161,8 +161,8 @@ def render_html(data: dict) -> str:
         <h1>One clean place to start tinkering without spelunking through a 200 MB ZIP.</h1>
         <p class=\"lede\">C/Arduino sketches, MicroPython examples, libraries, setup links, datasheets, and the official docs — organized as a fast searchable launchpad.</p>
         <div class=\"ctaRow\">
-          <a class=\"button primary\" href=\"./course/\">Start the 30-day course</a>
-          <a class=\"button\" href=\"#projects\">Browse the Library</a>
+          <a class=\"button primary\" href=\"#projects\">Browse projects</a>
+          <a class=\"button\" href=\"./course/\">Start the 30-day course</a>
           <a class=\"button\" href=\"{GITHUB_ZIP}\">Download official ZIP</a>
         </div>
       </div>

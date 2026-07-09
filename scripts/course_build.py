@@ -21,6 +21,7 @@ import shutil
 from pathlib import Path
 
 from lesson_schema import (
+    INLINE_TOPIC_RE,
     PACKET_SCHEMA,
     ROOT,
     Lesson,
@@ -66,6 +67,12 @@ def _define_chip(topic: str) -> str:
     return f'<button class="define" data-topic="{esc(topic)}">Define</button>'
 
 
+def _chip(block: dict) -> str:
+    """A leading-space Define chip for a block's ``explain:`` key, or ''."""
+    key = block.get("explain")
+    return f" {_define_chip(key)}" if key else ""
+
+
 def inline(text: object) -> str:
     """Render a short Markdown string to inline HTML.
 
@@ -75,25 +82,16 @@ def inline(text: object) -> str:
     out = re.sub(r"`([^`]+)`", lambda m: f"<code>{m.group(1)}</code>", out)
     out = re.sub(r"\*\*([^*]+)\*\*", lambda m: f"<strong>{m.group(1)}</strong>", out)
     out = re.sub(r"\*([^*]+)\*", lambda m: f"<em>{m.group(1)}</em>", out)
-    out = INLINE_TOPIC_SUB(out)
+    out = INLINE_TOPIC_RE.sub(lambda m: _define_chip(m.group(1)), out)
     return out
-
-
-def _topic_sub(text: str) -> str:
-    return re.sub(r"\{([a-zA-Z][a-zA-Z0-9]*)\}",
-                  lambda m: _define_chip(m.group(1)), text)
-
-
-INLINE_TOPIC_SUB = _topic_sub
 
 
 def plain_text(text: object) -> str:
     """Strip lesson markup to plain prose for the agent packet."""
     out = str(text if text is not None else "")
-    out = re.sub(r"\s*\{[a-zA-Z][a-zA-Z0-9]*\}", "", out)  # drop define chips
-    out = out.replace("`", "")
-    out = out.replace("**", "").replace("*", "")
-    return out.strip()
+    out = INLINE_TOPIC_RE.sub("", out)  # drop {glossary-key} define chips
+    out = out.replace("`", "").replace("**", "").replace("*", "")
+    return re.sub(r"\s{2,}", " ", out).strip()
 
 
 def headline_html(text: str) -> str:
@@ -236,7 +234,7 @@ def _parts_section(index: int, block: dict) -> str:
     meta = _section_meta("parts", block)
     cards = []
     for item in block.get("items") or []:
-        chip = f' {_define_chip(item["explain"])}' if item.get("explain") else ""
+        chip = _chip(item)
         cards.append(f"""              <article class="part-card">
                 <figure class="part-photo"><img src="../assets/{esc(item["image"])}" alt="{esc(item["alt"])}" /><figcaption>{esc(item["imageKind"])}</figcaption></figure>
                 <h3>{esc(item["name"])}{chip}</h3>
@@ -258,7 +256,7 @@ def _wiring_section(index: int, block: dict) -> str:
     img = esc(diagram.get("image"))
     rows = []
     for pin in block.get("pins") or []:
-        chip = f' {_define_chip(pin["explain"])}' if pin.get("explain") else ""
+        chip = _chip(pin)
         rows.append(f"""                <div class="pin-row">
                   <span class="pin-name"><span class="pin-dot"></span>{esc(pin["from"])}{chip}</span>
                   <span class="pin-arrow">→</span><span class="pin-dest">{esc(pin["to"])}</span>
@@ -321,7 +319,7 @@ def _steps_section(index: int, block: dict) -> str:
 def _code_notes(notes: list) -> str:
     out = []
     for note in notes or []:
-        chip = f' {_define_chip(note["explain"])}' if note.get("explain") else ""
+        chip = _chip(note)
         out.append(f"""                  <div class="code-note"><code>{esc(note.get("code"))}</code><span class="note-text">{inline(note.get("text"))}{chip}</span></div>""")
     return "\n".join(out)
 
@@ -374,7 +372,7 @@ def _theory_section(index: int, block: dict) -> str:
         flow.append(f"""              <article class="flow-step"><span class="n">{esc(step.get("n"))}</span><h3>{esc(step.get("title"))}</h3><p>{esc(step.get("body"))}</p></article>""")
     minis = []
     for note in block.get("notes") or []:
-        chip = f' {_define_chip(note["explain"])}' if note.get("explain") else ""
+        chip = _chip(note)
         minis.append(f"""              <article class="mini-card"><h3>{esc(note.get("title"))}{chip}</h3><p>{inline(note.get("body"))}</p></article>""")
     minis_html = ""
     if minis:
@@ -430,7 +428,7 @@ def _challenge_section(index: int, block: dict) -> str:
     meta = _section_meta("challenge", block)
     cards = []
     for card in block.get("cards") or []:
-        chip = f' {_define_chip(card["explain"])}' if card.get("explain") else ""
+        chip = _chip(card)
         cards.append(f"""              <article class="mini-card"><h3>{esc(card.get("title"))}{chip}</h3><p>{inline(card.get("body"))}</p></article>""")
     prompts = []
     for prompt in block.get("logbook") or []:
@@ -526,14 +524,13 @@ def render_lesson(lesson: dict, glossary: dict, order: list[dict]) -> str:
         "parts": _parts_section, "wiring": _wiring_section, "steps": _steps_section,
         "code": _code_section, "theory": _theory_section, "test": _test_section,
         "challenge": _challenge_section,
+        # agent takes the lesson code too, adapted to the uniform (index, block) call
+        "agent": lambda n, block: _agent_section(n, block, code),
     }
-    body_sections = []
-    for n, (kind, _meta) in enumerate(present, start=1):
-        block = lesson.get(kind) or {}
-        if kind == "agent":
-            body_sections.append(_agent_section(n, block, code))
-        else:
-            body_sections.append(renderers[kind](n, block))
+    body_sections = [
+        renderers[kind](n, lesson.get(kind) or {})
+        for n, (kind, _meta) in enumerate(present, start=1)
+    ]
 
     data = {
         "day": day,
@@ -731,9 +728,14 @@ def emit_packet(lesson: dict, glossary: dict) -> dict:
             return str(glossary[key].get("body", "")).strip()
         return plain_text(part.get("blurb"))
 
+    chapter = None
+    if src.get("chapter"):
+        chapter = f"Chapter {src['chapter']}"
+        if src.get("chapterTitle"):
+            chapter += f" {src['chapterTitle']}"
     source_meta = {
         "officialPdf": f"{SOURCE_PREFIX}/C/{src.get('pdf')}" if src.get("pdf") else None,
-        "chapter": f"Chapter {src.get('chapter')}" if src.get("chapter") else None,
+        "chapter": chapter,
         "page": src.get("page"),
     }
     if arduino.get("sketch"):
@@ -785,7 +787,8 @@ def emit_packet(lesson: dict, glossary: dict) -> dict:
             for n in micro["notes"]
         ]
     packet["theoryModel"] = {
-        "plainLanguage": "; ".join(str(f.get("title")) for f in theory.get("flow") or []),
+        "plainLanguage": plain_text(theory.get("summary"))
+        or "; ".join(str(f.get("title")) for f in theory.get("flow") or []),
         "formula": plain_text(theory.get("formula")),
         "notes": [{"title": n.get("title"), "body": plain_text(n.get("body"))}
                   for n in theory.get("notes") or []],
