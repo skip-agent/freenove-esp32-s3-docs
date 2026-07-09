@@ -1,0 +1,291 @@
+# Day 16 — Soft colourful light · tinyskiff.lesson.v1
+# One source of truth: this file renders to the guided page
+# (/course/day-16-soft-colour/), the agent packet, and the course-map entry.
+# Day 15's knob times three — three inputs mapped straight onto three colour channels.
+
+schema: tinyskiff.lesson.v1
+lessonCode: TSK-DAY16-SOFTCOLOUR
+day: 16
+slug: day-16-soft-colour
+title: 'Soft colourful light: map input to colour'
+status: published
+estimatedTimeMinutes: 25
+tracks: { main: arduino, optional: micropython }
+learnerProfile: adult beginner; curious and capable; no electronics assumed
+
+mission: >
+  Wire three knobs to three input pins and the RGB LED to three PWM pins, upload
+  the Arduino sketch, and turn the knobs to mix any colour by hand — a small
+  mixing desk where each knob owns one channel of light.
+unlocks: One loop can run three read-map-write chains side by side, so a few lines of code control a whole bank of channels at once.
+seoDescription: >
+  Wire three potentiometers and an RGB LED to the ESP32-S3, upload the sketch,
+  and mix colours by hand — each knob maps its reading onto one PWM colour
+  channel in real time.
+
+hero:
+  instrument: none
+  headline: Mix your own colour|with three {knobs}
+  lede: >
+    Today the colour mixing moves into your hands. Three knobs each feed a reading
+    to the board, and each reading sets the brightness of one colour in the RGB
+    dome — red, green, and blue on their own channels. Turn them together and you
+    are mixing light the way a deckhand trims three sheets at once.
+  pills:
+    - { text: About 25 minutes, key: true }
+    - Arduino first
+    - MicroPython optional
+    - Day 9's dome meets Day 15's knob
+
+parts:
+  intro: >
+    Seven things, and every one of them has been aboard before. Tap *Define* on
+    any part you haven't met — the answer opens as a field note you can read and
+    dismiss without losing your place.
+  items:
+    - name: ESP32-S3 board
+      image: shared/item-esp32-s3-board.jpg
+      imageKind: Manual photo
+      alt: Official manual photo of the ESP32-S3 development board.
+      blurb: The brain that runs your uploaded sketch.
+      explain: esp32
+    - name: GPIO extension board
+      image: shared/item-gpio-extension-board.png
+      imageKind: Manual photo
+      alt: Official manual image of the ESP32-S3 GPIO extension board.
+      blurb: Spreads the pins into rows you can reach and label.
+      explain: gpio
+    - name: 3 × rotary potentiometers
+      image: shared/item-potentiometer.png
+      imageKind: Manual photo
+      alt: Official manual photo of a rotary potentiometer with its three legs visible.
+      blurb: Three knobs — one for each colour channel.
+      explain: potentiometer
+    - name: RGB LED
+      image: shared/item-rgb-led.png
+      imageKind: Manual photo
+      alt: Official manual photo of an RGB LED showing its long common pin and three colour legs.
+      blurb: Three lights — red, green, blue — in one dome with a shared pin.
+      explain: rgb
+    - name: 3 × 220 Ω resistors
+      image: shared/item-resistor.png
+      imageKind: Manual photo
+      alt: Official manual photo of a resistor with coloured value bands.
+      blurb: One in series with each colour leg to keep the current gentle.
+      explain: resistor
+    - name: Jumper wires
+      image: shared/item-jumper-wire.png
+      imageKind: Manual photo
+      alt: Official manual image of a jumper wire.
+      blurb: Temporary, solder-free connections — thirteen of them today.
+      explain: jumpers
+    - name: Arduino IDE
+      image: shared/item-arduino-ide.png
+      imageKind: Manual screenshot
+      alt: Official manual screenshot of the Arduino IDE interface.
+      blurb: Uploads the sketch to the board.
+      explain: arduino
+
+wiring:
+  intro: >
+    The official Freenove diagram is your chart — schematic on top, the same
+    circuit built on a breadboard below. Click it to enlarge. The pairing to keep
+    in your head: the knob on GPIO 12 drives the red leg on GPIO 38, 13 drives
+    green on 39, and 14 drives blue on 40.
+  diagram:
+    image: day-16/circuit-page-113.png
+    alt: >-
+      Official Freenove circuit for soft colourful light: three rotary
+      potentiometers with their middle pins on GPIO 12, 13, and 14, and an RGB
+      LED whose red, green, and blue legs run through 220 ohm resistors to GPIO
+      38, 39, and 40, with the long common pin joined to 3.3 volts, shown as
+      both a schematic and a breadboard photo.
+    caption: Official Freenove circuit — C Tutorial, Chapter 10 (Potentiometer & LED), page 113.
+    zoomCaption: Official Freenove circuit, C Tutorial Chapter 10, page 113.
+    source: { pdf: C_Tutorial.pdf, chapter: 10, chapterTitle: Potentiometer & LED, page: 113 }
+  pins:
+    - { from: Red knob middle pin, to: GPIO 12, why: The board reads this knob to set how much red shows., explain: adc }
+    - { from: Green knob middle pin, to: GPIO 13, why: The board reads this knob to set how much green shows., explain: potentiometer }
+    - { from: Blue knob middle pin, to: GPIO 14, why: The board reads this knob to set how much blue shows. }
+    - { from: Each knob's outer legs, to: 3.3V and GND, why: The two ends give the middle pin a full sweep from zero to full voltage., explain: gnd }
+    - { from: Red leg (via 220 Ω), to: GPIO 38, why: PWM on this pin sets the red brightness., explain: pwm }
+    - { from: Green leg (via 220 Ω), to: GPIO 39, why: PWM on this pin sets the green brightness. }
+    - { from: Blue leg (via 220 Ω), to: GPIO 40, why: PWM on this pin sets the blue brightness., explain: rgb }
+    - { from: Common (long) pin, to: 3.3V, why: All three colours share this positive pin so a colour lights when its pin goes LOW., explain: commonAnode }
+  safety:
+    - label: The common pin goes to 3.3V.
+      icon: "⚓"
+      body: >
+        This is the same common-anode LED as Day 9 — the long common pin goes to
+        3.3V, the opposite of a single LED's ground leg. Each colour leg reaches
+        its own GPIO through a 220 Ω resistor. Unplug USB before you move any wire.
+
+steps:
+  intro: >
+    This is the main path — you can finish the day without opening a single field
+    note. Tap each step as you go to keep your place.
+  items:
+    - Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.
+    - Place the three potentiometers on the breadboard with room to turn each knob. {potentiometer}
+    - Wire each knob's outer legs to 3.3V and GND so its middle pin can sweep the full range.
+    - Run the middle pins to GPIO 12, 13, and 14 — red, green, and blue in that order. {adc}
+    - Wire the RGB LED's red leg through a 220 Ω resistor to GPIO 38, green to GPIO 39, blue to GPIO 40. {resistor}
+    - Run the LED's long common pin to 3.3V. {commonAnode}
+    - Compare every wire to the chart before you plug in USB.
+    - Open `Sketch_10.2_SoftColorfulLight.ino` in Arduino IDE and upload it.
+    - Turn each knob in turn and watch its colour rise and fall in the dome.
+  done:
+    icon: "💡"
+    title: Your own mixing desk.
+    body: Three knobs now hold the colour between them. Head to Test & debug to confirm each channel answers its own knob.
+
+code:
+  intro: >
+    Day 15 built one chain — read a knob, rescale it, write a brightness. Today
+    the sketch runs that chain three times per pass using three small arrays and
+    one loop. Switch to MicroPython if you'd rather see the same idea in Python —
+    the wiring never changes.
+  arduino:
+    file: Sketch_10.2_SoftColorfulLight.ino
+    sketch: C/Sketches/Sketch_10.2_SoftColorfulLight/Sketch_10.2_SoftColorfulLight.ino
+    excerpt: |
+      const byte adcChns[] = {12, 13, 14};    // define the adc channels
+      const byte ledPins[] = {38, 39, 40};    // define led pins
+      const byte pwmChns[] = { 0,  1,  2};    // define the pwm channels
+      int colors[] = {0, 0, 0};               // red, green ,blue values of color.
+      void setup() {
+        for (int i = 0; i < 3; i++) {         //setup the pwm channels
+          ledcAttachChannel(ledPins[i], 1000, 8, pwmChns[i]);//1KHz, 8bit(0-255).
+        }
+      }
+
+      void loop() {
+        for (int i = 0; i < 3; i++) {
+          colors[i] = map(analogRead(adcChns[i]), 0, 4096, 0, 255); //calculate color value.
+          ledcWrite(ledPins[i], 256 - colors[i]);                   //set color
+        }
+        delay(10);
+      }
+    notes:
+      - code: const byte adcChns[] = {12, 13, 14}
+        text: Three matched arrays pair each knob with a colour leg — position 0 links the knob on 12 to the red leg on 38 and so on down the line.
+        explain: pinArray
+      - code: colors[i] = map(analogRead(adcChns[i]), 0, 4096, 0, 255)
+        text: Reads one knob (0–4095) and rescales it onto the 0–255 brightness range in a single line.
+        explain: mapValue
+      - code: ledcWrite(ledPins[i], 256 - colors[i])
+        text: Day 9's common-anode inversion — this dome lights when its pin goes LOW so the sketch subtracts the value before writing it.
+        explain: commonAnode
+      - code: ledcAttachChannel(ledPins[i], 1000, 8, pwmChns[i])
+        text: Gives each colour leg its own hardware PWM channel at 1 kHz with 8-bit brightness.
+        explain: ledc
+  micropython:
+    file: 09.2_Soft_Colorful_Light/Soft_Colorful_Light.py
+    path: Python/Python_Codes/09.2_Soft_Colorful_Light/Soft_Colorful_Light.py
+    optionalTag: Optional side path · same circuit
+    excerpt: |
+      pwm0=PWM(Pin(40,Pin.OUT),10000)
+      pwm1=PWM(Pin(39,Pin.OUT),10000)
+      pwm2=PWM(Pin(38,Pin.OUT),10000)
+      adc0=ADC(Pin(12))
+      adc1=ADC(Pin(13))
+      adc2=ADC(Pin(14))
+
+      pwm0.duty(1023-remap(adc0.read(),0,4095,0,1023))
+      pwm1.duty(1023-remap(adc1.read(),0,4095,0,1023))
+      pwm2.duty(1023-remap(adc2.read(),0,4095,0,1023))
+    notes:
+      - code: pwm0.duty(1023-remap(adc0.read(),0,4095,0,1023))
+        text: The whole chain in one line — read the knob, rescale to the 10-bit duty range, and subtract for the common-anode dome.
+    note: >
+      Same wiring, one difference to expect: Freenove's Python version pairs the
+      knobs to the colours in the reverse order — the knob on GPIO 12 drives the
+      leg on GPIO 40 — and both pairings work fine. Run it in Thonny if
+      MicroPython is set up; otherwise skip it — it should never block the
+      Arduino-first path.
+
+theory:
+  title: Three chains, one loop
+  summary: The same read-map-write chain runs three times per pass — arrays hold the pin numbers and the loop walks them.
+  intro: >
+    Day 15's single control chain — read the knob, rescale the number, write the
+    brightness — appears here three times over, copied by a loop over three
+    arrays.
+  flow:
+    - { n: Read three, title: Knobs in, body: analogRead measures each knob on GPIO 12 13 14 every pass. }
+    - { n: Rescale, title: map(), body: Each reading up to 4095 becomes a colour value from 0 to 255. }
+    - { n: Invert, title: 256 minus, body: The common-anode dome lights when its pin goes LOW so the sketch flips the scale before writing. }
+    - { n: Repeat, title: Every 10 ms, body: The loop refreshes all three channels fast enough that the colour rides your hands. }
+  formulaLabel: The model
+  formula: '**colour** = three knob readings → three mapped brightnesses'
+  notes:
+    - title: Why arrays and a loop
+      explain: pinArray
+      body: Writing the pins as three matched arrays lets one loop serve every channel. Adding a fourth channel would mean one more entry in each array and nothing else.
+    - title: The same inversion as Day 9
+      explain: commonAnode
+      body: The common pin sits at 3.3V, so a colour is brightest when its own pin is pulled LOW. Subtracting the value from 256 flips the scale so a bigger knob reading still means a brighter colour.
+
+test:
+  mode: visual
+  intro: >
+    Nothing prints to the screen today — the proof is the colour under your
+    fingers.
+  expectedTitle: What you should see
+  readoutLabel: RGB LED
+  expected:
+    - Turn one knob and one colour sweeps smoothly from dark to full while the other two hold steady.
+    - Set the knobs in combinations and the dome mixes the shades — red and green up makes yellow.
+    - All three knobs up glows white; all three down leaves the dome dark.
+  expectedNote: Every knob turned down means darkness by design — white takes all three channels at full.
+  checksTitle: If it doesn't
+  checks:
+    - symptom: "One colour never changes?"
+      fix: "Check that knob's middle wire on GPIO 12, 13, or 14 — the board is reading air."
+    - symptom: "Turning the red knob changes the wrong colour?"
+      fix: "The RGB legs are in the wrong order — red goes to GPIO 38, green to 39, blue to 40."
+    - symptom: "The dome stays dark with knobs up?"
+      fix: "Check the common pin — it goes to 3.3V."
+    - symptom: "Upload fails?"
+      fix: "Swap in a data-capable USB cable."
+
+challenge:
+  title: "Try this: dial a sunset"
+  railLabel: Try this
+  intro: >
+    Same working circuit, two experiments — one with your hands, one with a
+    single line of code. It fits inside today's 25 minutes.
+  summary: Dial the dome to sunset orange and record the three knob levels, then rewrite one line so two knobs mix the whole colour.
+  cards:
+    - title: Dial a sunset
+      explain: rgb
+      body: Turn the knobs until the dome glows sunset orange — red high, green partway, blue low. Write down roughly where each knob sits, as three numbers from 0 to 255.
+    - title: Two-knob mixer
+      explain: pinArray
+      body: In the loop, make the blue channel reuse the green knob's value — set `colors[2] = colors[1]` after the map line — and the mix now lives on two knobs.
+  logbook:
+    - What three numbers made your sunset orange?
+    - Which colour surprised you most when you mixed it?
+    - With blue riding the green knob, which colours could you no longer reach?
+
+agent:
+  intro: >
+    Every lesson ships with a code and a machine-readable packet, so an agent can
+    guide you with full context.
+  behaviour: >
+    guide one physical connection at a time, wait for you to confirm, explain the
+    knob-to-colour pairing on request, and always check wiring, board, port, and
+    USB before changing code.
+  coachInstructions:
+    - Anchor the pairing early — knob on GPIO 12 drives red on 38, 13 drives green on 39, 14 drives blue on 40 — and have the learner say it back before debugging.
+    - If one colour never changes, check that knob's middle wire on 12/13/14 and its outer legs on 3.3V and GND before touching code.
+    - If turning a knob moves the wrong colour, the RGB legs are swapped on 38/39/40 — fix the order rather than the sketch.
+    - If the dome is always dark, check the common pin reaches 3.3V; also confirm all three knobs turned down is correct dark behaviour before treating it as a fault.
+    - The 256-minus inversion is Day 9's common-anode trick — explain it on request and keep the sketch's map upper bound of 4096 exactly as written.
+    - Keep the Arduino path primary; MicroPython pairs the knobs to colours in reverse order (12 drives 40) and that difference is expected, so never "fix" it.
+
+source:
+  license: CC BY-NC-SA 3.0
+  licenseNote: >
+    Based on Freenove official material released under CC BY-NC-SA 3.0; preserve
+    attribution and non-affiliation language.

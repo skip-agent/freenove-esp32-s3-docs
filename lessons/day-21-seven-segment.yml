@@ -1,0 +1,298 @@
+# Day 21 — Seven-segment display · tinyskiff.lesson.v1
+# One source of truth: this file renders to the guided page
+# (/course/day-21-seven-segment/), the agent packet, and the course-map entry.
+# Same three wires as Day 20 — the shift register now draws a digit you can read.
+
+schema: tinyskiff.lesson.v1
+lessonCode: TSK-DAY21-SEVENSEG
+day: 21
+slug: day-21-seven-segment
+title: "Seven-segment display: show one clear digit"
+status: published
+estimatedTimeMinutes: 30
+tracks: { main: arduino, optional: micropython }
+learnerProfile: adult beginner; curious and capable; no electronics assumed
+
+mission: >
+  Wire Day 20's 74HC595 to a 7-segment display, upload the Arduino sketch, and
+  watch the display count 0 through F, one character per second — the same
+  three wires from the board now draw a shape you can read at a glance.
+unlocks: One byte can be a picture — eight bits mapped onto eight segments turn the shift register's outputs into a readable character.
+seoDescription: >
+  Drive a 7-segment display from the ESP32-S3 with a 74HC595 shift register.
+  Upload the sketch and watch it count 0 through F — one byte per character,
+  three wires from the board.
+
+hero:
+  instrument: none
+  headline: Turn one byte|into a {digit}
+  lede: >
+    Today the shift register earns its keep. You wire its eight outputs to a
+    7-segment display, upload a sketch that sends one pattern byte per
+    character, and the display counts 0 through F — a readable digit from the
+    same three wires you ran on Day 20.
+  pills:
+    - { text: About 30 minutes, key: true }
+    - Arduino first
+    - MicroPython optional
+    - Same three wires as Day 20
+
+parts:
+  intro: >
+    Six things, and two of them are old friends from Day 20. Tap *Define* on any
+    part you haven't met — the answer opens as a field note you can read and
+    dismiss without losing your place.
+  items:
+    - name: ESP32-S3 board
+      image: shared/item-esp32-s3-board.jpg
+      imageKind: Manual photo
+      alt: Official manual photo of the ESP32-S3 development board.
+      blurb: The brain that runs your uploaded sketch.
+      explain: esp32
+    - name: GPIO extension board
+      image: shared/item-gpio-extension-board.png
+      imageKind: Manual photo
+      alt: Official manual image of the ESP32-S3 GPIO extension board.
+      blurb: Spreads the pins into rows you can reach and label.
+      explain: gpio
+    - name: 74HC595 shift register
+      image: shared/item-74hc595.png
+      imageKind: Manual photo
+      alt: Official manual photo of the 74HC595 shift register chip with its pins labelled.
+      blurb: Day 20's chip — takes a byte in on three wires and holds it on eight outputs.
+      explain: shiftRegister
+    - name: 7-segment display
+      image: shared/item-seven-segment.png
+      imageKind: Manual photo
+      alt: Official manual photo of a one-digit seven-segment display module with its pins numbered 10, 6, 1, and 5 at the corners.
+      blurb: Eight lit bars arranged as a figure — together they draw one character.
+      explain: sevenSegment
+    - name: 8 × 220 Ω resistors
+      image: shared/item-resistor.png
+      imageKind: Manual photo
+      alt: Official manual photo of a resistor with coloured value bands.
+      blurb: One per segment, each keeping its own current gentle.
+      explain: resistor
+    - name: Jumper wires
+      image: shared/item-jumper-wire.png
+      imageKind: Manual photo
+      alt: Official manual image of a jumper wire.
+      blurb: Temporary, solder-free connections.
+      explain: jumpers
+
+wiring:
+  intro: >
+    The official Freenove diagram is your chart — schematic on top, the same
+    circuit built on a breadboard below. Click it to enlarge. The three control
+    wires are exactly where Day 20 left them; today's work is the eight resistor
+    paths from the chip's outputs to the display's segments.
+  diagram:
+    image: day-21/circuit-page-140.png
+    alt: >-
+      Official Freenove circuit for the 7-segment display: a 74HC595 shift
+      register driven from GPIO 12, 13, and 14, its eight outputs wired through
+      220 ohm resistors to the segments of a one-digit display, shown as both a
+      schematic and a breadboard photo.
+    caption: Official Freenove circuit — C Tutorial, Chapter 15 (74HC595 & 7-Segment Display), page 140.
+    zoomCaption: Official Freenove circuit, C Tutorial Chapter 15, page 140.
+    source: { pdf: C_Tutorial.pdf, chapter: 15, chapterTitle: 74HC595 & 7-Segment Display, page: 140 }
+  pins:
+    - { from: GPIO 12, to: 74HC595 DS (pin 14), why: Carries each bit of the pattern byte into the chip., explain: shiftRegister }
+    - { from: GPIO 13, to: 74HC595 ST_CP (pin 12), why: The latch — a low-high pulse shows the finished byte on all eight outputs at once. }
+    - { from: GPIO 14, to: 74HC595 SH_CP (pin 11), why: The clock tick that moves each bit one place along., explain: shiftOut }
+    - { from: 74HC595 Q0-Q7, to: segments A-G and DP via 220 Ω each, why: Each output drives one segment through its own resistor., explain: sevenSegment }
+    - { from: Display common pins (3 and 8), to: positive rail (3.3V/5V), why: Feeds the shared anode so a 0 bit can light its segment. }
+  safety:
+    - label: Mind the chip and the display's orientation.
+      icon: "⚓"
+      body: >
+        Seat the 74HC595 with its notch matching the diagram, and place the
+        display the way the breadboard photo shows — its segments only line up
+        with the right Q pins one way round. Unplug USB before you move any wire.
+
+steps:
+  intro: >
+    This is the main path — you can finish the day without opening a single
+    field note. Tap each step as you go to keep your place.
+  items:
+    - Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.
+    - Straddle the 74HC595 across the breadboard's centre gap with its notch matching the diagram — the same seat as Day 20. {shiftRegister}
+    - Place the 7-segment display nearby the way the breadboard photo shows, and find its two common pins (3 and 8). {sevenSegment}
+    - Run the three control wires — GPIO 12 to DS, GPIO 13 to ST_CP, GPIO 14 to SH_CP.
+    - Wire each chip output Q0 through Q7 to its segment through its own 220 Ω resistor, following the diagram one row at a time. {resistor}
+    - Wire the display's common pins (3 and 8) to the positive rail so the shared anode has power.
+    - Compare every wire to the chart before you plug in USB.
+    - Open `Sketch_15.1_1_Digit_7-Segment_Display.ino` in Arduino IDE and upload it.
+    - Watch the display count 0 through F, one character per second.
+  done:
+    icon: "🔢"
+    title: A digit you can read.
+    body: The board is drawing characters now, one byte each. Head to Test & debug to confirm the full count.
+
+code:
+  intro: >
+    The sketch keeps Day 20's `writeData()` helper word for word. The new piece
+    is a table of sixteen bytes — one ready-made segment pattern per character —
+    and a loop that sends them one per second. Switch to MicroPython if you'd
+    rather see the same idea in Python — the wiring never changes.
+  arduino:
+    file: Sketch_15.1_1_Digit_7-Segment_Display.ino
+    sketch: C/Sketches/Sketch_15.1_1_Digit_7-Segment_Display/Sketch_15.1_1_Digit_7-Segment_Display.ino
+    excerpt: |
+      int dataPin  = 12;          // Pin connected to DS of 74HC595（Pin14）
+      int latchPin = 13;          // Pin connected to ST_CP of 74HC595（Pin12）
+      int clockPin = 14;          // Pin connected to SH_CP of 74HC595（Pin11）
+
+      // Define the encoding of characters 0-F for the common-anode 7-Segment Display
+      byte num[] = {
+        0xc0, 0xf9, 0xa4, 0xb0, 0x99, 0x92, 0x82, 0xf8,
+        0x80, 0x90, 0x88, 0x83, 0xc6, 0xa1, 0x86, 0x8e
+      };
+
+      void setup() {
+        // set pins to output
+        pinMode(latchPin, OUTPUT);
+        pinMode(clockPin, OUTPUT);
+        pinMode(dataPin, OUTPUT);
+      }
+
+      void loop() {
+        // display 0-F on digital tube
+        for (int i = 0; i < 16; i++) {
+          writeData(num[i]);// Send data to 74HC595
+          delay(1000);      // delay 1 second
+          writeData(0xff);  // Clear the display content
+        }
+      }
+
+      void writeData(int value) {
+        // Make latchPin output low level
+        digitalWrite(latchPin, LOW);
+        // Send serial data to 74HC595
+        shiftOut(dataPin, clockPin, LSBFIRST, value);
+        // Make latchPin output high level, then 74HC595 will update the data to parallel output
+        digitalWrite(latchPin, HIGH);
+      }
+    notes:
+      - code: byte num[]
+        text: Sixteen ready-made segment patterns — one byte per character, 0 through F.
+        explain: sevenSegment
+      - code: shiftOut(dataPin, clockPin, LSBFIRST, value)
+        text: Clocks the byte into the chip one bit at a time — the same move as Day 20.
+        explain: shiftOut
+      - code: writeData(0xff)
+        text: All eight bits set to 1 means every segment off — this line blanks the display.
+      - code: delay(1000)
+        text: Holds each character on the display for one full second.
+        explain: delayMs
+  micropython:
+    file: 14.1_74HC595_and_7_segment_display/74HC595_and_7_segment_display.py
+    path: Python/Python_Codes/14.1_74HC595_and_7_segment_display/74HC595_and_7_segment_display.py
+    optionalTag: Optional side path · same circuit
+    excerpt: |
+      from my74HC595 import Chip74HC595
+
+      lists =[0xc0, 0xf9, 0xa4, 0xb0, 0x99, 0x92, 0x82, 0xf8,
+              0x80, 0x90, 0x88, 0x83, 0xc6, 0xa1, 0x86, 0x8e]
+
+      chip = Chip74HC595(12,13,14)
+      for count in range(16):
+          chip.shiftOut(0,lists[count])
+          time.sleep_ms(500)
+    notes:
+      - code: Chip74HC595(12,13,14)
+        text: A helper class wraps the chip — same three pins in the same order as the Arduino sketch.
+      - code: chip.shiftOut(0,lists[count])
+        text: Sends one pattern byte; the 0 picks lowest-bit-first order, matching LSBFIRST in Arduino.
+    note: >
+      Same chip, same table of bytes. This version paces at 500 ms per character
+      and skips the blanking write between them, so it counts twice as fast. Run
+      it in Thonny if MicroPython is set up; otherwise skip it — it should never
+      block the Arduino-first path.
+
+theory:
+  title: A byte is a picture
+  summary: Eight segments line up with eight bits, so one byte holds a whole character — and on this display a 0 bit is what lights a segment.
+  intro: >
+    The display is eight little lights arranged as a figure. Feed them the right
+    on-off pattern and your eye reads a character — the code table is just
+    sixteen of those patterns, stored and ready.
+  flow:
+    - { n: Eight lights, title: Eight bits, body: Segments A through G plus the decimal point line up with the eight bits of one byte. }
+    - { n: Zero lights, title: Common anode, body: All segments share the positive rail so a 0 bit pulls its segment low and lights it., explain: commonAnode }
+    - { n: Look it up, title: The code table, body: The table stores one ready-made pattern per character from 0 to F. }
+    - { n: Deliver it, title: Shift and latch, body: The 74HC595 from Day 20 carries the byte in on three wires and holds it on eight outputs. }
+  formulaLabel: The model
+  formula: character → **one byte** → eight segments → a shape you can read
+  notes:
+    - title: How the byte maps to segments
+      explain: sevenSegment
+      body: From the top bit down the order is DP G F E D C B A. So 0xc0 is 1100 0000 — DP and G stay dark while the other six light up and draw a 0.
+    - title: Why 0 means on
+      explain: commonAnode
+      body: This display is common anode — every segment's positive side is tied to the rail, so an output has to sit LOW to let current flow and light its segment. 0xff is all HIGH, which is a blank display.
+
+test:
+  mode: visual
+  intro: >
+    Nothing prints to the screen today — the proof is the count running on the
+    display in front of you.
+  expectedTitle: What you should see
+  readoutLabel: Display
+  expected:
+    - The display counts 0 1 2 3 4 5 6 7 8 9 then A b C d E F — one character per second.
+    - After F it wraps back to 0 and the count runs again.
+    - Each character sits steady for its full second.
+  expectedNote: Lowercase b and d are deliberate — with all seven segments a capital B would read as 8 and a capital D as 0.
+  checksTitle: If it doesn't
+  checks:
+    - symptom: "Every segment lit, all the time?"
+      fix: "The patterns aren't reaching the chip — check the latch wire on GPIO 13."
+    - symptom: "One segment never lights?"
+      fix: "Trace that segment's 220 Ω wire back to its Q pin on the chip."
+    - symptom: "Shapes are nonsense?"
+      fix: "Segment wires are on the wrong Q pins — re-check them against the diagram one row at a time."
+    - symptom: "Display completely dark?"
+      fix: "Run Day 20's chip power and orientation checklist, then confirm the common pins (3 and 8) reach the positive rail."
+
+challenge:
+  title: "Try this: draw your own byte"
+  railLabel: Try this
+  intro: >
+    Same working circuit, three small moves — pick a digit, change the pace, and
+    invent one character the table never had. It fits inside today's 30 minutes.
+  summary: Show your favourite digit from power-on, slow the count, then work out the byte for the letter H and put it on the display.
+  cards:
+    - title: Pick a boot digit
+      body: Add a `writeData(num[7])` call at the end of `setup()` and empty out `loop()` — your favourite digit (swap the 7) now holds steady from the moment power arrives.
+    - title: Slow the count
+      explain: delayMs
+      body: Change `delay(1000)` to 2000 and upload — each character now holds for two seconds. Find a pace you could actually read across the room.
+    - title: Draw an H
+      body: Segments F E G B C make an H, and in bit order DP G F E D C B A that pattern is the byte `0x89`. Call `writeData(0x89)` and check the shape that appears.
+  logbook:
+    - Which character surprised you when it appeared, and why?
+    - What byte would draw the first letter of your name — and can this display manage it?
+    - Where in daily life did you last read a seven-segment digit?
+
+agent:
+  intro: >
+    Every lesson ships with a code and a machine-readable packet, so an agent can
+    guide you with full context.
+  behaviour: >
+    guide one physical connection at a time, wait for you to confirm, explain
+    terms on request, and always check wiring, board, port, and USB before
+    changing code.
+  coachInstructions:
+    - Confirm the three Day 20 control wires first (GPIO 12 to DS, GPIO 13 to ST_CP, GPIO 14 to SH_CP) before touching the eight segment wires.
+    - The eight resistor paths from Q0-Q7 to the segments are today's main failure surface — have the learner verify them against the diagram one row at a time.
+    - If every segment is always lit, check the latch wire on GPIO 13 — the patterns are likely never reaching the outputs.
+    - If one segment never lights, trace that segment's 220 Ω wire back to its Q pin before changing code.
+    - If the display is completely dark, re-run Day 20's chip power and orientation checks, then confirm the common pins (3 and 8) reach the positive rail.
+    - Keep the Arduino path primary; the MicroPython version paces at 500 ms per character with no blanking, which is expected.
+
+source:
+  license: CC BY-NC-SA 3.0
+  licenseNote: >
+    Based on Freenove official material released under CC BY-NC-SA 3.0; preserve
+    attribution and non-affiliation language.

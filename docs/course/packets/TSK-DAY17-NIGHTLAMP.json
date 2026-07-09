@@ -1,0 +1,186 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY17-NIGHTLAMP",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 17,
+  "title": "Night lamp: respond to ambient light",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 25,
+  "mission": "Wire a photoresistor and a 10 kΩ resistor into a voltage divider on GPIO 1, put an LED on GPIO 14, upload the Arduino sketch, and watch the lamp shift brightness as you cover and light the sensor — the first day the board senses the room on its own.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "officialPdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+    "chapter": "Chapter 11 Photoresistor & LED",
+    "page": 118,
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_11.1_NightLamp/Sketch_11.1_NightLamp.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/10.1_NightLamp/NightLamp.py",
+    "imageAsset": "docs/course/assets/day-17/circuit-page-118.png",
+    "imageAlt": "Official Freenove circuit for the night lamp: a photoresistor and a 10 kilo-ohm resistor forming a voltage divider into GPIO 1, and an LED on GPIO 14 through a 220 ohm resistor, shown as both a schematic and a breadboard photo.",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "GPIO extension board",
+      "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
+      "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
+    },
+    {
+      "name": "Photoresistor",
+      "imageAsset": "docs/course/assets/shared/item-photoresistor.png",
+      "explanation": "A photoresistor changes resistance with light: bright light drops the resistance, darkness raises it. On its own the board can't read resistance — pair it with a fixed resistor as a voltage divider and the changing light becomes a changing voltage on an ADC pin."
+    },
+    {
+      "name": "LED",
+      "imageAsset": "docs/course/assets/shared/item-led.png",
+      "explanation": "A LED is a one-way light. It only lights when its longer leg (the +) faces the pin and its shorter leg (the −) faces ground. Too much current burns it out, so a LED always sits behind a resistor."
+    },
+    {
+      "name": "220 Ω resistor",
+      "imageAsset": "docs/course/assets/shared/item-resistor.png",
+      "explanation": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction."
+    },
+    {
+      "name": "10 kΩ resistor",
+      "imageAsset": "docs/course/assets/shared/item-resistor.png",
+      "explanation": "Two resistances in series split the supply voltage at their midpoint in proportion to their values. Make one of them a sensor — a photoresistor or a thermistor — and the midpoint voltage moves as the sensor's resistance moves. That midpoint is exactly what the ADC pin reads."
+    },
+    {
+      "name": "4 jumper wires",
+      "imageAsset": "docs/course/assets/shared/item-jumper-wire.png",
+      "explanation": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles."
+    }
+  ],
+  "wiring": [
+    {
+      "partPin": "10 kΩ resistor",
+      "connectTo": "3.3V and the divider midpoint",
+      "reason": "The fixed top half of the voltage divider."
+    },
+    {
+      "partPin": "Photoresistor",
+      "connectTo": "divider midpoint and GND",
+      "reason": "Its light-driven resistance sets the midpoint voltage."
+    },
+    {
+      "partPin": "Divider midpoint",
+      "connectTo": "GPIO 1",
+      "reason": "The ADC reads the light level here."
+    },
+    {
+      "partPin": "LED long leg (+)",
+      "connectTo": "GPIO 14 via 220 Ω",
+      "reason": "This pin sets the lamp's brightness with PWM."
+    },
+    {
+      "partPin": "LED short leg (−)",
+      "connectTo": "GND",
+      "reason": "Completes the LED's path back to zero volts."
+    }
+  ],
+  "coachInstructions": [
+    "Guide one physical connection at a time and wait for learner confirmation before proceeding.",
+    "The divider midpoint to GPIO 1 is the crux — if the LED never changes, check the photoresistor's legs and that midpoint wire before touching code.",
+    "If the LED sits at full brightness, suspect the divider is on the wrong rail — verify the 10 kΩ goes to 3.3V and the photoresistor's far leg to GND against the chart.",
+    "If nothing lights, check the LED's direction, the 220 Ω resistor, and the GPIO 14 wire before changing code.",
+    "The direction of the brightness change depends on the divider's orientation — treat \"cover shifts it one way and a torch shifts it back\" as success rather than insisting on a particular direction.",
+    "Keep the Arduino path primary; MicroPython is optional only if already set up, and its gentler response curve (10-bit duty with the full 0–4095 window) is expected to differ from Arduino's."
+  ],
+  "steps": [
+    "Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.",
+    "Place the photoresistor on the breadboard — its two legs are interchangeable.",
+    "Run the 10 kΩ resistor from the 3.3V rail to one leg of the photoresistor, and take the photoresistor's other leg to GND.",
+    "Wire the point where the resistor and the photoresistor meet — the divider's midpoint — to GPIO 1.",
+    "Place the LED so its long leg (+) heads toward GPIO 14 and its short leg (−) toward ground.",
+    "Put the 220 Ω resistor in series between GPIO 14 and the LED's long leg.",
+    "Compare every wire to the chart before you plug in USB.",
+    "Open Sketch_11.1_NightLamp.ino in Arduino IDE and upload it.",
+    "Cup a hand over the photoresistor, then light it with a phone torch — watch the LED answer each move."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "analogRead(PIN_ANALOG_IN)",
+        "explanation": "Reads the divider's midpoint voltage on GPIO 1 as a number from 0 to 4095."
+      },
+      {
+        "line": "constrain(adcVal, LIGHT_MIN, LIGHT_MAX)",
+        "explanation": "Fences the reading inside the 372–2048 window before map stretches that window across the full brightness scale — this is where constrain earns its keep."
+      },
+      {
+        "line": "ledcWrite(PIN_LED, pwmVal)",
+        "explanation": "Sets the lamp's brightness on GPIO 14 — 0 is dark and 4095 is full."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "adc.atten(ADC.ATTN_11DB)",
+        "explanation": "Widens the ADC's range so it can read the divider all the way up to 3.3V."
+      },
+      {
+        "line": "remap(adcValue,0,4095,0,1023)",
+        "explanation": "Stretches the full 12-bit reading onto MicroPython's 10-bit duty scale — the same map idea with different numbers."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "Light shifts a resistance, the divider turns that into a voltage, the ADC turns the voltage into a number, and constrain plus map turn the number into brightness.",
+    "formula": "light → resistance → voltage → number → brightness",
+    "notes": [
+      {
+        "title": "Why the window is 372 to 2048",
+        "body": "A room rarely swings the ADC across its whole range. constrain fences the reading inside a realistic window, and map stretches that window over the full 0–4095 brightness scale, so the lamp spends all its range on light levels your room actually produces."
+      },
+      {
+        "title": "What the 10 kΩ resistor is doing",
+        "body": "On its own the photoresistor only changes resistance, which a pin can't read directly. Paired with a fixed resistor it forms a divider, and the midpoint voltage rises and falls with the light — exactly the kind of signal the ADC measures."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "After upload the LED settles at a brightness set by the room's light.",
+      "Cup a hand over the photoresistor — the brightness slides one way.",
+      "Shine a phone torch on the sensor — the brightness slides back the other way."
+    ],
+    "successCriteria": "Which direction is which follows how the divider sits on your board — the proof is the slide itself, steady and repeatable each time you cover and light the sensor."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "LED never changes",
+      "firstChecks": [
+        "Check the photoresistor's legs and that the divider's midpoint wires to GPIO 1."
+      ]
+    },
+    {
+      "symptom": "LED always at full",
+      "firstChecks": [
+        "The divider is likely on the wrong rail — confirm the 10 kΩ goes to 3.3V and the photoresistor's far leg to GND."
+      ]
+    },
+    {
+      "symptom": "Nothing lights at all",
+      "firstChecks": [
+        "Check the LED's direction and the 220 Ω resistor on GPIO 14."
+      ]
+    },
+    {
+      "symptom": "Upload fails",
+      "firstChecks": [
+        "Swap in a data-capable USB cable."
+      ]
+    }
+  ],
+  "challenge": "Discover your room's own LIGHT_MIN and LIGHT_MAX by watching real readings, then flip the mapping so darkness makes the lamp glow.",
+  "logbookPrompts": [
+    "What LIGHT_MIN and LIGHT_MAX did your room actually call for?",
+    "Which way did covering the sensor move the lamp before you flipped it?",
+    "Where in your home would a lamp that senses darkness earn its keep?"
+  ]
+}

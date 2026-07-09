@@ -1,0 +1,186 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY20-SHIFTREG",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 20,
+  "title": "Shift register: many outputs, fewer pins",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 30,
+  "mission": "Wire a 74HC595 shift register between three GPIOs and the LED bar, upload the Arduino sketch, and watch a single lit LED flow along the bar and back — eight lights driven through one chip from just three pins.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "officialPdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+    "chapter": "Chapter 14 74HC595 & LED Bar Graph",
+    "page": 133,
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_14.1_FlowingLight02/Sketch_14.1_FlowingLight02.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/13.1_Flowing_Water_Light/Flowing_Water_Light.py",
+    "imageAsset": "docs/course/assets/day-20/circuit-page-133.png",
+    "imageAlt": "Official Freenove circuit for the 74HC595 flowing light: the chip straddles the breadboard with GPIO 12 on its data pin, GPIO 13 on its latch pin, and GPIO 14 on its clock pin, and outputs Q0 to Q7 driving the LED bar graph through eight 220 ohm resistors, shown as both a schematic and a breadboard photo.",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "GPIO extension board",
+      "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
+      "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
+    },
+    {
+      "name": "74HC595 shift register",
+      "imageAsset": "docs/course/assets/shared/item-74hc595.png",
+      "explanation": "The 74HC595 takes data one bit at a time on a single wire and presents it as eight parallel outputs. Three GPIO pins — data, clock, and latch — can drive eight LEDs, and chips can be chained for eight more. It's how a small board controls a big row of outputs."
+    },
+    {
+      "name": "LED bar graph",
+      "imageAsset": "docs/course/assets/shared/item-led-bar.png",
+      "explanation": "A LED bar packs ten separate LEDs into one strip, with a row of pins along each edge. Each LED is wired and driven on its own — exactly like the single LED from earlier days, just ten of them in a tidy line."
+    },
+    {
+      "name": "8 × 220 Ω resistors",
+      "imageAsset": "docs/course/assets/shared/item-resistor.png",
+      "explanation": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction."
+    },
+    {
+      "name": "Jumper wires (about 15)",
+      "imageAsset": "docs/course/assets/shared/item-jumper-wire.png",
+      "explanation": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles."
+    }
+  ],
+  "wiring": [
+    {
+      "partPin": "GPIO 12",
+      "connectTo": "74HC595 DS (pin 14)",
+      "reason": "Carries the byte into the chip one bit at a time."
+    },
+    {
+      "partPin": "GPIO 13",
+      "connectTo": "74HC595 ST_CP latch (pin 12)",
+      "reason": "One rising edge here presents all eight stored bits at once."
+    },
+    {
+      "partPin": "GPIO 14",
+      "connectTo": "74HC595 SH_CP clock (pin 11)",
+      "reason": "Each tick tells the chip to take in the next bit."
+    },
+    {
+      "partPin": "Outputs Q0–Q7",
+      "connectTo": "LED bar via 220 Ω each",
+      "reason": "Eight chip outputs each drive one segment through its own resistor."
+    },
+    {
+      "partPin": "OE (chip pin 13)",
+      "connectTo": "GND",
+      "reason": "Held low so the outputs stay switched on."
+    },
+    {
+      "partPin": "MR (chip pin 10)",
+      "connectTo": "5V",
+      "reason": "Held high so the chip never clears what it holds."
+    }
+  ],
+  "coachInstructions": [
+    "Guide one physical connection at a time — about fifteen jumpers is the most wiring so far — and wait for learner confirmation before proceeding.",
+    "The chip's half-moon notch sets its orientation; verify it matches the chart before checking anything else.",
+    "If nothing lights, check the chip's power first — VCC and MR (pin 10) to 5V, GND and OE (pin 13) to ground — before touching code.",
+    "If the pattern is scrambled, verify the three control wires against the sketch — data on GPIO 12, latch on GPIO 13, clock on GPIO 14.",
+    "If a single LED stays dark, check that segment's 220 Ω resistor and the bar's direction, which the learner met on Day 6.",
+    "Keep the Arduino path primary; MicroPython is optional only if already set up, and its library takes pins in the order data then latch then clock."
+  ],
+  "steps": [
+    "Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.",
+    "Straddle the 74HC595 across the breadboard's centre channel with its notch matching the chart.",
+    "Give the chip power — VCC and MR (pin 10) to 5V, GND and OE (pin 13) to ground.",
+    "Run the three control wires — GPIO 12 to DS (pin 14), GPIO 13 to ST_CP (pin 12), GPIO 14 to SH_CP (pin 11).",
+    "Connect outputs Q0–Q7 to the LED bar, with a 220 Ω resistor in series for each segment.",
+    "Check the LED bar's direction against the chart — you saw on Day 6 how easily it reverses.",
+    "Compare every wire to the chart before you plug in USB.",
+    "Open Sketch_14.1_FlowingLight02.ino in Arduino IDE and upload it.",
+    "Watch one lit LED run along the bar and back."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "shiftOut(dataPin, clockPin, order, _data)",
+        "explanation": "Sends the byte to the chip one bit at a time — data on GPIO 12, a clock tick on GPIO 14 for each bit."
+      },
+      {
+        "line": "digitalWrite(latchPin, HIGH)",
+        "explanation": "The rising edge on GPIO 13 moves all eight stored bits to the outputs in one step."
+      },
+      {
+        "line": "x <<= 1",
+        "explanation": "Slides the single 1 bit one place left, so the lit LED takes one step along the bar; delay(50) sets the pace."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "Chip74HC595(12,13,14,-1)",
+        "explanation": "The module takes its pins in the order data then latch then clock — matching today's wiring — with -1 meaning OE is simply wired to ground."
+      },
+      {
+        "line": "chip.shiftOut(1,x)",
+        "explanation": "Sends the byte and latches it in one call; the first argument picks which direction the pattern travels."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "The board clocks eight bits into the chip one at a time, and a single latch edge lights all eight outputs together.",
+    "formula": "eight outputs = one byte carried over three wires",
+    "notes": [
+      {
+        "title": "Where Day 6's ten pins went",
+        "body": "Day 6 gave every segment its own GPIO in a pin array. Today the chip holds all eight states, and the board keeps just three wires — data, clock, and latch."
+      },
+      {
+        "title": "What the latch is for",
+        "body": "While bits are still arriving, the outputs hold their previous pattern. The latch edge updates them all in one clean step, so you never see half a byte on the bar."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "One lit LED runs along the bar to one end.",
+      "It turns and runs back to where it started.",
+      "The run repeats forever, with a brief pause at each end."
+    ],
+    "successCriteria": "Eight segments take part — the chip has eight outputs, so two segments of the ten-segment bar stay dark. That's correct."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "Nothing lights at all",
+      "firstChecks": [
+        "Check the chip's orientation by its notch, then its power — VCC and MR to 5V, GND and OE to ground."
+      ]
+    },
+    {
+      "symptom": "Pattern scrambled or jumpy",
+      "firstChecks": [
+        "Re-check the three control wires — DS on GPIO 12, latch on GPIO 13, clock on GPIO 14."
+      ]
+    },
+    {
+      "symptom": "One LED never lights",
+      "firstChecks": [
+        "Check that segment's 220 Ω resistor and the bar's direction, just as on Day 6."
+      ]
+    },
+    {
+      "symptom": "Upload fails",
+      "firstChecks": [
+        "Swap in a data-capable USB cable."
+      ]
+    }
+  ],
+  "challenge": "Change the flow speed, send two lit LEDs travelling together, then fill the bar step by step — all by reshaping the byte x.",
+  "logbookPrompts": [
+    "Which speed made the flow easiest to follow, and why?",
+    "What starting value made the pair bounce cleanly at both ends?",
+    "After eight steps of the fill pattern, what byte is the chip holding?"
+  ]
+}

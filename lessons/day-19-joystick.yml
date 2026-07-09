@@ -1,0 +1,270 @@
+# Day 19 — Joystick · tinyskiff.lesson.v1
+# One source of truth: this file renders to the guided page
+# (/course/day-19-joystick/), the agent packet, and the course-map entry.
+# Two analog axes and one digital press arrive from a single module.
+
+schema: tinyskiff.lesson.v1
+lessonCode: TSK-DAY19-JOYSTICK
+day: 19
+slug: day-19-joystick
+title: "Joystick: read two axes and a button"
+status: published
+estimatedTimeMinutes: 20
+tracks: { main: arduino, optional: micropython }
+learnerProfile: adult beginner; curious and capable; no electronics assumed
+
+mission: >
+  Wire the joystick module's five pins, upload the Arduino sketch, and watch
+  three numbers stream in Serial Monitor — X and Y follow the stick's tilt, and
+  Z drops from 1 to 0 when you press straight down.
+unlocks: One module can hand the board three readings at once — two smooth analog axes and one crisp digital press, on just three signal pins.
+seoDescription: >
+  Wire a joystick module to the ESP32-S3, read its X and Y axes with analogRead
+  and its push button with digitalRead, and watch all three values stream in
+  Serial Monitor.
+
+hero:
+  instrument: none
+  headline: Read two axes|and one {button}
+  lede: >
+    Today you wire the control that steers every gamepad. Under the stick sit
+    two potentiometers at right angles and a push button hiding beneath them.
+    The sketch reads all three and prints their values twice a second, so you
+    can watch your hand become numbers.
+  pills:
+    - { text: About 20 minutes, key: true }
+    - Arduino first
+    - MicroPython optional
+    - No electronics assumed
+
+parts:
+  intro: >
+    Five things, one of them brand new. Tap *Define* on any part you haven't
+    met — the answer opens as a field note you can read and dismiss without
+    losing your place.
+  items:
+    - name: ESP32-S3 board
+      image: shared/item-esp32-s3-board.jpg
+      imageKind: Manual photo
+      alt: Official manual photo of the ESP32-S3 development board.
+      blurb: The brain that runs your uploaded sketch.
+      explain: esp32
+    - name: GPIO extension board
+      image: shared/item-gpio-extension-board.png
+      imageKind: Manual photo
+      alt: Official manual image of the ESP32-S3 GPIO extension board.
+      blurb: Spreads the pins into rows you can reach and label.
+      explain: gpio
+    - name: Joystick module
+      image: shared/item-joystick.png
+      imageKind: Manual photo
+      alt: Official manual photo of a joystick module with X and Y axis arrows and its five pins labelled 1 to 5.
+      blurb: A thumb stick over two dials and a hidden push button.
+      explain: joystick
+    - name: 5 jumper wires (F/M)
+      image: shared/item-jumper-wire.png
+      imageKind: Manual photo
+      alt: Official manual image of a jumper wire.
+      blurb: Female ends grip the module's header pins; male ends reach the board.
+      explain: jumpers
+    - name: Arduino IDE
+      image: shared/item-arduino-ide.png
+      imageKind: Manual screenshot
+      alt: Official manual screenshot of the Arduino IDE interface.
+      blurb: Uploads code and opens Serial Monitor.
+      explain: arduino
+
+wiring:
+  intro: >
+    The official Freenove diagram is your chart — schematic on top, the same
+    circuit built on a breadboard below. Click it to enlarge. Each connection
+    tells you where the wire goes and why.
+  diagram:
+    image: day-19/circuit-page-128.png
+    alt: >-
+      Official Freenove circuit for the joystick module: VRX to GPIO 14, VRY to
+      GPIO 13, SW to GPIO 12, the module's +5V pin fed from the 3.3V rail, and
+      GND to ground, shown as both a schematic and a breadboard photo.
+    caption: Official Freenove circuit — C Tutorial, Chapter 13 (Joystick), page 128.
+    zoomCaption: Official Freenove circuit, C Tutorial Chapter 13, page 128.
+    source: { pdf: C_Tutorial.pdf, chapter: 13, chapterTitle: Joystick, page: 128 }
+  pins:
+    - { from: VRX, to: GPIO 14, why: Carries the X potentiometer's voltage for the board to measure., explain: adc }
+    - { from: VRY, to: GPIO 13, why: Carries the Y potentiometer's voltage the same way., explain: potentiometer }
+    - { from: SW, to: GPIO 12, why: The button under the stick pulls this pin LOW when you press., explain: inputPullup }
+    - { from: "+5V", to: 3.3V, why: Powers the module — the official diagram feeds this pin from the 3.3V rail., explain: gpio }
+    - { from: GND, to: GND, why: Gives board and module the same zero point., explain: gnd }
+  safety:
+    - label: Power from 3.3V.
+      icon: "⚓"
+      body: >
+        The module's pin is printed +5V, and the official diagram feeds it from
+        the 3.3V rail — follow the diagram. Unplug USB before you move any wire.
+
+steps:
+  intro: >
+    This is the main path — you can finish the day without opening a single
+    field note. Tap each step as you go to keep your place.
+  items:
+    - Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.
+    - Push the five female jumper ends onto the module's header pins — the labels VRX, VRY, SW, +5V, and GND are printed beside them. {joystick}
+    - Connect `VRX → GPIO 14`, `VRY → GPIO 13`, and `SW → GPIO 12`. {adc}
+    - Connect the module's `+5V` pin to the 3.3V rail and `GND → GND`, just as the chart shows. {gnd}
+    - Compare every wire to the chart before you plug in USB.
+    - Open `Sketch_13.1_Joystick.ino` in Arduino IDE and upload it.
+    - Open Serial Monitor and set the baud rate to `115200`. {serial}
+    - Glide the stick to its edges, then press it straight down like a button.
+  done:
+    icon: "🕹️"
+    title: Three readings, one stick.
+    body: Your hand's position is now three numbers on screen. Head to Test & debug to learn what healthy values look like.
+
+code:
+  intro: >
+    The loop is three reads and one print. Two pins are measured with
+    analogRead, one with digitalRead, and printf lines all three up. Switch to
+    MicroPython if you'd rather see the same idea in Python — the wiring never
+    changes.
+  arduino:
+    file: Sketch_13.1_Joystick.ino
+    sketch: C/Sketches/Sketch_13.1_Joystick/Sketch_13.1_Joystick.ino
+    excerpt: |
+      int xyzPins[] = {14, 13, 12};   //x,y,z pins
+      void setup() {
+        Serial.begin(115200);
+        pinMode(xyzPins[2], INPUT_PULLUP);  //z axis is a button.
+      }
+
+      void loop() {
+        int xVal = analogRead(xyzPins[0]);
+        int yVal = analogRead(xyzPins[1]);
+        int zVal = digitalRead(xyzPins[2]);
+        Serial.printf("X,Y,Z: %d,\t%d,\t%d\n", xVal, yVal, zVal);
+        delay(500);
+      }
+    notes:
+      - code: "int xyzPins[] = {14, 13, 12}"
+        text: One array holds all three pins — X on GPIO 14, Y on GPIO 13, Z on GPIO 12.
+        explain: pinArray
+      - code: pinMode(xyzPins[2], INPUT_PULLUP)
+        text: Sets the button pin so it rests at 1 and a press pulls it to 0.
+        explain: inputPullup
+      - code: analogRead(xyzPins[0])
+        text: Measures the X potentiometer's voltage as a number from 0 to 4095.
+        explain: adc
+      - code: 'Serial.printf("X,Y,Z: %d,\t%d,\t%d\n", …)'
+        text: Prints all three values on one tab-separated line, twice a second.
+        explain: serialPrint
+  micropython:
+    file: 12.1_Joystick/Joystick.py
+    path: Python/Python_Codes/12.1_Joystick/Joystick.py
+    optionalTag: Optional side path · same circuit
+    excerpt: |
+      xVal=ADC(Pin(14))
+      yVal=ADC(Pin(13))
+      zVal=Pin(12,Pin.IN,Pin.PULL_UP)
+
+      xVal.atten(ADC.ATTN_11DB)
+      xVal.width(ADC.WIDTH_12BIT)
+
+      print("X,Y,Z:",xVal.read(),",",yVal.read(),",",zVal.value())
+    notes:
+      - code: ADC(Pin(14))
+        text: Wraps GPIO 14 in an ADC reader — the same measurement analogRead does in C.
+      - code: Pin(12,Pin.IN,Pin.PULL_UP)
+        text: The button pin with the internal pull-up — 1 at rest, 0 while pressed.
+    note: >
+      Same pins, same three values. This version prints once a second where the
+      Arduino sketch prints twice. Run it in Thonny if MicroPython is set up;
+      otherwise skip it — it should never block the Arduino-first path.
+
+theory:
+  title: Two dials and a button in one grip
+  summary: The stick tilts two potentiometers at right angles while a push button waits underneath — three sensors sharing one thumb.
+  intro: >
+    You already know every part inside this module. The joystick simply packs
+    them under a single stick — the same arrangement lives inside every gamepad
+    you've ever held.
+  flow:
+    - { n: Tilt, title: Pots turn, body: Pushing the stick rotates two potentiometers set at right angles. }
+    - { n: Measure, title: ADC reads, body: analogRead turns each pot's voltage into a number from 0 to 4095. }
+    - { n: Press, title: Button drops, body: INPUT_PULLUP holds GPIO 12 at 1 until a press pulls it to 0. }
+    - { n: Report, title: Serial prints, body: Twice a second the sketch prints all three values on one line. }
+  formulaLabel: The model
+  formula: "one joystick = **two potentiometers** at right angles + **one push button**"
+  notes:
+    - title: Two of the same dial
+      explain: potentiometer
+      body: Each axis is the dial you've already read — one turned by side-to-side motion, one by forward-and-back. At rest both sit near the middle of their travel.
+    - title: Why Z rests at 1
+      explain: inputPullup
+      body: The internal pull-up holds the button pin HIGH with nothing connected in the module. Pressing the stick closes the switch to ground, so the reading drops to 0.
+
+test:
+  mode: serial
+  intro: >
+    Success and recovery sit side by side, so you never have to go hunting when
+    something looks off.
+  expectedTitle: What you should see
+  baud: 115200
+  expected:
+    - "X,Y,Z: 1917,  1846,  1"
+    - "X,Y,Z: 4095,  1852,  1"
+    - "X,Y,Z: 1921,  1839,  0"
+  expectedNote: >
+    A new line lands twice a second. At rest both axes sit near mid-scale —
+    anywhere around 1800–2200 is healthy, and your exact numbers will differ. A
+    full push drives one axis toward 0 or 4095, and a straight-down press flips
+    Z from 1 to 0.
+  checksTitle: If it doesn't
+  checks:
+    - symptom: "One axis stuck at 0 or 4095?"
+      fix: "Reseat that axis's wire — VRX belongs on GPIO 14, VRY on GPIO 13."
+    - symptom: "Z always 1?"
+      fix: "Check the SW wire on GPIO 12, then press straight down firmly — a sideways tilt won't click it."
+    - symptom: "Both axes dead?"
+      fix: "Check the module's +5V and GND pins first."
+    - symptom: "Blank monitor?"
+      fix: "Confirm 115200 baud, then the board and port."
+    - symptom: "Upload fails?"
+      fix: "Swap in a data-capable USB cable."
+
+challenge:
+  title: "Try this: chart your stick"
+  railLabel: Try this
+  intro: >
+    Same working circuit, one new habit: learning your instrument's true
+    numbers. It fits inside today's 20 minutes.
+  summary: Find your joystick's true centre and corner numbers, sketch the four compass directions as value pairs, and count how far the resting centre drifts.
+  cards:
+    - title: Find true centre
+      body: Let the stick rest and write down the X and Y values. Watch a few more lines land and count how far the numbers drift while nothing touches the stick.
+    - title: Map the corners
+      explain: joystick
+      body: Push the stick to north, south, east, and west, and record the X and Y pair at each full deflection. Sketch them as a compass with your centre numbers in the middle.
+  logbook:
+    - What are your resting centre numbers, and how much do they drift?
+    - What value pairs mark north, south, east, and west?
+    - Where have you held a control like this before?
+
+agent:
+  intro: >
+    Every lesson ships with a code and a machine-readable packet, so an agent
+    can guide you with full context.
+  behaviour: >
+    guide one physical connection at a time, wait for you to confirm, explain
+    terms on request, and always check wiring, board, port, and USB before
+    changing code.
+  coachInstructions:
+    - Guide one physical connection at a time and wait for learner confirmation before proceeding.
+    - If one axis is stuck at 0 or 4095, check that axis's wire first — VRX belongs on GPIO 14 and VRY on GPIO 13.
+    - If X and Y move for the wrong direction of tilt, the VRX and VRY wires have traded places.
+    - If Z never leaves 1, check the SW wire on GPIO 12 and coach a firm straight-down press.
+    - If both axes read the same dead value, check the module's +5V and GND connections before touching code.
+    - Keep the Arduino path primary; MicroPython is optional only if already set up.
+
+source:
+  license: CC BY-NC-SA 3.0
+  licenseNote: >
+    Based on Freenove official material released under CC BY-NC-SA 3.0; preserve
+    attribution and non-affiliation language.
