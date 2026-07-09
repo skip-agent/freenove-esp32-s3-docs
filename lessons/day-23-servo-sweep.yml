@@ -1,0 +1,284 @@
+# Day 23 — Servo sweep · tinyskiff.lesson.v1
+# One source of truth: this file renders to the guided page
+# (/course/day-23-servo-sweep/), the agent packet, and the course-map entry.
+# The positioning day — the width of a repeating pulse tells a shaft exactly where to sit.
+
+schema: tinyskiff.lesson.v1
+lessonCode: TSK-DAY23-SERVOSWEEP
+day: 23
+slug: day-23-servo-sweep
+title: "Servo sweep: move to positions"
+status: published
+estimatedTimeMinutes: 20
+tracks: { main: arduino, optional: micropython }
+learnerProfile: adult beginner; curious and capable; no electronics assumed
+
+mission: >
+  Wire a servo's three leads to the board, upload the Arduino sketch, and watch
+  the horn sweep smoothly from 0° to 180° and back — your first part that moves
+  to an exact position on command.
+unlocks: A pulse's width can hold a shaft at an exact angle, so your builds can steer, point, and wave.
+seoDescription: >
+  Wire a servo to the ESP32-S3 and drive it with raw LEDC PWM. Upload the sketch
+  and watch the horn sweep smoothly from 0° to 180° and back — position set by
+  pulse width.
+
+hero:
+  instrument: none
+  headline: Swing an arm|to any {angle}
+  lede: >
+    Today the board gets an arm. You wire a small servo to one pin, upload a
+    sketch that counts through the angles, and the horn sweeps from 0° to 180°
+    and back — the same steady nudge an autopilot gives a tiller.
+  pills:
+    - { text: About 20 minutes, key: true }
+    - Arduino first
+    - MicroPython optional
+    - No electronics assumed
+
+parts:
+  intro: >
+    Five things, and one of them moves. Tap *Define* on any part you haven't met
+    — the answer opens as a field note you can read and dismiss without losing
+    your place.
+  items:
+    - name: ESP32-S3 board
+      image: shared/item-esp32-s3-board.jpg
+      imageKind: Manual photo
+      alt: Official manual photo of the ESP32-S3 development board.
+      blurb: The brain that runs your uploaded sketch.
+      explain: esp32
+    - name: GPIO extension board
+      image: shared/item-gpio-extension-board.png
+      imageKind: Manual photo
+      alt: Official manual image of the ESP32-S3 GPIO extension board.
+      blurb: Spreads the pins into rows you can reach and label.
+      explain: gpio
+    - name: Servo
+      image: shared/item-servo.png
+      imageKind: Manual photo
+      alt: Official manual illustration of a servo with its three wires labelled 1 signal, 2 power, and 3 ground.
+      blurb: A small geared motor that turns its horn to the angle you ask for and holds it.
+      explain: servo
+    - name: 3 jumper wires (M/M)
+      image: shared/item-jumper-wire.png
+      imageKind: Manual photo
+      alt: Official manual image of a jumper wire.
+      blurb: Temporary, solder-free connections.
+      explain: jumpers
+    - name: Arduino IDE
+      image: shared/item-arduino-ide.png
+      imageKind: Manual screenshot
+      alt: Official manual screenshot of the Arduino IDE interface.
+      blurb: Uploads the sketch to the board.
+      explain: arduino
+
+wiring:
+  intro: >
+    The official Freenove diagram is your chart — schematic on top, the same
+    circuit built on a breadboard below. Click it to enlarge. The servo's three
+    wires are colour-coded, so the colours are your map.
+  diagram:
+    image: day-23/circuit-page-154.png
+    alt: >-
+      Official Freenove circuit for the servo sweep: a servo's orange signal wire
+      on GPIO 21, its red power wire on 5V, and its brown ground wire on GND,
+      shown as both a schematic and a breadboard photo.
+    caption: Official Freenove circuit — C Tutorial, Chapter 17 (Servo), page 154.
+    zoomCaption: Official Freenove circuit, C Tutorial Chapter 17, page 154.
+    source: { pdf: C_Tutorial.pdf, chapter: 17, chapterTitle: Servo, page: 154 }
+  pins:
+    - { from: Servo signal (orange), to: GPIO 21, why: Carries the timed pulse that names the angle., explain: pulseWidth }
+    - { from: Servo power (red), to: 5V, why: Feeds the servo's motor with enough current to move., explain: servo }
+    - { from: Servo ground (brown), to: GND, why: Gives board and servo the same zero point., explain: gnd }
+  safety:
+    - label: 5V for the servo.
+      icon: "⚓"
+      body: >
+        The manual's own caution: "Use caution when supplying power to the servo,
+        it should be 5V." The red wire goes to the 5V pin with its own jumper —
+        and unplug USB before you move any wire.
+
+steps:
+  intro: >
+    This is the main path — you can finish the day without opening a single field
+    note. Tap each step as you go to keep your place.
+  items:
+    - Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.
+    - Push a jumper into each of the servo's three sockets — orange, red, and brown. {servo}
+    - Run the orange signal wire to GPIO 21. {gpio}
+    - Run the red wire to 5V and the brown wire to GND. {gnd}
+    - Press a horn onto the servo's shaft so you can see it move.
+    - Compare every wire to the chart before you plug in USB.
+    - Open `Sketch_17.1_Servo_Sweep.ino` in Arduino IDE and upload it.
+    - Watch the horn sweep from one end of its travel to the other and back.
+  done:
+    icon: "🧭"
+    title: The arm answers.
+    body: The horn is swinging on your command. Head to Test & debug to confirm the pace and the full 180° reach.
+
+code:
+  intro: >
+    The whole sketch is short, and it drives the servo with the same LEDC
+    hardware that faded your LEDs — set to 50 Hz and 12 bits, the timing a servo
+    listens for. The loop counts angles up and down; one `map()` line turns each
+    angle into a pulse. Switch to MicroPython if you'd rather see the same idea
+    in Python — the wiring never changes.
+  arduino:
+    file: Sketch_17.1_Servo_Sweep.ino
+    sketch: C/Sketches/Sketch_17.1_Servo_Sweep/Sketch_17.1_Servo_Sweep.ino
+    excerpt: |
+      #define SERVO_PIN 21  //define the pwm pin
+      #define SERVO_CHN 0   //define the pwm channel
+      #define SERVO_FRQ 50  //define the pwm frequency
+      #define SERVO_BIT 12  //define the pwm precision
+
+      void servo_set_pin(int pin);
+      void servo_set_angle(int angle);
+
+      void setup() {
+        servo_set_pin(SERVO_PIN);
+      }
+
+      void loop() {
+        for (int i = 0; i < 180; i++) {
+          servo_set_angle(i);
+          delay(10);
+        }
+        for (int i = 180; i > 0; i--) {
+          servo_set_angle(i);
+          delay(10);
+        }
+      }
+
+      void servo_set_pin(int pin) {
+        ledcAttachChannel(pin, SERVO_FRQ, SERVO_BIT, SERVO_CHN);
+      }
+
+      void servo_set_angle(int angle) {
+        if (angle > 180 || angle < 0)
+          return;
+        long pwm_value = map(angle, 0, 180, 103, 512);
+        ledcWrite(SERVO_PIN, pwm_value);
+      }
+    notes:
+      - code: ledcAttachChannel(pin, SERVO_FRQ, SERVO_BIT, SERVO_CHN)
+        text: Sets GPIO 21 switching at 50 Hz with 12-bit precision — the frame rate a servo expects.
+        explain: ledc
+      - code: map(angle, 0, 180, 103, 512)
+        text: Translates degrees into pulse counts — 103 counts for 0° up to 512 counts for 180°.
+        explain: mapValue
+      - code: ledcWrite(SERVO_PIN, pwm_value)
+        text: Sends a pulse of that width every 20 ms; the servo turns until its shaft matches.
+        explain: pwm
+  micropython:
+    file: 16.1_Servo_Sweep/Servo_Sweep.py
+    path: Python/Python_Codes/16.1_Servo_Sweep/Servo_Sweep.py
+    optionalTag: Optional side path · same circuit
+    excerpt: |
+      from myservo import myServo
+      servo=myServo(21)
+      servo.myServoWriteAngle(0)
+      time.sleep_ms(1000)
+      for i in range(0,180,1):
+          servo.myServoWriteAngle(i)
+          time.sleep_ms(15)
+      for i in range(180,0,-1):
+          servo.myServoWriteAngle(i)
+          time.sleep_ms(15)
+    notes:
+      - code: servo=myServo(21)
+        text: Builds the kit's servo helper on GPIO 21 — the same pin as the Arduino sketch.
+      - code: servo.myServoWriteAngle(i)
+        text: Hands the helper an angle in degrees; it works out the pulse width for you.
+    note: >
+      Same pin, same wiring. Copy the kit's own `myservo.py` module to the board
+      alongside the main file — it holds the pulse maths (a 10-bit duty from 26
+      to 128, the same 0.5–2.5 ms). Run it in Thonny if MicroPython is set up;
+      otherwise skip it — it should never block the Arduino-first path.
+
+theory:
+  title: The pulse is the position
+  summary: A servo reads the width of a repeating pulse and turns its shaft to the matching angle; the sketch only counts degrees and lets map() translate.
+  intro: >
+    The clever part of today fits in one line — the `map()` call. Everything
+    around it is a counter going up and coming back down.
+  flow:
+    - { n: Beat, title: 50 frames a second, body: The pin starts a fresh pulse every 20 ms. }
+    - { n: Width, title: The pulse is the order, body: A 0.5 ms pulse means 0° and a 2.5 ms pulse means 180°. }
+    - { n: Convert, title: map() translates, body: Degrees become pulse counts — 103 at one end and 512 at the other. }
+    - { n: Hold, title: The servo obeys, body: A circuit inside turns the shaft until it matches the width. }
+  formulaLabel: The model
+  formula: angle = **pulse width** — 0.5 ms is 0° · 1.5 ms is 90° · 2.5 ms is 180°
+  notes:
+    - title: Where 103 and 512 come from
+      explain: pulseWidth
+      body: At 50 Hz and 12 bits, each 20 ms frame is 4096 counts — so 103 counts lasts about 0.5 ms and 512 counts about 2.5 ms, the two ends of the servo's travel.
+    - title: A straight line of angles
+      explain: servo
+      body: The mapping is linear — 0.5 ms sits at 0°, 1.5 ms at 90°, 2.5 ms at 180°, and every angle between gets its own width.
+
+test:
+  mode: visual
+  intro: >
+    Nothing prints to the screen today — the proof is the horn swinging in front
+    of you.
+  expectedTitle: What you should see
+  readoutLabel: Servo horn
+  expected:
+    - The horn glides smoothly from 0° all the way round to 180°.
+    - It reverses and glides back, then repeats — about 1.8 seconds each way.
+    - The pace is steady, like a metronome.
+  expectedNote: A soft hum while it moves is normal. Each sweep should be one continuous glide, never a twitchy stutter.
+  checksTitle: If it doesn't
+  checks:
+    - symptom: "Horn twitches or judders?"
+      fix: "Power the servo from the 5V pin with its own jumper — a GPIO can't feed a motor."
+    - symptom: "Sweeps once, then jams at an end?"
+      fix: "The horn is hitting something — pull it off the shaft and refit it clear."
+    - symptom: "No motion at all?"
+      fix: "Check the orange signal wire on GPIO 21, then the red and brown power pair."
+    - symptom: "Board resets mid-sweep?"
+      fix: "The USB supply is weak — unplug other loads from the board."
+
+challenge:
+  title: "Try this: run a lighthouse"
+  railLabel: Try this
+  intro: >
+    Same working circuit, three small experiments with the sweep. They fit inside
+    today's 20 minutes.
+  summary: Sweep a half-arc, rest at each end like a lighthouse, then hunt for the smallest angle step your servo visibly answers.
+  cards:
+    - title: Sweep a half-arc
+      body: Change both `for` loops so the sweep runs 0° to 90° and back. Predict where the horn will stop before you upload.
+    - title: Rest like a lighthouse
+      explain: delayMs
+      body: Add `delay(1000)` after each `for` loop so the horn pauses a second at each end before turning back.
+    - title: Find the smallest step
+      body: Make the loops step by 2, then 5, then 10. Watch for the smallest angle step your servo turns into a visible move.
+  logbook:
+    - Where did the horn stop on your half-arc, and did it match your prediction?
+    - How did the one-second rest change the feel of the sweep?
+    - What was the smallest angle step your servo visibly moved?
+
+agent:
+  intro: >
+    Every lesson ships with a code and a machine-readable packet, so an agent can
+    guide you with full context.
+  behaviour: >
+    guide one physical connection at a time, wait for you to confirm, explain
+    terms on request, and always check wiring, board, port, and USB before
+    changing code.
+  coachInstructions:
+    - Guide one physical connection at a time and wait for learner confirmation before proceeding.
+    - Colour is the map — orange signal to GPIO 21, red to 5V, brown to GND; check that order before anything else.
+    - If the horn twitches or judders, confirm the red wire sits on the 5V pin with its own jumper — a GPIO cannot supply a servo's current.
+    - If it sweeps once then jams at an end, the horn is hitting something — have the learner refit it on the shaft.
+    - If the board resets mid-sweep, the USB supply is weak — unplug other loads before changing any code.
+    - Keep the Arduino path primary; MicroPython is optional only if already set up, and needs the kit's myservo.py copied to the board alongside the main file.
+
+source:
+  license: CC BY-NC-SA 3.0
+  licenseNote: >
+    Based on Freenove official material released under CC BY-NC-SA 3.0; preserve
+    attribution and non-affiliation language.

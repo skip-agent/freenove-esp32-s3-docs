@@ -1,0 +1,197 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY22-MOTOR",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 22,
+  "title": "Motor driver: control motion safely",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 30,
+  "mission": "Wire a DC motor through the L293D driver chip, power it from its own 9V battery, and turn a potentiometer to command the motor's speed and direction — the board sends the plan, the chip switches the current.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "officialPdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+    "chapter": "Chapter 16 Relay & Motor",
+    "page": 147,
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_16.1_Control_Motor_by_L293D/Sketch_16.1_Control_Motor_by_L293D.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/15.1_Motor_And_Driver/Motor_And_Driver.py",
+    "imageAsset": "docs/course/assets/day-22/circuit-page-147.png",
+    "imageAlt": "Official Freenove circuit for driving a DC motor with an L293D: the chip's In1, In2, and Enable1 pins wired to GPIO 13, 14, and 12, a rotary potentiometer feeding GPIO 1, the motor on the chip's Out1 and Out2, and a 9V battery powering the extension board, shown as both a schematic and a breadboard photo.",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "GPIO extension board",
+      "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
+      "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
+    },
+    {
+      "name": "DC motor",
+      "imageAsset": "docs/course/assets/shared/item-motor.png",
+      "explanation": "A DC motor spins whenever current flows through it — faster with more current, and the other way round when the current reverses. It draws far more current than a GPIO pin can supply, which is why a driver chip and its own power source sit between the board and the motor."
+    },
+    {
+      "name": "L293D driver chip",
+      "imageAsset": "docs/course/assets/shared/item-l293d.png",
+      "explanation": "The L293D is a driver chip that switches a motor's heavy current on behalf of the board. Two input pins set the direction (In1 HIGH + In2 LOW spins one way; swapped spins the other), the Enable pin takes PWM for speed, and the +Vmotor pin brings in the motor's own power supply."
+    },
+    {
+      "name": "Rotary potentiometer",
+      "imageAsset": "docs/course/assets/shared/item-potentiometer.png",
+      "explanation": "A potentiometer is a resistor with a third pin on a movable contact. Turning the shaft slides that contact along the resistor, so the voltage on the middle pin sweeps smoothly between the two ends. Wire the ends to 3.3V and ground and the knob becomes a voltage dial your ADC pin can read."
+    },
+    {
+      "name": "Jumper wires (M/M)",
+      "imageAsset": "docs/course/assets/shared/item-jumper-wire.png",
+      "explanation": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles."
+    }
+  ],
+  "wiring": [
+    {
+      "partPin": "L293D In1",
+      "connectTo": "GPIO 13",
+      "reason": "First direction signal — HIGH here drives the motor one way."
+    },
+    {
+      "partPin": "L293D In2",
+      "connectTo": "GPIO 14",
+      "reason": "Second direction signal — always set opposite to In1."
+    },
+    {
+      "partPin": "L293D Enable1",
+      "connectTo": "GPIO 12",
+      "reason": "The speed signal — PWM here sets how hard the motor drives."
+    },
+    {
+      "partPin": "Pot outer pins",
+      "connectTo": "3.3V and GND",
+      "reason": "Feed the knob's track so the wiper can sweep between them."
+    },
+    {
+      "partPin": "Pot middle pin",
+      "connectTo": "GPIO 1",
+      "reason": "The knob's voltage lands here — the pin the code reads as A0."
+    },
+    {
+      "partPin": "Motor terminals",
+      "connectTo": "L293D Out1 and Out2",
+      "reason": "Where the chip feeds the battery's current to the motor."
+    },
+    {
+      "partPin": "9V battery line",
+      "connectTo": "Extension board power terminal",
+      "reason": "Supplies the motor's current so the USB port never carries it."
+    }
+  ],
+  "coachInstructions": [
+    "Before anything powers up, confirm the 9V battery is connected to the extension board — Freenove warns that powering the motor from the ESP32-S3 directly may cause permanent damage to the board.",
+    "Confirm the battery and the board share a common ground through the extension board before debugging any behaviour.",
+    "If the motor never spins, check the battery and the extension board's power switch first, then the L293D's orientation by its notch.",
+    "If the motor spins one direction only, suspect the In1/In2 wires on GPIO 13 and GPIO 14.",
+    "If the board resets or its USB port drops out, the motor is pulling from USB — stop immediately and connect the 9V battery before continuing.",
+    "If the speed number in Serial Monitor is stuck, check the pot's middle wire on GPIO 1, the pin the code reads as A0."
+  ],
+  "steps": [
+    "Keep USB unplugged, seat the ESP32-S3 on the GPIO extension board, and set the 9V battery aside until the wiring is checked.",
+    "Press the L293D into the breadboard so its notch faces the same way as the chart — the chip only works one way round.",
+    "Wire the direction pins — In1 → GPIO 13 and In2 → GPIO 14.",
+    "Wire the speed pin — Enable1 → GPIO 12.",
+    "Connect the motor's two terminals to the chip's Out1 and Out2.",
+    "Wire the potentiometer — outer pins to 3.3V and GND, middle pin to GPIO 1.",
+    "Clip the battery line onto the 9V battery and connect it to the extension board's power terminal, minding + and −.",
+    "Compare every wire to the chart — this is the day to be fussy about it — then plug in USB.",
+    "Open Sketch_16.1_Control_Motor_by_L293D.ino in Arduino IDE and upload it.",
+    "Switch on the extension board's power and sweep the knob slowly from end to end."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "analogRead(A0)",
+        "explanation": "Reads the knob. A0 is this board's alias for GPIO 1 — the same pin your wire lands on."
+      },
+      {
+        "line": "ledcAttachChannel(enable1Pin, 1000, 11, channel)",
+        "explanation": "Sets up PWM on the enable pin at 11 bits, so speed runs from 0 to 2047."
+      },
+      {
+        "line": "rotationSpeed = abs(potenVal - 2048)",
+        "explanation": "Speed is the knob's distance from centre; which side of 2048 it sits on picks the direction."
+      },
+      {
+        "line": "ledcWrite(enable1Pin, spd)",
+        "explanation": "Hands the speed to the chip — more on-time on Enable1 means more push through the motor."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "pwm=PWM(enablePin,10000)",
+        "explanation": "PWM on GPIO 12 at 10 kHz with a 10-bit duty (0–1023) — the same idea as Arduino's 0–2047 on a smaller scale."
+      },
+      {
+        "line": "adc=ADC(Pin(1))",
+        "explanation": "Reads the knob straight from GPIO 1 — the pin the Arduino sketch calls A0."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "The board sends three small signals — two for direction, one PWM for speed — and the L293D switches the battery's current through the motor.",
+    "formula": "speed = distance from 2048 · direction = side of 2048",
+    "notes": [
+      {
+        "title": "Why the chip is here",
+        "body": "A GPIO pin can offer a few milliamps, and this motor draws around 0.2–0.3 A before it even does any work. The L293D takes the pin's small signal and switches the battery's heavy current — the board decides, the chip delivers."
+      },
+      {
+        "title": "Two power worlds, one ground",
+        "body": "The 9V battery moves the motor; USB feeds the board. The two supplies only agree on what HIGH and LOW mean because they share a ground on the extension board — that shared wire is what makes the chip's inputs readable."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "Knob at centre — the motor sits still.",
+      "Turn one way — the shaft spins up, faster the further you go.",
+      "Sweep back through centre — it slows, stops, then spins the other way.",
+      "Serial Monitor at 115200 baud prints the speed number — 0 at centre, up to 2047 at the ends."
+    ],
+    "successCriteria": "Expect a small still zone either side of centre — a motor needs a push of current before it beats its own friction, so the first sliver of knob travel does nothing. Today's challenge puts a number on exactly that."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "Motor never spins",
+      "firstChecks": [
+        "Check the 9V battery on the extension board — its switch and its wiring — then the L293D's orientation by the notch."
+      ]
+    },
+    {
+      "symptom": "Spins one direction only",
+      "firstChecks": [
+        "A direction wire is loose or swapped — recheck In1 on GPIO 13 and In2 on GPIO 14."
+      ]
+    },
+    {
+      "symptom": "Board resets or USB drops out",
+      "firstChecks": [
+        "You're powering the motor from USB — stop and connect the 9V battery so the extension board carries the load."
+      ]
+    },
+    {
+      "symptom": "Speed number stuck in Serial Monitor",
+      "firstChecks": [
+        "Check the pot's middle wire on GPIO 1 — the pin the code reads as A0."
+      ]
+    }
+  ],
+  "challenge": "Find the smallest speed number that actually starts the motor turning, then make the serial output signed so reverse reads as negative.",
+  "logbookPrompts": [
+    "What speed number first got the shaft moving — and was it the same in both directions?",
+    "Why does the motor need current before it moves at all?",
+    "What would you drive with this chip if the motor were a wheel, a pump, or a winch?"
+  ]
+}

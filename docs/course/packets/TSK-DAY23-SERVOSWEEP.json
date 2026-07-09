@@ -1,0 +1,165 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY23-SERVOSWEEP",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 23,
+  "title": "Servo sweep: move to positions",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 20,
+  "mission": "Wire a servo's three leads to the board, upload the Arduino sketch, and watch the horn sweep smoothly from 0° to 180° and back — your first part that moves to an exact position on command.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "officialPdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+    "chapter": "Chapter 17 Servo",
+    "page": 154,
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_17.1_Servo_Sweep/Sketch_17.1_Servo_Sweep.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/16.1_Servo_Sweep/Servo_Sweep.py",
+    "imageAsset": "docs/course/assets/day-23/circuit-page-154.png",
+    "imageAlt": "Official Freenove circuit for the servo sweep: a servo's orange signal wire on GPIO 21, its red power wire on 5V, and its brown ground wire on GND, shown as both a schematic and a breadboard photo.",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "GPIO extension board",
+      "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
+      "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
+    },
+    {
+      "name": "Servo",
+      "imageAsset": "docs/course/assets/shared/item-servo.png",
+      "explanation": "A servo packs a DC motor, reduction gears, a position sensor, and a control circuit into one case. Send it a timing signal and it rotates its horn to the angle you asked for and holds there — 0 to 180 degrees. Three wires: orange signal, red power, brown ground."
+    },
+    {
+      "name": "3 jumper wires (M/M)",
+      "imageAsset": "docs/course/assets/shared/item-jumper-wire.png",
+      "explanation": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    }
+  ],
+  "wiring": [
+    {
+      "partPin": "Servo signal (orange)",
+      "connectTo": "GPIO 21",
+      "reason": "Carries the timed pulse that names the angle."
+    },
+    {
+      "partPin": "Servo power (red)",
+      "connectTo": "5V",
+      "reason": "Feeds the servo's motor with enough current to move."
+    },
+    {
+      "partPin": "Servo ground (brown)",
+      "connectTo": "GND",
+      "reason": "Gives board and servo the same zero point."
+    }
+  ],
+  "coachInstructions": [
+    "Guide one physical connection at a time and wait for learner confirmation before proceeding.",
+    "Colour is the map — orange signal to GPIO 21, red to 5V, brown to GND; check that order before anything else.",
+    "If the horn twitches or judders, confirm the red wire sits on the 5V pin with its own jumper — a GPIO cannot supply a servo's current.",
+    "If it sweeps once then jams at an end, the horn is hitting something — have the learner refit it on the shaft.",
+    "If the board resets mid-sweep, the USB supply is weak — unplug other loads before changing any code.",
+    "Keep the Arduino path primary; MicroPython is optional only if already set up, and needs the kit's myservo.py copied to the board alongside the main file."
+  ],
+  "steps": [
+    "Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.",
+    "Push a jumper into each of the servo's three sockets — orange, red, and brown.",
+    "Run the orange signal wire to GPIO 21.",
+    "Run the red wire to 5V and the brown wire to GND.",
+    "Press a horn onto the servo's shaft so you can see it move.",
+    "Compare every wire to the chart before you plug in USB.",
+    "Open Sketch_17.1_Servo_Sweep.ino in Arduino IDE and upload it.",
+    "Watch the horn sweep from one end of its travel to the other and back."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "ledcAttachChannel(pin, SERVO_FRQ, SERVO_BIT, SERVO_CHN)",
+        "explanation": "Sets GPIO 21 switching at 50 Hz with 12-bit precision — the frame rate a servo expects."
+      },
+      {
+        "line": "map(angle, 0, 180, 103, 512)",
+        "explanation": "Translates degrees into pulse counts — 103 counts for 0° up to 512 counts for 180°."
+      },
+      {
+        "line": "ledcWrite(SERVO_PIN, pwm_value)",
+        "explanation": "Sends a pulse of that width every 20 ms; the servo turns until its shaft matches."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "servo=myServo(21)",
+        "explanation": "Builds the kit's servo helper on GPIO 21 — the same pin as the Arduino sketch."
+      },
+      {
+        "line": "servo.myServoWriteAngle(i)",
+        "explanation": "Hands the helper an angle in degrees; it works out the pulse width for you."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "A servo reads the width of a repeating pulse and turns its shaft to the matching angle; the sketch only counts degrees and lets map() translate.",
+    "formula": "angle = pulse width — 0.5 ms is 0° · 1.5 ms is 90° · 2.5 ms is 180°",
+    "notes": [
+      {
+        "title": "Where 103 and 512 come from",
+        "body": "At 50 Hz and 12 bits, each 20 ms frame is 4096 counts — so 103 counts lasts about 0.5 ms and 512 counts about 2.5 ms, the two ends of the servo's travel."
+      },
+      {
+        "title": "A straight line of angles",
+        "body": "The mapping is linear — 0.5 ms sits at 0°, 1.5 ms at 90°, 2.5 ms at 180°, and every angle between gets its own width."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "The horn glides smoothly from 0° all the way round to 180°.",
+      "It reverses and glides back, then repeats — about 1.8 seconds each way.",
+      "The pace is steady, like a metronome."
+    ],
+    "successCriteria": "A soft hum while it moves is normal. Each sweep should be one continuous glide, never a twitchy stutter."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "Horn twitches or judders",
+      "firstChecks": [
+        "Power the servo from the 5V pin with its own jumper — a GPIO can't feed a motor."
+      ]
+    },
+    {
+      "symptom": "Sweeps once, then jams at an end",
+      "firstChecks": [
+        "The horn is hitting something — pull it off the shaft and refit it clear."
+      ]
+    },
+    {
+      "symptom": "No motion at all",
+      "firstChecks": [
+        "Check the orange signal wire on GPIO 21, then the red and brown power pair."
+      ]
+    },
+    {
+      "symptom": "Board resets mid-sweep",
+      "firstChecks": [
+        "The USB supply is weak — unplug other loads from the board."
+      ]
+    }
+  ],
+  "challenge": "Sweep a half-arc, rest at each end like a lighthouse, then hunt for the smallest angle step your servo visibly answers.",
+  "logbookPrompts": [
+    "Where did the horn stop on your half-arc, and did it match your prediction?",
+    "How did the one-second rest change the feel of the sweep?",
+    "What was the smallest angle step your servo visibly moved?"
+  ]
+}

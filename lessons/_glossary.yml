@@ -517,3 +517,67 @@ sevenSegment:
     pattern of segments on with LOW bits, and the lit pattern draws the digit.
     0xc0 lights every segment of a "0"; 0xff blanks the display.
   shortcut: One byte per character; a 0 bit lights its segment because the display is common-anode.
+
+dcMotor:
+  title: DC motor
+  body: >
+    A DC motor spins whenever current flows through it — faster with more
+    current, and the other way round when the current reverses. It draws far
+    more current than a GPIO pin can supply, which is why a driver chip and its
+    own power source sit between the board and the motor.
+  shortcut: Speed comes from how much current, direction from which way it flows.
+
+motorDriver:
+  title: L293D motor driver
+  body: >
+    The L293D is a driver chip that switches a motor's heavy current on behalf
+    of the board. Two input pins set the direction (In1 HIGH + In2 LOW spins one
+    way; swapped spins the other), the Enable pin takes PWM for speed, and the
+    +Vmotor pin brings in the motor's own power supply.
+  shortcut: In1/In2 pick the direction, PWM on Enable picks the speed, +Vmotor carries the battery.
+
+externalPower:
+  title: Powering the motor
+  body: >
+    A motor draws 0.2–0.3 A with no load — far beyond what the board's USB
+    supply should feed. The 9V battery powers the motor through the extension
+    board, and the battery and board share a ground so their signals agree.
+    Freenove's warning is blunt: powering the motor straight from the ESP32-S3
+    can permanently damage it.
+  shortcut: The battery drives the motor; the board only sends signals. Always share a ground.
+
+servo:
+  title: Servo
+  body: >
+    A servo packs a DC motor, reduction gears, a position sensor, and a control
+    circuit into one case. Send it a timing signal and it rotates its horn to
+    the angle you asked for and holds there — 0 to 180 degrees. Three wires:
+    orange signal, red power, brown ground.
+  shortcut: A motor that goes TO an angle and holds it, instead of spinning freely.
+
+pulseWidth:
+  title: Servo pulses — 0.5 to 2.5 ms
+  body: >
+    A servo listens for a pulse repeated 50 times a second and reads the
+    pulse's width as an angle: 0.5 ms means 0°, 1.5 ms means the middle, 2.5 ms
+    means 180°. The sketch's map(angle, 0, 180, 103, 512) turns a degree number
+    into exactly that pulse width on the ESP32-S3's PWM hardware.
+  shortcut: The width of the pulse IS the angle — 0.5 ms at one end, 2.5 ms at the other.
+
+i2c:
+  title: I2C — a two-wire bus
+  body: >
+    I2C carries data between the board and a device over just two wires: SDA
+    for data and SCL for the clock that paces it. Every device on the bus has
+    an address, so the board names which one it's talking to — the LCD's
+    backpack chip answers at 0x27 (some at 0x3F).
+  shortcut: Two wires, many devices, each with its own address.
+
+lcd1602:
+  title: LCD1602 module
+  body: >
+    A 16-character by 2-line liquid crystal display with an I2C backpack chip
+    (PCF8574T) soldered on, so four wires run the whole screen: power, ground,
+    SDA, and SCL. The sketch addresses it, switches on the backlight, places
+    the cursor, and prints text.
+  shortcut: 16 columns × 2 rows over four wires; if it powers up blank, check the address and the contrast dial.

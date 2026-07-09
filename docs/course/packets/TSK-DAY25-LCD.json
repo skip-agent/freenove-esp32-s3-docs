@@ -1,0 +1,175 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY25-LCD",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 25,
+  "title": "LCD1602: give the project a display",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 25,
+  "mission": "Wire the LCD1602's four backpack pins to the board, install the bundled I2C library once, upload the Arduino sketch, and read \"hello, world!\" plus a live seconds counter on the glass — your project's first screen.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "officialPdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+    "chapter": "Chapter 18 LCD1602",
+    "page": 165,
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_18.1_Display_the_string_on_LCD1602/Sketch_18.1_Display_the_string_on_LCD1602.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/17.1_IIC_LCD1602/IIC_LCD1602.py",
+    "imageAsset": "docs/course/assets/day-25/circuit-page-165.png",
+    "imageAlt": "Official Freenove circuit for the LCD1602: the module's I2C backpack wired with four jumpers — GND to ground, VCC to 5V, SDA to GPIO 14, and SCL to GPIO 13 — shown as both a schematic and a breadboard photo.",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "GPIO extension board",
+      "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
+      "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
+    },
+    {
+      "name": "LCD1602 module",
+      "imageAsset": "docs/course/assets/shared/item-lcd1602.png",
+      "explanation": "A 16-character by 2-line liquid crystal display with an I2C backpack chip (PCF8574T) soldered on, so four wires run the whole screen: power, ground, SDA, and SCL. The sketch addresses it, switches on the backlight, places the cursor, and prints text."
+    },
+    {
+      "name": "4 × jumper wires (F/M)",
+      "imageAsset": "docs/course/assets/shared/item-jumper-wire.png",
+      "explanation": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    }
+  ],
+  "wiring": [
+    {
+      "partPin": "LCD GND",
+      "connectTo": "GND",
+      "reason": "Gives the module the same zero-volt reference as the board."
+    },
+    {
+      "partPin": "LCD VCC",
+      "connectTo": "5V",
+      "reason": "The screen and its backlight run on the full five volts."
+    },
+    {
+      "partPin": "LCD SDA",
+      "connectTo": "GPIO 14",
+      "reason": "The data wire — every character rides in on this line."
+    },
+    {
+      "partPin": "LCD SCL",
+      "connectTo": "GPIO 13",
+      "reason": "The clock wire that keeps sender and screen in step."
+    }
+  ],
+  "coachInstructions": [
+    "Guide one backpack pin at a time — GND, VCC to 5V, SDA to GPIO 14, SCL to GPIO 13 — and wait for learner confirmation before proceeding.",
+    "The top gotcha is the contrast dial; a lit backlight with blank rows means turn the dial on the back of the module, never a code change.",
+    "If nothing glows at all, check VCC on the 5V pin and GND before touching the signal wires or the sketch.",
+    "A compile error naming LiquidCrystal_I2C.h means the ZIP library step was skipped — walk them through Sketch → Include Library → Add .ZIP Library… with the kit's LiquidCrystal_I2C-1.1.2.zip.",
+    "Swapped SDA and SCL look like a dead screen with a working backlight — confirm SDA is on GPIO 14 and SCL on GPIO 13 before suspecting the module.",
+    "Leave the 0x27/0x3F address logic alone — the sketch tests 0x27 and falls back to 0x3F on its own; restore the auto-test if the learner has hand-edited an address.",
+    "Keep the Arduino path primary; MicroPython is optional only if already set up, and it additionally needs I2C_LCD.py and LCD_API.py copied to the board."
+  ],
+  "steps": [
+    "Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.",
+    "Turn the LCD module over and find the four labelled pins on its backpack — GND, VCC, SDA, SCL.",
+    "Slide female jumper ends onto GND and VCC, then land them on the board's GND and 5V pins.",
+    "Wire SDA to GPIO 14 and SCL to GPIO 13.",
+    "Compare every wire to the chart before you plug in USB.",
+    "In Arduino IDE choose Sketch → Include Library → Add .ZIP Library… and pick LiquidCrystal_I2C-1.1.2.zip from the kit download's C/Libraries folder — you install it once and it stays.",
+    "Open Sketch_18.1_Display_the_string_on_LCD1602.ino and upload it. (Wire.h, the I2C library, ships with the board package.)",
+    "Watch row 0 greet you and row 1 start counting seconds."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "Wire.begin(SDA, SCL)",
+        "explanation": "Starts the I2C bus with GPIO 14 as the data line and GPIO 13 as the clock."
+      },
+      {
+        "line": "LiquidCrystal_I2C lcd(0x27,16,2)",
+        "explanation": "Names the display by its bus address — 16 columns, 2 rows. If nothing answers at 0x27, i2CAddrTest lets the sketch switch to 0x3F by itself."
+      },
+      {
+        "line": "lcd.setCursor(0,1)",
+        "explanation": "Parks the cursor at column 0 of row 1 so the next print lands on the bottom row."
+      },
+      {
+        "line": "lcd.print(millis() / 1000)",
+        "explanation": "Prints the seconds since the board booted — the running count you see tick."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "devices = i2c.scan()",
+        "explanation": "Asks every address on the bus and uses whichever one answers — the same job the Arduino sketch's address test does."
+      },
+      {
+        "line": "lcd.putstr(\"Counter:%d\" %(count))",
+        "explanation": "Rewrites row 1 with the running count once a second."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "I2C moves every character over one data wire and one clock wire; the backpack chip turns those messages into the signals the bare LCD needs.",
+    "formula": "two wires → address → cursor position → characters",
+    "notes": [
+      {
+        "title": "Another kind of serial",
+        "body": "The bits travel single file down SDA the way they travel down USB to your Serial Monitor; SCL is the shared clock that tells both ends when each bit counts."
+      },
+      {
+        "title": "Two possible addresses",
+        "body": "Backpacks built on the PCF8574T chip answer at 0x27 and PCF8574AT boards answer at 0x3F. The sketch tries 0x27 first and switches by itself when nothing replies."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "Row 0 shows \"hello, world!\" as soon as the sketch starts.",
+      "Row 1 shows \"Counter:\" followed by the seconds since the board booted.",
+      "The number ticks up once a second for as long as the board has power."
+    ],
+    "successCriteria": "A glowing backlight with blank rows is normal at first — the contrast dial on the back of the module sets whether characters show, and it often ships turned too far."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "Backlight on but no characters",
+      "firstChecks": [
+        "Turn the small contrast dial on the back of the module slowly until the text appears."
+      ]
+    },
+    {
+      "symptom": "Nothing at all — no glow",
+      "firstChecks": [
+        "Check the VCC and GND pair first, then SDA on GPIO 14 and SCL on GPIO 13."
+      ]
+    },
+    {
+      "symptom": "Compile fails on LiquidCrystal_I2C.h",
+      "firstChecks": [
+        "The library step was skipped — add the kit's ZIP via Sketch → Include Library → Add .ZIP Library…"
+      ]
+    },
+    {
+      "symptom": "Counter frozen",
+      "firstChecks": [
+        "Re-upload the sketch, then press the board's reset button."
+      ]
+    }
+  ],
+  "challenge": "Put your boat's name on row 0, turn the counter into minutes and seconds, then overflow a row on purpose and fix it.",
+  "logbookPrompts": [
+    "What did the screen do with the characters past column sixteen?",
+    "How would you show a sensor reading from an earlier day on this screen?",
+    "Where on a real boat would a two-line display earn its keep?"
+  ]
+}

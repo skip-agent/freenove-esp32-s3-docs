@@ -122,6 +122,30 @@
       "origin": "Freenove manual — 7-segment display module photo (C Tutorial, Chapter 15 74HC595 & 7-Segment Display, page 138)",
       "kind": "kit-item photo",
       "alt": "Official manual photo of a one-digit seven-segment display module with its pins numbered 10, 6, 1, and 5 at the corners."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-motor.png",
+      "origin": "Freenove manual — DC motor component photo (C Tutorial, Chapter 16 Relay & Motor, page 145)",
+      "kind": "kit-item photo",
+      "alt": "Official manual photo of a small DC motor with two terminals and a metal shaft."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-l293d.png",
+      "origin": "Freenove manual — L293D motor driver chip photo (C Tutorial, Chapter 16 Relay & Motor, page 145)",
+      "kind": "kit-item photo",
+      "alt": "Official manual photo of the L293D motor driver chip, a sixteen-pin integrated circuit."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-servo.png",
+      "origin": "Freenove manual — servo photo with wire labels (C Tutorial, Chapter 17 Servo, page 153)",
+      "kind": "kit-item photo",
+      "alt": "Official manual illustration of a servo with its three wires labelled 1 signal, 2 power, and 3 ground."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-lcd1602.png",
+      "origin": "Freenove manual — I2C LCD1602 module photo (C Tutorial, Chapter 18 LCD1602, page 163)",
+      "kind": "kit-item photo",
+      "alt": "Official manual photo of the I2C LCD1602 module, a sixteen-by-two character display with a four-pin I2C backpack."
     }
   ],
   "days": {
@@ -315,6 +339,54 @@
         },
         "kind": "per-day circuit diagram (cropped from the official PDF)",
         "alt": "Official Freenove circuit for the seven-segment display: the 74HC595 driven from GPIO 12, 13, and 14 with its outputs driving the display's segments through 220-ohm resistors, shown as both a schematic and a breadboard photo."
+      }
+    ],
+    "22": [
+      {
+        "asset": "course-assets/assets/day-22/circuit-page-147.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 16 Relay & Motor",
+          "page": 147
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF, including Freenove's 9V-battery note)",
+        "alt": "Official Freenove circuit for the motor: an L293D driver on GPIO 12, 13, and 14, a potentiometer on GPIO 1, the motor on the driver's outputs, and a 9V battery powering the extension board, shown as both a schematic and a breadboard photo."
+      }
+    ],
+    "23": [
+      {
+        "asset": "course-assets/assets/day-23/circuit-page-154.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 17 Servo",
+          "page": 154
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF)",
+        "alt": "Official Freenove circuit for the servo sweep: the servo's signal wire on GPIO 21, power on 5V, and ground to GND, shown as both a schematic and a breadboard photo."
+      }
+    ],
+    "24": [
+      {
+        "asset": "course-assets/assets/day-24/circuit-page-159.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 17 Servo",
+          "page": 159
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF; Project 17.2 Servo Knop)",
+        "alt": "Official Freenove circuit for the servo knob: a potentiometer feeding GPIO 14 and the servo's signal wire on GPIO 21, shown as both a schematic and a breadboard photo."
+      }
+    ],
+    "25": [
+      {
+        "asset": "course-assets/assets/day-25/circuit-page-165.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 18 LCD1602",
+          "page": 165
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF)",
+        "alt": "Official Freenove circuit for the LCD1602: the module's SDA on GPIO 14, SCL on GPIO 13, power on 5V, and ground to GND, shown as both a schematic and a breadboard photo."
       }
     ],
     "26": [
