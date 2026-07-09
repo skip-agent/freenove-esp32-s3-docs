@@ -87,6 +87,18 @@ class ValidationTests(unittest.TestCase):
         errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
         self.assertEqual(errors, [], f"theory is optional: {errors}")
 
+    def test_incomplete_micropython_fails(self):
+        lesson = load_day26()
+        del lesson["code"]["micropython"]["excerpt"]
+        errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
+        self.assertTrue(any("code.micropython.excerpt" in e for e in errors), errors)
+
+    def test_absent_micropython_is_ok(self):
+        lesson = load_day26()
+        del lesson["code"]["micropython"]
+        errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
+        self.assertEqual(errors, [], f"micropython is optional: {errors}")
+
     def test_bad_track_fails(self):
         lesson = load_day26()
         lesson["tracks"]["main"] = "micropython"

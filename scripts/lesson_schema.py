@@ -225,11 +225,17 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
     steps = _as_list(_as_dict(lesson.get("steps")).get("items"))
     _require(errors, len(steps) > 0, f"{code}: steps.items must be non-empty")
 
-    # Code focus — Arduino is required; MicroPython optional
-    arduino = _as_dict(_as_dict(lesson.get("code")).get("arduino"))
+    # Code focus — Arduino is required; MicroPython optional but complete if present
+    code_block = _as_dict(lesson.get("code"))
+    arduino = _as_dict(code_block.get("arduino"))
     for field in ("sketch", "excerpt"):
         _require(errors, _nonempty(arduino.get(field)),
                  f"{code}: code.arduino.{field} is required")
+    if code_block.get("micropython") is not None:
+        micro_block = _as_dict(code_block.get("micropython"))
+        for field in ("file", "path", "excerpt"):
+            _require(errors, _nonempty(micro_block.get(field)),
+                     f"{code}: code.micropython.{field} is required when a micropython block is present")
 
     # Theory is optional (setup days may have none), but must be complete if present
     theory = lesson.get("theory")
