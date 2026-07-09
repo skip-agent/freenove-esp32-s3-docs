@@ -49,6 +49,20 @@ class ValidationTests(unittest.TestCase):
         errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
         self.assertTrue(any("alt" in e for e in errors), errors)
 
+    def test_blank_yaml_null_alt_fails(self):
+        # a present-but-blank YAML field loads as None and must still fail
+        lesson = load_day26()
+        lesson["parts"]["items"][0]["alt"] = None
+        errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
+        self.assertTrue(any("alt is required" in e for e in errors), errors)
+
+    def test_nonempty_helper(self):
+        self.assertFalse(lesson_schema._nonempty(None))
+        self.assertFalse(lesson_schema._nonempty(""))
+        self.assertFalse(lesson_schema._nonempty("   "))
+        self.assertFalse(lesson_schema._nonempty(19))
+        self.assertTrue(lesson_schema._nonempty("x"))
+
     def test_missing_diagram_source_fails(self):
         lesson = load_day26()
         del lesson["wiring"]["diagram"]["source"]["page"]

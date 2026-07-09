@@ -134,6 +134,15 @@ def _as_list(node) -> list:
     return node if isinstance(node, list) else []
 
 
+def _nonempty(value) -> bool:
+    """True only for a real, non-blank string.
+
+    A blank YAML field (``alt:``) loads as None; ``str(None).strip()`` would be
+    the truthy ``"None"``, so required-text checks must go through this helper.
+    """
+    return isinstance(value, str) and bool(value.strip())
+
+
 def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
     """Return a list of human-readable problems for one lesson (empty = valid)."""
     errors: list[str] = []
@@ -162,7 +171,7 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
         _require(errors, code_match.group(1) == f"{day:02d}",
                  f"{code}: lessonCode day {code_match.group(1)} does not match day {day}")
     for field in ("title", "mission", "learnerProfile", "unlocks"):
-        _require(errors, bool(str(lesson.get(field, "")).strip()),
+        _require(errors, _nonempty(lesson.get(field)),
                  f"{code}: {field} is required")
     _require(errors, lesson.get("status") in STATUSES,
              f"{code}: status must be one of {sorted(STATUSES)}")
@@ -190,14 +199,14 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
         if not _require_mapping(part, where):
             continue
         for field in ("name", "image", "imageKind", "blurb", "alt"):
-            _require(errors, bool(str(part.get(field, "")).strip()),
+            _require(errors, _nonempty(part.get(field)),
                      f"{code}: {where}.{field} is required")
 
     # Wiring — diagram carries alt + source; pins have from/to/why
     wiring = _as_dict(lesson.get("wiring"))
     diagram = _as_dict(wiring.get("diagram"))
     for field in ("image", "alt", "caption"):
-        _require(errors, bool(str(diagram.get(field, "")).strip()),
+        _require(errors, _nonempty(diagram.get(field)),
                  f"{code}: wiring.diagram.{field} is required")
     src = _as_dict(diagram.get("source"))
     for field in ("pdf", "chapter", "page"):
@@ -209,7 +218,7 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
         if not _require_mapping(pin, f"wiring.pins[{i}]"):
             continue
         for field in ("from", "to", "why"):
-            _require(errors, bool(str(pin.get(field, "")).strip()),
+            _require(errors, _nonempty(pin.get(field)),
                      f"{code}: wiring.pins[{i}].{field} is required")
 
     # Steps
@@ -219,7 +228,7 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
     # Code focus — Arduino is required; MicroPython optional
     arduino = _as_dict(_as_dict(lesson.get("code")).get("arduino"))
     for field in ("sketch", "excerpt"):
-        _require(errors, bool(str(arduino.get(field, "")).strip()),
+        _require(errors, _nonempty(arduino.get(field)),
                  f"{code}: code.arduino.{field} is required")
 
     # Theory is optional (setup days may have none), but must be complete if present
@@ -228,7 +237,7 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
         theory = _as_dict(theory)
         _require(errors, len(_as_list(theory.get("flow"))) > 0,
                  f"{code}: theory.flow must be non-empty when theory is present")
-        _require(errors, bool(str(theory.get("formula", "")).strip()),
+        _require(errors, _nonempty(theory.get("formula")),
                  f"{code}: theory.formula is required when theory is present")
 
     # Test
@@ -240,9 +249,9 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
 
     # Challenge + logbook
     challenge = _as_dict(lesson.get("challenge"))
-    _require(errors, bool(str(challenge.get("title", "")).strip()),
+    _require(errors, _nonempty(challenge.get("title")),
              f"{code}: challenge.title is required")
-    _require(errors, bool(str(challenge.get("summary", "")).strip()),
+    _require(errors, _nonempty(challenge.get("summary")),
              f"{code}: challenge.summary is required (feeds the agent packet)")
     _require(errors, len(_as_list(challenge.get("logbook"))) > 0,
              f"{code}: challenge.logbook must be non-empty")
@@ -254,7 +263,7 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
 
     # Provenance / license
     source = _as_dict(lesson.get("source"))
-    _require(errors, bool(str(source.get("license", "")).strip()),
+    _require(errors, _nonempty(source.get("license")),
              f"{code}: source.license is required")
 
     # Shape guard — every list/sub-block the renderer dereferences with .get must
