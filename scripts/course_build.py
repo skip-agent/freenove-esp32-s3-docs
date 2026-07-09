@@ -152,6 +152,34 @@ def _section_meta(kind: str, block: dict) -> dict:
     }
 
 
+def _has_instrument(hero: dict) -> bool:
+    """A day shows a live instrument only if it opts in. Setup/LED/servo days
+    leave it out and get a clean text hero (the sonar animation is Day-26's)."""
+    return (hero.get("instrument") or "none") not in ("none", "")
+
+
+def _hero_instrument(hero: dict, instrument: str, readout: dict) -> str:
+    """The signature instrument card. Only 'sounder' is rich today; other
+    values render the same frame with a static readout until a bespoke
+    instrument is built for them."""
+    default_aria = ("Animated depth sounder: a sensor sends pings toward a target "
+                    "and reads back a live distance in centimetres."
+                    if instrument == "sounder" else "Live lesson instrument.")
+    aria = hero.get("instrumentAria") or default_aria
+    return f"""<div class="sounder" data-instrument="{instrument}" role="img" aria-label="{esc(aria)}">
+          <div class="sounder-head"><span>{esc(hero.get("instrumentTitle", "Live instrument"))}</span><span class="dot" aria-hidden="true"></span></div>
+          <div class="sounder-stage" aria-hidden="true">
+            <span class="sounder-sensor"></span>
+            <span class="ping"></span><span class="ping"></span><span class="ping"></span>
+            <span class="sounder-target" id="sounderTarget"></span>
+          </div>
+          <div class="sounder-readout">
+            <span class="label">{esc(readout.get("label", "Reading"))}</span>
+            <span class="value" id="sounderValue">{esc(readout.get("value", "0"))}<small>{esc(readout.get("unit", ""))}</small></span>
+          </div>
+        </div>"""
+
+
 def _hero(lesson: dict, day: int, total: int) -> str:
     hero = lesson.get("hero") or {}
     readout = hero.get("readout") or {}
@@ -179,19 +207,8 @@ def _hero(lesson: dict, day: int, total: int) -> str:
           {"".join(pills)}
         </div>
       </div>
-      <div class="hero-side">
-        <div class="sounder" data-instrument="{instrument}" role="img" aria-label="Animated depth sounder: a sensor sends pings toward a target and reads back a live distance in centimetres.">
-          <div class="sounder-head"><span>{esc(hero.get("instrumentTitle", "Live instrument"))}</span><span class="dot" aria-hidden="true"></span></div>
-          <div class="sounder-stage" aria-hidden="true">
-            <span class="sounder-sensor"></span>
-            <span class="ping"></span><span class="ping"></span><span class="ping"></span>
-            <span class="sounder-target" id="sounderTarget"></span>
-          </div>
-          <div class="sounder-readout">
-            <span class="label">{esc(readout.get("label", "Reading"))}</span>
-            <span class="value" id="sounderValue">{esc(readout.get("value", "0"))}<small>{esc(readout.get("unit", ""))}</small></span>
-          </div>
-        </div>
+      <div class="hero-side{"" if _has_instrument(hero) else " no-instrument"}">
+        {_hero_instrument(hero, instrument, readout) if _has_instrument(hero) else ""}
         <div class="agent-strip">
           <div class="lesson-code">
             <span class="label">Agent assist code</span>
@@ -396,22 +413,33 @@ def _theory_section(index: int, block: dict) -> str:
 
 def _test_section(index: int, block: dict) -> str:
     meta = _section_meta("test", block)
-    lines = "".join(f"<span>{esc(line)}</span>" for line in block.get("expected") or [])
+    mode = block.get("mode", "serial")
     checks = []
     for check in block.get("checks") or []:
         checks.append(f"""                  <li><strong>{esc(check.get("symptom"))}</strong> {inline(check.get("fix"))}</li>""")
     note = block.get("expectedNote")
     note_html = f'\n                <p class="micropython-note">{esc(note)}</p>' if note else ""
+    if mode == "visual":
+        # An honest what-you-should-see/hear panel for days whose result is a
+        # blink, colour, sound, or movement — not a Serial Monitor.
+        items = "".join(f"<li>{inline(line)}</li>" for line in block.get("expected") or [])
+        result_html = f"""<div class="observe" aria-label="What you should see">
+                  <div class="bar"><span>{esc(block.get("readoutLabel", "Look at the board"))}</span></div>
+                  <ul class="observe-lines">{items}</ul>
+                </div>"""
+    else:
+        lines = "".join(f"<span>{esc(line)}</span>" for line in block.get("expected") or [])
+        result_html = f"""<div class="serial" aria-label="Expected Serial Monitor output">
+                  <div class="bar"><span>Serial Monitor</span><span class="baud">{esc(block.get("baud", ""))} baud</span></div>
+                  <div class="lines">{lines}</div>
+                </div>"""
     return f"""        <section id="test" class="card">
           <div class="card-inner">
 {_section_head(index, meta, block.get("intro", ""))}
             <div class="test-grid">
               <div>
                 <span class="readout-title">{esc(block.get("expectedTitle", "What you should see"))}</span>
-                <div class="serial" aria-label="Expected Serial Monitor output">
-                  <div class="bar"><span>Serial Monitor</span><span class="baud">{esc(block.get("baud", ""))} baud</span></div>
-                  <div class="lines">{lines}</div>
-                </div>{note_html}
+                {result_html}{note_html}
               </div>
               <div>
                 <span class="checks-title">{esc(block.get("checksTitle", "If it doesn't"))}</span>
