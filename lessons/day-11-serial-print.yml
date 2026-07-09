@@ -1,0 +1,212 @@
+# Day 11 — Serial print · tinyskiff.lesson.v1
+# One source of truth: this file renders to the guided page
+# (/course/day-11-serial-print/), the agent packet, and the course-map entry.
+# The first day the board talks back — no wiring, just words over USB.
+
+schema: tinyskiff.lesson.v1
+lessonCode: TSK-DAY11-SERIALPRINT
+day: 11
+slug: day-11-serial-print
+title: Make the board talk back
+status: published
+estimatedTimeMinutes: 15
+tracks: { main: arduino, optional: micropython }
+learnerProfile: adult beginner; curious and capable; no electronics assumed
+
+mission: >
+  Upload a sketch with no wiring at all, open Serial Monitor, and watch the
+  ESP32-S3 print a start-up line and then count its own running time in seconds —
+  the board's first words back to you over the USB cable.
+unlocks: The board can send text back to your computer over USB, so you can watch what your code is doing instead of only guessing from lights.
+seoDescription: >
+  Open Serial Monitor and watch the ESP32-S3 print text over USB. No wiring — just
+  Serial.begin, println, and printf reporting the board's running time in seconds.
+
+hero:
+  instrument: none
+  headline: Make the board|{talk back}
+  lede: >
+    No wiring today. You upload a short sketch, open Serial Monitor, and the
+    ESP32-S3 starts sending text up the same USB cable that carries your code — a
+    start-up line first, then a running clock that ticks up every second.
+  pills:
+    - { text: About 15 minutes, key: true }
+    - Arduino first
+    - MicroPython optional
+    - No wiring today
+
+parts:
+  intro: >
+    Almost nothing today — the board talks over the same USB cable that's already
+    uploading your code. Tap *Define* on anything unfamiliar; the answer opens as
+    a field note you can read and dismiss without losing your place.
+  items:
+    - name: ESP32-S3 board
+      image: shared/item-esp32-s3-board.jpg
+      imageKind: Manual photo
+      alt: Official manual photo of the ESP32-S3 development board.
+      blurb: The brain that runs your sketch and sends the text.
+      explain: esp32
+    - name: Arduino IDE
+      image: shared/item-arduino-ide.png
+      imageKind: Manual screenshot
+      alt: Official manual screenshot of the Arduino IDE interface.
+      blurb: Uploads the sketch and opens Serial Monitor.
+      explain: arduino
+    - name: Official sketch
+      image: shared/item-official-sketch.png
+      imageKind: Manual sketch
+      alt: Official manual page showing an Arduino sketch and its Serial Monitor output.
+      blurb: "`Sketch_07.1_SerialPrinter.ino`"
+      explain: sketch
+
+steps:
+  intro: >
+    The whole day is upload, open the monitor, and read. Tap each step as you go
+    to keep your place — you can finish without opening a single field note.
+  items:
+    - Plug the ESP32-S3 into your computer with a data-capable USB cable.
+    - In Arduino IDE, select your ESP32-S3 board and the port it appears on.
+    - Open `Sketch_07.1_SerialPrinter.ino`.
+    - Press **Upload** and wait for the IDE to say `Done uploading`.
+    - Open Serial Monitor and set the baud rate to `115200`. {serial}
+    - Watch the start-up line appear, then a running-time count that climbs every second.
+  done:
+    icon: "📡"
+    title: The board has a voice.
+    body: Your ESP32-S3 is sending text back over USB. Head to Test & debug to confirm what should scroll past.
+
+code:
+  intro: >
+    The whole sketch is short. Two lines in `setup()` open the link and announce
+    the board is ready; the `loop()` prints a running-time line once a second.
+    Switch to MicroPython if you'd rather see the same idea in Python.
+  arduino:
+    file: Sketch_07.1_SerialPrinter.ino
+    sketch: C/Sketches/Sketch_07.1_SerialPrinter/Sketch_07.1_SerialPrinter.ino
+    excerpt: |
+      void setup() {
+        Serial.begin(115200);
+        Serial.println("ESP32S3 initialization completed!");
+      }
+
+      void loop() {
+        Serial.printf("Running time : %.1f s\r\n", millis() / 1000.0f);
+        delay(1000);
+      }
+    notes:
+      - code: Serial.begin(115200)
+        text: Opens the USB serial link at 115200 baud — the same number you set in Serial Monitor.
+        explain: serialBegin
+      - code: Serial.println("ESP32S3 initialization completed!")
+        text: Sends one line of text, then moves to the next line — the board's start-up announcement.
+        explain: serialPrint
+      - code: 'Serial.printf("Running time : %.1f s\r\n", millis() / 1000.0f)'
+        text: Fills the running time into the text, one decimal place, and sends it once a second.
+        explain: millis
+  micropython:
+    file: 07.1_Serial_Print/Serial_Print.py
+    path: Python/Python_Codes/07.1_Serial_Print/Serial_Print.py
+    optionalTag: Optional side path · no wiring
+    excerpt: |
+      import time
+
+      print("ESP32S3 initialization completed!")
+
+      while True:
+          print("Running time : ", time.ticks_ms()/1000, "s")
+          time.sleep(1)
+    notes:
+      - code: print("ESP32S3 initialization completed!")
+        text: In MicroPython, print() sends text up the same USB serial link Thonny reads.
+      - code: time.ticks_ms()/1000
+        text: Milliseconds since the board started, divided into seconds — the same running clock as the Arduino sketch.
+    note: >
+      Same cable, no wiring. MicroPython's print() lands in Thonny's shell instead
+      of Serial Monitor, but the idea is identical. If MicroPython isn't set up
+      yet, skip this — it should never block the Arduino-first path.
+
+theory:
+  title: How the board talks over USB
+  summary: One USB cable carries both your upload and the board's replies, as long as both ends agree on the baud rate.
+  intro: >
+    There's no new hardware today — the same cable that flashes your code doubles
+    as a two-way text line, provided the board and the monitor keep the same pace.
+  flow:
+    - { n: Open the link, title: Serial.begin, body: The board switches the USB line into text mode at a set speed. }
+    - { n: Agree on speed, title: Same baud, body: Serial Monitor must use the same 115200 or the text arrives scrambled. }
+    - { n: Send a line, title: println, body: Each print pushes characters up the cable to your screen. }
+    - { n: Keep reporting, title: Once a second, body: The loop prints the running time again after each delay. }
+  formulaLabel: The rule
+  formula: readable text = **board baud** = **monitor baud**
+  notes:
+    - title: What the baud rate is
+      explain: serialBegin
+      body: Baud is how fast the two sides send signal changes. Both must agree, or the letters turn to gibberish.
+    - title: Where the number comes from
+      explain: millis
+      body: millis() is the board's own stopwatch — milliseconds since it booted — which the sketch divides into seconds.
+
+test:
+  mode: serial
+  intro: >
+    Success and recovery sit side by side, so you never have to go hunting when
+    something looks off.
+  expectedTitle: What you should see
+  baud: 115200
+  expected:
+    - "ESP32S3 initialization completed!"
+    - "Running time : 1.0 s"
+    - "Running time : 2.0 s"
+    - "Running time : 3.0 s"
+  expectedNote: The first line prints once at start-up; the running time then climbs by about one each second.
+  checksTitle: If it doesn't
+  checks:
+    - symptom: "Garbled or random characters?"
+      fix: "Set Serial Monitor to 115200 baud to match the sketch."
+    - symptom: "Blank monitor?"
+      fix: "Confirm the right board and port, then press the board's reset button."
+    - symptom: "Only the first line, no count?"
+      fix: "Give it a second — the running time prints once per delay(1000)."
+    - symptom: "Upload fails?"
+      fix: "Swap in a data-capable USB cable."
+
+challenge:
+  title: "Try this: change what it says"
+  railLabel: Try this
+  intro: >
+    Same working sketch, no wiring — just the text and the timing. It fits inside
+    today's 15 minutes.
+  summary: Change the start-up message and the reporting speed, then add a line of your own to the loop.
+  cards:
+    - title: Rename the start-up line
+      explain: serialPrint
+      body: Change the words inside `Serial.println("…")` and re-upload — the board greets you however you like.
+    - title: Report faster
+      explain: millis
+      body: Lower the `delay(1000)` to `delay(250)` so the running time updates four times a second, then add a second `Serial.println` of your own.
+  logbook:
+    - What message did you have the board greet you with?
+    - How fast could the running time update before it was hard to read?
+    - What would you want the board to report back to you in a real project?
+
+agent:
+  intro: >
+    Every lesson ships with a code and a machine-readable packet, so an agent can
+    guide you with full context.
+  behaviour: >
+    keep it to upload-and-read, check board, port, cable, and baud rate before
+    touching code, and explain Serial.begin, println, and millis on request.
+  coachInstructions:
+    - Keep the day to upload-and-read; there is nothing to wire.
+    - If the monitor shows garbled text, the baud rate is the first thing to check — it must be 115200.
+    - If the monitor is blank, check board, port, and a data-capable cable, then have the learner press reset.
+    - Explain that one USB cable carries both the upload and the board's replies; do not front-load theory.
+    - For the challenge, change only the message text and the delay value, preserving the working sketch.
+    - Keep the Arduino path primary; MicroPython's print() lands in Thonny's shell and is optional only if already set up.
+
+source:
+  license: CC BY-NC-SA 3.0
+  licenseNote: >
+    Based on Freenove official material released under CC BY-NC-SA 3.0; preserve
+    attribution and non-affiliation language.

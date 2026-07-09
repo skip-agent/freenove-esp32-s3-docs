@@ -1,0 +1,137 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY12-SERIALRW",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 12,
+  "title": "Type to the board, hear it answer",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 15,
+  "mission": "Upload a sketch with no wiring, open Serial Monitor, type a message, and watch the ESP32-S3 read what you sent and echo it straight back — the USB line working both ways for the first time.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_07.2_SerialRW/Sketch_07.2_SerialRW.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/07.2_Serial_Read_and_Write/Serial_Read_and_Write.py",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    },
+    {
+      "name": "Official sketch",
+      "imageAsset": "docs/course/assets/shared/item-official-sketch.png",
+      "explanation": "A sketch is the Arduino name for a program. This lesson uses Freenove's Sketch_19.1_Ultrasonic_Ranging.ino so you can focus first on wiring, observation, and the measurement model."
+    }
+  ],
+  "wiring": [],
+  "coachInstructions": [
+    "Keep the day to upload, type, and read the reply; there is nothing to wire.",
+    "If nothing echoes back, the Newline line ending is the first thing to check — the board waits for it to end a message.",
+    "If text is garbled, confirm the baud rate is 115200; if the monitor is blank at start, check board and port and press reset.",
+    "Explain that the same USB cable now carries words both ways; do not front-load theory.",
+    "For the challenge, change only the reply text or add a single word check, preserving the working loop.",
+    "Keep the Arduino path primary; MicroPython's input() reads from Thonny's shell and is optional only if already set up."
+  ],
+  "steps": [
+    "Plug the ESP32-S3 into your computer with a data-capable USB cable.",
+    "In Arduino IDE, select your ESP32-S3 board and the port it appears on.",
+    "Open Sketch_07.2_SerialRW.ino.",
+    "Press Upload and wait for the IDE to say Done uploading.",
+    "Open Serial Monitor, set the baud rate to 115200, and set the line ending to Newline.",
+    "Type a word into the input box, press Enter, and watch the board echo it back."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "Serial.available()",
+        "explanation": "Checks whether you've sent any characters yet, so the board reads only when there's something waiting."
+      },
+      {
+        "line": "Serial.readStringUntil('\\n')",
+        "explanation": "Gathers what you typed up to the Enter key into one complete message."
+      },
+      {
+        "line": "inputString.trim()",
+        "explanation": "Trims the stray newline and spaces off the ends so the echo is clean."
+      },
+      {
+        "line": "Serial.printf(\"inputString: %s\\r\\n\", inputString.c_str())",
+        "explanation": "Sends your message straight back, then the sketch clears it and waits for the next one."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "input()",
+        "explanation": "In MicroPython, input() waits for a line you type in Thonny's shell — the same pause-and-read as Serial.available plus readStringUntil."
+      },
+      {
+        "line": "print(\"inputString: \", input())",
+        "explanation": "Echoes your typed line straight back, just like the Arduino sketch."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "The board checks whether anything arrived, reads a whole line, and answers — the USB link working both directions.",
+    "formula": "check → read a line → answer → wait",
+    "notes": [
+      {
+        "title": "Why check before reading",
+        "body": "Reading when nothing has arrived would just return empty. available() lets the board wait for real input instead."
+      },
+      {
+        "title": "What readStringUntil does",
+        "body": "It gathers characters until the newline you send with Enter, so the board gets one whole message rather than single letters."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "ESP32S3 initialization completed!",
+      "Ready to receive data...",
+      "(you type) hello",
+      "inputString: hello"
+    ],
+    "successCriteria": "The start-up lines print once; after that, each line you send comes straight back prefixed with \"inputString:\"."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "Nothing echoes back",
+      "firstChecks": [
+        "Set the line ending to Newline so the board sees where your message ends."
+      ]
+    },
+    {
+      "symptom": "Garbled characters",
+      "firstChecks": [
+        "Set Serial Monitor to 115200 baud to match the sketch."
+      ]
+    },
+    {
+      "symptom": "Blank monitor at start",
+      "firstChecks": [
+        "Confirm the right board and port, then press the board's reset button."
+      ]
+    },
+    {
+      "symptom": "Upload fails",
+      "firstChecks": [
+        "Swap in a data-capable USB cable."
+      ]
+    }
+  ],
+  "challenge": "Change the reply so the board wraps your message in words of its own, then make it react to one specific word.",
+  "logbookPrompts": [
+    "What reply did you have the board send back?",
+    "What word did you teach it to react to, and what did it answer?",
+    "What could you control if a typed word could trigger an action later?"
+  ]
+}

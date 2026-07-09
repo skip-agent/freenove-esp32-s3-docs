@@ -1,0 +1,220 @@
+# Day 12 — Serial read and write · tinyskiff.lesson.v1
+# One source of truth: this file renders to the guided page
+# (/course/day-12-serial-rw/), the agent packet, and the course-map entry.
+# The board starts listening — you type, it reads, it answers. Still no wiring.
+
+schema: tinyskiff.lesson.v1
+lessonCode: TSK-DAY12-SERIALRW
+day: 12
+slug: day-12-serial-rw
+title: Type to the board, hear it answer
+status: published
+estimatedTimeMinutes: 15
+tracks: { main: arduino, optional: micropython }
+learnerProfile: adult beginner; curious and capable; no electronics assumed
+
+mission: >
+  Upload a sketch with no wiring, open Serial Monitor, type a message, and watch
+  the ESP32-S3 read what you sent and echo it straight back — the USB line
+  working both ways for the first time.
+unlocks: The USB link runs both ways, so your code can react to what you type — the start of a real conversation between you and the board.
+seoDescription: >
+  Type into Serial Monitor and watch the ESP32-S3 read your message and echo it
+  back. No wiring — just Serial.available and readStringUntil turning USB two-way.
+
+hero:
+  instrument: none
+  headline: Type to the board|hear it {answer}
+  lede: >
+    Yesterday the board only talked. Today it listens. You upload a short sketch,
+    type a message into Serial Monitor, and the ESP32-S3 reads what you sent and
+    sends it right back — the same USB cable now carrying words in both directions.
+  pills:
+    - { text: About 15 minutes, key: true }
+    - Arduino first
+    - MicroPython optional
+    - No wiring today
+
+parts:
+  intro: >
+    The same three things as yesterday — nothing to wire. Tap *Define* on anything
+    unfamiliar; the answer opens as a field note you can read and dismiss without
+    losing your place.
+  items:
+    - name: ESP32-S3 board
+      image: shared/item-esp32-s3-board.jpg
+      imageKind: Manual photo
+      alt: Official manual photo of the ESP32-S3 development board.
+      blurb: Now it reads your input as well as printing its own.
+      explain: esp32
+    - name: Arduino IDE
+      image: shared/item-arduino-ide.png
+      imageKind: Manual screenshot
+      alt: Official manual screenshot of the Arduino IDE interface.
+      blurb: Serial Monitor's input box is how you type to the board.
+      explain: arduino
+    - name: Official sketch
+      image: shared/item-official-sketch.png
+      imageKind: Manual sketch
+      alt: Official manual page showing an Arduino sketch and its Serial Monitor output.
+      blurb: "`Sketch_07.2_SerialRW.ino`"
+      explain: sketch
+
+steps:
+  intro: >
+    The whole day is upload, type, and read the reply. Tap each step as you go to
+    keep your place — you can finish without opening a single field note.
+  items:
+    - Plug the ESP32-S3 into your computer with a data-capable USB cable.
+    - In Arduino IDE, select your ESP32-S3 board and the port it appears on.
+    - Open `Sketch_07.2_SerialRW.ino`.
+    - Press **Upload** and wait for the IDE to say `Done uploading`.
+    - Open Serial Monitor, set the baud rate to `115200`, and set the line ending to `Newline`. {serial}
+    - Type a word into the input box, press Enter, and watch the board echo it back.
+  done:
+    icon: "🔁"
+    title: The line runs both ways.
+    body: The board is reading your input and answering. Head to Test & debug to confirm the echo.
+
+code:
+  intro: >
+    The sketch waits for you. When characters arrive it collects them into one
+    message, tidies the ends, and prints that message back. Switch to MicroPython
+    if you'd rather see the same idea in Python.
+  arduino:
+    file: Sketch_07.2_SerialRW.ino
+    sketch: C/Sketches/Sketch_07.2_SerialRW/Sketch_07.2_SerialRW.ino
+    excerpt: |
+      void loop() {
+        if (Serial.available()) {
+          inputString = Serial.readStringUntil('\n');
+          inputString.trim();
+          if (inputString.length() > 0) {
+            stringComplete = true;
+          }
+        }
+
+        if (stringComplete) {
+          Serial.printf("inputString: %s\r\n", inputString.c_str());
+          inputString = "";
+          stringComplete = false;
+        }
+      }
+    notes:
+      - code: Serial.available()
+        text: Checks whether you've sent any characters yet, so the board reads only when there's something waiting.
+        explain: serialAvailable
+      - code: Serial.readStringUntil('\n')
+        text: Gathers what you typed up to the Enter key into one complete message.
+        explain: serialRead
+      - code: inputString.trim()
+        text: Trims the stray newline and spaces off the ends so the echo is clean.
+      - code: "Serial.printf(\"inputString: %s\\r\\n\", inputString.c_str())"
+        text: Sends your message straight back, then the sketch clears it and waits for the next one.
+        explain: serialPrint
+  micropython:
+    file: 07.2_Serial_Read_and_Write/Serial_Read_and_Write.py
+    path: Python/Python_Codes/07.2_Serial_Read_and_Write/Serial_Read_and_Write.py
+    optionalTag: Optional side path · no wiring
+    excerpt: |
+      print(str("\nESP32S3 initialization completed!\n")
+            + str("Please input some characters,\n")
+            + str("select \"Newline\" below and click send button. \n"))
+
+      while True:
+          print("inputString: ", input())
+    notes:
+      - code: input()
+        text: In MicroPython, input() waits for a line you type in Thonny's shell — the same pause-and-read as Serial.available plus readStringUntil.
+      - code: 'print("inputString: ", input())'
+        text: Echoes your typed line straight back, just like the Arduino sketch.
+    note: >
+      Same cable, no wiring. MicroPython's input() reads from Thonny's shell
+      instead of Serial Monitor, but the two-way idea is identical. If MicroPython
+      isn't set up yet, skip this — it should never block the Arduino-first path.
+
+theory:
+  title: Listening as well as talking
+  summary: The board checks whether anything arrived, reads a whole line, and answers — the USB link working both directions.
+  intro: >
+    Yesterday's cable only carried the board's voice out. The same wires carry
+    your words back in; the sketch just has to check for them and read a full line.
+  flow:
+    - { n: Anything there, title: available(), body: The board asks whether you've sent characters before it tries to read. }
+    - { n: Read a line, title: readStringUntil, body: It collects your characters up to the Enter key into one message. }
+    - { n: Tidy it, title: trim(), body: Stray newline and spaces come off the ends so the message is clean. }
+    - { n: Answer, title: print it back, body: The board sends your message straight back and waits for the next. }
+  formulaLabel: The loop
+  formula: "**check** → **read a line** → **answer** → wait"
+  notes:
+    - title: Why check before reading
+      explain: serialAvailable
+      body: Reading when nothing has arrived would just return empty. available() lets the board wait for real input instead.
+    - title: What readStringUntil does
+      explain: serialRead
+      body: It gathers characters until the newline you send with Enter, so the board gets one whole message rather than single letters.
+
+test:
+  mode: serial
+  intro: >
+    Success and recovery sit side by side, so you never have to go hunting when
+    something looks off.
+  expectedTitle: What you should see
+  baud: 115200
+  expected:
+    - "ESP32S3 initialization completed!"
+    - "Ready to receive data..."
+    - "(you type) hello"
+    - "inputString: hello"
+  expectedNote: The start-up lines print once; after that, each line you send comes straight back prefixed with "inputString:".
+  checksTitle: If it doesn't
+  checks:
+    - symptom: "Nothing echoes back?"
+      fix: "Set the line ending to Newline so the board sees where your message ends."
+    - symptom: "Garbled characters?"
+      fix: "Set Serial Monitor to 115200 baud to match the sketch."
+    - symptom: "Blank monitor at start?"
+      fix: "Confirm the right board and port, then press the board's reset button."
+    - symptom: "Upload fails?"
+      fix: "Swap in a data-capable USB cable."
+
+challenge:
+  title: "Try this: make it a real reply"
+  railLabel: Try this
+  intro: >
+    Same working sketch, no wiring — change what the board says back. It fits
+    inside today's 15 minutes.
+  summary: Change the reply so the board wraps your message in words of its own, then make it react to one specific word.
+  cards:
+    - title: Wrap the echo
+      explain: serialPrint
+      body: 'Change the reply text so the board answers with something like `You said: hello` instead of the plain `inputString:` label.'
+    - title: React to a word
+      explain: serialRead
+      body: Add an `if (inputString == "ping")` check that answers `pong` — the first hint of a board that follows commands.
+  logbook:
+    - What reply did you have the board send back?
+    - What word did you teach it to react to, and what did it answer?
+    - What could you control if a typed word could trigger an action later?
+
+agent:
+  intro: >
+    Every lesson ships with a code and a machine-readable packet, so an agent can
+    guide you with full context.
+  behaviour: >
+    keep it to upload-type-read, check board, port, cable, baud rate, and the
+    Newline line ending before touching code, and explain available, readStringUntil,
+    and trim on request.
+  coachInstructions:
+    - Keep the day to upload, type, and read the reply; there is nothing to wire.
+    - If nothing echoes back, the Newline line ending is the first thing to check — the board waits for it to end a message.
+    - If text is garbled, confirm the baud rate is 115200; if the monitor is blank at start, check board and port and press reset.
+    - Explain that the same USB cable now carries words both ways; do not front-load theory.
+    - For the challenge, change only the reply text or add a single word check, preserving the working loop.
+    - Keep the Arduino path primary; MicroPython's input() reads from Thonny's shell and is optional only if already set up.
+
+source:
+  license: CC BY-NC-SA 3.0
+  licenseNote: >
+    Based on Freenove official material released under CC BY-NC-SA 3.0; preserve
+    attribution and non-affiliation language.
