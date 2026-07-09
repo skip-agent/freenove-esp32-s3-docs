@@ -1,0 +1,265 @@
+# Day 7 — Breathing LED · tinyskiff.lesson.v1
+# One source of truth: this file renders to the guided page
+# (/course/day-07-breathing/), the agent packet, and the course-map entry.
+# The first analog day — a pin learns to fade instead of only switch.
+
+schema: tinyskiff.lesson.v1
+lessonCode: TSK-DAY07-BREATHE
+day: 7
+slug: day-07-breathing
+title: Make an LED breathe
+status: published
+estimatedTimeMinutes: 20
+tracks: { main: arduino, optional: micropython }
+learnerProfile: adult beginner; curious and capable; no electronics assumed
+
+mission: >
+  Wire the same single LED as Blink, upload the Arduino sketch, and watch it fade
+  up to full and back down to dark over and over — your first pin that does more
+  than switch on and off.
+unlocks: A pin can sit at any brightness in between on and off, so the board can shade a light instead of only flipping it.
+seoDescription: >
+  Fade an LED on the ESP32-S3 with PWM. Upload the sketch and watch the light
+  breathe smoothly from dark to full and back — your first analog-feeling output.
+
+hero:
+  instrument: none
+  headline: Make a light|learn to {breathe}
+  lede: >
+    Today the LED stops snapping. You keep yesterday's single-LED circuit, upload a
+    sketch that sweeps the pin's brightness up and then down, and the light fades in
+    and out like a slow breath — the board's first move beyond plain on and off.
+  pills:
+    - { text: About 20 minutes, key: true }
+    - Arduino first
+    - MicroPython optional
+    - Same LED circuit as Blink
+
+parts:
+  intro: >
+    Five things, all of them familiar from Blink. Tap *Define* on any part you
+    haven't met — the answer opens as a field note you can read and dismiss
+    without losing your place.
+  items:
+    - name: ESP32-S3 board
+      image: shared/item-esp32-s3-board.jpg
+      imageKind: Manual photo
+      alt: Official manual photo of the ESP32-S3 development board.
+      blurb: The brain that runs your uploaded sketch.
+      explain: esp32
+    - name: GPIO extension board
+      image: shared/item-gpio-extension-board.png
+      imageKind: Manual photo
+      alt: Official manual image of the ESP32-S3 GPIO extension board.
+      blurb: Spreads the pins into rows you can reach and label.
+      explain: gpio
+    - name: LED
+      image: shared/item-led.png
+      imageKind: Manual photo
+      alt: Official manual photo of a red LED with its longer positive leg and shorter negative leg labelled.
+      blurb: The light you'll fade — it only works one way round.
+      explain: led
+    - name: 220 Ω resistor
+      image: shared/item-resistor.png
+      imageKind: Manual photo
+      alt: Official manual photo of a resistor with coloured value bands.
+      blurb: Sits in series with the LED to keep the current gentle.
+      explain: resistor
+    - name: Jumper wires
+      image: shared/item-jumper-wire.png
+      imageKind: Manual photo
+      alt: Official manual image of a jumper wire.
+      blurb: Temporary, solder-free connections.
+      explain: jumpers
+    - name: Arduino IDE
+      image: shared/item-arduino-ide.png
+      imageKind: Manual screenshot
+      alt: Official manual screenshot of the Arduino IDE interface.
+      blurb: Uploads the sketch to the board.
+      explain: arduino
+
+wiring:
+  intro: >
+    The official Freenove diagram is your chart — schematic on top, the same
+    circuit built on a breadboard below. Click it to enlarge. This is the same
+    single-LED circuit you built for Blink, so if it's still wired you're ready.
+  diagram:
+    image: day-07/circuit-page-62.png
+    alt: >-
+      Official Freenove circuit for a breathing LED: a single LED on GPIO 2 through
+      a 220 ohm resistor to ground, shown as both a schematic and a breadboard
+      photo.
+    caption: Official Freenove circuit — C Tutorial, Chapter 4 (Analog & PWM), page 62.
+    zoomCaption: Official Freenove circuit, C Tutorial Chapter 4, page 62.
+    source: { pdf: C_Tutorial.pdf, chapter: 4, chapterTitle: Analog & PWM, page: 62 }
+  pins:
+    - { from: LED long leg (+), to: GPIO 2 via 220 Ω, why: This pin fades the LED with PWM., explain: led }
+    - { from: LED short leg (−), to: GND, why: Completes the LED's path back to zero volts., explain: gnd }
+  safety:
+    - label: Mind the LED's legs.
+      icon: "⚓"
+      body: >
+        The LED only lights one way round — long leg toward GPIO 2 through the
+        220 Ω resistor, short leg to ground. Unplug USB before you move any wire.
+
+steps:
+  intro: >
+    This is the main path — you can finish the day without opening a single field
+    note. Tap each step as you go to keep your place.
+  items:
+    - Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.
+    - Place the LED so its long leg (+) is on the GPIO 2 side and its short leg (−) heads toward ground. {led}
+    - Put the 220 Ω resistor in series between GPIO 2 and the LED's long leg. {resistor}
+    - Compare every wire to the chart before you plug in USB.
+    - Open `Sketch_04.1_BreathingLight.ino` in Arduino IDE and upload it.
+    - Watch the LED fade up and down, over and over.
+  done:
+    icon: "💡"
+    title: The pin can fade now.
+    body: The LED is sliding through every brightness in between. Head to Test & debug to confirm the breathing.
+
+code:
+  intro: >
+    The whole sketch is short. A few lines set up a hardware PWM channel on the
+    pin; two loops sweep its brightness up and then back down. Switch to
+    MicroPython if you'd rather see the same idea in Python — the wiring never
+    changes.
+  arduino:
+    file: Sketch_04.1_BreathingLight.ino
+    sketch: C/Sketches/Sketch_04.1_BreathingLight/Sketch_04.1_BreathingLight.ino
+    excerpt: |
+      #define PIN_LED  2
+      #define CHN      0        // PWM channel
+      #define FRQ      1000     // switching frequency, Hz
+      #define PWM_BIT  8        // resolution: 0-255
+
+      void setup() {
+        ledcAttachChannel(PIN_LED, FRQ, PWM_BIT, CHN);
+      }
+
+      void loop() {
+        for (int i = 0; i < 255; i++) {   // fade in
+          ledcWrite(PIN_LED, i);
+          delay(10);
+        }
+        for (int i = 255; i > -1; i--) {  // fade out
+          ledcWrite(PIN_LED, i);
+          delay(10);
+        }
+      }
+    notes:
+      - code: ledcAttachChannel(PIN_LED, FRQ, PWM_BIT, CHN)
+        text: Attaches GPIO 2 to a hardware PWM channel so the board can switch it fast on its own.
+        explain: ledc
+      - code: ledcWrite(PIN_LED, i)
+        text: Sets the brightness from 0 (dark) to 255 (full) by changing how much of each instant the pin is on.
+        explain: pwm
+      - code: for (int i = 0; i < 255; i++)
+        text: The first loop sweeps brightness up and the second sweeps it back down; delay(10) sets how fast each step passes.
+        explain: delayMs
+  micropython:
+    file: 04.1_BreatheLight/BreatheLight.py
+    path: Python/Python_Codes/04.1_BreatheLight/BreatheLight.py
+    optionalTag: Optional side path · same circuit
+    excerpt: |
+      pwm = PWM(Pin(2), 10000)
+
+      while True:
+          for i in range(1024):      # fade in
+              pwm.duty(i)
+              sleep_ms(1)
+          for i in range(1023, -1, -1):  # fade out
+              pwm.duty(i)
+              sleep_ms(1)
+    notes:
+      - code: PWM(Pin(2), 10000)
+        text: Sets up PWM on GPIO 2 at 10 kHz — the same fast-switching trick the Arduino sketch uses.
+      - code: pwm.duty(i)
+        text: Sets brightness by duty, which is how much of each instant the pin is on.
+    note: >
+      Same pin, same wiring. MicroPython here uses a 10-bit duty (0–1023), so the
+      numbers differ from Arduino's 0–255 while the idea is identical. Run it in
+      Thonny if MicroPython is set up; otherwise skip it — it should never block
+      the Arduino-first path.
+
+theory:
+  title: Dimming by switching fast
+  summary: The pin is still only on or off — switching it quickly and holding on longer looks brighter to your eye.
+  intro: >
+    There's no half-voltage trick here — just a pin flipping faster than you can
+    see, held on for a bigger or smaller share of each moment.
+  flow:
+    - { n: Only two states, title: On or off, body: The pin itself can only be fully on or fully off. }
+    - { n: Switch fast, title: 1000 times a second, body: PWM flips it far quicker than your eye can follow. }
+    - { n: Hold longer, title: More on-time, body: The more of each instant the pin stays on the brighter it looks. }
+    - { n: Sweep it, title: Up then down, body: Sliding that share from none to all and back is the breath. }
+  formulaLabel: The model
+  formula: brightness = **duty cycle** = the share of each instant the pin is on
+  notes:
+    - title: What PWM actually does
+      explain: pwm
+      body: Pulse-width modulation switches the pin on and off so fast that your eye blends the flicker into a steady, dimmable glow.
+    - title: Why a channel
+      explain: ledc
+      body: The ESP32-S3 has dedicated PWM hardware that keeps switching the pin on its own, so the sketch only has to set a brightness and move on.
+
+test:
+  mode: visual
+  intro: >
+    Nothing prints to the screen today — the proof is the LED fading in front of
+    you.
+  expectedTitle: What you should see
+  readoutLabel: LED
+  expected:
+    - The LED brightens smoothly from dark up to full.
+    - Then it dims smoothly back down to dark.
+    - It repeats, over and over, like slow breathing.
+  expectedNote: The change should be a smooth slide, never a hard on/off snap. If it snaps, you're likely still running the Blink sketch.
+  checksTitle: If it doesn't
+  checks:
+    - symptom: "LED just blinks hard on and off?"
+      fix: "You may be on the Blink sketch — re-upload Sketch_04.1_BreathingLight."
+    - symptom: "LED stays dim or dark?"
+      fix: "Check the 220 Ω resistor and the GPIO 2 wire, then the LED's direction."
+    - symptom: "Upload fails?"
+      fix: "Swap in a data-capable USB cable."
+
+challenge:
+  title: "Try this: find a calm breath"
+  railLabel: Try this
+  intro: >
+    Same working circuit, one number to play with: the fade speed. It fits inside
+    today's 20 minutes.
+  summary: Change the delay in the fade loops to find a resting-breath rhythm, then make the light pause at full before it fades back.
+  cards:
+    - title: Slow the breath
+      explain: delayMs
+      body: Change both `delay(10)` lines together — try 5 for a quick breath, 20 for a slow one — and upload until the fade feels like a resting breath.
+    - title: Hold at the top
+      body: Add a short `delay(300)` between the fade-in and fade-out loops so the light pauses at full brightness before it sinks again.
+  logbook:
+    - What fade speed felt most like a calm, resting breath?
+    - How did a pause at full brightness change the feel of the breath?
+    - Where in daily life have you seen a light breathe like this?
+
+agent:
+  intro: >
+    Every lesson ships with a code and a machine-readable packet, so an agent can
+    guide you with full context.
+  behaviour: >
+    guide one physical connection at a time, wait for you to confirm, explain
+    terms on request, and always check wiring, board, port, and USB before
+    changing code.
+  coachInstructions:
+    - Keep the day light on theory; let the learner see the LED breathe before explaining how PWM works.
+    - Confirm this is the same single-LED circuit as Blink — LED direction and the 220 Ω series resistor are the usual first mistakes.
+    - If the LED snaps hard on and off instead of fading, suspect the Blink sketch is still loaded and have them re-upload 04.1.
+    - If the LED stays dim or dark, check the 220 Ω resistor, the GPIO 2 wire, and the LED's direction before changing code.
+    - Before any speed change, preserve the working sketch, then adjust only the two delay values together.
+    - Keep the Arduino path primary; MicroPython is optional only if already set up, and its 0–1023 duty is expected to differ from Arduino's 0–255.
+
+source:
+  license: CC BY-NC-SA 3.0
+  licenseNote: >
+    Based on Freenove official material released under CC BY-NC-SA 3.0; preserve
+    attribution and non-affiliation language.

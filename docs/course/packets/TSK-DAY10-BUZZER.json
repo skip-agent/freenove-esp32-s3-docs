@@ -1,0 +1,191 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY10-BUZZER",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 10,
+  "title": "Give the board a voice",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 25,
+  "mission": "Wire an active buzzer through an NPN transistor, add a push button, upload the Arduino sketch, and turn your board into a doorbell — press for a beep, let go for silence.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "officialPdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+    "chapter": "Chapter 6 Buzzer",
+    "page": 80,
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_06.1_Doorbell/Sketch_06.1_Doorbell.ino",
+    "arduinoVariant": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_06.2_Alertor/Sketch_06.2_Alertor.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/06.1_Doorbell/Doorbell.py",
+    "imageAsset": "docs/course/assets/day-10/circuit-page-80.png",
+    "imageAlt": "Official Freenove circuit for the Buzzer: an active buzzer driven from GPIO 14 through an NPN transistor with a 1 kilo-ohm resistor on its base and the buzzer powered from the 5V rail, plus a push button on GPIO 21 held by 10 kilo-ohm resistors, shown as both a schematic and a breadboard photo.",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "GPIO extension board",
+      "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
+      "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
+    },
+    {
+      "name": "Active buzzer",
+      "imageAsset": "docs/course/assets/shared/item-buzzer.png",
+      "explanation": "A buzzer turns electricity into sound. An active buzzer has its own oscillator inside, so switching it on plays one fixed tone. A passive buzzer has no oscillator — you feed it a changing signal to choose the pitch, which is how you get melodies or a siren."
+    },
+    {
+      "name": "NPN transistor",
+      "imageAsset": "docs/course/assets/shared/item-transistor.png",
+      "explanation": "A GPIO pin can switch things but only supplies a trickle of current — not enough for a buzzer. An NPN transistor uses that trickle on its base to switch a much larger current from the 5V rail through the buzzer. It is an electrically controlled switch."
+    },
+    {
+      "name": "Push button",
+      "imageAsset": "docs/course/assets/shared/item-push-button.png",
+      "explanation": "This push button has four pins in two connected pairs. Pressing it bridges the pairs and completes the circuit; releasing it breaks the connection again. It is the simplest way to hand the board a yes-or-no input."
+    },
+    {
+      "name": "1 kΩ resistor",
+      "imageAsset": "docs/course/assets/shared/item-resistor.png",
+      "explanation": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction."
+    },
+    {
+      "name": "2 × 10 kΩ resistors",
+      "imageAsset": "docs/course/assets/shared/item-resistor.png",
+      "explanation": "An input pin left floating drifts between HIGH and LOW and reads at random. A 10 kΩ resistor gently ties the pin to a known level, so it reads a steady value until a button press forces the other one."
+    },
+    {
+      "name": "Jumper wires",
+      "imageAsset": "docs/course/assets/shared/item-jumper-wire.png",
+      "explanation": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    }
+  ],
+  "wiring": [
+    {
+      "partPin": "Buzzer +",
+      "connectTo": "5V rail",
+      "reason": "The buzzer draws more current than a pin can give so it runs off 5V."
+    },
+    {
+      "partPin": "Transistor base (via 1 kΩ)",
+      "connectTo": "GPIO 14",
+      "reason": "The pin switches the buzzer through the transistor."
+    },
+    {
+      "partPin": "Push button",
+      "connectTo": "GPIO 21",
+      "reason": "The board reads this pin to catch the press."
+    },
+    {
+      "partPin": "10 kΩ resistor",
+      "connectTo": "3.3V",
+      "reason": "Holds GPIO 21 HIGH until a press pulls it LOW."
+    }
+  ],
+  "coachInstructions": [
+    "Guide one physical connection at a time and wait for learner confirmation before proceeding.",
+    "Check the transistor's orientation first — emitter, base, and collector each have a job, and a reversed transistor is the most common cause of no sound.",
+    "Confirm the buzzer's + pin goes to the 5V rail, not 3.3V, or the sound will be faint or absent.",
+    "If there is no sound, check the transistor legs and the 5V buzzer connection before changing code.",
+    "If the buzzer always sounds, suspect the button wiring or its 10 kΩ pull-up on GPIO 21.",
+    "Keep the Arduino path primary; MicroPython and the passive-buzzer siren are optional only if already set up."
+  ],
+  "steps": [
+    "Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.",
+    "Place the transistor on the breadboard and note its three legs — emitter, base, and collector.",
+    "Wire the buzzer's + pin to the 5V rail and its other pin down to the transistor.",
+    "Connect the transistor's base to GPIO 14 through the 1 kΩ resistor.",
+    "Wire the push button so one side reaches GPIO 21, then add its 10 kΩ pull-up to 3.3V.",
+    "Compare every wire to the chart before you plug in USB.",
+    "Open Sketch_06.1_Doorbell.ino in Arduino IDE and upload it.",
+    "Press the button and listen."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "digitalRead(PIN_BUTTON) == LOW",
+        "explanation": "True only while the button is held — a press pulls GPIO 21 LOW."
+      },
+      {
+        "line": "digitalWrite(PIN_BUZZER, HIGH)",
+        "explanation": "Sends the pin HIGH, which switches the buzzer on through the transistor."
+      },
+      {
+        "line": "ledcWriteTone(channel, freq)",
+        "explanation": "The passive-buzzer variant (Sketch_06.2_Alertor) uses ledcWriteTone to choose the pitch and sweep a siren."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "Pin(21, Pin.IN, Pin.PULL_UP)",
+        "explanation": "Reads GPIO 21 as an input with a built-in pull-up — the same job the 10 kΩ resistor does in hardware."
+      },
+      {
+        "line": "activeBuzzer = Pin(14, Pin.OUT)",
+        "explanation": "Drives GPIO 14, which switches the buzzer through the transistor."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "The pin reads the button and switches a transistor, and the transistor drives the 5V buzzer the pin couldn't power alone.",
+    "formula": "press → transistor switches 5V → buzzer sounds",
+    "notes": [
+      {
+        "title": "Active vs passive buzzers",
+        "body": "An active buzzer has its own oscillator and plays one fixed tone. A passive buzzer is silent until you feed it a changing signal, so you choose the pitch."
+      },
+      {
+        "title": "What the transistor is for",
+        "body": "The pin can't supply the buzzer's current. The transistor lets the small pin signal switch the larger 5V current on and off."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "Press and hold the button — a steady beep sounds at once.",
+      "Let go — silence.",
+      "Every press sounds the same note, for as long as the board has power."
+    ],
+    "successCriteria": "An active buzzer plays one fixed tone — choosing the pitch is the passive-buzzer variant's job."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "No sound at all",
+      "firstChecks": [
+        "Check the transistor legs are the right way round, and that the buzzer + goes to 5V."
+      ]
+    },
+    {
+      "symptom": "Always sounding",
+      "firstChecks": [
+        "The button or its 10 kΩ pull-up is likely miswired on GPIO 21."
+      ]
+    },
+    {
+      "symptom": "Very faint",
+      "firstChecks": [
+        "The buzzer may be on 3.3V instead of 5V — move it to the 5V rail."
+      ]
+    },
+    {
+      "symptom": "Upload fails",
+      "firstChecks": [
+        "Swap in a data-capable USB cable."
+      ]
+    }
+  ],
+  "challenge": "Design a two-beep pattern that means something, then try the passive buzzer to hear a pitch you control.",
+  "logbookPrompts": [
+    "What did your two-beep signal mean, and could someone else read it?",
+    "What was the transistor doing every time the buzzer sounded?",
+    "Where in daily life does one fixed tone do a whole job?"
+  ]
+}

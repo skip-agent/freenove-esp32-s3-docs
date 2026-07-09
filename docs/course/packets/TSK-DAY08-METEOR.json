@@ -1,0 +1,159 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY08-METEOR",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 8,
+  "title": "Send a comet down the bar",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 20,
+  "mission": "Rebuild the Day 6 LED bar, upload the Arduino sketch, and watch a bright head with a fading tail glide along the bar and back — the first time each segment holds its own brightness instead of full on or full off.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "officialPdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+    "chapter": "Chapter 3 LED Bar",
+    "page": 56,
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_04.2_FlowingLight2/Sketch_04.2_FlowingLight2.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/04.2_FlowingLight/FlowingLight.py",
+    "imageAsset": "docs/course/assets/day-08/circuit-page-56.png",
+    "imageAlt": "Official Freenove LED bar circuit: ten LED segments, each driven from its own GPIO pin through a 220 ohm resistor and returning through a shared common row to ground, shown as both a schematic and a breadboard photo.",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "GPIO extension board",
+      "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
+      "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
+    },
+    {
+      "name": "LED bar graph",
+      "imageAsset": "docs/course/assets/shared/item-led-bar.png",
+      "explanation": "A LED bar packs ten separate LEDs into one strip, with a row of pins along each edge. Each LED is wired and driven on its own — exactly like the single LED from earlier days, just ten of them in a tidy line."
+    },
+    {
+      "name": "8 × 220 Ω resistors",
+      "imageAsset": "docs/course/assets/shared/item-resistor.png",
+      "explanation": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction."
+    },
+    {
+      "name": "Jumper wires",
+      "imageAsset": "docs/course/assets/shared/item-jumper-wire.png",
+      "explanation": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    }
+  ],
+  "wiring": [
+    {
+      "partPin": "8 bar segments (via 220 Ω each)",
+      "connectTo": "GPIO 21 47 38 39 40 41 42 2",
+      "reason": "Each pin drives one segment with its own PWM channel."
+    },
+    {
+      "partPin": "Bar common row",
+      "connectTo": "GND",
+      "reason": "Returns every segment to zero volts."
+    }
+  ],
+  "coachInstructions": [
+    "Start by confirming the Day 6 LED bar is still wired; only eight segments are driven today, and two staying dark is expected.",
+    "Remind the learner that each driven segment needs its own 220 Ω series resistor — a shared or missing resistor is the common mistake here.",
+    "If only one segment lights with no tail, suspect Day 6's on/off sketch is still loaded; have the learner upload 04.2 before changing anything else.",
+    "If a segment in the path stays dark, check that segment's resistor and its jumper to its GPIO pin, not the whole circuit.",
+    "Explain PWM, the dutys gradient, and the sliding window on request; do not dump theory before the learner has a working comet.",
+    "Keep the Arduino path primary; MicroPython is optional only if already set up."
+  ],
+  "steps": [
+    "Confirm the Day 6 LED bar is still wired, or rebuild it — LED bar across the centre channel, one 220 Ω resistor per segment, common row to ground.",
+    "Keep USB unplugged while you check or move any wire.",
+    "Note that only eight segments are wired for PWM today, since the board has eight PWM channels; two segments stay dark on purpose.",
+    "Compare every wire to the chart before you plug in USB.",
+    "Open Sketch_04.2_FlowingLight2.ino in Arduino IDE and upload it.",
+    "Watch a bright segment with a fading tail glide along the bar and back."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "ledcAttachChannel(ledPins[i], 1000, 10, chns[i])",
+        "explanation": "Gives each of the eight pins its own PWM channel, so every segment can hold a brightness of its own."
+      },
+      {
+        "line": "const int dutys[] = {0,..., 1023,512,256,128,64,32,16,8, ...,0}",
+        "explanation": "A brightness gradient — bright to dim — with dark padding on each side; those falling numbers are the fading tail."
+      },
+      {
+        "line": "ledcWrite(ledPins[j], dutys[i + j])",
+        "explanation": "Reads an eight-wide window of the gradient and slides it one step each pass, which is what makes the comet move."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "mypwm = myPWM(21,47,38,39,40,41,42,2)",
+        "explanation": "A helper wraps each of the eight pins as a PWM object so they can hold brightness in Python."
+      },
+      {
+        "line": "dutys = [...1023,512,256,128,64,32,16,8...]",
+        "explanation": "The same falling gradient as the Arduino sketch — the head is brightest and the tail fades."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "Give each LED its own brightness, shape a bright-to-dim gradient, then slide that gradient one step at a time so the head leads and the tail fades.",
+    "formula": "eight brightnesses → a falling gradient → slide it one step → head leads, tail fades",
+    "notes": [
+      {
+        "title": "What PWM is doing",
+        "body": "PWM flicks each pin on and off very fast; the fraction of time it stays on sets how bright that segment looks, so a whole row can carry a smooth gradient."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "A bright segment leads with dimmer segments trailing behind it.",
+      "The bright head and its fading tail glide along the bar together.",
+      "Then the comet slides back the other way, smoothly, for as long as the board has power."
+    ],
+    "successCriteria": "Two segments stay dark on purpose — only eight are on PWM, because the board has eight PWM channels."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "Only one segment lights, with no tail",
+      "firstChecks": [
+        "You may be running Day 6's on/off sketch — upload 04.2 so PWM sets the brightnesses."
+      ]
+    },
+    {
+      "symptom": "A segment in the path stays dark",
+      "firstChecks": [
+        "Check that segment's own 220 Ω resistor and its jumper to its GPIO pin."
+      ]
+    },
+    {
+      "symptom": "Nothing lights at all",
+      "firstChecks": [
+        "Re-check the common row to ground, then that the sketch uploaded."
+      ]
+    },
+    {
+      "symptom": "Upload fails",
+      "firstChecks": [
+        "Swap in a data-capable USB cable."
+      ]
+    }
+  ],
+  "challenge": "Change the trail by editing the dutys values, then change the sweep speed with the delay, and note what each edit does to the comet.",
+  "logbookPrompts": [
+    "What did a longer or shorter tail change about how the comet looked?",
+    "Which sweep speed felt best, and why?",
+    "What real-world moving light works like this comet and tail?"
+  ]
+}

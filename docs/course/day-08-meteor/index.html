@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Day 8 · Send a comet down the bar — TinySkiff ESP32-S3 Lab</title>
+  <meta name="description" content="Reuse the ESP32-S3 LED bar from Day 6, upload the sketch, and give each segment its own PWM brightness to make a bright comet head with a fading tail sweep along the bar and back." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../course.css" />
+</head>
+<body>
+  <div class="lesson-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 8 of 30</p>
+        <h1>A bright head<br />and a fading <em>tail</em></h1>
+        <p class="lede">Today the light gains a tail. You reuse the same LED bar from Day 6, then upload a sketch that gives each segment its own brightness with PWM — a bright head at the front, dimmer segments trailing behind, all sliding along the bar and back.
+</p>
+        <div class="meta-row" aria-label="Lesson facts">
+          <span class="pill is-key">About 20 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">Same LED bar as Day 6</span>
+        </div>
+      </div>
+      <div class="hero-side no-instrument">
+        
+        <div class="agent-strip">
+          <div class="lesson-code">
+            <span class="label">Agent assist code</span>
+            <code>TSK-DAY08-METEOR</code>
+          </div>
+          <button class="copy-prompt" type="button" data-copy="I am doing TinySkiff lesson TSK-DAY08-METEOR. Pull the lesson packet, then guide me one step at a time. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY08-METEOR.json">lesson packet</a> and coach you step by step.</p>
+        </div>
+      </div>
+    </header>
+    <div class="layout">
+      <nav class="rail" aria-label="Lesson progress">
+        <div class="rail-head">
+          <strong>Today's route</strong>
+          <span class="day-of">8 / 30</span>
+        </div>
+        <div class="voyage" style="--voyage-fill: 26.67%" aria-hidden="true"><span></span></div>
+        <div class="rail-nav">
+          <a href="#parts"><span class="tick"></span>What you need</a>
+          <a href="#wiring"><span class="tick"></span>Chart the circuit</a>
+          <a href="#steps"><span class="tick"></span>Build it</a>
+          <a href="#code"><span class="tick"></span>Read the code</a>
+          <a href="#theory"><span class="tick"></span>A gradient that moves</a>
+          <a href="#test"><span class="tick"></span>Test &amp; debug</a>
+          <a href="#challenge"><span class="tick"></span>Try this</a>
+          <a href="#agent"><span class="tick"></span>Coach me</a>
+        </div>
+      </nav>
+      <main class="lesson-main">
+        <section id="parts" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">01</span> First, know the pieces</p>
+              <h2>What you need</h2>
+              <p class="muted">The same six things as Day 6 — you may already have them wired. Tap <em>Define</em> on any part you haven&#x27;t met; the answer opens as a field note you can read and dismiss without losing your place.
+</p>
+            </div>
+            <div class="part-grid">
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-esp32-s3-board.jpg" alt="Official manual photo of the ESP32-S3 development board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>ESP32-S3 board <button class="define" data-topic="esp32">Define</button></h3>
+                <p>The brain that runs your uploaded sketch.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-gpio-extension-board.png" alt="Official manual image of the ESP32-S3 GPIO extension board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>GPIO extension board <button class="define" data-topic="gpio">Define</button></h3>
+                <p>Spreads the pins into rows you can reach and label.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-led-bar.png" alt="Official manual photo of a ten-segment LED bar graph module." /><figcaption>Manual photo</figcaption></figure>
+                <h3>LED bar graph <button class="define" data-topic="ledBar">Define</button></h3>
+                <p>The same strip from Day 6 — ten small LEDs, each its own segment.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-resistor.png" alt="Official manual photo of a resistor with coloured value bands." /><figcaption>Manual photo</figcaption></figure>
+                <h3>8 × 220 Ω resistors <button class="define" data-topic="resistor">Define</button></h3>
+                <p>One in series with each driven segment to keep every current gentle.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-jumper-wire.png" alt="Official manual image of a jumper wire." /><figcaption>Manual photo</figcaption></figure>
+                <h3>Jumper wires <button class="define" data-topic="jumpers">Define</button></h3>
+                <p>Temporary, solder-free connections.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-arduino-ide.png" alt="Official manual screenshot of the Arduino IDE interface." /><figcaption>Manual screenshot</figcaption></figure>
+                <h3>Arduino IDE <button class="define" data-topic="arduino">Define</button></h3>
+                <p>Uploads the sketch to the board.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+        <section id="wiring" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">02</span> Make the physical circuit</p>
+              <h2>Chart the circuit</h2>
+              <p class="muted">This is the same LED bar circuit you built on Day 6 — if it&#x27;s still on the breadboard, you&#x27;re nearly done. The one difference is that today&#x27;s sketch drives eight of the segments, because each needs its own PWM channel and the board has eight, so two segments stay dark.
+</p>
+            </div>
+            <div class="wire-layout">
+              <figure class="image-frame">
+                <button class="zoom" type="button" data-zoom="../assets/day-08/circuit-page-56.png" data-cap="Official Freenove LED-bar circuit, C Tutorial Chapter 3, page 56.">
+                  <img src="../assets/day-08/circuit-page-56.png" alt="Official Freenove LED bar circuit: ten LED segments, each driven from its own GPIO pin through a 220 ohm resistor and returning through a shared common row to ground, shown as both a schematic and a breadboard photo." />
+                  <span class="zoom-hint">Click to enlarge</span>
+                </button>
+                <figcaption class="caption">Official Freenove LED-bar circuit — C Tutorial, Chapter 3, page 56 (the meteor light in Chapter 4 reuses it).</figcaption>
+              </figure>
+              <div class="pin-table" aria-label="Wiring">
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>8 bar segments (via 220 Ω each) <button class="define" data-topic="pinArray">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GPIO 21 47 38 39 40 41 42 2</span>
+                  <span class="pin-why">Each pin drives one segment with its own PWM channel.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>Bar common row <button class="define" data-topic="gnd">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GND</span>
+                  <span class="pin-why">Returns every segment to zero volts.</span>
+                </div>
+              </div>
+            </div>
+            <div class="callout">
+              <div class="icon" aria-hidden="true">⚓</div>
+              <p><strong>The bar can go in backwards.</strong> The LED bar&#x27;s label direction is easy to reverse. If the driven segments stay dark once you upload, rotate it 180° in the breadboard and try again. Unplug USB before you move any wire.
+</p>
+            </div>
+          </div>
+        </section>
+        <section id="steps" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">03</span> One action at a time</p>
+              <h2>Build it</h2>
+              <p class="muted">This is the main path — you can finish the day without opening a single field note. Tap each step as you go to keep your place.
+</p>
+            </div>
+            <div class="steps-progress">
+              <div class="bar" aria-hidden="true"><span id="stepBar"></span></div>
+              <span class="count" id="stepCount">0 / 6 done</span>
+            </div>
+            <ol class="step-list">
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 1 done"></button><p class="text">Confirm the Day 6 LED bar is still wired, or rebuild it — LED bar across the centre channel, one 220 Ω resistor per segment, common row to ground. <button class="define" data-topic="ledBar">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 2 done"></button><p class="text">Keep USB unplugged while you check or move any wire.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">Note that only eight segments are wired for PWM today, since the board has eight PWM channels; two segments stay dark on purpose. <button class="define" data-topic="pinArray">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">Compare every wire to the chart before you plug in USB.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Open <code>Sketch_04.2_FlowingLight2.ino</code> in Arduino IDE and upload it.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 6 done"></button><p class="text">Watch a bright segment with a fading tail glide along the bar and back.</p></li>
+            </ol>
+            <div class="done-banner" id="doneBanner" role="status">
+              <span class="icon" aria-hidden="true">💡</span>
+              <div><strong>The light has a tail.</strong><p>Each segment is now holding its own brightness. Head to Test &amp; debug to confirm the comet and its fading trail.</p></div>
+            </div>
+          </div>
+        </section>
+        <section id="code" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">04</span> Read just enough code</p>
+              <h2>Read the code</h2>
+              <p class="muted">The sketch keeps the pins in one list, like Day 6, but adds a second list of brightness values that forms the tail. Switch to MicroPython if you&#x27;d rather see the same idea in Python — the wiring never changes.
+</p>
+            </div>
+            <div class="tabs" role="tablist" aria-label="Code language">
+              <button class="tab" id="tab-arduino" role="tab" aria-selected="true" aria-controls="panel-arduino">Arduino <span class="badge">Main</span></button><button class="tab" id="tab-micropython" role="tab" aria-selected="false" aria-controls="panel-micropython">MicroPython <span class="badge">Optional</span></button>
+            </div>
+            <div class="tabpanel" id="panel-arduino" role="tabpanel" aria-labelledby="tab-arduino">
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">Sketch_04.2_FlowingLight2.ino</span></div>
+<pre><code><span class="tok-key">const</span> byte ledPins[] = {<span class="tok-num">21</span>, <span class="tok-num">47</span>, <span class="tok-num">38</span>, <span class="tok-num">39</span>, <span class="tok-num">40</span>, <span class="tok-num">41</span>, <span class="tok-num">42</span>, <span class="tok-num">2</span>};
+<span class="tok-key">const</span> byte chns[] = {<span class="tok-num">0</span>, <span class="tok-num">1</span>, <span class="tok-num">2</span>, <span class="tok-num">3</span>, <span class="tok-num">4</span>, <span class="tok-num">5</span>, <span class="tok-num">6</span>, <span class="tok-num">7</span>};
+<span class="tok-key">const</span> <span class="tok-key">int</span> dutys[] = {<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>, <span class="tok-num">1023</span>,<span class="tok-num">512</span>,<span class="tok-num">256</span>,<span class="tok-num">128</span>,<span class="tok-num">64</span>,<span class="tok-num">32</span>,<span class="tok-num">16</span>,<span class="tok-num">8</span>, <span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>};
+
+<span class="tok-key">void</span> <span class="tok-fn">setup</span>() {
+  <span class="tok-fn">for</span> (<span class="tok-key">int</span> i = <span class="tok-num">0</span>; i &lt; <span class="tok-num">8</span>; i++) {
+    <span class="tok-fn">ledcAttachChannel</span>(ledPins[i], <span class="tok-num">1000</span>, <span class="tok-num">10</span>, chns[i]);
+  }
+}
+
+<span class="tok-key">void</span> <span class="tok-fn">loop</span>() {
+  <span class="tok-fn">for</span> (<span class="tok-key">int</span> i = <span class="tok-num">0</span>; i &lt; <span class="tok-num">16</span>; i++) {
+    <span class="tok-fn">for</span> (<span class="tok-key">int</span> j = <span class="tok-num">0</span>; j &lt; <span class="tok-num">8</span>; j++) {
+      <span class="tok-fn">ledcWrite</span>(ledPins[j], dutys[i + j]);
+    }
+    <span class="tok-fn">delay</span>(<span class="tok-num">100</span>);
+  }
+}</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>ledcAttachChannel(ledPins[i], 1000, 10, chns[i])</code><span class="note-text">Gives each of the eight pins its own PWM channel, so every segment can hold a brightness of its own. <button class="define" data-topic="ledc">Define</button></span></div>
+                  <div class="code-note"><code>const int dutys[] = {0,..., 1023,512,256,128,64,32,16,8, ...,0}</code><span class="note-text">A brightness gradient — bright to dim — with dark padding on each side; those falling numbers are the fading tail. <button class="define" data-topic="pwm">Define</button></span></div>
+                  <div class="code-note"><code>ledcWrite(ledPins[j], dutys[i + j])</code><span class="note-text">Reads an eight-wide window of the gradient and slides it one step each pass, which is what makes the comet move. <button class="define" data-topic="pinArray">Define</button></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="tabpanel" id="panel-micropython" role="tabpanel" aria-labelledby="tab-micropython" hidden>
+              <p class="optional-tag">Optional side path · same circuit</p>
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">04.2_FlowingLight/FlowingLight.py</span></div>
+<pre><code>mypwm = <span class="tok-fn">myPWM</span>(<span class="tok-num">21</span>,<span class="tok-num">47</span>,<span class="tok-num">38</span>,<span class="tok-num">39</span>,<span class="tok-num">40</span>,<span class="tok-num">41</span>,<span class="tok-num">42</span>,<span class="tok-num">2</span>)
+chns = [<span class="tok-num">0</span>,<span class="tok-num">1</span>,<span class="tok-num">2</span>,<span class="tok-num">3</span>,<span class="tok-num">4</span>,<span class="tok-num">5</span>,<span class="tok-num">6</span>,<span class="tok-num">7</span>]
+dutys = [<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>, <span class="tok-num">1023</span>,<span class="tok-num">512</span>,<span class="tok-num">256</span>,<span class="tok-num">128</span>,<span class="tok-num">64</span>,<span class="tok-num">32</span>,<span class="tok-num">16</span>,<span class="tok-num">8</span>, <span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>,<span class="tok-num">0</span>]</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>mypwm = myPWM(21,47,38,39,40,41,42,2)</code><span class="note-text">A helper wraps each of the eight pins as a PWM object so they can hold brightness in Python.</span></div>
+                  <div class="code-note"><code>dutys = [...1023,512,256,128,64,32,16,8...]</code><span class="note-text">The same falling gradient as the Arduino sketch — the head is brightest and the tail fades.</span></div>
+                </div>
+              </div>
+              <p class="micropython-note">A helper <code>pwm.py</code> wraps each pin as a PWM object. Run it in Thonny if MicroPython is set up; otherwise skip it — it should never block the Arduino-first path.
+</p>
+            </div>
+          </div>
+        </section>
+        <section id="theory" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">05</span> Understand, don&#x27;t memorise</p>
+              <h2>A gradient that moves</h2>
+              <p class="muted">There&#x27;s no trick here — the board sets eight brightnesses at once, then nudges the whole pattern along the bar, faster than the eye separates the steps.
+</p>
+            </div>
+            <div class="theory-flow" aria-label="Measurement model">
+              <article class="flow-step"><span class="n">Brightness</span><h3>PWM per LED</h3><p>Each segment gets its own channel so it can be bright or dim.</p></article>
+              <article class="flow-step"><span class="n">Gradient</span><h3>bright to dim</h3><p>The dutys list falls from full on down to a faint glow.</p></article>
+              <article class="flow-step"><span class="n">Slide</span><h3>one step</h3><p>An eight-wide window of that list moves one place each pass.</p></article>
+              <article class="flow-step"><span class="n">Comet</span><h3>head and tail</h3><p>The bright end leads and the dim end trails it down the bar.</p></article>
+            </div>
+            <div class="formula-card">
+              <span class="label">The model</span>
+              <code>eight brightnesses → a falling gradient → slide it one step → head leads, tail fades</code>
+            </div>
+            <div class="two-col" style="margin-top:14px">
+              <article class="mini-card"><h3>What PWM is doing <button class="define" data-topic="pwm">Define</button></h3><p>PWM flicks each pin on and off very fast; the fraction of time it stays on sets how bright that segment looks, so a whole row can carry a smooth gradient.</p></article>
+            </div>
+          </div>
+        </section>
+        <section id="test" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">06</span> Know it worked</p>
+              <h2>Test &amp; debug</h2>
+              <p class="muted">Nothing prints to the screen today — the proof is the moving comet on the bar.
+</p>
+            </div>
+            <div class="test-grid">
+              <div>
+                <span class="readout-title">What you should see</span>
+                <div class="observe" aria-label="What you should see">
+                  <div class="bar"><span>LED bar</span></div>
+                  <ul class="observe-lines"><li>A bright segment leads with dimmer segments trailing behind it.</li><li>The bright head and its fading tail glide along the bar together.</li><li>Then the comet slides back the other way, smoothly, for as long as the board has power.</li></ul>
+                </div>
+                <p class="micropython-note">Two segments stay dark on purpose — only eight are on PWM, because the board has eight PWM channels.</p>
+              </div>
+              <div>
+                <span class="checks-title">If it doesn&#x27;t</span>
+                <ul class="checklist">
+                  <li><strong>Only one segment lights, with no tail?</strong> You may be running Day 6&#x27;s on/off sketch — upload 04.2 so PWM sets the brightnesses.</li>
+                  <li><strong>A segment in the path stays dark?</strong> Check that segment&#x27;s own 220 Ω resistor and its jumper to its GPIO pin.</li>
+                  <li><strong>Nothing lights at all?</strong> Re-check the common row to ground, then that the sketch uploaded.</li>
+                  <li><strong>Upload fails?</strong> Swap in a data-capable USB cable.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="challenge" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">07</span> Make the idea yours</p>
+              <h2>Try this: reshape the comet</h2>
+              <p class="muted">Same working circuit, small edits to the sketch. Both fit inside today&#x27;s time and leave the wiring untouched.
+</p>
+            </div>
+            <div class="two-col">
+              <article class="mini-card"><h3>Reshape the tail <button class="define" data-topic="pwm">Define</button></h3><p>Edit the falling numbers in <code>dutys</code> — add more dim values for a longer tail, or fewer for a shorter one. Predict the shape before you upload.</p></article>
+              <article class="mini-card"><h3>Change the speed <button class="define" data-topic="delayMs">Define</button></h3><p>Set <code>delay(100)</code> to a larger or smaller number and upload. Find the speed where the comet still reads as one moving light.</p></article>
+            </div>
+            <div class="logbook">
+              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
+              <label>What did a longer or shorter tail change about how the comet looked?<textarea rows="2"></textarea></label>
+              <label>Which sweep speed felt best, and why?<textarea rows="2"></textarea></label>
+              <label>What real-world moving light works like this comet and tail?<textarea rows="2"></textarea></label>
+            </div>
+          </div>
+        </section>
+        <section id="agent" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">08</span> Learn it with a hand on the tiller</p>
+              <h2>Coach me through it</h2>
+              <p class="muted">Every lesson ships with a code and a machine-readable packet, so an agent can guide you with full context.
+</p>
+            </div>
+            <div class="agent-grid">
+              <article class="mini-card"><h3>Lesson code</h3><p><code>TSK-DAY08-METEOR</code></p></article>
+              <article class="mini-card"><h3>Context packet</h3><p><a href="../packets/TSK-DAY08-METEOR.json">Open the JSON packet →</a></p></article>
+            </div>
+            <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
+              <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
+              <p><strong>How the agent should behave:</strong> confirm the Day 6 circuit first, guide one segment at a time, wait for you to confirm, explain terms on request, and always check wiring, board, port, and USB before changing code.
+</p>
+            </div>
+          </div>
+        </section>
+        <nav class="day-nav" aria-label="Course navigation">
+        <a class="day-nav-link prev" href="../day-07-breathing/">
+          <span class="day-nav-dir">← Day 7</span>
+          <span class="day-nav-title">Make an LED breathe</span>
+        </a>
+        <a class="day-nav-link next" href="../day-09-rgb/">
+          <span class="day-nav-dir">Day 9 →</span>
+          <span class="day-nav-title">Mix any colour from three lights</span>
+        </a>
+        </nav>
+      </main>
+    </div>
+    <footer class="colophon">
+      <p><strong>Day 8 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <div class="rule"></div>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — the circuit diagram from C_Tutorial.pdf, Chapter 3, page 56; sketch <code>Sketch_04.2_FlowingLight2.ino</code>; MicroPython <code>04.2_FlowingLight/FlowingLight.py</code>. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+    </footer>
+  </div>
+
+  <dialog class="lightbox" id="explainer">
+    <div class="lb-head">
+      <div>
+        <span class="lb-kicker">Field note</span>
+        <h3 id="explainerTitle"></h3>
+      </div>
+      <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="lb-body"><p id="explainerBody"></p></div>
+    <div class="lb-shortcut"><span class="tag">Shortcut</span><span id="explainerShortcut"></span></div>
+  </dialog>
+
+  <dialog class="lightbox image" id="imageBox">
+    <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    <div class="lb-body"><img id="imageBoxImg" alt="" /></div>
+    <p class="lb-cap" id="imageBoxCap"></p>
+  </dialog>
+
+  <div class="toast" id="toast">Prompt copied</div>
+
+  <script id="lesson-data" type="application/json">{"day": 8, "totalDays": 30, "slug": "day-08-meteor", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "delayMs": {"title": "delay()", "body": "delay() pauses the whole program for a number of milliseconds — 1000 is one second. The blink you see is the LED held on for a moment, then off for a moment, on a loop.\n", "shortcut": "The number is milliseconds — 1000 = 1 second, 200 = a fifth of a second."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "gnd": {"title": "Ground / GND", "body": "Ground is the shared zero-voltage reference. The board and sensor need a common ground so a signal like HIGH or LOW means the same thing to both parts.\n", "shortcut": "A missing ground can make everything look haunted. Check it early."}, "gpio": {"title": "GPIO extension board", "body": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself.\n", "shortcut": "When a lesson says GPIO 13, look for the pin labelled 13 on the extension board."}, "jumpers": {"title": "Jumper wires", "body": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles.\n", "shortcut": "If a reading seems impossible, gently reseat the jumper wires before changing code."}, "ledBar": {"title": "LED bar graph", "body": "A LED bar packs ten separate LEDs into one strip, with a row of pins along each edge. Each LED is wired and driven on its own — exactly like the single LED from earlier days, just ten of them in a tidy line.\n", "shortcut": "Ten LEDs in one part. If it stays dark, rotate it 180° — the label direction is easy to get backwards."}, "ledc": {"title": "ledcWrite() and PWM channels", "body": "The ESP32-S3 has hardware PWM \"channels\" (its LEDC controller). You attach a pin to a channel once, then ledcWrite() sets its level. The board does the fast switching for you, so your loop just names a brightness number.\n", "shortcut": "Attach the pin to a channel once; then ledcWrite(pin, level) sets brightness."}, "pinArray": {"title": "An array of pins", "body": "Instead of naming ten pins one by one, the sketch keeps them in a list (an array) and walks the list with a loop. Change the order or length of the list and the pattern changes with it — no rewiring needed.\n", "shortcut": "One loop over a list of pins does the work of ten copied-and-pasted lines."}, "pwm": {"title": "PWM — dimming by blinking", "body": "A pin is only ever fully on or fully off. But if it flicks on and off thousands of times a second, your eye blends it into a steady in-between brightness. The share of time it stays on is the duty cycle — more on-time looks brighter.\n", "shortcut": "PWM fakes \"half on\" by switching fast. Duty 0 = off, maximum = brightest."}, "resistor": {"title": "Resistor", "body": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction.\n", "shortcut": "The 220 Ω resistor protects the LED; either way round is fine."}}, "prev": {"day": 7, "slug": "day-07-breathing", "title": "Make an LED breathe"}, "next": {"day": 9, "slug": "day-09-rgb", "title": "Mix any colour from three lights"}}</script>
+  <script src="../course.js"></script>
+</body>
+</html>

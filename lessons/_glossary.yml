@@ -292,3 +292,80 @@ toggle:
     live. Press once and the LED latches on; press again and it latches off. That
     memory is what turns a momentary button into a lamp switch.
   shortcut: Button-and-LED reacts while held; the lamp remembers and flips.
+
+ledBar:
+  title: LED bar graph
+  body: >
+    A LED bar packs ten separate LEDs into one strip, with a row of pins along
+    each edge. Each LED is wired and driven on its own — exactly like the single
+    LED from earlier days, just ten of them in a tidy line.
+  shortcut: Ten LEDs in one part. If it stays dark, rotate it 180° — the label direction is easy to get backwards.
+
+pinArray:
+  title: An array of pins
+  body: >
+    Instead of naming ten pins one by one, the sketch keeps them in a list (an
+    array) and walks the list with a loop. Change the order or length of the list
+    and the pattern changes with it — no rewiring needed.
+  shortcut: One loop over a list of pins does the work of ten copied-and-pasted lines.
+
+pwm:
+  title: PWM — dimming by blinking
+  body: >
+    A pin is only ever fully on or fully off. But if it flicks on and off
+    thousands of times a second, your eye blends it into a steady in-between
+    brightness. The share of time it stays on is the duty cycle — more on-time
+    looks brighter.
+  shortcut: PWM fakes "half on" by switching fast. Duty 0 = off, maximum = brightest.
+
+ledc:
+  title: ledcWrite() and PWM channels
+  body: >
+    The ESP32-S3 has hardware PWM "channels" (its LEDC controller). You attach a
+    pin to a channel once, then ledcWrite() sets its level. The board does the
+    fast switching for you, so your loop just names a brightness number.
+  shortcut: Attach the pin to a channel once; then ledcWrite(pin, level) sets brightness.
+
+rgb:
+  title: RGB colour mixing
+  body: >
+    An RGB LED is three tiny LEDs — red, green, and blue — in one dome. Set each
+    one's brightness with PWM and your eye blends them into a single colour. All
+    off is dark; all full is white; everything else is a mix — the same trick a
+    screen uses.
+  shortcut: Red + green + blue at different brightnesses makes any colour.
+
+commonAnode:
+  title: Common anode — why brightness looks inverted
+  body: >
+    In this RGB LED all three colours share one positive pin, so a colour lights
+    when its own pin is pulled LOW, not HIGH. The sketch writes 255 minus your
+    value, so 255 still means "brightest" to you even though the hardware works
+    upside down.
+  shortcut: A bigger number still means brighter — the 255 − value in code hides the inversion.
+
+buzzer:
+  title: Active vs passive buzzer
+  body: >
+    A buzzer turns electricity into sound. An active buzzer has its own oscillator
+    inside, so switching it on plays one fixed tone. A passive buzzer has no
+    oscillator — you feed it a changing signal to choose the pitch, which is how
+    you get melodies or a siren.
+  shortcut: Active buzzer = on/off, one note. Passive buzzer = you choose the pitch.
+
+transistor:
+  title: Transistor — a current amplifier
+  body: >
+    A GPIO pin can switch things but only supplies a trickle of current — not
+    enough for a buzzer. An NPN transistor uses that trickle on its base to switch
+    a much larger current from the 5V rail through the buzzer. It is an
+    electrically controlled switch.
+  shortcut: The pin controls the transistor; the transistor drives the buzzer.
+
+tone:
+  title: Tone and frequency
+  body: >
+    Pitch is frequency — how many times a second the signal repeats, measured in
+    hertz. Send a passive buzzer a higher frequency and it plays a higher note.
+    Sweeping the frequency up and down is what turns a beep into a siren.
+  shortcut: Higher frequency = higher pitch. This passive buzzer is loudest around 2 kHz.

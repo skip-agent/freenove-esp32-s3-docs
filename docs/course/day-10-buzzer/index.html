@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Day 10 · Give the board a voice — TinySkiff ESP32-S3 Lab</title>
+  <meta name="description" content="Wire an active buzzer and an NPN transistor to the ESP32-S3, add a push button, and build a doorbell — press to beep. Your first circuit that makes sound and switches a bigger load through a transistor." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../course.css" />
+</head>
+<body>
+  <div class="lesson-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 10 of 30</p>
+        <h1>Give the board<br />a <em>voice</em></h1>
+        <p class="lede">Today the board makes sound. You wire an active buzzer through a small transistor, add a push button, and upload a sketch that beeps the moment you press — a doorbell you built yourself. The transistor is the new trick: it lets a gentle pin switch a load the pin could never drive alone.
+</p>
+        <div class="meta-row" aria-label="Lesson facts">
+          <span class="pill is-key">About 25 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">No electronics assumed</span>
+        </div>
+      </div>
+      <div class="hero-side no-instrument">
+        
+        <div class="agent-strip">
+          <div class="lesson-code">
+            <span class="label">Agent assist code</span>
+            <code>TSK-DAY10-BUZZER</code>
+          </div>
+          <button class="copy-prompt" type="button" data-copy="I am doing TinySkiff lesson TSK-DAY10-BUZZER. Pull the lesson packet, then guide me one step at a time. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY10-BUZZER.json">lesson packet</a> and coach you step by step.</p>
+        </div>
+      </div>
+    </header>
+    <div class="layout">
+      <nav class="rail" aria-label="Lesson progress">
+        <div class="rail-head">
+          <strong>Today's route</strong>
+          <span class="day-of">10 / 30</span>
+        </div>
+        <div class="voyage" style="--voyage-fill: 33.33%" aria-hidden="true"><span></span></div>
+        <div class="rail-nav">
+          <a href="#parts"><span class="tick"></span>What you need</a>
+          <a href="#wiring"><span class="tick"></span>Chart the circuit</a>
+          <a href="#steps"><span class="tick"></span>Build it</a>
+          <a href="#code"><span class="tick"></span>Read the code</a>
+          <a href="#theory"><span class="tick"></span>Active buzzers, passive buzzers, and the transistor</a>
+          <a href="#test"><span class="tick"></span>Test &amp; debug</a>
+          <a href="#challenge"><span class="tick"></span>Try this</a>
+          <a href="#agent"><span class="tick"></span>Coach me</a>
+        </div>
+      </nav>
+      <main class="lesson-main">
+        <section id="parts" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">01</span> First, know the pieces</p>
+              <h2>What you need</h2>
+              <p class="muted">Nine things, most of them tiny. Tap <em>Define</em> on any part you haven&#x27;t met — the answer opens as a field note you can read and dismiss without losing your place.
+</p>
+            </div>
+            <div class="part-grid">
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-esp32-s3-board.jpg" alt="Official manual photo of the ESP32-S3 development board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>ESP32-S3 board <button class="define" data-topic="esp32">Define</button></h3>
+                <p>The brain that runs your uploaded sketch.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-gpio-extension-board.png" alt="Official manual image of the ESP32-S3 GPIO extension board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>GPIO extension board <button class="define" data-topic="gpio">Define</button></h3>
+                <p>Spreads the pins into rows you can reach and label.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-buzzer.png" alt="Official manual photo of a small round active buzzer." /><figcaption>Manual photo</figcaption></figure>
+                <h3>Active buzzer <button class="define" data-topic="buzzer">Define</button></h3>
+                <p>Makes one fixed tone whenever it gets power.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-transistor.png" alt="Official manual photo of an NPN transistor with three legs." /><figcaption>Manual photo</figcaption></figure>
+                <h3>NPN transistor <button class="define" data-topic="transistor">Define</button></h3>
+                <p>A tiny switch the pin controls to drive the buzzer.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-push-button.png" alt="Official manual photo of a four-pin push button switch with its pin pairs labelled 1 and 2." /><figcaption>Manual photo</figcaption></figure>
+                <h3>Push button <button class="define" data-topic="pushButton">Define</button></h3>
+                <p>A four-pin switch that closes the circuit when pressed.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-resistor.png" alt="Official manual photo of a resistor with coloured value bands." /><figcaption>Manual photo</figcaption></figure>
+                <h3>1 kΩ resistor <button class="define" data-topic="resistor">Define</button></h3>
+                <p>Sits between the pin and the transistor&#x27;s base to keep the current gentle.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-resistor.png" alt="Official manual photo of a resistor with coloured value bands." /><figcaption>Manual photo</figcaption></figure>
+                <h3>2 × 10 kΩ resistors <button class="define" data-topic="pullResistor">Define</button></h3>
+                <p>Hold the button&#x27;s pin at a steady level until you press.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-jumper-wire.png" alt="Official manual image of a jumper wire." /><figcaption>Manual photo</figcaption></figure>
+                <h3>Jumper wires <button class="define" data-topic="jumpers">Define</button></h3>
+                <p>Temporary, solder-free connections.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-arduino-ide.png" alt="Official manual screenshot of the Arduino IDE interface." /><figcaption>Manual screenshot</figcaption></figure>
+                <h3>Arduino IDE <button class="define" data-topic="arduino">Define</button></h3>
+                <p>Uploads the sketch to the board.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+        <section id="wiring" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">02</span> Make the physical circuit</p>
+              <h2>Chart the circuit</h2>
+              <p class="muted">The official Freenove diagram is your chart — schematic on top, the same circuit built on a breadboard below. Click it to enlarge. Each connection tells you where the wire goes and why.
+</p>
+            </div>
+            <div class="wire-layout">
+              <figure class="image-frame">
+                <button class="zoom" type="button" data-zoom="../assets/day-10/circuit-page-80.png" data-cap="Official Freenove circuit, C Tutorial Chapter 6, page 80.">
+                  <img src="../assets/day-10/circuit-page-80.png" alt="Official Freenove circuit for the Buzzer: an active buzzer driven from GPIO 14 through an NPN transistor with a 1 kilo-ohm resistor on its base and the buzzer powered from the 5V rail, plus a push button on GPIO 21 held by 10 kilo-ohm resistors, shown as both a schematic and a breadboard photo." />
+                  <span class="zoom-hint">Click to enlarge</span>
+                </button>
+                <figcaption class="caption">Official Freenove circuit — C Tutorial, Chapter 6 (Buzzer), page 80.</figcaption>
+              </figure>
+              <div class="pin-table" aria-label="Wiring">
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>Buzzer + <button class="define" data-topic="buzzer">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">5V rail</span>
+                  <span class="pin-why">The buzzer draws more current than a pin can give so it runs off 5V.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>Transistor base (via 1 kΩ) <button class="define" data-topic="transistor">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GPIO 14</span>
+                  <span class="pin-why">The pin switches the buzzer through the transistor.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>Push button <button class="define" data-topic="digitalRead">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GPIO 21</span>
+                  <span class="pin-why">The board reads this pin to catch the press.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>10 kΩ resistor <button class="define" data-topic="pullResistor">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">3.3V</span>
+                  <span class="pin-why">Holds GPIO 21 HIGH until a press pulls it LOW.</span>
+                </div>
+              </div>
+            </div>
+            <div class="callout">
+              <div class="icon" aria-hidden="true">⚓</div>
+              <p><strong>Mind the transistor&#x27;s legs.</strong> The transistor&#x27;s three legs have their own jobs — emitter, base, and collector — so get them the right way round against the chart. Unplug USB before you move any wire.
+</p>
+            </div>
+          </div>
+        </section>
+        <section id="steps" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">03</span> One action at a time</p>
+              <h2>Build it</h2>
+              <p class="muted">This is the main path — you can finish the day without opening a single field note. Tap each step as you go to keep your place.
+</p>
+            </div>
+            <div class="steps-progress">
+              <div class="bar" aria-hidden="true"><span id="stepBar"></span></div>
+              <span class="count" id="stepCount">0 / 8 done</span>
+            </div>
+            <ol class="step-list">
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 1 done"></button><p class="text">Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 2 done"></button><p class="text">Place the transistor on the breadboard and note its three legs — emitter, base, and collector. <button class="define" data-topic="transistor">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">Wire the buzzer&#x27;s + pin to the 5V rail and its other pin down to the transistor.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">Connect the transistor&#x27;s base to GPIO 14 through the 1 kΩ resistor.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Wire the push button so one side reaches GPIO 21, then add its 10 kΩ pull-up to 3.3V. <button class="define" data-topic="pullResistor">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 6 done"></button><p class="text">Compare every wire to the chart before you plug in USB.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 7 done"></button><p class="text">Open <code>Sketch_06.1_Doorbell.ino</code> in Arduino IDE and upload it.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 8 done"></button><p class="text">Press the button and listen.</p></li>
+            </ol>
+            <div class="done-banner" id="doneBanner" role="status">
+              <span class="icon" aria-hidden="true">💡</span>
+              <div><strong>The board can speak.</strong><p>Press for a beep, release for silence — your first doorbell. Head to Test &amp; debug to confirm the sound.</p></div>
+            </div>
+          </div>
+        </section>
+        <section id="code" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">04</span> Read just enough code</p>
+              <h2>Read the code</h2>
+              <p class="muted">The whole sketch is short. Two lines set the pins up; the loop just asks the button and answers with the buzzer. Switch to MicroPython if you&#x27;d rather see the same idea in Python — the wiring never changes.
+</p>
+            </div>
+            <div class="tabs" role="tablist" aria-label="Code language">
+              <button class="tab" id="tab-arduino" role="tab" aria-selected="true" aria-controls="panel-arduino">Arduino <span class="badge">Main</span></button><button class="tab" id="tab-micropython" role="tab" aria-selected="false" aria-controls="panel-micropython">MicroPython <span class="badge">Optional</span></button>
+            </div>
+            <div class="tabpanel" id="panel-arduino" role="tabpanel" aria-labelledby="tab-arduino">
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">Sketch_06.1_Doorbell.ino</span></div>
+<pre><code><span class="tok-key">#define</span> PIN_BUZZER <span class="tok-num">14</span>
+<span class="tok-key">#define</span> PIN_BUTTON <span class="tok-num">21</span>
+
+<span class="tok-key">void</span> <span class="tok-fn">setup</span>() {
+  <span class="tok-fn">pinMode</span>(PIN_BUZZER, OUTPUT);
+  <span class="tok-fn">pinMode</span>(PIN_BUTTON, INPUT);
+}
+
+<span class="tok-key">void</span> <span class="tok-fn">loop</span>() {
+  <span class="tok-fn">if</span> (<span class="tok-fn">digitalRead</span>(PIN_BUTTON) == LOW) {
+    <span class="tok-fn">digitalWrite</span>(PIN_BUZZER, HIGH);   // pressed -&gt; beep
+  } else {
+    <span class="tok-fn">digitalWrite</span>(PIN_BUZZER, LOW);    // released -&gt; silent
+  }
+}</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>digitalRead(PIN_BUTTON) == LOW</code><span class="note-text">True only while the button is held — a press pulls GPIO 21 LOW. <button class="define" data-topic="digitalRead">Define</button></span></div>
+                  <div class="code-note"><code>digitalWrite(PIN_BUZZER, HIGH)</code><span class="note-text">Sends the pin HIGH, which switches the buzzer on through the transistor. <button class="define" data-topic="transistor">Define</button></span></div>
+                  <div class="code-note"><code>ledcWriteTone(channel, freq)</code><span class="note-text">The passive-buzzer variant (<code>Sketch_06.2_Alertor</code>) uses ledcWriteTone to choose the pitch and sweep a siren. <button class="define" data-topic="tone">Define</button></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="tabpanel" id="panel-micropython" role="tabpanel" aria-labelledby="tab-micropython" hidden>
+              <p class="optional-tag">Optional side path · same circuit</p>
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">06.1_Doorbell/Doorbell.py</span></div>
+<pre><code>button = <span class="tok-fn">Pin</span>(<span class="tok-num">21</span>, Pin.IN, Pin.PULL_UP)
+activeBuzzer = <span class="tok-fn">Pin</span>(<span class="tok-num">14</span>, Pin.OUT)
+
+if not button.<span class="tok-fn">value</span>():
+    activeBuzzer.<span class="tok-fn">value</span>(<span class="tok-num">1</span>)
+else:
+    activeBuzzer.<span class="tok-fn">value</span>(<span class="tok-num">0</span>)</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>Pin(21, Pin.IN, Pin.PULL_UP)</code><span class="note-text">Reads GPIO 21 as an input with a built-in pull-up — the same job the 10 kΩ resistor does in hardware.</span></div>
+                  <div class="code-note"><code>activeBuzzer = Pin(14, Pin.OUT)</code><span class="note-text">Drives GPIO 14, which switches the buzzer through the transistor.</span></div>
+                </div>
+              </div>
+              <p class="micropython-note">Same pins, same wiring. The passive-buzzer version uses <code>PWM(Pin(14), 2000)</code> and <code>.freq(...)</code> to pick the pitch. Run it in Thonny if MicroPython is set up; otherwise skip it — it should never block the Arduino-first path.
+</p>
+            </div>
+          </div>
+        </section>
+        <section id="theory" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">05</span> Understand, don&#x27;t memorise</p>
+              <h2>Active buzzers, passive buzzers, and the transistor</h2>
+              <p class="muted">There&#x27;s no trick here — the pin does the deciding, and a small transistor does the heavy lifting the pin can&#x27;t.
+</p>
+            </div>
+            <div class="theory-flow" aria-label="Measurement model">
+              <article class="flow-step"><span class="n">Sense</span><h3>Button in</h3><p>digitalRead checks GPIO 21 many times a second.</p></article>
+              <article class="flow-step"><span class="n">Trickle</span><h3>Weak pin</h3><p>The pin can only supply a trickle of current on its own.</p></article>
+              <article class="flow-step"><span class="n">Switch</span><h3>Transistor</h3><p>The transistor uses that trickle to switch the 5V buzzer.</p></article>
+              <article class="flow-step"><span class="n">Silence</span><h3>Release</h3><p>Let go and the transistor opens so the buzzer goes silent.</p></article>
+            </div>
+            <div class="formula-card">
+              <span class="label">The model</span>
+              <code>press → <b>transistor</b> switches 5V → buzzer sounds</code>
+            </div>
+            <div class="two-col" style="margin-top:14px">
+              <article class="mini-card"><h3>Active vs passive buzzers <button class="define" data-topic="buzzer">Define</button></h3><p>An active buzzer has its own oscillator and plays one fixed tone. A passive buzzer is silent until you feed it a changing signal, so you choose the pitch.</p></article>
+              <article class="mini-card"><h3>What the transistor is for <button class="define" data-topic="transistor">Define</button></h3><p>The pin can&#x27;t supply the buzzer&#x27;s current. The transistor lets the small pin signal switch the larger 5V current on and off.</p></article>
+            </div>
+          </div>
+        </section>
+        <section id="test" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">06</span> Know it worked</p>
+              <h2>Test &amp; debug</h2>
+              <p class="muted">Nothing prints to the screen today — the proof is the sound under your finger.
+</p>
+            </div>
+            <div class="test-grid">
+              <div>
+                <span class="readout-title">What you should hear</span>
+                <div class="observe" aria-label="What you should see">
+                  <div class="bar"><span>Buzzer</span></div>
+                  <ul class="observe-lines"><li>Press and hold the button — a steady beep sounds at once.</li><li>Let go — silence.</li><li>Every press sounds the same note, for as long as the board has power.</li></ul>
+                </div>
+                <p class="micropython-note">An active buzzer plays one fixed tone — choosing the pitch is the passive-buzzer variant&#x27;s job.</p>
+              </div>
+              <div>
+                <span class="checks-title">If it doesn&#x27;t</span>
+                <ul class="checklist">
+                  <li><strong>No sound at all?</strong> Check the transistor legs are the right way round, and that the buzzer + goes to 5V.</li>
+                  <li><strong>Always sounding?</strong> The button or its 10 kΩ pull-up is likely miswired on GPIO 21.</li>
+                  <li><strong>Very faint?</strong> The buzzer may be on 3.3V instead of 5V — move it to the 5V rail.</li>
+                  <li><strong>Upload fails?</strong> Swap in a data-capable USB cable.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="challenge" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">07</span> Make the idea yours</p>
+              <h2>Try this: invent a signal</h2>
+              <p class="muted">Same working circuit, one new idea: giving a sound a meaning. It fits inside today&#x27;s 30 minutes.
+</p>
+            </div>
+            <div class="two-col">
+              <article class="mini-card"><h3>Invent a signal</h3><p>Design a two-beep pattern — short-short, or short-long — and write down what it means. Press it out by hand and see if a listener can read it.</p></article>
+              <article class="mini-card"><h3>Hear a siren <button class="define" data-topic="tone">Define</button></h3><p>Swap in the passive buzzer and upload <code>Sketch_06.2_Alertor.ino</code> to hear a siren instead of a single note. Notice how choosing the pitch changes everything.</p></article>
+            </div>
+            <div class="logbook">
+              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
+              <label>What did your two-beep signal mean, and could someone else read it?<textarea rows="2"></textarea></label>
+              <label>What was the transistor doing every time the buzzer sounded?<textarea rows="2"></textarea></label>
+              <label>Where in daily life does one fixed tone do a whole job?<textarea rows="2"></textarea></label>
+            </div>
+          </div>
+        </section>
+        <section id="agent" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">08</span> Learn it with a hand on the tiller</p>
+              <h2>Coach me through it</h2>
+              <p class="muted">Every lesson ships with a code and a machine-readable packet, so an agent can guide you with full context.
+</p>
+            </div>
+            <div class="agent-grid">
+              <article class="mini-card"><h3>Lesson code</h3><p><code>TSK-DAY10-BUZZER</code></p></article>
+              <article class="mini-card"><h3>Context packet</h3><p><a href="../packets/TSK-DAY10-BUZZER.json">Open the JSON packet →</a></p></article>
+            </div>
+            <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
+              <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
+              <p><strong>How the agent should behave:</strong> guide one physical connection at a time, wait for you to confirm, explain terms on request, and always check the transistor orientation, wiring, board, port, and USB before changing code.
+</p>
+            </div>
+          </div>
+        </section>
+        <nav class="day-nav" aria-label="Course navigation">
+        <a class="day-nav-link prev" href="../day-09-rgb/">
+          <span class="day-nav-dir">← Day 9</span>
+          <span class="day-nav-title">Mix any colour from three lights</span>
+        </a>
+        <a class="day-nav-link next" href="../day-26-ultrasonic/">
+          <span class="day-nav-dir">Day 26 →</span>
+          <span class="day-nav-title">Measure the room with sound</span>
+        </a>
+        </nav>
+      </main>
+    </div>
+    <footer class="colophon">
+      <p><strong>Day 10 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <div class="rule"></div>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — the circuit diagram from C_Tutorial.pdf, Chapter 6, page 80; sketch <code>Sketch_06.1_Doorbell.ino</code>; MicroPython <code>06.1_Doorbell/Doorbell.py</code>. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+    </footer>
+  </div>
+
+  <dialog class="lightbox" id="explainer">
+    <div class="lb-head">
+      <div>
+        <span class="lb-kicker">Field note</span>
+        <h3 id="explainerTitle"></h3>
+      </div>
+      <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="lb-body"><p id="explainerBody"></p></div>
+    <div class="lb-shortcut"><span class="tag">Shortcut</span><span id="explainerShortcut"></span></div>
+  </dialog>
+
+  <dialog class="lightbox image" id="imageBox">
+    <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    <div class="lb-body"><img id="imageBoxImg" alt="" /></div>
+    <p class="lb-cap" id="imageBoxCap"></p>
+  </dialog>
+
+  <div class="toast" id="toast">Prompt copied</div>
+
+  <script id="lesson-data" type="application/json">{"day": 10, "totalDays": 30, "slug": "day-10-buzzer", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "buzzer": {"title": "Active vs passive buzzer", "body": "A buzzer turns electricity into sound. An active buzzer has its own oscillator inside, so switching it on plays one fixed tone. A passive buzzer has no oscillator — you feed it a changing signal to choose the pitch, which is how you get melodies or a siren.\n", "shortcut": "Active buzzer = on/off, one note. Passive buzzer = you choose the pitch."}, "digitalRead": {"title": "digitalRead()", "body": "digitalRead() checks whether a pin is currently HIGH or LOW and hands that answer back to your code. Here it reads GPIO 13 every loop to find out whether the button is being pressed.\n", "shortcut": "digitalWrite() sets a pin; digitalRead() asks a pin."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "gpio": {"title": "GPIO extension board", "body": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself.\n", "shortcut": "When a lesson says GPIO 13, look for the pin labelled 13 on the extension board."}, "jumpers": {"title": "Jumper wires", "body": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles.\n", "shortcut": "If a reading seems impossible, gently reseat the jumper wires before changing code."}, "pullResistor": {"title": "Pull resistor (10 kΩ)", "body": "An input pin left floating drifts between HIGH and LOW and reads at random. A 10 kΩ resistor gently ties the pin to a known level, so it reads a steady value until a button press forces the other one.\n", "shortcut": "The 10 kΩ resistors stop GPIO 13 from guessing while the button is idle."}, "pushButton": {"title": "Push button", "body": "This push button has four pins in two connected pairs. Pressing it bridges the pairs and completes the circuit; releasing it breaks the connection again. It is the simplest way to hand the board a yes-or-no input.\n", "shortcut": "Pressed means connected; released means open."}, "resistor": {"title": "Resistor", "body": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction.\n", "shortcut": "The 220 Ω resistor protects the LED; either way round is fine."}, "tone": {"title": "Tone and frequency", "body": "Pitch is frequency — how many times a second the signal repeats, measured in hertz. Send a passive buzzer a higher frequency and it plays a higher note. Sweeping the frequency up and down is what turns a beep into a siren.\n", "shortcut": "Higher frequency = higher pitch. This passive buzzer is loudest around 2 kHz."}, "transistor": {"title": "Transistor — a current amplifier", "body": "A GPIO pin can switch things but only supplies a trickle of current — not enough for a buzzer. An NPN transistor uses that trickle on its base to switch a much larger current from the 5V rail through the buzzer. It is an electrically controlled switch.\n", "shortcut": "The pin controls the transistor; the transistor drives the buzzer."}}, "prev": {"day": 9, "slug": "day-09-rgb", "title": "Mix any colour from three lights"}, "next": {"day": 26, "slug": "day-26-ultrasonic", "title": "Measure the room with sound"}}</script>
+  <script src="../course.js"></script>
+</body>
+</html>

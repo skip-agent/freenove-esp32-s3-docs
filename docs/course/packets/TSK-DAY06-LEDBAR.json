@@ -1,0 +1,160 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY06-LEDBAR",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 6,
+  "title": "Make ten lights flow like water",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 25,
+  "mission": "Wire a ten-segment LED bar — each segment on its own pin through its own 220 Ω resistor — upload the Arduino sketch, and watch a single lit segment sweep along the bar and back, over and over.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "officialPdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+    "chapter": "Chapter 3 LED Bar",
+    "page": 56,
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_03.1_FlowingLight/Sketch_03.1_FlowingLight.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/03.1_FlowingLight/FlowingLight.py",
+    "imageAsset": "docs/course/assets/day-06/circuit-page-56.png",
+    "imageAlt": "Official Freenove circuit for the LED Bar: ten LED segments, each driven from its own GPIO pin through a 220 ohm resistor and returning through a shared common row to ground, shown as both a schematic and a breadboard photo.",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language."
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "GPIO extension board",
+      "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
+      "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
+    },
+    {
+      "name": "LED bar graph",
+      "imageAsset": "docs/course/assets/shared/item-led-bar.png",
+      "explanation": "A LED bar packs ten separate LEDs into one strip, with a row of pins along each edge. Each LED is wired and driven on its own — exactly like the single LED from earlier days, just ten of them in a tidy line."
+    },
+    {
+      "name": "10 × 220 Ω resistors",
+      "imageAsset": "docs/course/assets/shared/item-resistor.png",
+      "explanation": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction."
+    },
+    {
+      "name": "Jumper wires",
+      "imageAsset": "docs/course/assets/shared/item-jumper-wire.png",
+      "explanation": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    }
+  ],
+  "wiring": [
+    {
+      "partPin": "10 bar segments (via 220 Ω each)",
+      "connectTo": "GPIO 21 47 48 38 39 40 41 42 2 1",
+      "reason": "Each pin lights one segment of the bar."
+    },
+    {
+      "partPin": "Bar common row",
+      "connectTo": "GND",
+      "reason": "Returns every segment to zero volts."
+    }
+  ],
+  "coachInstructions": [
+    "Guide one segment at a time and wait for learner confirmation before moving to the next; ten connections are easy to lose track of.",
+    "Remind the learner that each segment needs its own 220 Ω series resistor — a shared or missing resistor is the common mistake here.",
+    "If the whole bar stays dark, have the learner rotate the LED bar 180° and re-check the common row to ground before changing code.",
+    "If one segment never lights, check that segment's resistor and its jumper to its GPIO pin, not the whole circuit.",
+    "Explain the pin array and the forward and reverse loops on request; do not dump theory before the learner has a working circuit.",
+    "Keep the Arduino path primary; MicroPython is optional only if already set up."
+  ],
+  "steps": [
+    "Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.",
+    "Place the LED bar across the breadboard's centre channel so each segment has its own row.",
+    "Wire each segment through its own 220 Ω resistor to its GPIO pin, working along the list in order.",
+    "Wire the bar's common row to ground so every segment shares the same return.",
+    "Compare every wire to the chart before you plug in USB.",
+    "Open Sketch_03.1_FlowingLight.ino in Arduino IDE and upload it.",
+    "Watch a single lit segment sweep along the bar and back."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "byte ledPins[] = {21, 47, 48, 38, 39, 40, 41, 42, 2, 1}",
+        "explanation": "One list holds all ten pins in bar order, so the loop can reach each by number."
+      },
+      {
+        "line": "digitalWrite(ledPins[i], HIGH)",
+        "explanation": "Lights whichever segment the loop is pointing at right now; the next line turns it off."
+      },
+      {
+        "line": "for (int i = ledCounts - 1; i > -1; i--)",
+        "explanation": "Walks the same list backwards, which is what sends the light flowing back the other way."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "pins = [21, 47, 48, 38, 39, 40, 41, 42, 2, 1]",
+        "explanation": "The same list of pins in Python, in the same bar order."
+      },
+      {
+        "line": "led = Pin(pins[i], Pin.OUT)",
+        "explanation": "Picks one pin from the list and drives it, then the loop moves to the next."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "Keep the pins in an array, then walk the list to light them in turn — forward, then back.",
+    "formula": "one array of pins → walk it forward → walk it back → repeat",
+    "notes": [
+      {
+        "title": "Why a pin array",
+        "body": "Ten separate variables would mean ten copies of every line. One array lets a single loop stand in for all of them."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "One lit segment starts at one end of the bar.",
+      "It travels along the bar a segment at a time to the far end.",
+      "Then it flows back the other way, and repeats for as long as the board has power."
+    ],
+    "successCriteria": "Only one segment is lit at any instant — the flow is that single light moving, not a growing row."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "Whole bar stays dark",
+      "firstChecks": [
+        "Rotate the LED bar 180° — its direction is easy to reverse — then re-check the common row to ground."
+      ]
+    },
+    {
+      "symptom": "One segment never lights",
+      "firstChecks": [
+        "Check that segment's own 220 Ω resistor and its jumper to its GPIO pin."
+      ]
+    },
+    {
+      "symptom": "Nothing happens at all",
+      "firstChecks": [
+        "Re-check the common row to ground, then that the sketch uploaded."
+      ]
+    },
+    {
+      "symptom": "Upload fails",
+      "firstChecks": [
+        "Swap in a data-capable USB cable."
+      ]
+    }
+  ],
+  "challenge": "Reverse the direction the light flows, then change how fast it moves by editing the delay, and note what each edit does.",
+  "logbookPrompts": [
+    "Which delay made the flow feel best, and why?",
+    "What changed when you ran the reverse loop first?",
+    "What real-world display works like this moving bar?"
+  ]
+}
