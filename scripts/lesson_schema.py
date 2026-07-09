@@ -124,6 +124,16 @@ def _require(errors: list[str], cond: bool, msg: str) -> None:
         errors.append(msg)
 
 
+def _as_dict(node) -> dict:
+    """A block coerced to a mapping (non-mappings validate as missing fields)."""
+    return node if isinstance(node, dict) else {}
+
+
+def _as_list(node) -> list:
+    """A block coerced to a list (non-lists validate as empty)."""
+    return node if isinstance(node, list) else []
+
+
 def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
     """Return a list of human-readable problems for one lesson (empty = valid)."""
     errors: list[str] = []
@@ -165,39 +175,49 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
     _require(errors, isinstance(tracks, dict) and tracks.get("main") == "arduino",
              f"{code}: tracks.main must be 'arduino'")
 
+    def _require_mapping(node, where: str) -> bool:
+        """Guard that a list item is a mapping before .get is used on it."""
+        if isinstance(node, dict):
+            return True
+        err(f"{where} must be a mapping")
+        return False
+
     # Parts — each needs an image + alt (provenance) + name
-    parts = (lesson.get("parts") or {}).get("items") or []
+    parts = _as_list(_as_dict(lesson.get("parts")).get("items"))
     _require(errors, len(parts) > 0, f"{code}: parts.items must be non-empty")
     for i, part in enumerate(parts):
         where = f"parts.items[{i}]"
+        if not _require_mapping(part, where):
+            continue
         for field in ("name", "image", "imageKind", "blurb", "alt"):
             _require(errors, bool(str(part.get(field, "")).strip()),
                      f"{code}: {where}.{field} is required")
 
     # Wiring — diagram carries alt + source; pins have from/to/why
-    wiring = lesson.get("wiring") or {}
-    diagram = wiring.get("diagram") or {}
+    wiring = _as_dict(lesson.get("wiring"))
+    diagram = _as_dict(wiring.get("diagram"))
     for field in ("image", "alt", "caption"):
         _require(errors, bool(str(diagram.get(field, "")).strip()),
                  f"{code}: wiring.diagram.{field} is required")
-    src = diagram.get("source") or {}
+    src = _as_dict(diagram.get("source"))
     for field in ("pdf", "chapter", "page"):
         _require(errors, src.get(field) not in (None, ""),
                  f"{code}: wiring.diagram.source.{field} is required")
-    pins = wiring.get("pins") or []
+    pins = _as_list(wiring.get("pins"))
     _require(errors, len(pins) > 0, f"{code}: wiring.pins must be non-empty")
     for i, pin in enumerate(pins):
+        if not _require_mapping(pin, f"wiring.pins[{i}]"):
+            continue
         for field in ("from", "to", "why"):
             _require(errors, bool(str(pin.get(field, "")).strip()),
                      f"{code}: wiring.pins[{i}].{field} is required")
 
     # Steps
-    steps = (lesson.get("steps") or {}).get("items") or []
+    steps = _as_list(_as_dict(lesson.get("steps")).get("items"))
     _require(errors, len(steps) > 0, f"{code}: steps.items must be non-empty")
 
     # Code focus — Arduino is required; MicroPython optional
-    code_focus = lesson.get("code") or {}
-    arduino = code_focus.get("arduino") or {}
+    arduino = _as_dict(_as_dict(lesson.get("code")).get("arduino"))
     for field in ("sketch", "excerpt"):
         _require(errors, bool(str(arduino.get(field, "")).strip()),
                  f"{code}: code.arduino.{field} is required")
@@ -205,34 +225,35 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
     # Theory is optional (setup days may have none), but must be complete if present
     theory = lesson.get("theory")
     if theory is not None:
-        _require(errors, len(theory.get("flow") or []) > 0,
+        theory = _as_dict(theory)
+        _require(errors, len(_as_list(theory.get("flow"))) > 0,
                  f"{code}: theory.flow must be non-empty when theory is present")
         _require(errors, bool(str(theory.get("formula", "")).strip()),
                  f"{code}: theory.formula is required when theory is present")
 
     # Test
-    test = lesson.get("test") or {}
-    _require(errors, len(test.get("expected") or []) > 0,
+    test = _as_dict(lesson.get("test"))
+    _require(errors, len(_as_list(test.get("expected"))) > 0,
              f"{code}: test.expected must be non-empty")
-    _require(errors, len(test.get("checks") or []) > 0,
+    _require(errors, len(_as_list(test.get("checks"))) > 0,
              f"{code}: test.checks must be non-empty")
 
     # Challenge + logbook
-    challenge = lesson.get("challenge") or {}
+    challenge = _as_dict(lesson.get("challenge"))
     _require(errors, bool(str(challenge.get("title", "")).strip()),
              f"{code}: challenge.title is required")
     _require(errors, bool(str(challenge.get("summary", "")).strip()),
              f"{code}: challenge.summary is required (feeds the agent packet)")
-    _require(errors, len(challenge.get("logbook") or []) > 0,
+    _require(errors, len(_as_list(challenge.get("logbook"))) > 0,
              f"{code}: challenge.logbook must be non-empty")
 
     # Agent packet
-    agent = lesson.get("agent") or {}
-    _require(errors, len(agent.get("coachInstructions") or []) > 0,
+    agent = _as_dict(lesson.get("agent"))
+    _require(errors, len(_as_list(agent.get("coachInstructions"))) > 0,
              f"{code}: agent.coachInstructions must be non-empty")
 
     # Provenance / license
-    source = lesson.get("source") or {}
+    source = _as_dict(lesson.get("source"))
     _require(errors, bool(str(source.get("license", "")).strip()),
              f"{code}: source.license is required")
 
@@ -251,10 +272,10 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
 
 def _image_paths(lesson: dict) -> list[str]:
     paths: list[str] = []
-    for part in (lesson.get("parts") or {}).get("items") or []:
-        if part.get("image"):
+    for part in _as_list(_as_dict(lesson.get("parts")).get("items")):
+        if isinstance(part, dict) and part.get("image"):
             paths.append(str(part["image"]))
-    diagram = (lesson.get("wiring") or {}).get("diagram") or {}
+    diagram = _as_dict(_as_dict(lesson.get("wiring")).get("diagram"))
     if diagram.get("image"):
         paths.append(str(diagram["image"]))
     return paths

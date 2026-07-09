@@ -97,6 +97,25 @@ class ValidationTests(unittest.TestCase):
         errors = lesson_schema.validate_corpus([a, b])
         self.assertTrue(any("duplicate day" in e for e in errors), errors)
 
+    def test_malformed_blocks_report_not_crash(self):
+        # Wrong types must produce validation errors, never an AttributeError.
+        lesson = load_day26()
+        lesson["parts"] = ["oops"]            # should be a mapping with items
+        lesson["steps"] = {"items": ["wire"]}  # items should be strings (ok) — keep valid
+        lesson["wiring"] = "nope"             # should be a mapping
+        try:
+            errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
+        except AttributeError as exc:  # pragma: no cover
+            self.fail(f"validator crashed on malformed input: {exc}")
+        self.assertTrue(any("parts.items" in e for e in errors), errors)
+        self.assertTrue(any("wiring.diagram" in e for e in errors), errors)
+
+    def test_malformed_item_type_reported(self):
+        lesson = load_day26()
+        lesson["parts"]["items"] = ["not-a-mapping"]
+        errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
+        self.assertTrue(any("must be a mapping" in e for e in errors), errors)
+
     def test_collect_lessons_passes(self):
         lessons = lesson_schema.collect_lessons()
         self.assertGreaterEqual(len(lessons), 1)
