@@ -1,0 +1,253 @@
+# Day 27 — BLE pass-through · tinyskiff.lesson.v1
+# One source of truth: this file renders to the guided page
+# (/course/day-27-ble/), the agent packet (/course/packets/…json), and
+# the course-map entry.
+# First radio day — no wiring, the board and the phone trade text over BLE.
+
+schema: tinyskiff.lesson.v1
+lessonCode: TSK-DAY27-BLE
+day: 27
+slug: day-27-ble
+title: "BLE pass-through: talk at short range"
+status: published
+estimatedTimeMinutes: 25
+tracks: { main: arduino, optional: micropython }
+learnerProfile: adult beginner; curious and capable; no electronics assumed
+
+mission: >
+  Upload the BLE pass-through sketch, find the board with the LightBlue app on
+  your phone, and pass text both ways — type in Serial Monitor and read it on
+  the phone, write on the phone and read it in Serial Monitor.
+unlocks: The ESP32-S3 carries its own radio, so your board and your phone can trade text at short range over Bluetooth Low Energy.
+seoDescription: >
+  Turn the ESP32-S3 into a BLE serial pipe. Upload the pass-through sketch,
+  connect with the LightBlue phone app, and send text both ways between Serial
+  Monitor and your phone.
+
+hero:
+  instrument: none
+  headline: Talk to your phone|over {radio}
+  lede: >
+    Today the cable stops being the only path. The ESP32-S3's built-in Bluetooth
+    Low Energy radio becomes a short-range text line — you type in Serial
+    Monitor and the words land on your phone, then your phone answers back the
+    same way.
+  pills:
+    - { text: About 25 minutes, key: true }
+    - Arduino first
+    - MicroPython optional
+    - Bring your phone
+
+parts:
+  intro: >
+    Just the board and its USB cable from the kit — plus your phone. Today's
+    extra tool is a free app called **LightBlue** (iOS App Store or Google
+    Play) that speaks BLE and lets you see exactly what the board broadcasts.
+    Tap *Define* on anything unfamiliar — the answer opens as a field note you
+    can read and dismiss without losing your place.
+  items:
+    - name: ESP32-S3 board
+      image: shared/item-esp32-s3-board.jpg
+      imageKind: Manual photo
+      alt: Official manual photo of the ESP32-S3 development board.
+      blurb: The brain — and today, the radio.
+      explain: esp32
+    - name: Arduino IDE
+      image: shared/item-arduino-ide.png
+      imageKind: Manual screenshot
+      alt: Official manual screenshot of the Arduino IDE interface.
+      blurb: Uploads the sketch and opens Serial Monitor.
+      explain: arduino
+    - name: Official sketch
+      image: shared/item-official-sketch.png
+      imageKind: Manual sketch
+      alt: Official manual page showing the BLE data pass-through sketch and Serial Monitor output.
+      blurb: "`Sketch_20.1_BLE_USART.ino`"
+      explain: sketch
+
+steps:
+  intro: >
+    Two ends today — the board end in Serial Monitor and the phone end in
+    LightBlue. Tap each step as you go to keep your place; you can finish
+    without opening a single field note.
+  items:
+    - On your phone, install the free **LightBlue** app from the iOS App Store or Google Play, and turn Bluetooth on. (On Android, Serial Bluetooth Terminal also works if you already have it.)
+    - Plug the ESP32-S3 into your computer with a data-capable USB cable. {usbData}
+    - Open `Sketch_20.1_BLE_USART.ino` in Arduino IDE — the BLE libraries ship with the ESP32 board package, so there is nothing extra to install.
+    - Press **Upload**, then open Serial Monitor and set the baud rate to `115200`. {serial}
+    - Watch for `Waiting a client connection to notify...` — the board is now broadcasting its name. {ble}
+    - In LightBlue, open the Scan page, swipe down to refresh, and tap **ESP32S3_Bluetooth**. BLE devices are opened inside a GATT app like this — the name never shows up in your phone's Settings→Bluetooth pairing list.
+    - To hear the board, open the characteristic ending **0003**, set Data Format to `utf-string`, and tap **Subscribe**. {bleCharacteristic}
+    - Type a line in Serial Monitor's send box and press Enter — it appears on the phone.
+    - To talk back, open the characteristic ending **0002**, set Data Format to `utf-string`, type a message, and tap **Write**.
+    - Watch your message appear in Serial Monitor.
+  done:
+    icon: "📻"
+    title: Radio contact.
+    body: Your board and your phone are trading text with no cable between them. Head to Test & debug for what each end should show.
+
+code:
+  intro: >
+    The sketch is about seventy lines; the parts that matter fit here. A helper
+    called `setupBLE()` builds the radio's public face — it creates the service
+    with a **write** characteristic for phone→board and a **notify**
+    characteristic for board→phone, then starts advertising. The BLE libraries
+    ship with the ESP32 board package, so it compiles as-is.
+  arduino:
+    file: Sketch_20.1_BLE_USART.ino
+    sketch: C/Sketches/Sketch_20.1_BLE_USART/Sketch_20.1_BLE_USART.ino
+    excerpt: |
+      #include "BLEDevice.h"
+      #include "BLEServer.h"
+
+      #define SERVICE_UUID           "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
+      #define CHARACTERISTIC_UUID_RX "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
+      #define CHARACTERISTIC_UUID_TX "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
+
+      void setup() {
+        Serial.begin(115200);
+        setupBLE("ESP32S3_Bluetooth");
+      }
+
+      void loop() {
+        long now = millis();
+        if (now - lastMsg > 100) {
+          if (deviceConnected&&rxload.length()>0) {
+              Serial.println(rxload);
+              rxload="";
+          }
+          if(Serial.available()>0){
+              String str=Serial.readString();
+              const char *newValue=str.c_str();
+              pCharacteristic->setValue(newValue);
+              pCharacteristic->notify();
+          }
+          lastMsg = now;
+        }
+      }
+    notes:
+      - code: setupBLE("ESP32S3_Bluetooth")
+        text: The helper shown in the full sketch. It creates the service with a write characteristic for phone→board and a notify characteristic for board→phone, then starts advertising this name.
+        explain: ble
+      - code: "#define CHARACTERISTIC_UUID_RX …"
+        text: UUIDs are the fixed names each side looks up to find the right data lane — this trio is the widely adopted Nordic UART set.
+        explain: uuid
+      - code: Serial.println(rxload)
+        text: Whatever the phone wrote arrives in `rxload` and prints straight to Serial Monitor.
+        explain: serialPrint
+      - code: pCharacteristic->notify()
+        text: Pushes whatever you typed in Serial Monitor out over the radio to every subscribed phone.
+        explain: bleCharacteristic
+  micropython:
+    file: 19.1_BLE/BLE.py
+    path: Python/Python_Codes/19.1_BLE/BLE.py
+    optionalTag: Optional side path · no wiring
+    excerpt: |
+      _UART_UUID = bluetooth.UUID("6E400001-B5A3-F393-E0A9-E50E24DCCA9E")
+
+      p = BLESimplePeripheral(ble)
+      p.on_write(on_rx)
+
+      print("Please use LightBlue to connect to ESP32S3.")
+
+      tx_data = input("Enter anything: ")
+      p.send(tx_data)
+    notes:
+      - code: _UART_UUID = bluetooth.UUID("6E400001-…")
+        text: The same Nordic UART service UUID as the Arduino sketch — the phone app sees the same service either way.
+      - code: p.on_write(on_rx)
+        text: Registers the function that runs whenever the phone writes — the Python side of the pass-through.
+    note: >
+      Copy `ble_advertising.py` onto the board alongside `BLE.py` — the script
+      imports it. This version broadcasts the shorter name **ESP32S3**, so scan
+      for that in LightBlue. If MicroPython isn't set up yet, skip this — it
+      should never block the Arduino-first day.
+
+theory:
+  title: A serial pipe over radio
+  summary: The board advertises, the phone connects, and two one-way characteristics — write in, notify out — make a serial-style pipe over radio.
+  intro: >
+    BLE organises everything a device offers into services, and each service
+    into characteristics — small named mailboxes the phone can read, write, or
+    subscribe to. Today's service holds exactly two, one for each direction.
+  flow:
+    - { n: Advertise, title: The board calls out, body: The sketch broadcasts the name ESP32S3_Bluetooth so nearby phones can find it. }
+    - { n: Connect, title: The phone answers, body: LightBlue opens a connection and finds the service by its UUID. }
+    - { n: Write in, title: Phone → board, body: Text written to the characteristic ending 0002 lands in the sketch and prints to Serial Monitor. }
+    - { n: Notify out, title: Board → phone, body: Text typed in Serial Monitor is pushed through the characteristic ending 0003 to every subscriber. }
+  formulaLabel: Useful model
+  formula: "one **write** lane in + one **notify** lane out = a two-way text pipe"
+  notes:
+    - title: Why the long UUIDs
+      explain: uuid
+      body: A UUID is a name long enough that nobody else's gadget will ever share it by accident. This particular trio is the Nordic UART set — a convention so common that serial-over-BLE apps recognise it on sight.
+    - title: Why you must subscribe
+      explain: bleCharacteristic
+      body: A notify characteristic only sends to phones that asked. Subscribing is how the phone says "keep me posted" — until then, the board's messages have nowhere to go.
+
+test:
+  mode: serial
+  intro: >
+    Success and recovery sit side by side, so you never have to go hunting when
+    something looks off.
+  expectedTitle: What you should see
+  baud: 115200
+  expected:
+    - "Waiting a client connection to notify..."
+    - "hello from the phone"
+  expectedNote: >
+    The waiting line prints once at start-up. After you connect and write from
+    the phone, each message appears as its own line — a stray `Test` right
+    after connecting is just the sketch's starter value.
+  checksTitle: If it doesn't
+  checks:
+    - symptom: "ESP32S3_Bluetooth never appears in LightBlue?"
+      fix: "Power-cycle the board and swipe down to rescan — it starts advertising at boot. Look for it inside the app; BLE devices skip the phone's Settings→Bluetooth pairing list."
+    - symptom: "Nothing arrives on the phone?"
+      fix: "Open the characteristic ending 0003 and tap Subscribe first — notifications only flow to subscribers."
+    - symptom: "Garbled symbols on the phone?"
+      fix: "Set the characteristic's Data Format to utf-string."
+    - symptom: "Nothing lands in Serial Monitor?"
+      fix: "Confirm 115200 baud, and that you're writing to the characteristic ending 0002."
+    - symptom: "Can't reconnect after a disconnect?"
+      fix: "Press the board's reset button, then rescan — this sketch advertises once at boot, a known quirk."
+
+challenge:
+  title: "Try this: name your boat, find the edge"
+  railLabel: Try this
+  intro: >
+    Same working sketch, two experiments — one line of code, then a walk. It
+    fits inside today's 25 minutes.
+  summary: Rename the broadcast to your boat's name and rescan, then send messages from the far end of your home to find the edge of BLE's range.
+  cards:
+    - title: Fly your own name
+      explain: ble
+      body: Change `setupBLE("ESP32S3_Bluetooth")` to `setupBLE("YourBoatName")`, re-upload, and rescan in LightBlue — your board now broadcasts under its own flag.
+    - title: Find the range edge
+      body: Stay subscribed on the phone and walk to the far end of your home while a helper (or a repeated send) keeps messages coming from Serial Monitor. Note where they stop arriving.
+  logbook:
+    - What name did you broadcast, and how quickly did it show up in a rescan?
+    - Where in your home did the link drop out?
+    - What would you want your board to report to your phone in a real project?
+
+agent:
+  intro: >
+    Every lesson ships with a code and a machine-readable packet, so an agent can
+    guide you with full context.
+  behaviour: >
+    work one end at a time — board side in Serial Monitor, phone side in
+    LightBlue — confirm the waiting line before touching the app, and treat
+    subscribe, data format, and reset-after-disconnect as the first checks.
+  coachInstructions:
+    - Establish which end is failing — board side (Serial Monitor) or phone side (LightBlue) — before changing anything.
+    - If the name never appears in the app, have the learner power-cycle the board and rescan; remind them BLE devices skip the phone's Settings→Bluetooth pairing list and only show inside a GATT app.
+    - If nothing reaches the phone, confirm they subscribed to the characteristic ending 0003; if the text is garbled, set Data Format to utf-string.
+    - If Serial Monitor stays empty, check 115200 baud and that they are writing to the characteristic ending 0002.
+    - After any disconnect, have them press the board's reset button before reconnecting — this sketch advertises once at boot.
+    - Keep the Arduino path primary; the MicroPython version broadcasts the shorter name ESP32S3 and is optional only if already set up.
+
+source:
+  license: CC BY-NC-SA 3.0
+  licenseNote: >
+    Based on Freenove official material released under CC BY-NC-SA 3.0; preserve
+    attribution and non-affiliation language.

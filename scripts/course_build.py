@@ -658,6 +658,15 @@ def render_course_index(course: dict, lessons: list[Lesson]) -> str:
     }
     total = course.get("totalDays", 30)
     done_count = len(published)
+    # Once every charted day is published the "on the way" clause has nothing
+    # left to point at, so the note changes to the full-fleet form.
+    if done_count >= total:
+        map_note = f"All {total} days are ready to sail. Pick your day and cast off."
+    else:
+        map_note = (
+            f"{done_count} of {total} days are ready to sail. "
+            "The rest are charted and on the way."
+        )
 
     arcs_html = []
     for arc in course.get("arcs") or []:
@@ -736,7 +745,7 @@ def render_course_index(course: dict, lessons: list[Lesson]) -> str:
       </div>
     </header>
     <main class="course-body">
-      <p class="map-note muted">{done_count} of {total} days are ready to sail. The rest are charted and on the way.</p>
+      <p class="map-note muted">{map_note}</p>
 {chr(10).join(arcs_html)}
     </main>
     <footer class="colophon">

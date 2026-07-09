@@ -386,7 +386,15 @@ class CourseIndexTests(unittest.TestCase):
         self.assertIn('href="day-26-ultrasonic/"', self.html)
 
     def test_upcoming_day_not_linked(self):
-        self.assertIn("is-upcoming", self.html)
+        # While any charted day is unpublished the map must show it as an
+        # unlinked upcoming tile; once all 30 are published there is nothing
+        # upcoming and the map's note must switch to the full-fleet form.
+        published = self.html.count('class="day-tile is-ready"')
+        if published < 30:
+            self.assertIn("is-upcoming", self.html)
+        else:
+            self.assertNotIn("is-upcoming", self.html)
+            self.assertIn("All 30 days are ready to sail", self.html)
 
 
 class PacketTests(unittest.TestCase):

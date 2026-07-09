@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Day 29 · Put the board on the network — TinySkiff ESP32-S3 Lab</title>
+  <meta name="description" content="Connect the ESP32-S3 to your Wi-Fi in station mode, read its IP address in Serial Monitor, then host your own network with soft-AP mode. No wiring — just WiFi.begin, your credentials, and the radio already on the board." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../course.css" />
+</head>
+<body>
+  <div class="lesson-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 29 of 30</p>
+        <h1>Put the board<br />on the <em>network</em></h1>
+        <p class="lede">No wiring today — the radio is already inside the ESP32-S3. You hand the board your Wi-Fi name and password, watch it join your network, and read back the address your router assigns it. That address is the board&#x27;s berth number, and Day 30 dials it.
+</p>
+        <div class="meta-row" aria-label="Lesson facts">
+          <span class="pill is-key">About 25 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">No wiring today</span>
+        </div>
+      </div>
+      <div class="hero-side no-instrument">
+        
+        <div class="agent-strip">
+          <div class="lesson-code">
+            <span class="label">Agent assist code</span>
+            <code>TSK-DAY29-WIFI</code>
+          </div>
+          <button class="copy-prompt" type="button" data-copy="I am doing TinySkiff lesson TSK-DAY29-WIFI. Pull the lesson packet, then guide me one step at a time. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY29-WIFI.json">lesson packet</a> and coach you step by step.</p>
+        </div>
+      </div>
+    </header>
+    <div class="layout">
+      <nav class="rail" aria-label="Lesson progress">
+        <div class="rail-head">
+          <strong>Today's route</strong>
+          <span class="day-of">29 / 30</span>
+        </div>
+        <div class="voyage" style="--voyage-fill: 96.67%" aria-hidden="true"><span></span></div>
+        <div class="rail-nav">
+          <a href="#parts"><span class="tick"></span>What you need</a>
+          <a href="#steps"><span class="tick"></span>Build it</a>
+          <a href="#code"><span class="tick"></span>Read the code</a>
+          <a href="#theory"><span class="tick"></span>One radio, two roles</a>
+          <a href="#test"><span class="tick"></span>Test &amp; debug</a>
+          <a href="#challenge"><span class="tick"></span>Try this</a>
+          <a href="#agent"><span class="tick"></span>Coach me</a>
+        </div>
+      </nav>
+      <main class="lesson-main">
+        <section id="parts" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">01</span> First, know the pieces</p>
+              <h2>What you need</h2>
+              <p class="muted">Three things on the bench, plus one you already own: the name and password of your 2.4 GHz Wi-Fi network. Have both written down before you start. Tap <em>Define</em> on anything unfamiliar — the answer opens as a field note you can read and dismiss without losing your place.
+</p>
+            </div>
+            <div class="part-grid">
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-esp32-s3-board.jpg" alt="Official manual photo of the ESP32-S3 development board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>ESP32-S3 board <button class="define" data-topic="esp32">Define</button></h3>
+                <p>The brain of the build — with a Wi-Fi radio already aboard.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-arduino-ide.png" alt="Official manual screenshot of the Arduino IDE interface." /><figcaption>Manual screenshot</figcaption></figure>
+                <h3>Arduino IDE <button class="define" data-topic="arduino">Define</button></h3>
+                <p>Uploads the sketch and opens Serial Monitor.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-official-sketch.png" alt="Official manual page showing the WiFi Station sketch and its Serial Monitor output." /><figcaption>Manual sketch</figcaption></figure>
+                <h3>Official sketch <button class="define" data-topic="sketch">Define</button></h3>
+                <p><code>Sketch_23.1_WiFi_Station.ino</code></p>
+              </article>
+            </div>
+          </div>
+        </section>
+        <section id="steps" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">02</span> One action at a time</p>
+              <h2>Build it</h2>
+              <p class="muted">The whole day is edit two lines, upload, and read the monitor. Tap each step as you go to keep your place — you can finish without opening a single field note.
+</p>
+            </div>
+            <div class="steps-progress">
+              <div class="bar" aria-hidden="true"><span id="stepBar"></span></div>
+              <span class="count" id="stepCount">0 / 7 done</span>
+            </div>
+            <ol class="step-list">
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 1 done"></button><p class="text">Plug the ESP32-S3 into your computer with a data-capable USB cable. <button class="define" data-topic="usbData">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 2 done"></button><p class="text">Open <code>Sketch_23.1_WiFi_Station.ino</code> in Arduino IDE. <button class="define" data-topic="stationMode">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">Replace both <code>&quot;********&quot;</code> strings with your own Wi-Fi name and password — keep the double quotes, and use your 2.4 GHz network. <button class="define" data-topic="wifi">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">Select your ESP32-S3 board and its port, then press <strong>Upload</strong>.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Open Serial Monitor and set the baud rate to <code>115200</code>. <button class="define" data-topic="serial">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 6 done"></button><p class="text">Watch <code>Setup start</code>, then dots while the board negotiates, then the IP address your router assigns. <button class="define" data-topic="ipAddress">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 7 done"></button><p class="text">Write that address in your logbook — Day 30 dials it.</p></li>
+            </ol>
+            <div class="done-banner" id="doneBanner" role="status">
+              <span class="icon" aria-hidden="true">📶</span>
+              <div><strong>You&#x27;re aboard the network.</strong><p>Your ESP32-S3 holds an address on your Wi-Fi. Head to Test &amp; debug to confirm each line of the monitor.</p></div>
+            </div>
+          </div>
+        </section>
+        <section id="code" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">03</span> Read just enough code</p>
+              <h2>Read the code</h2>
+              <p class="muted">The sketch is short enough to read whole. Two lines near the top hold the placeholders you replace with your own credentials; <code>setup()</code> does all the work and <code>loop()</code> stays empty. Switch to MicroPython if you&#x27;d rather see the same idea in Python.
+</p>
+            </div>
+            <div class="tabs" role="tablist" aria-label="Code language">
+              <button class="tab" id="tab-arduino" role="tab" aria-selected="true" aria-controls="panel-arduino">Arduino <span class="badge">Main</span></button><button class="tab" id="tab-micropython" role="tab" aria-selected="false" aria-controls="panel-micropython">MicroPython <span class="badge">Optional</span></button>
+            </div>
+            <div class="tabpanel" id="panel-arduino" role="tabpanel" aria-labelledby="tab-arduino">
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">Sketch_23.1_WiFi_Station.ino</span></div>
+<pre><code><span class="tok-key">#include</span> &lt;WiFi.h&gt;
+
+<span class="tok-key">const</span> <span class="tok-key">char</span> *ssid_Router     = &quot;********&quot;; //Enter the router name
+<span class="tok-key">const</span> <span class="tok-key">char</span> *password_Router = &quot;********&quot;; //Enter the router password
+
+<span class="tok-key">void</span> <span class="tok-fn">setup</span>(){
+  Serial.<span class="tok-fn">begin</span>(<span class="tok-num">115200</span>);
+  <span class="tok-fn">delay</span>(<span class="tok-num">2000</span>);
+  Serial.<span class="tok-fn">println</span>(&quot;Setup start&quot;);
+  WiFi.<span class="tok-fn">begin</span>(ssid_Router, password_Router);
+  Serial.<span class="tok-fn">println</span>(<span class="tok-fn">String</span>(&quot;Connecting to &quot;)+ssid_Router);
+  <span class="tok-fn">while</span> (WiFi.<span class="tok-fn">status</span>() != WL_CONNECTED){
+    <span class="tok-fn">delay</span>(<span class="tok-num">500</span>);
+    Serial.<span class="tok-fn">print</span>(&quot;.&quot;);
+  }
+  Serial.<span class="tok-fn">println</span>(&quot;\nConnected, IP address: &quot;);
+  Serial.<span class="tok-fn">println</span>(WiFi.<span class="tok-fn">localIP</span>());
+  Serial.<span class="tok-fn">println</span>(&quot;Setup End&quot;);
+}
+
+<span class="tok-key">void</span> <span class="tok-fn">loop</span>() {
+}</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>WiFi.begin(ssid_Router, password_Router)</code><span class="note-text">Asks to join your router by name — station mode — using the credentials you typed into the two strings above. <button class="define" data-topic="stationMode">Define</button></span></div>
+                  <div class="code-note"><code>while (WiFi.status() != WL_CONNECTED)</code><span class="note-text">Waits for the router to accept the board, printing a dot every half second — and it will wait forever, so endless dots mean wrong credentials. <button class="define" data-topic="wifi">Define</button></span></div>
+                  <div class="code-note"><code>Serial.println(WiFi.localIP())</code><span class="note-text">Prints the IP address your router assigned — the board&#x27;s berth number, and the number Day 30 dials. <button class="define" data-topic="ipAddress">Define</button></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="tabpanel" id="panel-micropython" role="tabpanel" aria-labelledby="tab-micropython" hidden>
+              <p class="optional-tag">Optional side path · no wiring</p>
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">20.1_Station_mode/Station_mode.py</span></div>
+<pre><code>ssidRouter     = &#x27;********&#x27; #Enter the router name
+passwordRouter = &#x27;********&#x27; #Enter the router password
+
+def <span class="tok-fn">STA_Setup</span>(ssidRouter,passwordRouter):
+    <span class="tok-fn">print</span>(&quot;Setup start&quot;)
+    sta_if = network.<span class="tok-fn">WLAN</span>(network.STA_IF)
+    if not sta_if.<span class="tok-fn">isconnected</span>():
+        <span class="tok-fn">print</span>(&#x27;connecting to&#x27;,ssidRouter)
+        sta_if.<span class="tok-fn">active</span>(True)
+        sta_if.<span class="tok-fn">connect</span>(ssidRouter,passwordRouter)
+        while not sta_if.<span class="tok-fn">isconnected</span>():
+            pass
+    <span class="tok-fn">print</span>(&#x27;Connected, IP address:&#x27;, sta_if.<span class="tok-fn">ifconfig</span>())
+    <span class="tok-fn">print</span>(&quot;Setup End&quot;)</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>network.WLAN(network.STA_IF)</code><span class="note-text">Creates the station interface — MicroPython&#x27;s handle on the board&#x27;s radio in join-a-network mode.</span></div>
+                  <div class="code-note"><code>sta_if.ifconfig()</code><span class="note-text">Returns the board&#x27;s network details once connected — the first value is its IP address.</span></div>
+                </div>
+              </div>
+              <p class="micropython-note">Same radio, same credentials — replace both &#x27;********&#x27; strings before you run it in Thonny. If MicroPython isn&#x27;t set up yet, skip this — it should never block the Arduino-first day.
+</p>
+            </div>
+          </div>
+        </section>
+        <section id="theory" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">04</span> Understand, don&#x27;t memorise</p>
+              <h2>One radio, two roles</h2>
+              <p class="muted">Chapter 23 of the manual gives the radio three working modes. Today&#x27;s upload is station mode — the board joins your network the way your phone does. The challenge flips it to access-point mode, where the board hosts a network of its own.
+</p>
+            </div>
+            <div class="theory-flow" aria-label="Measurement model">
+              <article class="flow-step"><span class="n">Ask to join</span><h3>WiFi.begin</h3><p>The board calls your router by name and offers the password.</p></article>
+              <article class="flow-step"><span class="n">Handshake</span><h3>Router checks</h3><p>The router verifies the password and accepts the board onto the network.</p></article>
+              <article class="flow-step"><span class="n">Get an address</span><h3>DHCP assigns</h3><p>The router hands the board an IP address of its own — its berth number.</p></article>
+              <article class="flow-step"><span class="n">Report</span><h3>localIP prints</h3><p>The sketch prints that address so you can write it down for Day 30.</p></article>
+            </div>
+            <div class="formula-card">
+              <span class="label">The two modes</span>
+              <code>station = <b>join</b> a network · access point = <b>be</b> the network</code>
+            </div>
+            <div class="two-col" style="margin-top:14px">
+              <article class="mini-card"><h3>Where the address comes from <button class="define" data-topic="ipAddress">Define</button></h3><p>Your router runs a small harbourmaster service called DHCP. Every device that joins gets assigned a free berth — an IP address — which is why the one your board prints will differ from the one in this lesson.
+</p></article>
+              <article class="mini-card"><h3>Both roles at once <button class="define" data-topic="apMode">Define</button></h3><p>The third mode, AP+Station (<code>Sketch_23.3_AP_Station</code>), runs both at the same time — the board stays joined to your router while hosting its own network.
+</p></article>
+            </div>
+          </div>
+        </section>
+        <section id="test" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">05</span> Know it worked</p>
+              <h2>Test &amp; debug</h2>
+              <p class="muted">Success and recovery sit side by side, so you never have to go hunting when something looks off.
+</p>
+            </div>
+            <div class="test-grid">
+              <div>
+                <span class="readout-title">What you should see</span>
+                <div class="serial" aria-label="Expected Serial Monitor output">
+                  <div class="bar"><span>Serial Monitor</span><span class="baud">115200 baud</span></div>
+                  <div class="lines"><span>Setup start</span><span>Connecting to YourNetworkName</span><span>......</span><span>Connected, IP address: </span><span>192.168.1.23</span><span>Setup End</span></div>
+                </div>
+                <p class="micropython-note">Your network name and the address itself will differ — the IP is whatever your router assigns. A handful of dots is normal; they should stop within a few seconds.
+</p>
+              </div>
+              <div>
+                <span class="checks-title">If it doesn&#x27;t</span>
+                <ul class="checklist">
+                  <li><strong>Dots marching forever?</strong> The network name or password is wrong. Fix both strings in the sketch, re-upload, and press reset — the loop has no timeout.</li>
+                  <li><strong>Your network never connects at all?</strong> The board speaks 2.4 GHz Wi-Fi only. Check that your router broadcasts a 2.4 GHz band.</li>
+                  <li><strong>Blank monitor?</strong> Confirm 115200 baud, then the board and port.</li>
+                  <li><strong>AP name missing from your phone&#x27;s list?</strong> The access-point password must be at least 8 characters. Re-upload Sketch_23.2 and rescan.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="challenge" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">06</span> Make the idea yours</p>
+              <h2>Try this: be the network</h2>
+              <p class="muted">Same board, opposite role. The second official sketch turns the ESP32-S3 into an access point — a network your phone can see and join. It fits inside today&#x27;s 25 minutes.
+</p>
+            </div>
+            <div class="two-col">
+              <article class="mini-card"><h3>Host your own network <button class="define" data-topic="apMode">Define</button></h3><p>Upload <code>Sketch_23.2_WiFi_AP</code> — the line <code>WiFi.softAP(ssid_AP, password_AP)</code> turns the board into an access point, and the monitor prints <code>Soft-AP IP address = …</code>. Your phone&#x27;s Wi-Fi list now shows <code>WiFi_Name</code>; join it with the password <code>12345678</code>.
+</p></article>
+              <article class="mini-card"><h3>Fly your own name</h3><p>Change <code>ssid_AP</code> to your boat&#x27;s name, pick a new password of 8 or more characters, and re-upload. Rescan on your phone and there it is.
+</p></article>
+              <article class="mini-card"><h3>Find the board on the chart <button class="define" data-topic="ipAddress">Define</button></h3><p>Back in station mode, open your router&#x27;s device list and find your board there — the same IP address the monitor printed.
+</p></article>
+            </div>
+            <div class="logbook">
+              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
+              <label>What IP address did your router assign the board?<textarea rows="2"></textarea></label>
+              <label>What did you name the board&#x27;s own network?<textarea rows="2"></textarea></label>
+              <label>What would you want the board to serve up once your phone can reach it?<textarea rows="2"></textarea></label>
+            </div>
+          </div>
+        </section>
+        <section id="agent" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">07</span> Learn it with a hand on the tiller</p>
+              <h2>Coach me through it</h2>
+              <p class="muted">Every lesson ships with a code and a machine-readable packet, so an agent can guide you with full context.
+</p>
+            </div>
+            <div class="agent-grid">
+              <article class="mini-card"><h3>Lesson code</h3><p><code>TSK-DAY29-WIFI</code></p></article>
+              <article class="mini-card"><h3>Context packet</h3><p><a href="../packets/TSK-DAY29-WIFI.json">Open the JSON packet →</a></p></article>
+            </div>
+            <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
+              <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
+              <p><strong>How the agent should behave:</strong> keep credentials private — the learner edits them into the sketch locally, never into chat — and check the 2.4 GHz band, both placeholder strings, and baud rate before changing code.
+</p>
+            </div>
+          </div>
+        </section>
+        <nav class="day-nav" aria-label="Course navigation">
+        <a class="day-nav-link prev" href="../day-28-bluetooth-led/">
+          <span class="day-nav-dir">← Day 28</span>
+          <span class="day-nav-title">Switch an LED from your phone</span>
+        </a>
+        <a class="day-nav-link next" href="../day-30-tcpip/">
+          <span class="day-nav-dir">Day 30 →</span>
+          <span class="day-nav-title">TCP/IP: a mini web-connected device</span>
+        </a>
+        </nav>
+      </main>
+    </div>
+    <footer class="colophon">
+      <p><strong>Day 29 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <div class="rule"></div>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — sketch <code>Sketch_23.1_WiFi_Station.ino</code>; MicroPython <code>20.1_Station_mode/Station_mode.py</code>. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+    </footer>
+  </div>
+
+  <dialog class="lightbox" id="explainer">
+    <div class="lb-head">
+      <div>
+        <span class="lb-kicker">Field note</span>
+        <h3 id="explainerTitle"></h3>
+      </div>
+      <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="lb-body"><p id="explainerBody"></p></div>
+    <div class="lb-shortcut"><span class="tag">Shortcut</span><span id="explainerShortcut"></span></div>
+  </dialog>
+
+  <dialog class="lightbox image" id="imageBox">
+    <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    <div class="lb-body"><img id="imageBoxImg" alt="" /></div>
+    <p class="lb-cap" id="imageBoxCap"></p>
+  </dialog>
+
+  <div class="toast" id="toast">Prompt copied</div>
+
+  <script id="lesson-data" type="application/json">{"day": 29, "totalDays": 30, "slug": "day-29-wifi", "explainers": {"apMode": {"title": "AP mode", "body": "In AP (access point) mode the board becomes the network: it broadcasts its own name, hands out addresses, and phones join it directly — with no router involved. The two modes can even run at once (AP+station), with the board joined to your network while hosting its own.\n", "shortcut": "AP = the board IS the network. Look for its name in your phone's Wi-Fi list."}, "arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "ipAddress": {"title": "IP address", "body": "An IP address is a device's number on a network, like a berth number in a marina. The router assigns one to the board when it joins (yours will differ from any example), and other machines reach the board by that number. The serial monitor prints it so you can copy it.\n", "shortcut": "Your board's address WILL differ from the manual's — always use the one your serial monitor prints."}, "serial": {"title": "Serial Monitor", "body": "Serial Monitor is a text window in Arduino IDE. The board can print messages to it over USB. Here, it prints the measured distance so you can see what the sensor is doing.\n", "shortcut": "If the window is blank, check that the baud rate is 115200."}, "sketch": {"title": "Official sketch", "body": "A sketch is the Arduino name for a program. This lesson uses Freenove's Sketch_19.1_Ultrasonic_Ranging.ino so you can focus first on wiring, observation, and the measurement model.\n", "shortcut": "Treat the sketch as a working example to read and modify, not a spell to copy blindly."}, "stationMode": {"title": "Station mode", "body": "In station mode the board joins an existing network, like any laptop or phone: it presents the router's name and password, waits for the connection, and the router assigns it an IP address. WiFi.begin() starts the process; WiFi.status() reports when it's connected.\n", "shortcut": "Station = the board joins YOUR network and the router hands it an address."}, "usbData": {"title": "Data-capable USB cable", "body": "Some USB cables only carry power (for charging), with no data wires inside. Uploading code needs a cable that carries data. A charge-only cable will power the board but never let the IDE talk to it.\n", "shortcut": "If uploads fail on a cable that charges phones fine, suspect the cable first."}, "wifi": {"title": "Wi-Fi on the ESP32-S3", "body": "The chip has a full Wi-Fi radio and can join networks or create them. One hard rule: it speaks 2.4 GHz only, so a 5 GHz-only network is invisible to it. Check that your router broadcasts a 2.4 GHz band before troubleshooting anything else.\n", "shortcut": "2.4 GHz only — if the board can't find your network, check the band first."}}, "prev": {"day": 28, "slug": "day-28-bluetooth-led", "title": "Switch an LED from your phone"}, "next": {"day": 30, "slug": "day-30-tcpip", "title": "TCP/IP: a mini web-connected device"}}</script>
+  <script src="../course.js"></script>
+</body>
+</html>

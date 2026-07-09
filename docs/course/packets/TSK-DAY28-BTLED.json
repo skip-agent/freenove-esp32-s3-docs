@@ -1,0 +1,170 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY28-BTLED",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 28,
+  "title": "Switch an LED from your phone",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 25,
+  "mission": "Wire one LED to GPIO 2, upload the Bluetooth sketch, and switch the light from your phone — write led_on and led_off in LightBlue and watch the board obey a command sent over the air.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "officialPdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+    "chapter": "Chapter 20 Bluetooth",
+    "page": 193,
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_20.2_BluetoothToLed/Sketch_20.2_BluetoothToLed.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/19.2_BLE_LED/BLE_LED.py",
+    "imageAsset": "docs/course/assets/day-28/circuit-page-193.png",
+    "imageAlt": "Official Freenove circuit for Bluetooth Control LED: a single LED on GPIO 2 through a 220 ohm resistor to ground, shown as both a schematic and a breadboard photo.",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "GPIO extension board",
+      "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
+      "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
+    },
+    {
+      "name": "LED",
+      "imageAsset": "docs/course/assets/shared/item-led.png",
+      "explanation": "A LED is a one-way light. It only lights when its longer leg (the +) faces the pin and its shorter leg (the −) faces ground. Too much current burns it out, so a LED always sits behind a resistor."
+    },
+    {
+      "name": "220 Ω resistor",
+      "imageAsset": "docs/course/assets/shared/item-resistor.png",
+      "explanation": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction."
+    },
+    {
+      "name": "2 jumper wires (M/M)",
+      "imageAsset": "docs/course/assets/shared/item-jumper-wire.png",
+      "explanation": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    }
+  ],
+  "wiring": [
+    {
+      "partPin": "LED long leg (+)",
+      "connectTo": "GPIO 2 via 220 Ω",
+      "reason": "This pin obeys the command your phone sends."
+    },
+    {
+      "partPin": "LED short leg (−)",
+      "connectTo": "GND",
+      "reason": "Completes the LED's path back to zero volts."
+    }
+  ],
+  "coachInstructions": [
+    "Guide one physical step at a time and wait for learner confirmation before proceeding.",
+    "The commands are led_on and led_off with underscores, written as utf-string; the manual's captions show hyphens and are wrong — always follow the code, never print the hyphen form.",
+    "If the LED never reacts, check Serial Monitor at 115200 first — an echoed command with a dark LED points at wiring on GPIO 2; no echo points at the phone side or the spelling.",
+    "If the LED is wired but dead, confirm long leg to GPIO 2 through the 220 Ω resistor and short leg to GND before changing code.",
+    "If the phone can't find the board, repeat Day 27's LightBlue connection steps and have the learner press reset before reconnecting.",
+    "Keep the Arduino path primary; the MicroPython version broadcasts as ESP32S3 and matches each command byte-for-byte, so expect those two differences."
+  ],
+  "steps": [
+    "Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.",
+    "Place the LED so its long leg (+) is on the GPIO 2 side and its short leg (−) heads toward ground.",
+    "Put the 220 Ω resistor in series between GPIO 2 and the LED's long leg.",
+    "Compare every wire to the chart, then plug in USB.",
+    "Open Sketch_20.2_BluetoothToLed.ino in Arduino IDE and upload it.",
+    "Open Serial Monitor at 115200 and look for the \"device started\" line.",
+    "On your phone, open LightBlue and connect to ESP32S3_Bluetooth, exactly as you did on Day 27.",
+    "Find the write characteristic, set the format to utf-string, and write led_on — underscore, exact spelling.",
+    "Watch the LED light, then write led_off to put it out."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "setupBLE(\"ESP32S3_Bluetooth\")",
+        "explanation": "The same radio setup as Day 27 — the board advertises under the same name, with the same service underneath."
+      },
+      {
+        "line": "strncmp(rxload, \"led_on\", 6) == 0",
+        "explanation": "True when the first six characters the phone wrote spell led_on — underscore included. The buffer rxload holds whatever landed in the write characteristic."
+      },
+      {
+        "line": "digitalWrite(LED, HIGH)",
+        "explanation": "The matched command drives GPIO 2 HIGH and the LED lights; led_off drives it LOW again."
+      },
+      {
+        "line": "Serial.println(rxload)",
+        "explanation": "Echoes every received command to Serial Monitor, so you can watch the words arrive as the LED obeys."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "rx_data == b'led_on'",
+        "explanation": "Compares the received bytes to the exact command — every character must match, where the Arduino sketch checks only the front of the buffer."
+      },
+      {
+        "line": "led.value(1)",
+        "explanation": "Drives GPIO 2 HIGH and the LED lights."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "The board reads whatever arrived, compares it to two known words, and acts — the shape of every command protocol.",
+    "formula": "phone text → match a known command → digitalWrite",
+    "notes": [
+      {
+        "title": "Why spelling is the whole protocol",
+        "body": "The board compares raw characters. led_on with an underscore is a command; anything else is just text that scrolls past, and the LED holds its state."
+      },
+      {
+        "title": "What the radio adds",
+        "body": "BLE only carries the bytes. The meaning — which words count as commands and what they do — lives entirely in the sketch you wrote."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "Write led_on in LightBlue (utf-string format) — the LED lights.",
+      "Write led_off — the LED goes dark.",
+      "Any other text leaves the LED exactly as it was — the sketch only acts on its two known commands."
+    ],
+    "successCriteria": "Serial Monitor at 115200 shows \"The device started, now you can pair it with Bluetooth!\" on boot, then echoes every command the board receives."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "LED never reacts",
+      "firstChecks": [
+        "Send the underscore spelling led_on exactly, in utf-string format."
+      ]
+    },
+    {
+      "symptom": "LED wired but dead",
+      "firstChecks": [
+        "Long leg to GPIO 2 through the 220 Ω resistor, short leg to GND."
+      ]
+    },
+    {
+      "symptom": "Can't find the board",
+      "firstChecks": [
+        "Repeat Day 27's LightBlue steps, and press reset before reconnecting."
+      ]
+    },
+    {
+      "symptom": "Monitor blank",
+      "firstChecks": [
+        "Set the baud rate to 115200."
+      ]
+    }
+  ],
+  "challenge": "Add a third command that blinks the LED twice, rename the commands to your own words, and note the exact spelling discipline a protocol demands.",
+  "logbookPrompts": [
+    "What did your third command do, and what did you name it?",
+    "What happened when a command was off by a single character?",
+    "What device in your life is obeying exact spellings like this right now?"
+  ]
+}
