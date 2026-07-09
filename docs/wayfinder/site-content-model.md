@@ -200,14 +200,14 @@ Result: `python scripts/build_site.py` produces the whole static site — Librar
 
 ---
 
-## 8. Decisions to confirm
+## 8. Decisions — confirmed
 
-Defaults chosen; each is a real fork worth your nod.
+Skipper confirmed all four (2026-07-08).
 
-1. **Lesson source format → YAML structured files.** Alternative: Markdown with heavy frontmatter. YAML wins because the page is slot-based and the same data must feed the agent packet; prose-in-Markdown-body would need re-parsing into slots. *(Recommend YAML.)*
-2. **Landing page → course-forward.** `/` leads with "Start the 30-day course" and keeps the Library one click away, rather than the current library-first hero. Alternative: keep today's launchpad as home and treat the course as a section. *(Recommend course-forward once ≥1 day is real; keep library-first until then.)*
-3. **Progress storage → `localStorage`, no accounts.** Matches "light infra". Accounts/sync are a possible later course, out of this map. *(Recommend localStorage.)*
-4. **Generator → keep and extend Python `build_site.py`.** The output is static HTML and the prototype is vanilla HTML/CSS/JS, so a static generator (Astro/Eleventy) would add tooling for no gain here. Revisit only if authoring grows past hand-written YAML. *(Recommend keep Python.)*
+1. **Lesson source format → YAML structured files.** The page is slot-based and the same data must feed the agent packet, so structured YAML beats prose-in-Markdown-body (which would need re-parsing into slots).
+2. **Landing page → course-forward.** `/` leads with "Start the 30-day course" and keeps the Library one click away. Interim: stay library-first until the first real day exists, then flip.
+3. **Progress storage → `localStorage`, no accounts.** Matches the light-infra stance. Accounts/sync are a possible later course, out of this map.
+4. **Generator → keep and extend Python `build_site.py`.** Output is static HTML and the prototype is vanilla HTML/CSS/JS, so a static generator would add tooling for no gain. Revisit only if authoring grows past hand-written YAML.
 
 ---
 
