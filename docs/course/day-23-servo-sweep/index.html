@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Day 23 · Servo sweep: move to positions — TinySkiff ESP32-S3 Lab</title>
+  <meta name="description" content="Wire a servo to the ESP32-S3 and drive it with raw LEDC PWM. Upload the sketch and watch the horn sweep smoothly from 0° to 180° and back — position set by pulse width." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../course.css" />
+</head>
+<body>
+  <div class="lesson-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 23 of 30</p>
+        <h1>Swing an arm<br />to any <em>angle</em></h1>
+        <p class="lede">Today the board gets an arm. You wire a small servo to one pin, upload a sketch that counts through the angles, and the horn sweeps from 0° to 180° and back — the same steady nudge an autopilot gives a tiller.
+</p>
+        <div class="meta-row" aria-label="Lesson facts">
+          <span class="pill is-key">About 20 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">No electronics assumed</span>
+        </div>
+      </div>
+      <div class="hero-side no-instrument">
+        
+        <div class="agent-strip">
+          <div class="lesson-code">
+            <span class="label">Agent assist code</span>
+            <code>TSK-DAY23-SERVOSWEEP</code>
+          </div>
+          <button class="copy-prompt" type="button" data-copy="I am doing TinySkiff lesson TSK-DAY23-SERVOSWEEP. Pull the lesson packet, then guide me one step at a time. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY23-SERVOSWEEP.json">lesson packet</a> and coach you step by step.</p>
+        </div>
+      </div>
+    </header>
+    <div class="layout">
+      <nav class="rail" aria-label="Lesson progress">
+        <div class="rail-head">
+          <strong>Today's route</strong>
+          <span class="day-of">23 / 30</span>
+        </div>
+        <div class="voyage" style="--voyage-fill: 76.67%" aria-hidden="true"><span></span></div>
+        <div class="rail-nav">
+          <a href="#parts"><span class="tick"></span>What you need</a>
+          <a href="#wiring"><span class="tick"></span>Chart the circuit</a>
+          <a href="#steps"><span class="tick"></span>Build it</a>
+          <a href="#code"><span class="tick"></span>Read the code</a>
+          <a href="#theory"><span class="tick"></span>The pulse is the position</a>
+          <a href="#test"><span class="tick"></span>Test &amp; debug</a>
+          <a href="#challenge"><span class="tick"></span>Try this</a>
+          <a href="#agent"><span class="tick"></span>Coach me</a>
+        </div>
+      </nav>
+      <main class="lesson-main">
+        <section id="parts" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">01</span> First, know the pieces</p>
+              <h2>What you need</h2>
+              <p class="muted">Five things, and one of them moves. Tap <em>Define</em> on any part you haven&#x27;t met — the answer opens as a field note you can read and dismiss without losing your place.
+</p>
+            </div>
+            <div class="part-grid">
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-esp32-s3-board.jpg" alt="Official manual photo of the ESP32-S3 development board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>ESP32-S3 board <button class="define" data-topic="esp32">Define</button></h3>
+                <p>The brain that runs your uploaded sketch.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-gpio-extension-board.png" alt="Official manual image of the ESP32-S3 GPIO extension board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>GPIO extension board <button class="define" data-topic="gpio">Define</button></h3>
+                <p>Spreads the pins into rows you can reach and label.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-servo.png" alt="Official manual illustration of a servo with its three wires labelled 1 signal, 2 power, and 3 ground." /><figcaption>Manual photo</figcaption></figure>
+                <h3>Servo <button class="define" data-topic="servo">Define</button></h3>
+                <p>A small geared motor that turns its horn to the angle you ask for and holds it.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-jumper-wire.png" alt="Official manual image of a jumper wire." /><figcaption>Manual photo</figcaption></figure>
+                <h3>3 jumper wires (M/M) <button class="define" data-topic="jumpers">Define</button></h3>
+                <p>Temporary, solder-free connections.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-arduino-ide.png" alt="Official manual screenshot of the Arduino IDE interface." /><figcaption>Manual screenshot</figcaption></figure>
+                <h3>Arduino IDE <button class="define" data-topic="arduino">Define</button></h3>
+                <p>Uploads the sketch to the board.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+        <section id="wiring" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">02</span> Make the physical circuit</p>
+              <h2>Chart the circuit</h2>
+              <p class="muted">The official Freenove diagram is your chart — schematic on top, the same circuit built on a breadboard below. Click it to enlarge. The servo&#x27;s three wires are colour-coded, so the colours are your map.
+</p>
+            </div>
+            <div class="wire-layout">
+              <figure class="image-frame">
+                <button class="zoom" type="button" data-zoom="../assets/day-23/circuit-page-154.png" data-cap="Official Freenove circuit, C Tutorial Chapter 17, page 154.">
+                  <img src="../assets/day-23/circuit-page-154.png" alt="Official Freenove circuit for the servo sweep: a servo&#x27;s orange signal wire on GPIO 21, its red power wire on 5V, and its brown ground wire on GND, shown as both a schematic and a breadboard photo." />
+                  <span class="zoom-hint">Click to enlarge</span>
+                </button>
+                <figcaption class="caption">Official Freenove circuit — C Tutorial, Chapter 17 (Servo), page 154.</figcaption>
+              </figure>
+              <div class="pin-table" aria-label="Wiring">
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>Servo signal (orange) <button class="define" data-topic="pulseWidth">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GPIO 21</span>
+                  <span class="pin-why">Carries the timed pulse that names the angle.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>Servo power (red) <button class="define" data-topic="servo">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">5V</span>
+                  <span class="pin-why">Feeds the servo&#x27;s motor with enough current to move.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>Servo ground (brown) <button class="define" data-topic="gnd">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GND</span>
+                  <span class="pin-why">Gives board and servo the same zero point.</span>
+                </div>
+              </div>
+            </div>
+            <div class="callout">
+              <div class="icon" aria-hidden="true">⚓</div>
+              <p><strong>5V for the servo.</strong> The manual&#x27;s own caution: &quot;Use caution when supplying power to the servo, it should be 5V.&quot; The red wire goes to the 5V pin with its own jumper — and unplug USB before you move any wire.
+</p>
+            </div>
+          </div>
+        </section>
+        <section id="steps" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">03</span> One action at a time</p>
+              <h2>Build it</h2>
+              <p class="muted">This is the main path — you can finish the day without opening a single field note. Tap each step as you go to keep your place.
+</p>
+            </div>
+            <div class="steps-progress">
+              <div class="bar" aria-hidden="true"><span id="stepBar"></span></div>
+              <span class="count" id="stepCount">0 / 8 done</span>
+            </div>
+            <ol class="step-list">
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 1 done"></button><p class="text">Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 2 done"></button><p class="text">Push a jumper into each of the servo&#x27;s three sockets — orange, red, and brown. <button class="define" data-topic="servo">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">Run the orange signal wire to GPIO 21. <button class="define" data-topic="gpio">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">Run the red wire to 5V and the brown wire to GND. <button class="define" data-topic="gnd">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Press a horn onto the servo&#x27;s shaft so you can see it move.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 6 done"></button><p class="text">Compare every wire to the chart before you plug in USB.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 7 done"></button><p class="text">Open <code>Sketch_17.1_Servo_Sweep.ino</code> in Arduino IDE and upload it.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 8 done"></button><p class="text">Watch the horn sweep from one end of its travel to the other and back.</p></li>
+            </ol>
+            <div class="done-banner" id="doneBanner" role="status">
+              <span class="icon" aria-hidden="true">🧭</span>
+              <div><strong>The arm answers.</strong><p>The horn is swinging on your command. Head to Test &amp; debug to confirm the pace and the full 180° reach.</p></div>
+            </div>
+          </div>
+        </section>
+        <section id="code" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">04</span> Read just enough code</p>
+              <h2>Read the code</h2>
+              <p class="muted">The whole sketch is short, and it drives the servo with the same LEDC hardware that faded your LEDs — set to 50 Hz and 12 bits, the timing a servo listens for. The loop counts angles up and down; one <code>map()</code> line turns each angle into a pulse. Switch to MicroPython if you&#x27;d rather see the same idea in Python — the wiring never changes.
+</p>
+            </div>
+            <div class="tabs" role="tablist" aria-label="Code language">
+              <button class="tab" id="tab-arduino" role="tab" aria-selected="true" aria-controls="panel-arduino">Arduino <span class="badge">Main</span></button><button class="tab" id="tab-micropython" role="tab" aria-selected="false" aria-controls="panel-micropython">MicroPython <span class="badge">Optional</span></button>
+            </div>
+            <div class="tabpanel" id="panel-arduino" role="tabpanel" aria-labelledby="tab-arduino">
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">Sketch_17.1_Servo_Sweep.ino</span></div>
+<pre><code><span class="tok-key">#define</span> SERVO_PIN <span class="tok-num">21</span>  //define the pwm pin
+<span class="tok-key">#define</span> SERVO_CHN <span class="tok-num">0</span>   //define the pwm channel
+<span class="tok-key">#define</span> SERVO_FRQ <span class="tok-num">50</span>  //define the pwm frequency
+<span class="tok-key">#define</span> SERVO_BIT <span class="tok-num">12</span>  //define the pwm precision
+
+<span class="tok-key">void</span> <span class="tok-fn">servo_set_pin</span>(<span class="tok-key">int</span> pin);
+<span class="tok-key">void</span> <span class="tok-fn">servo_set_angle</span>(<span class="tok-key">int</span> angle);
+
+<span class="tok-key">void</span> <span class="tok-fn">setup</span>() {
+  <span class="tok-fn">servo_set_pin</span>(SERVO_PIN);
+}
+
+<span class="tok-key">void</span> <span class="tok-fn">loop</span>() {
+  <span class="tok-fn">for</span> (<span class="tok-key">int</span> i = <span class="tok-num">0</span>; i &lt; <span class="tok-num">180</span>; i++) {
+    <span class="tok-fn">servo_set_angle</span>(i);
+    <span class="tok-fn">delay</span>(<span class="tok-num">10</span>);
+  }
+  <span class="tok-fn">for</span> (<span class="tok-key">int</span> i = <span class="tok-num">180</span>; i &gt; <span class="tok-num">0</span>; i--) {
+    <span class="tok-fn">servo_set_angle</span>(i);
+    <span class="tok-fn">delay</span>(<span class="tok-num">10</span>);
+  }
+}
+
+<span class="tok-key">void</span> <span class="tok-fn">servo_set_pin</span>(<span class="tok-key">int</span> pin) {
+  <span class="tok-fn">ledcAttachChannel</span>(pin, SERVO_FRQ, SERVO_BIT, SERVO_CHN);
+}
+
+<span class="tok-key">void</span> <span class="tok-fn">servo_set_angle</span>(<span class="tok-key">int</span> angle) {
+  <span class="tok-fn">if</span> (angle &gt; <span class="tok-num">180</span> || angle &lt; <span class="tok-num">0</span>)
+    <span class="tok-key">return</span>;
+  <span class="tok-key">long</span> pwm_value = <span class="tok-fn">map</span>(angle, <span class="tok-num">0</span>, <span class="tok-num">180</span>, <span class="tok-num">103</span>, <span class="tok-num">512</span>);
+  <span class="tok-fn">ledcWrite</span>(SERVO_PIN, pwm_value);
+}</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>ledcAttachChannel(pin, SERVO_FRQ, SERVO_BIT, SERVO_CHN)</code><span class="note-text">Sets GPIO 21 switching at 50 Hz with 12-bit precision — the frame rate a servo expects. <button class="define" data-topic="ledc">Define</button></span></div>
+                  <div class="code-note"><code>map(angle, 0, 180, 103, 512)</code><span class="note-text">Translates degrees into pulse counts — 103 counts for 0° up to 512 counts for 180°. <button class="define" data-topic="mapValue">Define</button></span></div>
+                  <div class="code-note"><code>ledcWrite(SERVO_PIN, pwm_value)</code><span class="note-text">Sends a pulse of that width every 20 ms; the servo turns until its shaft matches. <button class="define" data-topic="pwm">Define</button></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="tabpanel" id="panel-micropython" role="tabpanel" aria-labelledby="tab-micropython" hidden>
+              <p class="optional-tag">Optional side path · same circuit</p>
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">16.1_Servo_Sweep/Servo_Sweep.py</span></div>
+<pre><code>from myservo import myServo
+servo=<span class="tok-fn">myServo</span>(<span class="tok-num">21</span>)
+servo.<span class="tok-fn">myServoWriteAngle</span>(<span class="tok-num">0</span>)
+time.<span class="tok-fn">sleep_ms</span>(<span class="tok-num">1000</span>)
+for i in <span class="tok-fn">range</span>(<span class="tok-num">0</span>,<span class="tok-num">180</span>,<span class="tok-num">1</span>):
+    servo.<span class="tok-fn">myServoWriteAngle</span>(i)
+    time.<span class="tok-fn">sleep_ms</span>(<span class="tok-num">15</span>)
+for i in <span class="tok-fn">range</span>(<span class="tok-num">180</span>,<span class="tok-num">0</span>,-<span class="tok-num">1</span>):
+    servo.<span class="tok-fn">myServoWriteAngle</span>(i)
+    time.<span class="tok-fn">sleep_ms</span>(<span class="tok-num">15</span>)</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>servo=myServo(21)</code><span class="note-text">Builds the kit&#x27;s servo helper on GPIO 21 — the same pin as the Arduino sketch.</span></div>
+                  <div class="code-note"><code>servo.myServoWriteAngle(i)</code><span class="note-text">Hands the helper an angle in degrees; it works out the pulse width for you.</span></div>
+                </div>
+              </div>
+              <p class="micropython-note">Same pin, same wiring. Copy the kit&#x27;s own <code>myservo.py</code> module to the board alongside the main file — it holds the pulse maths (a 10-bit duty from 26 to 128, the same 0.5–2.5 ms). Run it in Thonny if MicroPython is set up; otherwise skip it — it should never block the Arduino-first path.
+</p>
+            </div>
+          </div>
+        </section>
+        <section id="theory" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">05</span> Understand, don&#x27;t memorise</p>
+              <h2>The pulse is the position</h2>
+              <p class="muted">The clever part of today fits in one line — the <code>map()</code> call. Everything around it is a counter going up and coming back down.
+</p>
+            </div>
+            <div class="theory-flow" aria-label="Measurement model">
+              <article class="flow-step"><span class="n">Beat</span><h3>50 frames a second</h3><p>The pin starts a fresh pulse every 20 ms.</p></article>
+              <article class="flow-step"><span class="n">Width</span><h3>The pulse is the order</h3><p>A 0.5 ms pulse means 0° and a 2.5 ms pulse means 180°.</p></article>
+              <article class="flow-step"><span class="n">Convert</span><h3>map() translates</h3><p>Degrees become pulse counts — 103 at one end and 512 at the other.</p></article>
+              <article class="flow-step"><span class="n">Hold</span><h3>The servo obeys</h3><p>A circuit inside turns the shaft until it matches the width.</p></article>
+            </div>
+            <div class="formula-card">
+              <span class="label">The model</span>
+              <code>angle = <b>pulse width</b> — 0.5 ms is 0° · 1.5 ms is 90° · 2.5 ms is 180°</code>
+            </div>
+            <div class="two-col" style="margin-top:14px">
+              <article class="mini-card"><h3>Where 103 and 512 come from <button class="define" data-topic="pulseWidth">Define</button></h3><p>At 50 Hz and 12 bits, each 20 ms frame is 4096 counts — so 103 counts lasts about 0.5 ms and 512 counts about 2.5 ms, the two ends of the servo&#x27;s travel.</p></article>
+              <article class="mini-card"><h3>A straight line of angles <button class="define" data-topic="servo">Define</button></h3><p>The mapping is linear — 0.5 ms sits at 0°, 1.5 ms at 90°, 2.5 ms at 180°, and every angle between gets its own width.</p></article>
+            </div>
+          </div>
+        </section>
+        <section id="test" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">06</span> Know it worked</p>
+              <h2>Test &amp; debug</h2>
+              <p class="muted">Nothing prints to the screen today — the proof is the horn swinging in front of you.
+</p>
+            </div>
+            <div class="test-grid">
+              <div>
+                <span class="readout-title">What you should see</span>
+                <div class="observe" aria-label="What you should see">
+                  <div class="bar"><span>Servo horn</span></div>
+                  <ul class="observe-lines"><li>The horn glides smoothly from 0° all the way round to 180°.</li><li>It reverses and glides back, then repeats — about 1.8 seconds each way.</li><li>The pace is steady, like a metronome.</li></ul>
+                </div>
+                <p class="micropython-note">A soft hum while it moves is normal. Each sweep should be one continuous glide, never a twitchy stutter.</p>
+              </div>
+              <div>
+                <span class="checks-title">If it doesn&#x27;t</span>
+                <ul class="checklist">
+                  <li><strong>Horn twitches or judders?</strong> Power the servo from the 5V pin with its own jumper — a GPIO can&#x27;t feed a motor.</li>
+                  <li><strong>Sweeps once, then jams at an end?</strong> The horn is hitting something — pull it off the shaft and refit it clear.</li>
+                  <li><strong>No motion at all?</strong> Check the orange signal wire on GPIO 21, then the red and brown power pair.</li>
+                  <li><strong>Board resets mid-sweep?</strong> The USB supply is weak — unplug other loads from the board.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="challenge" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">07</span> Make the idea yours</p>
+              <h2>Try this: run a lighthouse</h2>
+              <p class="muted">Same working circuit, three small experiments with the sweep. They fit inside today&#x27;s 20 minutes.
+</p>
+            </div>
+            <div class="two-col">
+              <article class="mini-card"><h3>Sweep a half-arc</h3><p>Change both <code>for</code> loops so the sweep runs 0° to 90° and back. Predict where the horn will stop before you upload.</p></article>
+              <article class="mini-card"><h3>Rest like a lighthouse <button class="define" data-topic="delayMs">Define</button></h3><p>Add <code>delay(1000)</code> after each <code>for</code> loop so the horn pauses a second at each end before turning back.</p></article>
+              <article class="mini-card"><h3>Find the smallest step</h3><p>Make the loops step by 2, then 5, then 10. Watch for the smallest angle step your servo turns into a visible move.</p></article>
+            </div>
+            <div class="logbook">
+              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
+              <label>Where did the horn stop on your half-arc, and did it match your prediction?<textarea rows="2"></textarea></label>
+              <label>How did the one-second rest change the feel of the sweep?<textarea rows="2"></textarea></label>
+              <label>What was the smallest angle step your servo visibly moved?<textarea rows="2"></textarea></label>
+            </div>
+          </div>
+        </section>
+        <section id="agent" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">08</span> Learn it with a hand on the tiller</p>
+              <h2>Coach me through it</h2>
+              <p class="muted">Every lesson ships with a code and a machine-readable packet, so an agent can guide you with full context.
+</p>
+            </div>
+            <div class="agent-grid">
+              <article class="mini-card"><h3>Lesson code</h3><p><code>TSK-DAY23-SERVOSWEEP</code></p></article>
+              <article class="mini-card"><h3>Context packet</h3><p><a href="../packets/TSK-DAY23-SERVOSWEEP.json">Open the JSON packet →</a></p></article>
+            </div>
+            <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
+              <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
+              <p><strong>How the agent should behave:</strong> guide one physical connection at a time, wait for you to confirm, explain terms on request, and always check wiring, board, port, and USB before changing code.
+</p>
+            </div>
+          </div>
+        </section>
+        <nav class="day-nav" aria-label="Course navigation">
+        <a class="day-nav-link prev" href="../day-22-motor/">
+          <span class="day-nav-dir">← Day 22</span>
+          <span class="day-nav-title">Motor driver: control motion safely</span>
+        </a>
+        <a class="day-nav-link next" href="../day-24-servo-knob/">
+          <span class="day-nav-dir">Day 24 →</span>
+          <span class="day-nav-title">Servo knob: control position with a knob</span>
+        </a>
+        </nav>
+      </main>
+    </div>
+    <footer class="colophon">
+      <p><strong>Day 23 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <div class="rule"></div>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — the circuit diagram from C_Tutorial.pdf, Chapter 17, page 154; sketch <code>Sketch_17.1_Servo_Sweep.ino</code>; MicroPython <code>16.1_Servo_Sweep/Servo_Sweep.py</code>. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+    </footer>
+  </div>
+
+  <dialog class="lightbox" id="explainer">
+    <div class="lb-head">
+      <div>
+        <span class="lb-kicker">Field note</span>
+        <h3 id="explainerTitle"></h3>
+      </div>
+      <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="lb-body"><p id="explainerBody"></p></div>
+    <div class="lb-shortcut"><span class="tag">Shortcut</span><span id="explainerShortcut"></span></div>
+  </dialog>
+
+  <dialog class="lightbox image" id="imageBox">
+    <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    <div class="lb-body"><img id="imageBoxImg" alt="" /></div>
+    <p class="lb-cap" id="imageBoxCap"></p>
+  </dialog>
+
+  <div class="toast" id="toast">Prompt copied</div>
+
+  <script id="lesson-data" type="application/json">{"day": 23, "totalDays": 30, "slug": "day-23-servo-sweep", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "delayMs": {"title": "delay()", "body": "delay() pauses the whole program for a number of milliseconds — 1000 is one second. The blink you see is the LED held on for a moment, then off for a moment, on a loop.\n", "shortcut": "The number is milliseconds — 1000 = 1 second, 200 = a fifth of a second."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "gnd": {"title": "Ground / GND", "body": "Ground is the shared zero-voltage reference. The board and sensor need a common ground so a signal like HIGH or LOW means the same thing to both parts.\n", "shortcut": "A missing ground can make everything look haunted. Check it early."}, "gpio": {"title": "GPIO extension board", "body": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself.\n", "shortcut": "When a lesson says GPIO 13, look for the pin labelled 13 on the extension board."}, "jumpers": {"title": "Jumper wires", "body": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles.\n", "shortcut": "If a reading seems impossible, gently reseat the jumper wires before changing code."}, "ledc": {"title": "ledcWrite() and PWM channels", "body": "The ESP32-S3 has hardware PWM \"channels\" (its LEDC controller). You attach a pin to a channel once, then ledcWrite() sets its level. The board does the fast switching for you, so your loop just names a brightness number.\n", "shortcut": "Attach the pin to a channel once; then ledcWrite(pin, level) sets brightness."}, "mapValue": {"title": "map() and constrain()", "body": "map(value, 0, 4095, 0, 255) rescales a number from one range into another — here squeezing the ADC's 0–4095 into PWM's 0–255. constrain(value, low, high) clamps a number so it stays inside a window before you map it. The two together turn any sensor range into any output range.\n", "shortcut": "constrain() fences the value in; map() rescales it to the range you need."}, "pulseWidth": {"title": "Servo pulses — 0.5 to 2.5 ms", "body": "A servo listens for a pulse repeated 50 times a second and reads the pulse's width as an angle: 0.5 ms means 0°, 1.5 ms means the middle, 2.5 ms means 180°. The sketch's map(angle, 0, 180, 103, 512) turns a degree number into exactly that pulse width on the ESP32-S3's PWM hardware.\n", "shortcut": "The width of the pulse IS the angle — 0.5 ms at one end, 2.5 ms at the other."}, "pwm": {"title": "PWM — dimming by blinking", "body": "A pin is only ever fully on or fully off. But if it flicks on and off thousands of times a second, your eye blends it into a steady in-between brightness. The share of time it stays on is the duty cycle — more on-time looks brighter.\n", "shortcut": "PWM fakes \"half on\" by switching fast. Duty 0 = off, maximum = brightest."}, "servo": {"title": "Servo", "body": "A servo packs a DC motor, reduction gears, a position sensor, and a control circuit into one case. Send it a timing signal and it rotates its horn to the angle you asked for and holds there — 0 to 180 degrees. Three wires: orange signal, red power, brown ground.\n", "shortcut": "A motor that goes TO an angle and holds it, instead of spinning freely."}}, "prev": {"day": 22, "slug": "day-22-motor", "title": "Motor driver: control motion safely"}, "next": {"day": 24, "slug": "day-24-servo-knob", "title": "Servo knob: control position with a knob"}}</script>
+  <script src="../course.js"></script>
+</body>
+</html>

@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Day 25 · LCD1602: give the project a display — TinySkiff ESP32-S3 Lab</title>
+  <meta name="description" content="Wire the I2C LCD1602 module to the ESP32-S3, install the LiquidCrystal_I2C library, and display &quot;hello, world!&quot; with a live seconds counter — a whole sixteen-by-two screen driven over two signal wires." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../course.css" />
+</head>
+<body>
+  <div class="lesson-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 25 of 30</p>
+        <h1>Put words<br />on a <em>screen</em></h1>
+        <p class="lede">Today the project gets a face. You wire the LCD1602&#x27;s four pins to the board, add one library to the Arduino IDE, and upload a sketch that greets you on the top row while the bottom row counts the seconds — a whole screen carried over two signal wires.
+</p>
+        <div class="meta-row" aria-label="Lesson facts">
+          <span class="pill is-key">About 25 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">First I2C device</span>
+        </div>
+      </div>
+      <div class="hero-side no-instrument">
+        
+        <div class="agent-strip">
+          <div class="lesson-code">
+            <span class="label">Agent assist code</span>
+            <code>TSK-DAY25-LCD</code>
+          </div>
+          <button class="copy-prompt" type="button" data-copy="I am doing TinySkiff lesson TSK-DAY25-LCD. Pull the lesson packet, then guide me one step at a time. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY25-LCD.json">lesson packet</a> and coach you step by step.</p>
+        </div>
+      </div>
+    </header>
+    <div class="layout">
+      <nav class="rail" aria-label="Lesson progress">
+        <div class="rail-head">
+          <strong>Today's route</strong>
+          <span class="day-of">25 / 30</span>
+        </div>
+        <div class="voyage" style="--voyage-fill: 83.33%" aria-hidden="true"><span></span></div>
+        <div class="rail-nav">
+          <a href="#parts"><span class="tick"></span>What you need</a>
+          <a href="#wiring"><span class="tick"></span>Chart the circuit</a>
+          <a href="#steps"><span class="tick"></span>Build it</a>
+          <a href="#code"><span class="tick"></span>Read the code</a>
+          <a href="#theory"><span class="tick"></span>Two wires carry the whole screen</a>
+          <a href="#test"><span class="tick"></span>Test &amp; debug</a>
+          <a href="#challenge"><span class="tick"></span>Try this</a>
+          <a href="#agent"><span class="tick"></span>Coach me</a>
+        </div>
+      </nav>
+      <main class="lesson-main">
+        <section id="parts" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">01</span> First, know the pieces</p>
+              <h2>What you need</h2>
+              <p class="muted">Five things, and only four wires between them. Tap <em>Define</em> on any part you haven&#x27;t met — the answer opens as a field note you can read and dismiss without losing your place.
+</p>
+            </div>
+            <div class="part-grid">
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-esp32-s3-board.jpg" alt="Official manual photo of the ESP32-S3 development board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>ESP32-S3 board <button class="define" data-topic="esp32">Define</button></h3>
+                <p>The brain that runs your uploaded sketch.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-gpio-extension-board.png" alt="Official manual image of the ESP32-S3 GPIO extension board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>GPIO extension board <button class="define" data-topic="gpio">Define</button></h3>
+                <p>Spreads the pins into rows you can reach and label.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-lcd1602.png" alt="Official manual photo of the I2C LCD1602 module, a sixteen-by-two character display with a four-pin I2C backpack." /><figcaption>Manual photo</figcaption></figure>
+                <h3>LCD1602 module <button class="define" data-topic="lcd1602">Define</button></h3>
+                <p>A sixteen-by-two character screen with an I2C backpack on its back.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-jumper-wire.png" alt="Official manual image of a jumper wire." /><figcaption>Manual photo</figcaption></figure>
+                <h3>4 × jumper wires (F/M) <button class="define" data-topic="jumpers">Define</button></h3>
+                <p>Female ends slide onto the module&#x27;s pins; male ends reach the board.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-arduino-ide.png" alt="Official manual screenshot of the Arduino IDE interface." /><figcaption>Manual screenshot</figcaption></figure>
+                <h3>Arduino IDE <button class="define" data-topic="arduino">Define</button></h3>
+                <p>Uploads the sketch to the board.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+        <section id="wiring" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">02</span> Make the physical circuit</p>
+              <h2>Chart the circuit</h2>
+              <p class="muted">The official Freenove diagram is your chart — schematic on top, the same circuit built on a breadboard below. Click it to enlarge. Four wires today, all from the little backpack board soldered to the back of the screen.
+</p>
+            </div>
+            <div class="wire-layout">
+              <figure class="image-frame">
+                <button class="zoom" type="button" data-zoom="../assets/day-25/circuit-page-165.png" data-cap="Official Freenove circuit, C Tutorial Chapter 18, page 165.">
+                  <img src="../assets/day-25/circuit-page-165.png" alt="Official Freenove circuit for the LCD1602: the module&#x27;s I2C backpack wired with four jumpers — GND to ground, VCC to 5V, SDA to GPIO 14, and SCL to GPIO 13 — shown as both a schematic and a breadboard photo." />
+                  <span class="zoom-hint">Click to enlarge</span>
+                </button>
+                <figcaption class="caption">Official Freenove circuit — C Tutorial, Chapter 18 (LCD1602), page 165.</figcaption>
+              </figure>
+              <div class="pin-table" aria-label="Wiring">
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>LCD GND <button class="define" data-topic="gnd">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GND</span>
+                  <span class="pin-why">Gives the module the same zero-volt reference as the board.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>LCD VCC</span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">5V</span>
+                  <span class="pin-why">The screen and its backlight run on the full five volts.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>LCD SDA <button class="define" data-topic="i2c">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GPIO 14</span>
+                  <span class="pin-why">The data wire — every character rides in on this line.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>LCD SCL <button class="define" data-topic="i2c">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GPIO 13</span>
+                  <span class="pin-why">The clock wire that keeps sender and screen in step.</span>
+                </div>
+              </div>
+            </div>
+            <div class="callout">
+              <div class="icon" aria-hidden="true">⚓</div>
+              <p><strong>Mind the 5V pin.</strong> The module&#x27;s VCC wants the board&#x27;s 5V pin — on 3.3V the display runs faint or dark. Unplug USB before you move any wire.
+</p>
+            </div>
+          </div>
+        </section>
+        <section id="steps" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">03</span> One action at a time</p>
+              <h2>Build it</h2>
+              <p class="muted">This is the main path — you can finish the day without opening a single field note. Tap each step as you go to keep your place.
+</p>
+            </div>
+            <div class="steps-progress">
+              <div class="bar" aria-hidden="true"><span id="stepBar"></span></div>
+              <span class="count" id="stepCount">0 / 8 done</span>
+            </div>
+            <ol class="step-list">
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 1 done"></button><p class="text">Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 2 done"></button><p class="text">Turn the LCD module over and find the four labelled pins on its backpack — GND, VCC, SDA, SCL. <button class="define" data-topic="lcd1602">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">Slide female jumper ends onto GND and VCC, then land them on the board&#x27;s GND and 5V pins.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">Wire SDA to GPIO 14 and SCL to GPIO 13. <button class="define" data-topic="i2c">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Compare every wire to the chart before you plug in USB.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 6 done"></button><p class="text">In Arduino IDE choose Sketch → Include Library → Add .ZIP Library… and pick <code>LiquidCrystal_I2C-1.1.2.zip</code> from the kit download&#x27;s <code>C/Libraries</code> folder — you install it once and it stays. <button class="define" data-topic="arduino">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 7 done"></button><p class="text">Open <code>Sketch_18.1_Display_the_string_on_LCD1602.ino</code> and upload it. (<code>Wire.h</code>, the I2C library, ships with the board package.)</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 8 done"></button><p class="text">Watch row 0 greet you and row 1 start counting seconds.</p></li>
+            </ol>
+            <div class="done-banner" id="doneBanner" role="status">
+              <span class="icon" aria-hidden="true">🖥️</span>
+              <div><strong>The project has a face.</strong><p>The screen is greeting you and counting on its own. Head to Test &amp; debug to confirm both rows.</p></div>
+            </div>
+          </div>
+        </section>
+        <section id="code" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">04</span> Read just enough code</p>
+              <h2>Read the code</h2>
+              <p class="muted">The sketch does its real work in setup — start the I2C bus, find the display&#x27;s address, wake it, and print the greeting. The loop then rewrites row 1 once a second with the count. Switch to MicroPython if you&#x27;d rather see the same idea in Python — the wiring never changes.
+</p>
+            </div>
+            <div class="tabs" role="tablist" aria-label="Code language">
+              <button class="tab" id="tab-arduino" role="tab" aria-selected="true" aria-controls="panel-arduino">Arduino <span class="badge">Main</span></button><button class="tab" id="tab-micropython" role="tab" aria-selected="false" aria-controls="panel-micropython">MicroPython <span class="badge">Optional</span></button>
+            </div>
+            <div class="tabpanel" id="panel-arduino" role="tabpanel" aria-labelledby="tab-arduino">
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">Sketch_18.1_Display_the_string_on_LCD1602.ino</span></div>
+<pre><code><span class="tok-key">#include</span> &lt;LiquidCrystal_I2C.h&gt;
+<span class="tok-key">#include</span> &lt;Wire.h&gt;
+
+<span class="tok-key">#define</span> SDA <span class="tok-num">14</span>                    //Define SDA pins
+<span class="tok-key">#define</span> SCL <span class="tok-num">13</span>                    //Define SCL pins
+
+/*
+ * note:If lcd1602 uses PCF8574T, IIC&#x27;s address is <span class="tok-num">0</span>x27,
+ *      or lcd1602 uses PCF8574AT, IIC&#x27;s address is <span class="tok-num">0</span>x3F.
+*/
+LiquidCrystal_I2C <span class="tok-fn">lcd</span>(<span class="tok-num">0</span>x27,<span class="tok-num">16</span>,<span class="tok-num">2</span>);
+<span class="tok-key">void</span> <span class="tok-fn">setup</span>() {
+  Wire.<span class="tok-fn">begin</span>(SDA, SCL);           // attach the IIC pin
+  <span class="tok-fn">if</span> (!<span class="tok-fn">i2CAddrTest</span>(<span class="tok-num">0</span>x27)) {
+    lcd = <span class="tok-fn">LiquidCrystal_I2C</span>(<span class="tok-num">0</span>x3F, <span class="tok-num">16</span>, <span class="tok-num">2</span>);
+  }
+  lcd.<span class="tok-fn">init</span>();                     // LCD driver initialization
+  lcd.<span class="tok-fn">backlight</span>();                // Open the backlight
+  lcd.<span class="tok-fn">setCursor</span>(<span class="tok-num">0</span>,<span class="tok-num">0</span>);             // Move the cursor to row <span class="tok-num">0</span>, column <span class="tok-num">0</span>
+  lcd.<span class="tok-fn">print</span>(&quot;hello, world!&quot;);     // The print content is displayed on the LCD
+}
+
+<span class="tok-key">void</span> <span class="tok-fn">loop</span>() {
+  lcd.<span class="tok-fn">setCursor</span>(<span class="tok-num">0</span>,<span class="tok-num">1</span>);             // Move the cursor to row <span class="tok-num">1</span>, column <span class="tok-num">0</span>
+  lcd.<span class="tok-fn">print</span>(&quot;Counter:&quot;);          // The count is displayed every second
+  lcd.<span class="tok-fn">print</span>(<span class="tok-fn">millis</span>() / <span class="tok-num">1000</span>);
+  <span class="tok-fn">delay</span>(<span class="tok-num">1000</span>);
+}
+
+<span class="tok-key">bool</span> <span class="tok-fn">i2CAddrTest</span>(uint8_t addr) {
+  Wire.<span class="tok-fn">beginTransmission</span>(addr);
+  <span class="tok-fn">if</span> (Wire.<span class="tok-fn">endTransmission</span>() == <span class="tok-num">0</span>) {
+    <span class="tok-key">return</span> true;
+  }
+  <span class="tok-key">return</span> false;
+}</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>Wire.begin(SDA, SCL)</code><span class="note-text">Starts the I2C bus with GPIO 14 as the data line and GPIO 13 as the clock. <button class="define" data-topic="i2c">Define</button></span></div>
+                  <div class="code-note"><code>LiquidCrystal_I2C lcd(0x27,16,2)</code><span class="note-text">Names the display by its bus address — 16 columns, 2 rows. If nothing answers at 0x27, i2CAddrTest lets the sketch switch to 0x3F by itself. <button class="define" data-topic="lcd1602">Define</button></span></div>
+                  <div class="code-note"><code>lcd.setCursor(0,1)</code><span class="note-text">Parks the cursor at column 0 of row 1 so the next print lands on the bottom row.</span></div>
+                  <div class="code-note"><code>lcd.print(millis() / 1000)</code><span class="note-text">Prints the seconds since the board booted — the running count you see tick. <button class="define" data-topic="millis">Define</button></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="tabpanel" id="panel-micropython" role="tabpanel" aria-labelledby="tab-micropython" hidden>
+              <p class="optional-tag">Optional side path · same circuit</p>
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">17.1_IIC_LCD1602/IIC_LCD1602.py</span></div>
+<pre><code>i2c = <span class="tok-fn">I2C</span>(scl=<span class="tok-fn">Pin</span>(<span class="tok-num">13</span>), sda=<span class="tok-fn">Pin</span>(<span class="tok-num">14</span>), freq=<span class="tok-num">400000</span>)
+devices = i2c.<span class="tok-fn">scan</span>()
+lcd = <span class="tok-fn">I2cLcd</span>(i2c, device, <span class="tok-num">2</span>, <span class="tok-num">16</span>)
+
+lcd.<span class="tok-fn">move_to</span>(<span class="tok-num">0</span>, <span class="tok-num">0</span>)
+lcd.<span class="tok-fn">putstr</span>(&quot;Hello,world!&quot;)
+count = <span class="tok-num">0</span>
+while True:
+    lcd.<span class="tok-fn">move_to</span>(<span class="tok-num">0</span>, <span class="tok-num">1</span>)
+    lcd.<span class="tok-fn">putstr</span>(&quot;Counter:%d&quot; %(count))
+    time.<span class="tok-fn">sleep_ms</span>(<span class="tok-num">1000</span>)
+    count += <span class="tok-num">1</span></code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>devices = i2c.scan()</code><span class="note-text">Asks every address on the bus and uses whichever one answers — the same job the Arduino sketch&#x27;s address test does.</span></div>
+                  <div class="code-note"><code>lcd.putstr(&quot;Counter:%d&quot; %(count))</code><span class="note-text">Rewrites row 1 with the running count once a second.</span></div>
+                </div>
+              </div>
+              <p class="micropython-note">Same pins, same wiring. This path needs two helper modules — <code>I2C_LCD.py</code> and <code>LCD_API.py</code> from the same kit folder — copied onto the board before it runs. Run it in Thonny if MicroPython is set up; otherwise skip it — it should never block the Arduino-first path.
+</p>
+            </div>
+          </div>
+        </section>
+        <section id="theory" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">05</span> Understand, don&#x27;t memorise</p>
+              <h2>Two wires carry the whole screen</h2>
+              <p class="muted">A bare LCD1602 wants over a dozen wires. The backpack soldered to its back shrinks that to two signals, because I2C sends everything as addressed messages down a shared pair.
+</p>
+            </div>
+            <div class="theory-flow" aria-label="Measurement model">
+              <article class="flow-step"><span class="n">One bus</span><h3>Two shared wires</h3><p>SDA carries the data while SCL keeps the beat for both ends.</p></article>
+              <article class="flow-step"><span class="n">Address</span><h3>0x27 or 0x3F</h3><p>Every device on the bus has a number so the board can call this one by name.</p></article>
+              <article class="flow-step"><span class="n">Translate</span><h3>The backpack chip</h3><p>It turns bus messages into the many parallel signals the bare LCD needs.</p></article>
+              <article class="flow-step"><span class="n">Print</span><h3>Cursor then text</h3><p>The sketch parks the cursor at a row and column and writes characters there.</p></article>
+            </div>
+            <div class="formula-card">
+              <span class="label">The model</span>
+              <code>two wires → <b>address</b> → cursor position → characters</code>
+            </div>
+            <div class="two-col" style="margin-top:14px">
+              <article class="mini-card"><h3>Another kind of serial <button class="define" data-topic="serial">Define</button></h3><p>The bits travel single file down SDA the way they travel down USB to your Serial Monitor; SCL is the shared clock that tells both ends when each bit counts.</p></article>
+              <article class="mini-card"><h3>Two possible addresses <button class="define" data-topic="i2c">Define</button></h3><p>Backpacks built on the PCF8574T chip answer at 0x27 and PCF8574AT boards answer at 0x3F. The sketch tries 0x27 first and switches by itself when nothing replies.</p></article>
+            </div>
+          </div>
+        </section>
+        <section id="test" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">06</span> Know it worked</p>
+              <h2>Test &amp; debug</h2>
+              <p class="muted">Nothing prints to the Serial Monitor today — the proof is written on the glass in front of you.
+</p>
+            </div>
+            <div class="test-grid">
+              <div>
+                <span class="readout-title">What you should see</span>
+                <div class="observe" aria-label="What you should see">
+                  <div class="bar"><span>LCD</span></div>
+                  <ul class="observe-lines"><li>Row 0 shows &quot;hello, world!&quot; as soon as the sketch starts.</li><li>Row 1 shows &quot;Counter:&quot; followed by the seconds since the board booted.</li><li>The number ticks up once a second for as long as the board has power.</li></ul>
+                </div>
+                <p class="micropython-note">A glowing backlight with blank rows is normal at first — the contrast dial on the back of the module sets whether characters show, and it often ships turned too far.</p>
+              </div>
+              <div>
+                <span class="checks-title">If it doesn&#x27;t</span>
+                <ul class="checklist">
+                  <li><strong>Backlight on but no characters?</strong> Turn the small contrast dial on the back of the module slowly until the text appears.</li>
+                  <li><strong>Nothing at all — no glow?</strong> Check the VCC and GND pair first, then SDA on GPIO 14 and SCL on GPIO 13.</li>
+                  <li><strong>Compile fails on LiquidCrystal_I2C.h?</strong> The library step was skipped — add the kit&#x27;s ZIP via Sketch → Include Library → Add .ZIP Library…</li>
+                  <li><strong>Counter frozen?</strong> Re-upload the sketch, then press the board&#x27;s reset button.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="challenge" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">07</span> Make the idea yours</p>
+              <h2>Try this: make the screen yours</h2>
+              <p class="muted">Same working circuit, three edits to the two print lines. It fits inside today&#x27;s 25 minutes.
+</p>
+            </div>
+            <div class="two-col">
+              <article class="mini-card"><h3>Name the boat</h3><p>Change <code>lcd.print(&quot;hello, world!&quot;)</code> to your boat&#x27;s name and upload — row 0 is yours now.</p></article>
+              <article class="mini-card"><h3>Minutes and seconds <button class="define" data-topic="millis">Define</button></h3><p>Make row 1 read like a clock — print <code>millis() / 60000</code> for the minutes, print a colon, then print <code>(millis() / 1000) % 60</code> for the seconds.</p></article>
+              <article class="mini-card"><h3>Overflow the row <button class="define" data-topic="lcd1602">Define</button></h3><p>Print a message longer than sixteen characters and watch where the extra letters go. Then trim the message until the whole line fits the glass again.</p></article>
+            </div>
+            <div class="logbook">
+              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
+              <label>What did the screen do with the characters past column sixteen?<textarea rows="2"></textarea></label>
+              <label>How would you show a sensor reading from an earlier day on this screen?<textarea rows="2"></textarea></label>
+              <label>Where on a real boat would a two-line display earn its keep?<textarea rows="2"></textarea></label>
+            </div>
+          </div>
+        </section>
+        <section id="agent" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">08</span> Learn it with a hand on the tiller</p>
+              <h2>Coach me through it</h2>
+              <p class="muted">Every lesson ships with a code and a machine-readable packet, so an agent can guide you with full context.
+</p>
+            </div>
+            <div class="agent-grid">
+              <article class="mini-card"><h3>Lesson code</h3><p><code>TSK-DAY25-LCD</code></p></article>
+              <article class="mini-card"><h3>Context packet</h3><p><a href="../packets/TSK-DAY25-LCD.json">Open the JSON packet →</a></p></article>
+            </div>
+            <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
+              <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
+              <p><strong>How the agent should behave:</strong> guide one physical connection at a time, wait for you to confirm, explain terms on request, and always check wiring, board, port, and USB before changing code.
+</p>
+            </div>
+          </div>
+        </section>
+        <nav class="day-nav" aria-label="Course navigation">
+        <a class="day-nav-link prev" href="../day-24-servo-knob/">
+          <span class="day-nav-dir">← Day 24</span>
+          <span class="day-nav-title">Servo knob: control position with a knob</span>
+        </a>
+        <a class="day-nav-link next" href="../day-26-ultrasonic/">
+          <span class="day-nav-dir">Day 26 →</span>
+          <span class="day-nav-title">Measure the room with sound</span>
+        </a>
+        </nav>
+      </main>
+    </div>
+    <footer class="colophon">
+      <p><strong>Day 25 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <div class="rule"></div>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — the circuit diagram from C_Tutorial.pdf, Chapter 18, page 165; sketch <code>Sketch_18.1_Display_the_string_on_LCD1602.ino</code>; MicroPython <code>17.1_IIC_LCD1602/IIC_LCD1602.py</code>. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+    </footer>
+  </div>
+
+  <dialog class="lightbox" id="explainer">
+    <div class="lb-head">
+      <div>
+        <span class="lb-kicker">Field note</span>
+        <h3 id="explainerTitle"></h3>
+      </div>
+      <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="lb-body"><p id="explainerBody"></p></div>
+    <div class="lb-shortcut"><span class="tag">Shortcut</span><span id="explainerShortcut"></span></div>
+  </dialog>
+
+  <dialog class="lightbox image" id="imageBox">
+    <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    <div class="lb-body"><img id="imageBoxImg" alt="" /></div>
+    <p class="lb-cap" id="imageBoxCap"></p>
+  </dialog>
+
+  <div class="toast" id="toast">Prompt copied</div>
+
+  <script id="lesson-data" type="application/json">{"day": 25, "totalDays": 30, "slug": "day-25-lcd", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "gnd": {"title": "Ground / GND", "body": "Ground is the shared zero-voltage reference. The board and sensor need a common ground so a signal like HIGH or LOW means the same thing to both parts.\n", "shortcut": "A missing ground can make everything look haunted. Check it early."}, "gpio": {"title": "GPIO extension board", "body": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself.\n", "shortcut": "When a lesson says GPIO 13, look for the pin labelled 13 on the extension board."}, "i2c": {"title": "I2C — a two-wire bus", "body": "I2C carries data between the board and a device over just two wires: SDA for data and SCL for the clock that paces it. Every device on the bus has an address, so the board names which one it's talking to — the LCD's backpack chip answers at 0x27 (some at 0x3F).\n", "shortcut": "Two wires, many devices, each with its own address."}, "jumpers": {"title": "Jumper wires", "body": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles.\n", "shortcut": "If a reading seems impossible, gently reseat the jumper wires before changing code."}, "lcd1602": {"title": "LCD1602 module", "body": "A 16-character by 2-line liquid crystal display with an I2C backpack chip (PCF8574T) soldered on, so four wires run the whole screen: power, ground, SDA, and SCL. The sketch addresses it, switches on the backlight, places the cursor, and prints text.\n", "shortcut": "16 columns × 2 rows over four wires; if it powers up blank, check the address and the contrast dial."}, "millis": {"title": "millis()", "body": "millis() hands back the number of milliseconds since the board last powered on or reset. Dividing it by 1000 turns it into seconds, which is how this sketch reports how long it has been running.\n", "shortcut": "millis() is the board's stopwatch — milliseconds since it booted."}, "serial": {"title": "Serial Monitor", "body": "Serial Monitor is a text window in Arduino IDE. The board can print messages to it over USB. Here, it prints the measured distance so you can see what the sensor is doing.\n", "shortcut": "If the window is blank, check that the baud rate is 115200."}}, "prev": {"day": 24, "slug": "day-24-servo-knob", "title": "Servo knob: control position with a knob"}, "next": {"day": 26, "slug": "day-26-ultrasonic", "title": "Measure the room with sound"}}</script>
+  <script src="../course.js"></script>
+</body>
+</html>

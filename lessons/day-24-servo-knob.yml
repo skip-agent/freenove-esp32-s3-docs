@@ -1,0 +1,301 @@
+# Day 24 — Servo knob · tinyskiff.lesson.v1
+# One source of truth: this file renders to the guided page
+# (/course/day-24-servo-knob/), the agent packet, and the course-map entry.
+# Day 13's knob meets Day 23's servo — two map() calls join reading to angle.
+
+schema: tinyskiff.lesson.v1
+lessonCode: TSK-DAY24-SERVOKNOB
+day: 24
+slug: day-24-servo-knob
+title: "Servo knob: control position with a knob"
+status: published
+estimatedTimeMinutes: 20
+tracks: { main: arduino, optional: micropython }
+learnerProfile: adult beginner; curious and capable; no electronics assumed
+
+mission: >
+  Wire a rotary potentiometer to GPIO 14 and a servo to GPIO 21, upload the
+  Arduino sketch, and steer the servo's horn by hand — the knob's raw reading
+  and its mapped angle stream to Serial Monitor as proof of the conversion.
+unlocks: An analogue input can drive an analogue output — one map() call joins any sensor reading to any actuator range.
+seoDescription: >
+  Wire a rotary potentiometer and a servo to the ESP32-S3, upload the sketch,
+  and steer the servo horn with the knob while Serial Monitor prints the raw
+  reading and the mapped angle side by side.
+
+hero:
+  instrument: none
+  headline: Steer the horn|with a {knob}
+  lede: >
+    Today the board gets a helm. You wire the knob from Day 13 and the servo
+    from Day 23 into one circuit, and a two-line conversion joins them — turn
+    the knob and the horn swings with your hand, live. Serial Monitor prints
+    the raw reading and the finished angle side by side so you can watch the
+    mapping happen.
+  pills:
+    - { text: About 20 minutes, key: true }
+    - Arduino first
+    - MicroPython optional
+    - No electronics assumed
+
+parts:
+  intro: >
+    Six things, and you've met them all. Tap *Define* on any part you'd like a
+    refresher on — the answer opens as a field note you can read and dismiss
+    without losing your place.
+  items:
+    - name: ESP32-S3 board
+      image: shared/item-esp32-s3-board.jpg
+      imageKind: Manual photo
+      alt: Official manual photo of the ESP32-S3 development board.
+      blurb: The brain that runs your uploaded sketch.
+      explain: esp32
+    - name: GPIO extension board
+      image: shared/item-gpio-extension-board.png
+      imageKind: Manual photo
+      alt: Official manual image of the ESP32-S3 GPIO extension board.
+      blurb: Spreads the pins into rows you can reach and label.
+      explain: gpio
+    - name: Servo
+      image: shared/item-servo.png
+      imageKind: Manual photo
+      alt: Official manual photo of a hobby servo with its three-wire lead and a set of horns.
+      blurb: The motor that holds whatever angle you command.
+      explain: servo
+    - name: Rotary potentiometer
+      image: shared/item-potentiometer.png
+      imageKind: Manual illustration
+      alt: Official manual illustration of a rotary potentiometer with rotation arrows and its three pins labelled 1, 3, and 2.
+      blurb: The knob — a resistor track with a sliding tap.
+      explain: potentiometer
+    - name: 6 jumper wires (M/M)
+      image: shared/item-jumper-wire.png
+      imageKind: Manual photo
+      alt: Official manual image of a jumper wire.
+      blurb: Temporary, solder-free connections.
+      explain: jumpers
+    - name: Arduino IDE
+      image: shared/item-arduino-ide.png
+      imageKind: Manual screenshot
+      alt: Official manual screenshot of the Arduino IDE interface.
+      blurb: Uploads the sketch and opens Serial Monitor.
+      explain: arduino
+
+wiring:
+  intro: >
+    The official Freenove diagram is your chart — schematic on top, the same
+    circuit built on a breadboard below. Click it to enlarge. Two familiar
+    circuits share the board today: the knob on one side, the servo on the
+    other, joined through the code.
+  diagram:
+    image: day-24/circuit-page-159.png
+    alt: >-
+      Official Freenove circuit for controlling a servo with a potentiometer:
+      the pot's middle pin wired to GPIO 14 and its outer pins to 3.3V and
+      ground, with the servo's signal wire on GPIO 21 and its power pair on 5V
+      and ground, shown as both a schematic and a breadboard photo.
+    caption: Official Freenove circuit — C Tutorial, Chapter 17 (Servo), page 159.
+    zoomCaption: Official Freenove circuit, C Tutorial Chapter 17, page 159.
+    source: { pdf: C_Tutorial.pdf, chapter: 17, chapterTitle: Servo, page: 159 }
+  pins:
+    - { from: Pot outer pin 1, to: 3.3V, why: Feeds one end of the knob's track with full voltage., explain: potentiometer }
+    - { from: Pot outer pin 2, to: GND, why: Holds the other end of the track at zero volts., explain: gnd }
+    - { from: Pot middle pin 3, to: GPIO 14, why: The wiper delivers the in-between voltage for the ADC to read., explain: adc }
+    - { from: Servo signal (orange), to: GPIO 21, why: Carries the timing pulse that names the horn's angle., explain: pulseWidth }
+    - { from: Servo VCC (red), to: 5V, why: Powers the servo's motor and gears., explain: servo }
+    - { from: Servo GND (brown), to: GND, why: Gives board and servo the same zero point., explain: gnd }
+  safety:
+    - label: Two power rails, each to its own device.
+      icon: "⚓"
+      body: >
+        The servo's motor drinks from the 5V pin; the potentiometer stays on
+        3.3V so GPIO 14 reads within its limit. Keep the two supplies straight,
+        never twist the horn by hand while it's powered, and unplug USB before
+        you move any wire.
+
+steps:
+  intro: >
+    This is the main path — you can finish the day without opening a single
+    field note. Tap each step as you go to keep your place.
+  items:
+    - Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.
+    - Push the potentiometer into the breadboard so each of its three pins has its own row. {potentiometer}
+    - Wire the pot's outer pins to 3.3V and GND, then run its middle pin to GPIO 14. {adc}
+    - Connect the servo's lead — orange signal to GPIO 21, red to 5V, brown to GND. {servo}
+    - Press a horn onto the servo's output shaft so the motion is easy to see.
+    - Compare every wire to the chart before you plug in USB.
+    - Open `Sketch_17.2_Control_Servo_by_Potentiometer.ino` in Arduino IDE and upload it.
+    - Open Serial Monitor and set the baud rate to `115200`. {serial}
+    - Turn the knob slowly end to end and watch the horn follow your hand.
+  done:
+    icon: "🧭"
+    title: The helm answers.
+    body: The horn tracks the knob, live. Head to Test & debug to read the number pairs behind the motion.
+
+code:
+  intro: >
+    The loop is five working lines — read the knob, print, map, steer, print
+    again. Switch to MicroPython if you'd rather see the same idea in Python —
+    the wiring never changes.
+  arduino:
+    file: Sketch_17.2_Control_Servo_by_Potentiometer.ino
+    sketch: C/Sketches/Sketch_17.2_Control_Servo_by_Potentiometer/Sketch_17.2_Control_Servo_by_Potentiometer.ino
+    excerpt: |
+      #define SERVO_PIN 21  //define the pwm pin
+      #define SERVO_CHN 0   //define the pwm channel
+      #define SERVO_FRQ 50  //define the pwm frequency
+      #define SERVO_BIT 12  //define the pwm precision
+      #define ADC_PIN   14  //define the adc pin
+
+      void setup() {
+        servo_set_pin(SERVO_PIN);
+        Serial.begin(115200);
+      }
+
+      void loop() {
+        // read the value of the potentiometer (value between 0 and 4095)
+        int potVal = analogRead(ADC_PIN);
+        Serial.printf("potVal_1: %d\t",potVal);
+        // scale it to use it with the servo (value between 0 and 180)
+        potVal = map(potVal, 0, 4095, 0, 180);
+        // set the servo position according to the scaled value
+        servo_set_angle(potVal);
+        Serial.printf("potVal_2: %d\r\n",potVal);
+        delay(15);// wait for the servo to get there
+      }
+
+      void servo_set_pin(int pin) {
+        ledcAttachChannel(pin, SERVO_FRQ, SERVO_BIT, SERVO_CHN);
+      }
+
+      void servo_set_angle(int angle) {
+        if (angle > 180 || angle < 0)
+          return;
+        long pwm_value = map(angle, 0, 180, 103, 512);
+        ledcWrite(SERVO_PIN, pwm_value);
+      }
+    notes:
+      - code: map(potVal, 0, 4095, 0, 180)
+        text: Rescales the knob's raw reading onto the servo's range — 0 stays 0, 4095 becomes 180, and everything between lands in proportion.
+        explain: mapValue
+      - code: map(angle, 0, 180, 103, 512)
+        text: The second map turns the angle into a duty value — the width of the pulse that tells the servo where to hold.
+        explain: pulseWidth
+      - code: ledcAttachChannel(pin, SERVO_FRQ, SERVO_BIT, SERVO_CHN)
+        text: Sets GPIO 21 up as 50 Hz PWM with 12-bit precision — the timing a hobby servo expects.
+        explain: ledc
+      - code: 'Serial.printf("potVal_1: %d\t",potVal)'
+        text: Prints the raw reading before the mapping, so each line pairs the input with its finished angle.
+        explain: serialPrint
+  micropython:
+    file: 16.2_Servo_Knop/Servo_Knop.py
+    path: Python/Python_Codes/16.2_Servo_Knop/Servo_Knop.py
+    optionalTag: Optional side path · same circuit
+    excerpt: |
+      servo=myServo(21)
+
+      adc=ADC(Pin(14))
+      adc.atten(ADC.ATTN_11DB)
+      adc.width(ADC.WIDTH_12BIT)
+
+      adcValue=adc.read()
+      angle=(adcValue*180)/4096
+      servo.myServoWriteAngle(int(angle))
+      time.sleep_ms(50)
+    notes:
+      - code: angle=(adcValue*180)/4096
+        text: The same rescale as the Arduino map — one line of arithmetic from reading to angle.
+      - code: servo.myServoWriteAngle(int(angle))
+        text: The helper in `myservo.py` builds the matching pulse and sends it to GPIO 21.
+    note: >
+      Same pins, same behaviour. Copy `myservo.py` onto the board alongside the
+      script — the import needs it there. Run it in Thonny if MicroPython is
+      set up; otherwise skip it — it should never block the Arduino-first path.
+
+theory:
+  title: Reading → angle → pulse
+  summary: Day 13's knob and Day 23's servo meet in the middle — two map() calls carry the reading to an angle and the angle to a pulse.
+  intro: >
+    Everything in today's loop is a rescale. The knob speaks in 0 to 4095, the
+    servo listens in 0 to 180, and the PWM hardware wants a duty value — map()
+    translates at each border.
+  flow:
+    - { n: Turn, title: Knob dials voltage, body: The wiper hands GPIO 14 a voltage that tracks the knob's position. }
+    - { n: Sample, title: ADC measures, body: analogRead turns that voltage into a number from 0 to 4095. }
+    - { n: Map, title: Reading becomes angle, body: map() rescales 0-4095 onto 0-180 so every knob position names an angle. }
+    - { n: Steer, title: Angle becomes pulse, body: A second map() converts the angle to a duty value from 103 to 512 and ledcWrite sends it. }
+  formulaLabel: The chain
+  formula: angle = **map**(reading, 0, 4095, 0, 180) → pulse = **map**(angle, 0, 180, 103, 512)
+  notes:
+    - title: Why two map() calls
+      explain: mapValue
+      body: Each call bridges one border — sensor range to human range, then human range to hardware range. Keeping the angle in the middle lets you think in degrees.
+    - title: The pulse under the angle
+      explain: pulseWidth
+      body: At 50 Hz with 12-bit precision, duty 103 is roughly a 0.5 ms pulse and 512 is roughly 2.5 ms — the width, repeated every 20 ms, is the position command the servo holds.
+
+test:
+  mode: serial
+  intro: >
+    The horn tracking your hand is the payoff; the serial pairs are the proof.
+    Success and recovery sit side by side, so you never have to go hunting when
+    something looks off.
+  expectedTitle: What you should see
+  baud: 115200
+  expected:
+    - "potVal_1: 0\tpotVal_2: 0"
+    - "potVal_1: 2048\tpotVal_2: 90"
+    - "potVal_1: 4095\tpotVal_2: 180"
+  expectedNote: Each line pairs the raw reading with its mapped angle — one end of the knob prints near 0 and 0, the centre near 2048 and 90, the far end near 4095 and 180.
+  checksTitle: If it doesn't
+  checks:
+    - symptom: "Horn ignores the knob?"
+      fix: "Check the pot's middle wire on GPIO 14, then its outer pins on 3.3V and GND."
+    - symptom: "Angles print but nothing moves?"
+      fix: "Check the servo's signal wire on GPIO 21 and its power pair on 5V and GND."
+    - symptom: "Horn jitters at rest?"
+      fix: "Small twitches are normal; a steadier 5V supply calms them."
+    - symptom: "Garbled or random characters?"
+      fix: "Set Serial Monitor to 115200 baud to match the sketch."
+
+challenge:
+  title: "Try this: tiller stops"
+  railLabel: Try this
+  intro: >
+    Same working circuit, three small rewrites of one line. Each teaches you
+    something about owning the mapping. It fits inside today's 20 minutes.
+  summary: Limit the horn to a 45° window like a tiller stop, reverse the steering direction, and mark three knob positions that point the horn at known angles.
+  cards:
+    - title: Fit tiller stops
+      explain: mapValue
+      body: Change the first map() so the angle runs 67 to 112 — a 45° window around centre, like the stops on a boat's tiller. The knob still sweeps end to end; the horn stays inside its lane.
+    - title: Steer the other way
+      body: Swap the output ends — map to 180 down to 0 — and the horn runs against the knob. One line reverses the helm.
+    - title: Mark the helm
+      body: With the original sketch restored, find the knob positions that print 0, 90, and 180, and mark each on the knob with a sliver of tape. You've calibrated a control.
+  logbook:
+    - What did your 45° window feel like compared with the full sweep?
+    - Which map() arguments did you change to reverse the direction, and why did that work?
+    - Where did your three marks land on the knob — evenly spaced or bunched?
+
+agent:
+  intro: >
+    Every lesson ships with a code and a machine-readable packet, so an agent
+    can guide you with full context.
+  behaviour: >
+    guide one wire at a time, wait for you to confirm, explain terms on
+    request, and always check wiring, board, port, and baud rate before
+    changing code.
+  coachInstructions:
+    - Guide one physical connection at a time and wait for learner confirmation before proceeding.
+    - If the horn ignores the knob, check the pot's middle wire on GPIO 14 first, then its outer pins on 3.3V and GND.
+    - If angles print but the servo never moves, check the signal wire on GPIO 21 and the servo's 5V and GND pair before changing code.
+    - Small jitter at rest is normal servo behaviour; suggest a steadier 5V supply if it's constant, and keep the learner from twisting the horn by hand while powered.
+    - If the monitor shows garbled text, set the baud rate to 115200 before touching anything else.
+    - Use the serial pairs as the diagnostic — potVal_1 proves the knob side works and potVal_2 proves the mapping, which isolates any fault to the servo side.
+
+source:
+  license: CC BY-NC-SA 3.0
+  licenseNote: >
+    Based on Freenove official material released under CC BY-NC-SA 3.0; preserve
+    attribution and non-affiliation language.
