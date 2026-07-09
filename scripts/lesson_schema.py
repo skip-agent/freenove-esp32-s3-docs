@@ -91,6 +91,9 @@ def referenced_topics(lesson: dict) -> set[str]:
 
     # `headline` uses {word} for emphasis, not a glossary reference — skip it.
     skip_keys = {"headline"}
+    # Code fields may legitimately contain brace syntax (f-strings, `loop(){}`),
+    # which is not a glossary reference — don't scan those string values.
+    code_string_keys = {"excerpt", "code"}
 
     def walk(node) -> None:
         if isinstance(node, dict):
@@ -99,6 +102,8 @@ def referenced_topics(lesson: dict) -> set[str]:
                     continue
                 if key == "explain" and isinstance(value, str):
                     topics.add(value)
+                elif key in code_string_keys and isinstance(value, str):
+                    continue  # a code snippet, not prose
                 else:
                     walk(value)
         elif isinstance(node, list):

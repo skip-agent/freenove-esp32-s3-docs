@@ -54,8 +54,12 @@ const progress = {
     }
   },
   getResume() {
-    const raw = localStorage.getItem(this.resumeKey);
-    return raw ? Number(raw) : null;
+    try {
+      const raw = localStorage.getItem(this.resumeKey);
+      return raw ? Number(raw) : null;
+    } catch {
+      return null;
+    }
   },
 };
 

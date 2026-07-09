@@ -113,6 +113,20 @@ class ReferencedTopicsTests(unittest.TestCase):
         topics = lesson_schema.referenced_topics(lesson)
         self.assertNotIn("sound", topics)  # {sound} in headline is emphasis
 
+    def test_code_braces_not_topics(self):
+        # brace syntax inside code excerpts / snippets is not a glossary key
+        lesson = {
+            "code": {
+                "arduino": {
+                    "excerpt": "server.on('/', [](){ String s = \"${streamUrl}\"; });",
+                    "notes": [{"code": "loop() {}", "text": "runs forever. {serial}"}],
+                },
+            },
+        }
+        topics = lesson_schema.referenced_topics(lesson)
+        self.assertNotIn("streamUrl", topics)
+        self.assertIn("serial", topics)  # inline {serial} in prose text still counts
+
 
 class InlineRenderTests(unittest.TestCase):
     def test_code_and_emphasis(self):
