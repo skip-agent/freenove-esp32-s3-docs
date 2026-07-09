@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Day 11 · Make the board talk back — TinySkiff ESP32-S3 Lab</title>
+  <meta name="description" content="Open Serial Monitor and watch the ESP32-S3 print text over USB. No wiring — just Serial.begin, println, and printf reporting the board&#x27;s running time in seconds." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../course.css" />
+</head>
+<body>
+  <div class="lesson-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 11 of 30</p>
+        <h1>Make the board<br /><em>talk back</em></h1>
+        <p class="lede">No wiring today. You upload a short sketch, open Serial Monitor, and the ESP32-S3 starts sending text up the same USB cable that carries your code — a start-up line first, then a running clock that ticks up every second.
+</p>
+        <div class="meta-row" aria-label="Lesson facts">
+          <span class="pill is-key">About 15 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">No wiring today</span>
+        </div>
+      </div>
+      <div class="hero-side no-instrument">
+        
+        <div class="agent-strip">
+          <div class="lesson-code">
+            <span class="label">Agent assist code</span>
+            <code>TSK-DAY11-SERIALPRINT</code>
+          </div>
+          <button class="copy-prompt" type="button" data-copy="I am doing TinySkiff lesson TSK-DAY11-SERIALPRINT. Pull the lesson packet, then guide me one step at a time. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY11-SERIALPRINT.json">lesson packet</a> and coach you step by step.</p>
+        </div>
+      </div>
+    </header>
+    <div class="layout">
+      <nav class="rail" aria-label="Lesson progress">
+        <div class="rail-head">
+          <strong>Today's route</strong>
+          <span class="day-of">11 / 30</span>
+        </div>
+        <div class="voyage" style="--voyage-fill: 36.67%" aria-hidden="true"><span></span></div>
+        <div class="rail-nav">
+          <a href="#parts"><span class="tick"></span>What you need</a>
+          <a href="#steps"><span class="tick"></span>Build it</a>
+          <a href="#code"><span class="tick"></span>Read the code</a>
+          <a href="#theory"><span class="tick"></span>How the board talks over USB</a>
+          <a href="#test"><span class="tick"></span>Test &amp; debug</a>
+          <a href="#challenge"><span class="tick"></span>Try this</a>
+          <a href="#agent"><span class="tick"></span>Coach me</a>
+        </div>
+      </nav>
+      <main class="lesson-main">
+        <section id="parts" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">01</span> First, know the pieces</p>
+              <h2>What you need</h2>
+              <p class="muted">Almost nothing today — the board talks over the same USB cable that&#x27;s already uploading your code. Tap <em>Define</em> on anything unfamiliar; the answer opens as a field note you can read and dismiss without losing your place.
+</p>
+            </div>
+            <div class="part-grid">
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-esp32-s3-board.jpg" alt="Official manual photo of the ESP32-S3 development board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>ESP32-S3 board <button class="define" data-topic="esp32">Define</button></h3>
+                <p>The brain that runs your sketch and sends the text.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-arduino-ide.png" alt="Official manual screenshot of the Arduino IDE interface." /><figcaption>Manual screenshot</figcaption></figure>
+                <h3>Arduino IDE <button class="define" data-topic="arduino">Define</button></h3>
+                <p>Uploads the sketch and opens Serial Monitor.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-official-sketch.png" alt="Official manual page showing an Arduino sketch and its Serial Monitor output." /><figcaption>Manual sketch</figcaption></figure>
+                <h3>Official sketch <button class="define" data-topic="sketch">Define</button></h3>
+                <p><code>Sketch_07.1_SerialPrinter.ino</code></p>
+              </article>
+            </div>
+          </div>
+        </section>
+        <section id="steps" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">02</span> One action at a time</p>
+              <h2>Build it</h2>
+              <p class="muted">The whole day is upload, open the monitor, and read. Tap each step as you go to keep your place — you can finish without opening a single field note.
+</p>
+            </div>
+            <div class="steps-progress">
+              <div class="bar" aria-hidden="true"><span id="stepBar"></span></div>
+              <span class="count" id="stepCount">0 / 6 done</span>
+            </div>
+            <ol class="step-list">
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 1 done"></button><p class="text">Plug the ESP32-S3 into your computer with a data-capable USB cable.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 2 done"></button><p class="text">In Arduino IDE, select your ESP32-S3 board and the port it appears on.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">Open <code>Sketch_07.1_SerialPrinter.ino</code>.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">Press <strong>Upload</strong> and wait for the IDE to say <code>Done uploading</code>.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Open Serial Monitor and set the baud rate to <code>115200</code>. <button class="define" data-topic="serial">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 6 done"></button><p class="text">Watch the start-up line appear, then a running-time count that climbs every second.</p></li>
+            </ol>
+            <div class="done-banner" id="doneBanner" role="status">
+              <span class="icon" aria-hidden="true">📡</span>
+              <div><strong>The board has a voice.</strong><p>Your ESP32-S3 is sending text back over USB. Head to Test &amp; debug to confirm what should scroll past.</p></div>
+            </div>
+          </div>
+        </section>
+        <section id="code" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">03</span> Read just enough code</p>
+              <h2>Read the code</h2>
+              <p class="muted">The whole sketch is short. Two lines in <code>setup()</code> open the link and announce the board is ready; the <code>loop()</code> prints a running-time line once a second. Switch to MicroPython if you&#x27;d rather see the same idea in Python.
+</p>
+            </div>
+            <div class="tabs" role="tablist" aria-label="Code language">
+              <button class="tab" id="tab-arduino" role="tab" aria-selected="true" aria-controls="panel-arduino">Arduino <span class="badge">Main</span></button><button class="tab" id="tab-micropython" role="tab" aria-selected="false" aria-controls="panel-micropython">MicroPython <span class="badge">Optional</span></button>
+            </div>
+            <div class="tabpanel" id="panel-arduino" role="tabpanel" aria-labelledby="tab-arduino">
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">Sketch_07.1_SerialPrinter.ino</span></div>
+<pre><code><span class="tok-key">void</span> <span class="tok-fn">setup</span>() {
+  Serial.<span class="tok-fn">begin</span>(<span class="tok-num">115200</span>);
+  Serial.<span class="tok-fn">println</span>(&quot;ESP32S3 initialization completed!&quot;);
+}
+
+<span class="tok-key">void</span> <span class="tok-fn">loop</span>() {
+  Serial.<span class="tok-fn">printf</span>(&quot;Running time : %.<span class="tok-num">1</span>f s\r\n&quot;, <span class="tok-fn">millis</span>() / <span class="tok-num">1000.0</span>f);
+  <span class="tok-fn">delay</span>(<span class="tok-num">1000</span>);
+}</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>Serial.begin(115200)</code><span class="note-text">Opens the USB serial link at 115200 baud — the same number you set in Serial Monitor. <button class="define" data-topic="serialBegin">Define</button></span></div>
+                  <div class="code-note"><code>Serial.println(&quot;ESP32S3 initialization completed!&quot;)</code><span class="note-text">Sends one line of text, then moves to the next line — the board&#x27;s start-up announcement. <button class="define" data-topic="serialPrint">Define</button></span></div>
+                  <div class="code-note"><code>Serial.printf(&quot;Running time : %.1f s\r\n&quot;, millis() / 1000.0f)</code><span class="note-text">Fills the running time into the text, one decimal place, and sends it once a second. <button class="define" data-topic="millis">Define</button></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="tabpanel" id="panel-micropython" role="tabpanel" aria-labelledby="tab-micropython" hidden>
+              <p class="optional-tag">Optional side path · no wiring</p>
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">07.1_Serial_Print/Serial_Print.py</span></div>
+<pre><code>import time
+
+<span class="tok-fn">print</span>(&quot;ESP32S3 initialization completed!&quot;)
+
+while True:
+    <span class="tok-fn">print</span>(&quot;Running time : &quot;, time.<span class="tok-fn">ticks_ms</span>()/<span class="tok-num">1000</span>, &quot;s&quot;)
+    time.<span class="tok-fn">sleep</span>(<span class="tok-num">1</span>)</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>print(&quot;ESP32S3 initialization completed!&quot;)</code><span class="note-text">In MicroPython, print() sends text up the same USB serial link Thonny reads.</span></div>
+                  <div class="code-note"><code>time.ticks_ms()/1000</code><span class="note-text">Milliseconds since the board started, divided into seconds — the same running clock as the Arduino sketch.</span></div>
+                </div>
+              </div>
+              <p class="micropython-note">Same cable, no wiring. MicroPython&#x27;s print() lands in Thonny&#x27;s shell instead of Serial Monitor, but the idea is identical. If MicroPython isn&#x27;t set up yet, skip this — it should never block the Arduino-first path.
+</p>
+            </div>
+          </div>
+        </section>
+        <section id="theory" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">04</span> Understand, don&#x27;t memorise</p>
+              <h2>How the board talks over USB</h2>
+              <p class="muted">There&#x27;s no new hardware today — the same cable that flashes your code doubles as a two-way text line, provided the board and the monitor keep the same pace.
+</p>
+            </div>
+            <div class="theory-flow" aria-label="Measurement model">
+              <article class="flow-step"><span class="n">Open the link</span><h3>Serial.begin</h3><p>The board switches the USB line into text mode at a set speed.</p></article>
+              <article class="flow-step"><span class="n">Agree on speed</span><h3>Same baud</h3><p>Serial Monitor must use the same 115200 or the text arrives scrambled.</p></article>
+              <article class="flow-step"><span class="n">Send a line</span><h3>println</h3><p>Each print pushes characters up the cable to your screen.</p></article>
+              <article class="flow-step"><span class="n">Keep reporting</span><h3>Once a second</h3><p>The loop prints the running time again after each delay.</p></article>
+            </div>
+            <div class="formula-card">
+              <span class="label">The rule</span>
+              <code>readable text = <b>board baud</b> = <b>monitor baud</b></code>
+            </div>
+            <div class="two-col" style="margin-top:14px">
+              <article class="mini-card"><h3>What the baud rate is <button class="define" data-topic="serialBegin">Define</button></h3><p>Baud is how fast the two sides send signal changes. Both must agree, or the letters turn to gibberish.</p></article>
+              <article class="mini-card"><h3>Where the number comes from <button class="define" data-topic="millis">Define</button></h3><p>millis() is the board&#x27;s own stopwatch — milliseconds since it booted — which the sketch divides into seconds.</p></article>
+            </div>
+          </div>
+        </section>
+        <section id="test" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">05</span> Know it worked</p>
+              <h2>Test &amp; debug</h2>
+              <p class="muted">Success and recovery sit side by side, so you never have to go hunting when something looks off.
+</p>
+            </div>
+            <div class="test-grid">
+              <div>
+                <span class="readout-title">What you should see</span>
+                <div class="serial" aria-label="Expected Serial Monitor output">
+                  <div class="bar"><span>Serial Monitor</span><span class="baud">115200 baud</span></div>
+                  <div class="lines"><span>ESP32S3 initialization completed!</span><span>Running time : 1.0 s</span><span>Running time : 2.0 s</span><span>Running time : 3.0 s</span></div>
+                </div>
+                <p class="micropython-note">The first line prints once at start-up; the running time then climbs by about one each second.</p>
+              </div>
+              <div>
+                <span class="checks-title">If it doesn&#x27;t</span>
+                <ul class="checklist">
+                  <li><strong>Garbled or random characters?</strong> Set Serial Monitor to 115200 baud to match the sketch.</li>
+                  <li><strong>Blank monitor?</strong> Confirm the right board and port, then press the board&#x27;s reset button.</li>
+                  <li><strong>Only the first line, no count?</strong> Give it a second — the running time prints once per delay(1000).</li>
+                  <li><strong>Upload fails?</strong> Swap in a data-capable USB cable.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="challenge" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">06</span> Make the idea yours</p>
+              <h2>Try this: change what it says</h2>
+              <p class="muted">Same working sketch, no wiring — just the text and the timing. It fits inside today&#x27;s 15 minutes.
+</p>
+            </div>
+            <div class="two-col">
+              <article class="mini-card"><h3>Rename the start-up line <button class="define" data-topic="serialPrint">Define</button></h3><p>Change the words inside <code>Serial.println(&quot;…&quot;)</code> and re-upload — the board greets you however you like.</p></article>
+              <article class="mini-card"><h3>Report faster <button class="define" data-topic="millis">Define</button></h3><p>Lower the <code>delay(1000)</code> to <code>delay(250)</code> so the running time updates four times a second, then add a second <code>Serial.println</code> of your own.</p></article>
+            </div>
+            <div class="logbook">
+              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
+              <label>What message did you have the board greet you with?<textarea rows="2"></textarea></label>
+              <label>How fast could the running time update before it was hard to read?<textarea rows="2"></textarea></label>
+              <label>What would you want the board to report back to you in a real project?<textarea rows="2"></textarea></label>
+            </div>
+          </div>
+        </section>
+        <section id="agent" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">07</span> Learn it with a hand on the tiller</p>
+              <h2>Coach me through it</h2>
+              <p class="muted">Every lesson ships with a code and a machine-readable packet, so an agent can guide you with full context.
+</p>
+            </div>
+            <div class="agent-grid">
+              <article class="mini-card"><h3>Lesson code</h3><p><code>TSK-DAY11-SERIALPRINT</code></p></article>
+              <article class="mini-card"><h3>Context packet</h3><p><a href="../packets/TSK-DAY11-SERIALPRINT.json">Open the JSON packet →</a></p></article>
+            </div>
+            <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
+              <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
+              <p><strong>How the agent should behave:</strong> keep it to upload-and-read, check board, port, cable, and baud rate before touching code, and explain Serial.begin, println, and millis on request.
+</p>
+            </div>
+          </div>
+        </section>
+        <nav class="day-nav" aria-label="Course navigation">
+        <a class="day-nav-link prev" href="../day-10-buzzer/">
+          <span class="day-nav-dir">← Day 10</span>
+          <span class="day-nav-title">Give the board a voice</span>
+        </a>
+        <a class="day-nav-link next" href="../day-12-serial-rw/">
+          <span class="day-nav-dir">Day 12 →</span>
+          <span class="day-nav-title">Type to the board, hear it answer</span>
+        </a>
+        </nav>
+      </main>
+    </div>
+    <footer class="colophon">
+      <p><strong>Day 11 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <div class="rule"></div>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — sketch <code>Sketch_07.1_SerialPrinter.ino</code>; MicroPython <code>07.1_Serial_Print/Serial_Print.py</code>. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+    </footer>
+  </div>
+
+  <dialog class="lightbox" id="explainer">
+    <div class="lb-head">
+      <div>
+        <span class="lb-kicker">Field note</span>
+        <h3 id="explainerTitle"></h3>
+      </div>
+      <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="lb-body"><p id="explainerBody"></p></div>
+    <div class="lb-shortcut"><span class="tag">Shortcut</span><span id="explainerShortcut"></span></div>
+  </dialog>
+
+  <dialog class="lightbox image" id="imageBox">
+    <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    <div class="lb-body"><img id="imageBoxImg" alt="" /></div>
+    <p class="lb-cap" id="imageBoxCap"></p>
+  </dialog>
+
+  <div class="toast" id="toast">Prompt copied</div>
+
+  <script id="lesson-data" type="application/json">{"day": 11, "totalDays": 30, "slug": "day-11-serial-print", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "millis": {"title": "millis()", "body": "millis() hands back the number of milliseconds since the board last powered on or reset. Dividing it by 1000 turns it into seconds, which is how this sketch reports how long it has been running.\n", "shortcut": "millis() is the board's stopwatch — milliseconds since it booted."}, "serial": {"title": "Serial Monitor", "body": "Serial Monitor is a text window in Arduino IDE. The board can print messages to it over USB. Here, it prints the measured distance so you can see what the sensor is doing.\n", "shortcut": "If the window is blank, check that the baud rate is 115200."}, "serialBegin": {"title": "Serial.begin() and baud rate", "body": "Serial.begin() opens the USB serial link and sets the baud rate — how many signal changes a second both sides agree to use. The board and Serial Monitor must pick the same number, here 115200, or the text arrives as garbage.\n", "shortcut": "Set the same baud on both ends — 115200 in this sketch — or the words turn to gibberish."}, "serialPrint": {"title": "Serial.println() and printf()", "body": "Serial.println() sends a line of text to the computer and moves to the next line. Serial.printf() does the same but fills in values first — %.1f drops a number in with one decimal place — so the board can report live readings.\n", "shortcut": "println() sends plain lines; printf() slots numbers into a template before sending."}, "sketch": {"title": "Official sketch", "body": "A sketch is the Arduino name for a program. This lesson uses Freenove's Sketch_19.1_Ultrasonic_Ranging.ino so you can focus first on wiring, observation, and the measurement model.\n", "shortcut": "Treat the sketch as a working example to read and modify, not a spell to copy blindly."}}, "prev": {"day": 10, "slug": "day-10-buzzer", "title": "Give the board a voice"}, "next": {"day": 12, "slug": "day-12-serial-rw", "title": "Type to the board, hear it answer"}}</script>
+  <script src="../course.js"></script>
+</body>
+</html>

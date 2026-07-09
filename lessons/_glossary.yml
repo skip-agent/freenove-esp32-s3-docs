@@ -369,3 +369,43 @@ tone:
     hertz. Send a passive buzzer a higher frequency and it plays a higher note.
     Sweeping the frequency up and down is what turns a beep into a siren.
   shortcut: Higher frequency = higher pitch. This passive buzzer is loudest around 2 kHz.
+
+serialBegin:
+  title: Serial.begin() and baud rate
+  body: >
+    Serial.begin() opens the USB serial link and sets the baud rate — how many
+    signal changes a second both sides agree to use. The board and Serial Monitor
+    must pick the same number, here 115200, or the text arrives as garbage.
+  shortcut: Set the same baud on both ends — 115200 in this sketch — or the words turn to gibberish.
+
+serialPrint:
+  title: Serial.println() and printf()
+  body: >
+    Serial.println() sends a line of text to the computer and moves to the next
+    line. Serial.printf() does the same but fills in values first — %.1f drops a
+    number in with one decimal place — so the board can report live readings.
+  shortcut: println() sends plain lines; printf() slots numbers into a template before sending.
+
+millis:
+  title: millis()
+  body: >
+    millis() hands back the number of milliseconds since the board last powered
+    on or reset. Dividing it by 1000 turns it into seconds, which is how this
+    sketch reports how long it has been running.
+  shortcut: millis() is the board's stopwatch — milliseconds since it booted.
+
+serialAvailable:
+  title: Serial.available()
+  body: >
+    Serial.available() asks whether the computer has sent any characters the
+    board hasn't read yet. It returns how many are waiting, so the loop only
+    tries to read when something has actually arrived.
+  shortcut: Check available() before reading, so the board waits for input instead of reading nothing.
+
+serialRead:
+  title: Serial.readStringUntil()
+  body: >
+    readStringUntil('\n') collects incoming characters into a string and stops at
+    the newline you send when you press Enter. That gives the board one complete
+    message to work with instead of a scatter of single letters.
+  shortcut: It gathers what you typed up to the Enter key into one whole message.

@@ -1,0 +1,133 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY11-SERIALPRINT",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 11,
+  "title": "Make the board talk back",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 15,
+  "mission": "Upload a sketch with no wiring at all, open Serial Monitor, and watch the ESP32-S3 print a start-up line and then count its own running time in seconds — the board's first words back to you over the USB cable.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_07.1_SerialPrinter/Sketch_07.1_SerialPrinter.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/07.1_Serial_Print/Serial_Print.py",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    },
+    {
+      "name": "Official sketch",
+      "imageAsset": "docs/course/assets/shared/item-official-sketch.png",
+      "explanation": "A sketch is the Arduino name for a program. This lesson uses Freenove's Sketch_19.1_Ultrasonic_Ranging.ino so you can focus first on wiring, observation, and the measurement model."
+    }
+  ],
+  "wiring": [],
+  "coachInstructions": [
+    "Keep the day to upload-and-read; there is nothing to wire.",
+    "If the monitor shows garbled text, the baud rate is the first thing to check — it must be 115200.",
+    "If the monitor is blank, check board, port, and a data-capable cable, then have the learner press reset.",
+    "Explain that one USB cable carries both the upload and the board's replies; do not front-load theory.",
+    "For the challenge, change only the message text and the delay value, preserving the working sketch.",
+    "Keep the Arduino path primary; MicroPython's print() lands in Thonny's shell and is optional only if already set up."
+  ],
+  "steps": [
+    "Plug the ESP32-S3 into your computer with a data-capable USB cable.",
+    "In Arduino IDE, select your ESP32-S3 board and the port it appears on.",
+    "Open Sketch_07.1_SerialPrinter.ino.",
+    "Press Upload and wait for the IDE to say Done uploading.",
+    "Open Serial Monitor and set the baud rate to 115200.",
+    "Watch the start-up line appear, then a running-time count that climbs every second."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "Serial.begin(115200)",
+        "explanation": "Opens the USB serial link at 115200 baud — the same number you set in Serial Monitor."
+      },
+      {
+        "line": "Serial.println(\"ESP32S3 initialization completed!\")",
+        "explanation": "Sends one line of text, then moves to the next line — the board's start-up announcement."
+      },
+      {
+        "line": "Serial.printf(\"Running time : %.1f s\\r\\n\", millis() / 1000.0f)",
+        "explanation": "Fills the running time into the text, one decimal place, and sends it once a second."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "print(\"ESP32S3 initialization completed!\")",
+        "explanation": "In MicroPython, print() sends text up the same USB serial link Thonny reads."
+      },
+      {
+        "line": "time.ticks_ms()/1000",
+        "explanation": "Milliseconds since the board started, divided into seconds — the same running clock as the Arduino sketch."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "One USB cable carries both your upload and the board's replies, as long as both ends agree on the baud rate.",
+    "formula": "readable text = board baud = monitor baud",
+    "notes": [
+      {
+        "title": "What the baud rate is",
+        "body": "Baud is how fast the two sides send signal changes. Both must agree, or the letters turn to gibberish."
+      },
+      {
+        "title": "Where the number comes from",
+        "body": "millis() is the board's own stopwatch — milliseconds since it booted — which the sketch divides into seconds."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "ESP32S3 initialization completed!",
+      "Running time : 1.0 s",
+      "Running time : 2.0 s",
+      "Running time : 3.0 s"
+    ],
+    "successCriteria": "The first line prints once at start-up; the running time then climbs by about one each second."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "Garbled or random characters",
+      "firstChecks": [
+        "Set Serial Monitor to 115200 baud to match the sketch."
+      ]
+    },
+    {
+      "symptom": "Blank monitor",
+      "firstChecks": [
+        "Confirm the right board and port, then press the board's reset button."
+      ]
+    },
+    {
+      "symptom": "Only the first line, no count",
+      "firstChecks": [
+        "Give it a second — the running time prints once per delay(1000)."
+      ]
+    },
+    {
+      "symptom": "Upload fails",
+      "firstChecks": [
+        "Swap in a data-capable USB cable."
+      ]
+    }
+  ],
+  "challenge": "Change the start-up message and the reporting speed, then add a line of your own to the loop.",
+  "logbookPrompts": [
+    "What message did you have the board greet you with?",
+    "How fast could the running time update before it was hard to read?",
+    "What would you want the board to report back to you in a real project?"
+  ]
+}
