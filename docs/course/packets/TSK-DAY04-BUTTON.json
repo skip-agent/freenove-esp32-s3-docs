@@ -1,0 +1,185 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY04-BUTTON",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 4,
+  "title": "Make a button light an LED",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 25,
+  "mission": "Wire a push button to one pin and a LED to another, upload the Arduino sketch, and watch the LED light the instant you press — your first circuit where something you do changes what the board does.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "officialPdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+    "chapter": "Chapter 2 Button & LED",
+    "page": 48,
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_02.1_ButtonAndLed/Sketch_02.1_ButtonAndLed.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/02.1_ButtonAndLed/ButtonAndLed.py",
+    "imageAsset": "docs/course/assets/day-04/circuit-page-48.png",
+    "imageAlt": "Official Freenove circuit for Button and LED: a LED on GPIO 2 through a 220 ohm resistor to ground, and a push button on GPIO 13 held by 10 kilo-ohm resistors, shown as both a schematic and a breadboard photo.",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "GPIO extension board",
+      "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
+      "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
+    },
+    {
+      "name": "LED",
+      "imageAsset": "docs/course/assets/shared/item-led.png",
+      "explanation": "A LED is a one-way light. It only lights when its longer leg (the +) faces the pin and its shorter leg (the −) faces ground. Too much current burns it out, so a LED always sits behind a resistor."
+    },
+    {
+      "name": "220 Ω resistor",
+      "imageAsset": "docs/course/assets/shared/item-resistor.png",
+      "explanation": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction."
+    },
+    {
+      "name": "2 × 10 kΩ resistors",
+      "imageAsset": "docs/course/assets/shared/item-resistor.png",
+      "explanation": "An input pin left floating drifts between HIGH and LOW and reads at random. A 10 kΩ resistor gently ties the pin to a known level, so it reads a steady value until a button press forces the other one."
+    },
+    {
+      "name": "Push button",
+      "imageAsset": "docs/course/assets/shared/item-push-button.png",
+      "explanation": "This push button has four pins in two connected pairs. Pressing it bridges the pairs and completes the circuit; releasing it breaks the connection again. It is the simplest way to hand the board a yes-or-no input."
+    },
+    {
+      "name": "Jumper wires",
+      "imageAsset": "docs/course/assets/shared/item-jumper-wire.png",
+      "explanation": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    }
+  ],
+  "wiring": [
+    {
+      "partPin": "LED long leg (+)",
+      "connectTo": "GPIO 2 via 220 Ω",
+      "reason": "This pin switches the LED on and off."
+    },
+    {
+      "partPin": "LED short leg (−)",
+      "connectTo": "GND",
+      "reason": "Completes the LED's path back to zero volts."
+    },
+    {
+      "partPin": "Push button",
+      "connectTo": "GPIO 13",
+      "reason": "The board reads this pin to feel each press."
+    },
+    {
+      "partPin": "10 kΩ resistor",
+      "connectTo": "3.3V",
+      "reason": "Holds GPIO 13 HIGH until a press pulls it LOW."
+    }
+  ],
+  "coachInstructions": [
+    "Guide one physical connection at a time and wait for learner confirmation before proceeding.",
+    "Watch for LED polarity and the 220 Ω series resistor — the two most common first-circuit mistakes.",
+    "If the LED never lights, check its direction, the resistor, the GPIO 2 wire, and the shared ground before changing code.",
+    "If the LED is always on, suspect the button wiring or its 10 kΩ resistor on GPIO 13.",
+    "Offer short explanations on request; do not dump theory before the learner has a working circuit.",
+    "Keep the Arduino path primary; MicroPython is optional only if already set up."
+  ],
+  "steps": [
+    "Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.",
+    "Place the LED so its long leg (+) is on the GPIO 2 side and its short leg (−) heads toward ground.",
+    "Put the 220 Ω resistor in series between GPIO 2 and the LED's long leg.",
+    "Wire the push button so one side reaches GPIO 13 and the other reaches ground.",
+    "Add the 10 kΩ resistor that holds GPIO 13 steady until the button is pressed.",
+    "Compare every wire to the chart before you plug in USB.",
+    "Open Sketch_02.1_ButtonAndLed.ino in Arduino IDE and upload it.",
+    "Press the button and watch the LED."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "pinMode(PIN_BUTTON, INPUT)",
+        "explanation": "Sets GPIO 13 as an input so the board can read the button."
+      },
+      {
+        "line": "digitalRead(PIN_BUTTON) == LOW",
+        "explanation": "True only while the button is held — a press pulls the pin LOW."
+      },
+      {
+        "line": "digitalWrite(PIN_LED, HIGH)",
+        "explanation": "Lights the LED; the else branch turns it off again."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "Pin(13, Pin.IN, Pin.PULL_UP)",
+        "explanation": "Reads GPIO 13 as an input with a built-in pull-up — the same job the 10 kΩ resistor does in hardware."
+      },
+      {
+        "line": "if not button.value()",
+        "explanation": "True when the pin reads LOW, which is the press."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "The board reads the button, decides with an if, and drives the LED — the loop under every gadget.",
+    "formula": "input (button) → decision (code) → output (LED)",
+    "notes": [
+      {
+        "title": "Why a press reads LOW",
+        "body": "In this wiring a press pulls GPIO 13 toward ground, so the sketch checks for LOW on purpose."
+      },
+      {
+        "title": "What the 10 kΩ resistor is for",
+        "body": "Without it the input pin would float and read at random. The resistor gives it a steady resting value."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "Press and hold the button — the LED lights immediately.",
+      "Let go — the LED goes dark.",
+      "It follows your finger with no delay for as long as the board has power."
+    ],
+    "successCriteria": "This press is momentary — the LED only stays on while you hold it. Tomorrow's lamp will make it latch."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "LED never lights",
+      "firstChecks": [
+        "Check the LED's direction and the 220 Ω resistor, then the GPIO 2 wire."
+      ]
+    },
+    {
+      "symptom": "LED always on",
+      "firstChecks": [
+        "The button or its 10 kΩ resistor is likely miswired on GPIO 13."
+      ]
+    },
+    {
+      "symptom": "Nothing responds",
+      "firstChecks": [
+        "Re-check the shared ground, then that the sketch uploaded."
+      ]
+    },
+    {
+      "symptom": "Upload fails",
+      "firstChecks": [
+        "Swap in a data-capable USB cable."
+      ]
+    }
+  ],
+  "challenge": "Predict the LED's state before each press, then reason about what the 10 kΩ resistor is quietly doing.",
+  "logbookPrompts": [
+    "Which prediction did you get wrong, and why?",
+    "What did the 10 kΩ resistor turn out to be doing?",
+    "What everyday object works like this button and light?"
+  ]
+}
