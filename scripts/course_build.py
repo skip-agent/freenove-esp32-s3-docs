@@ -507,14 +507,20 @@ def _day_nav(prev_day: dict | None, next_day: dict | None) -> str:
         </nav>"""
 
 
-def render_lesson(lesson: dict, glossary: dict, order: list[dict]) -> str:
-    """Render one lesson to a full standalone page (docs/course/day-NN-slug/index.html)."""
+def render_lesson(lesson: dict, glossary: dict, order: list[dict],
+                  published: dict[int, dict]) -> str:
+    """Render one lesson to a full standalone page (docs/course/day-NN-slug/index.html).
+
+    ``published`` maps day number -> {day, slug, title} for every day that has a
+    generated page. Prev/next resolve to the nearest *published* neighbours so a
+    lesson never links to a day that hasn't been built yet.
+    """
     day = lesson["day"]
     total = len(order)
     code = lesson["lessonCode"]
-    idx = next(i for i, d in enumerate(order) if d["day"] == day)
-    prev_day = order[idx - 1] if idx > 0 else None
-    next_day = order[idx + 1] if idx < total - 1 else None
+    pub_days = sorted(published)
+    prev_day = next((published[d] for d in reversed(pub_days) if d < day), None)
+    next_day = next((published[d] for d in pub_days if d > day), None)
 
     # Rail + sections, in fixed order, skipping absent blocks.
     present = [(kind, _section_meta(kind, lesson.get(kind) or {}))
@@ -537,8 +543,8 @@ def render_lesson(lesson: dict, glossary: dict, order: list[dict]) -> str:
         "totalDays": total,
         "slug": lesson["slug"],
         "explainers": _resolve_explainers(lesson, glossary),
-        "prev": ({"slug": prev_day["slug"], "title": prev_day["title"], "day": prev_day["day"]} if prev_day else None),
-        "next": ({"slug": next_day["slug"], "title": next_day["title"], "day": next_day["day"]} if next_day else None),
+        "prev": prev_day,
+        "next": next_day,
     }
     payload = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
 
@@ -818,6 +824,8 @@ def derive_backlinks(lessons: list[Lesson]) -> dict:
     backlinks: dict[str, dict] = {}
     for ls in lessons:
         data = ls.data
+        if data.get("status") != "published":
+            continue  # only link to days that actually have a generated page
         arduino = (data.get("code") or {}).get("arduino") or {}
         sketch = arduino.get("sketch")
         if not sketch:

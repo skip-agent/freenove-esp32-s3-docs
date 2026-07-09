@@ -133,7 +133,9 @@ class InlineRenderTests(unittest.TestCase):
 
 class RenderLessonTests(unittest.TestCase):
     def setUp(self):
-        self.html = course_build.render_lesson(load_day26(), GLOSSARY, ORDER)
+        # Realistic corpus: only Day 26 is published.
+        self.published = {26: {"day": 26, "slug": "day-26-ultrasonic", "title": "Measure the room with sound"}}
+        self.html = course_build.render_lesson(load_day26(), GLOSSARY, ORDER, self.published)
 
     def test_key_markers(self):
         for needle in ["Measure the room", "Live echo sounder", "TSK-DAY26-ULTRASONIC",
@@ -142,10 +144,24 @@ class RenderLessonTests(unittest.TestCase):
                        "../course.css", "../course.js", "lesson-data"]:
             self.assertIn(needle, self.html, f"missing {needle!r}")
 
-    def test_prev_next_nav(self):
-        # Day 26 sits between 25 and 27 in the spine
-        self.assertIn("../day-25-lcd/", self.html)
-        self.assertIn("../day-27-ble/", self.html)
+    def test_no_nav_to_unpublished_neighbours(self):
+        # Day 26 is the only published day, so no prev/next links are emitted.
+        self.assertNotIn("day-25", self.html)
+        self.assertNotIn("day-27", self.html)
+        self.assertNotIn('class="day-nav"', self.html)
+
+    def test_prev_next_resolve_to_published_neighbours(self):
+        published = {
+            24: {"day": 24, "slug": "day-24-servo-knob", "title": "Servo knob"},
+            26: {"day": 26, "slug": "day-26-ultrasonic", "title": "Measure the room with sound"},
+            29: {"day": 29, "slug": "day-29-wifi", "title": "Wi-Fi modes"},
+        }
+        html = course_build.render_lesson(load_day26(), GLOSSARY, ORDER, published)
+        # nearest published below is 24, nearest above is 29 (skips unpublished 25/27)
+        self.assertIn("../day-24-servo-knob/", html)
+        self.assertIn("../day-29-wifi/", html)
+        self.assertNotIn("day-25", html)
+        self.assertNotIn("day-27", html)
 
     def test_packet_link(self):
         self.assertIn("../packets/TSK-DAY26-ULTRASONIC.json", self.html)

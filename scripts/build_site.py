@@ -305,8 +305,17 @@ def build_course(data: dict) -> dict:
     course_build.copy_course_assets(course_out)
     (course_out / "packets").mkdir(parents=True, exist_ok=True)
 
-    for lesson in lessons:
-        page = course_build.render_lesson(lesson.data, glossary, order)
+    # Only `published` days get a page + packet + prev/next entry. Draft/review
+    # days are still validated (above) but not deployed, matching the status
+    # contract in the authoring docs.
+    published = [ls for ls in lessons if ls.data.get("status") == "published"]
+    published_map = {
+        ls.data["day"]: {"day": ls.data["day"], "slug": ls.data["slug"], "title": ls.data["title"]}
+        for ls in published
+    }
+
+    for lesson in published:
+        page = course_build.render_lesson(lesson.data, glossary, order, published_map)
         day_dir = course_out / lesson.data["slug"]
         day_dir.mkdir(parents=True, exist_ok=True)
         (day_dir / "index.html").write_text(page, encoding="utf-8")
