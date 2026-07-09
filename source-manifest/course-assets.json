@@ -44,9 +44,51 @@
       "origin": "Freenove Super Starter Kit for ESP32-S3 — ESP32S3_Pinout.png",
       "kind": "kit-item reference",
       "alt": "Official ESP32-S3 pinout diagram labelling every GPIO, power, and USB pin on the board."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-led.png",
+      "origin": "Freenove manual — LED component photo (C Tutorial, Chapter 1 LED, page 40)",
+      "kind": "kit-item photo",
+      "alt": "Official manual photo of a red LED, its longer positive leg and shorter negative leg labelled."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-resistor.png",
+      "origin": "Freenove manual — resistor component photo (C Tutorial, Chapter 1 LED, page 40)",
+      "kind": "kit-item photo",
+      "alt": "Official manual photo of a resistor with coloured value bands."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-push-button.png",
+      "origin": "Freenove manual — push button component photo (C Tutorial, Chapter 2 Button & LED, page 48)",
+      "kind": "kit-item photo",
+      "alt": "Official manual photo of a four-pin push button switch with its pin pairs labelled 1 and 2."
     }
   ],
   "days": {
+    "4": [
+      {
+        "asset": "course-assets/assets/day-04/circuit-page-48.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 2 Button & LED",
+          "page": 48
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF)",
+        "alt": "Official Freenove circuit for Button & LED: an LED on GPIO 2 through a 220-ohm resistor to ground, and a push button on GPIO 13 with 10k-ohm resistors, shown as both a schematic and a breadboard photo."
+      }
+    ],
+    "5": [
+      {
+        "asset": "course-assets/assets/day-05/circuit-page-48.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 2 Button & LED",
+          "page": 48
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF; the table lamp reuses Project 2.1's circuit)",
+        "alt": "Official Freenove circuit for Button & LED: an LED on GPIO 2 through a 220-ohm resistor to ground, and a push button on GPIO 13 with 10k-ohm resistors, shown as both a schematic and a breadboard photo."
+      }
+    ],
     "26": [
       {
         "asset": "course-assets/assets/day-26/circuit-page-172.png",

@@ -1,0 +1,183 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY05-LAMP",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 5,
+  "title": "Make a mini table lamp",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 20,
+  "mission": "Keep yesterday's button-and-LED circuit and change only the code, so a single press latches the LED on and the next press turns it off — a real lamp switch instead of a button you have to hold.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "officialPdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+    "chapter": "Chapter 2 Button & LED",
+    "page": 48,
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_02.2_TableLamp/Sketch_02.2_TableLamp.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/02.2_TableLamp/TableLamp.py",
+    "imageAsset": "docs/course/assets/day-05/circuit-page-48.png",
+    "imageAlt": "Official Freenove circuit for Button and LED: a LED on GPIO 2 through a 220 ohm resistor to ground, and a push button on GPIO 13 held by 10 kilo-ohm resistors, shown as both a schematic and a breadboard photo.",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "GPIO extension board",
+      "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
+      "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
+    },
+    {
+      "name": "LED",
+      "imageAsset": "docs/course/assets/shared/item-led.png",
+      "explanation": "A LED is a one-way light. It only lights when its longer leg (the +) faces the pin and its shorter leg (the −) faces ground. Too much current burns it out, so a LED always sits behind a resistor."
+    },
+    {
+      "name": "220 Ω resistor",
+      "imageAsset": "docs/course/assets/shared/item-resistor.png",
+      "explanation": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction."
+    },
+    {
+      "name": "2 × 10 kΩ resistors",
+      "imageAsset": "docs/course/assets/shared/item-resistor.png",
+      "explanation": "An input pin left floating drifts between HIGH and LOW and reads at random. A 10 kΩ resistor gently ties the pin to a known level, so it reads a steady value until a button press forces the other one."
+    },
+    {
+      "name": "Push button",
+      "imageAsset": "docs/course/assets/shared/item-push-button.png",
+      "explanation": "This push button has four pins in two connected pairs. Pressing it bridges the pairs and completes the circuit; releasing it breaks the connection again. It is the simplest way to hand the board a yes-or-no input."
+    },
+    {
+      "name": "Jumper wires",
+      "imageAsset": "docs/course/assets/shared/item-jumper-wire.png",
+      "explanation": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    }
+  ],
+  "wiring": [
+    {
+      "partPin": "LED long leg (+)",
+      "connectTo": "GPIO 2 via 220 Ω",
+      "reason": "This pin switches the LED on and off."
+    },
+    {
+      "partPin": "LED short leg (−)",
+      "connectTo": "GND",
+      "reason": "Completes the LED's path back to zero volts."
+    },
+    {
+      "partPin": "Push button",
+      "connectTo": "GPIO 13",
+      "reason": "The board reads this pin to catch each press."
+    },
+    {
+      "partPin": "10 kΩ resistor",
+      "connectTo": "3.3V",
+      "reason": "Holds GPIO 13 HIGH until a press pulls it LOW."
+    }
+  ],
+  "coachInstructions": [
+    "Confirm the learner still has the Day 4 circuit before uploading; do not re-wire unless something is broken.",
+    "Keep the day to upload-and-watch; the new material is in the sketch, not the breadboard.",
+    "Explain debounce and toggle on request, using the learner's own double-press observations.",
+    "If a press flips the LED twice, check that both the debounce delay and the wait-until-release line are present.",
+    "Preserve the working lamp sketch before suggesting timing changes.",
+    "Keep the Arduino path primary; MicroPython is optional only if already set up."
+  ],
+  "steps": [
+    "Confirm the Day 4 circuit is still wired, or rebuild it from the chart.",
+    "Keep USB unplugged until every wire matches the chart.",
+    "Open Sketch_02.2_TableLamp.ino in Arduino IDE.",
+    "Upload it to the ESP32-S3.",
+    "Press the button once and let go — the LED should latch on.",
+    "Press once more — it should turn off."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "delay(20)",
+        "explanation": "The debounce pause — long enough for the switch's chatter to settle."
+      },
+      {
+        "line": "reverseGPIO(PIN_LED)",
+        "explanation": "Flips the LED to the opposite of whatever it is now — on becomes off, off becomes on."
+      },
+      {
+        "line": "while (digitalRead(PIN_BUTTON) == LOW);",
+        "explanation": "Waits right here until you let go, so one press can't count twice."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "time.sleep_ms(20)",
+        "explanation": "The same 20 ms debounce pause, written in Python."
+      },
+      {
+        "line": "while not button.value()",
+        "explanation": "Holds until you release, so the press registers once."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "Remember the last state, wait out the switch's chatter, and flip only on a clean, released press.",
+    "formula": "one clean press → flip the remembered state → the lamp stays",
+    "notes": [
+      {
+        "title": "Why the LED bounced before",
+        "body": "A switch chatters for a few milliseconds as it closes. Without the pause the board would toggle many times per press."
+      },
+      {
+        "title": "What toggling really is",
+        "body": "Instead of following the button live, the code keeps a state and inverts it — that memory is the whole difference from Day 4."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "Press once and release — the LED latches on and stays on.",
+      "Press once more — it turns off and stays off.",
+      "Each full press flips the light exactly once, cleanly."
+    ],
+    "successCriteria": "If a single press sometimes flips twice, the debounce pause is doing its job when it's present — and failing when it's removed."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "One press flips it twice",
+      "firstChecks": [
+        "Confirm the debounce delay and the wait-until-release line are both present."
+      ]
+    },
+    {
+      "symptom": "Nothing latches",
+      "firstChecks": [
+        "Re-run Day 4's checks — LED direction, the resistors, GPIO 2 and 13."
+      ]
+    },
+    {
+      "symptom": "LED flickers while held",
+      "firstChecks": [
+        "You may be on the Day 4 sketch — upload Sketch_02.2_TableLamp."
+      ]
+    },
+    {
+      "symptom": "Upload fails",
+      "firstChecks": [
+        "Swap in a data-capable USB cable."
+      ]
+    }
+  ],
+  "challenge": "Change one aspect of the lamp's feel — the debounce timing, or a double-press behaviour — and describe the result.",
+  "logbookPrompts": [
+    "What debounce value felt best, and how did too-short and too-long each fail?",
+    "How is a toggle different from the hold-to-light button of Day 4?",
+    "What household thing could you now rebuild as a tiny product?"
+  ]
+}

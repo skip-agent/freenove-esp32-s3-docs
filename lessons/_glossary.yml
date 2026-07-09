@@ -227,3 +227,68 @@ usbDriver:
     modern systems include it, but some (often macOS) need the CH343 driver
     installed once before the board shows up as a port.
   shortcut: No port appears after plugging in? Install the CH343 driver, then replug.
+
+led:
+  title: LED
+  body: >
+    A LED is a one-way light. It only lights when its longer leg (the +) faces
+    the pin and its shorter leg (the −) faces ground. Too much current burns it
+    out, so a LED always sits behind a resistor.
+  shortcut: Long leg toward the pin side; short leg toward ground.
+
+resistor:
+  title: Resistor
+  body: >
+    A resistor limits how much current flows. Placed in series with the LED, the
+    220 Ω one keeps the current gentle enough to light the LED instead of burning
+    it out. The bands of colour print its value, and it has no direction.
+  shortcut: The 220 Ω resistor protects the LED; either way round is fine.
+
+pushButton:
+  title: Push button
+  body: >
+    This push button has four pins in two connected pairs. Pressing it bridges
+    the pairs and completes the circuit; releasing it breaks the connection
+    again. It is the simplest way to hand the board a yes-or-no input.
+  shortcut: Pressed means connected; released means open.
+
+pullResistor:
+  title: Pull resistor (10 kΩ)
+  body: >
+    An input pin left floating drifts between HIGH and LOW and reads at random.
+    A 10 kΩ resistor gently ties the pin to a known level, so it reads a steady
+    value until a button press forces the other one.
+  shortcut: The 10 kΩ resistors stop GPIO 13 from guessing while the button is idle.
+
+digitalRead:
+  title: digitalRead()
+  body: >
+    digitalRead() checks whether a pin is currently HIGH or LOW and hands that
+    answer back to your code. Here it reads GPIO 13 every loop to find out
+    whether the button is being pressed.
+  shortcut: digitalWrite() sets a pin; digitalRead() asks a pin.
+
+activeLow:
+  title: Why a press reads LOW
+  body: >
+    In this wiring, pressing the button pulls GPIO 13 toward ground, so a press
+    reads LOW and rest reads HIGH. That is why the sketch checks for LOW. It
+    feels backwards at first and is very common in real circuits.
+  shortcut: Pressed reads LOW here — the code checks for LOW on purpose.
+
+debounce:
+  title: Debounce
+  body: >
+    A switch does not snap cleanly from open to closed. For a few milliseconds it
+    chatters between the two, and the board is fast enough to read that chatter as
+    many presses. Debouncing waits a moment and checks again so one press counts
+    once.
+  shortcut: A tiny wait-and-recheck turns mechanical chatter into one clean press.
+
+toggle:
+  title: Toggle
+  body: >
+    A toggle flips a remembered state each time, instead of following the button
+    live. Press once and the LED latches on; press again and it latches off. That
+    memory is what turns a momentary button into a lamp switch.
+  shortcut: Button-and-LED reacts while held; the lamp remembers and flips.
