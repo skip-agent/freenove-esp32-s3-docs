@@ -11,6 +11,8 @@ Representative day chosen: **Day 26 — Ultrasonic distance**.
 
 Why this day: it is mid/late enough to show real wiring, sensor behavior, serial output, measurement uncertainty, and debugging, but it avoids the extra complexity of BLE/Wi-Fi/network credentials.
 
+> **Superseded by the generated lesson.** The hand-written prototype page has been retired. Day 26 is now built from `lessons/day-26-ultrasonic.yml` through the course pipeline and served at [`/course/day-26-ultrasonic/`](../course/day-26-ultrasonic/index.html). This document is kept as the original design write-up for issue #5.
+
 ---
 
 # Day 26: Measure the room with sound
@@ -27,7 +29,7 @@ Use this when you want an agent to coach you through the lesson step by step:
 TSK-DAY26-ULTRASONIC
 ```
 
-Agent context packet: [`agent-lesson-packets/TSK-DAY26-ULTRASONIC.json`](agent-lesson-packets/TSK-DAY26-ULTRASONIC.json)
+Agent context packet: [`/course/packets/TSK-DAY26-ULTRASONIC.json`](../course/packets/TSK-DAY26-ULTRASONIC.json) (generated from the lesson file).
 
 Prompt idea:
 
@@ -70,7 +72,7 @@ The program on your computer that opens the example sketch, compiles it, uploads
 
 Use the official circuit as the main image for this day. In production, crop/export this into a clean lesson asset and keep the Freenove attribution in the lesson source metadata.
 
-![Official Freenove ultrasonic circuit and breadboard wiring for HC-SR04 on ESP32-S3 GPIO extension board](assets/prototype-day-26-ultrasonic-c-tutorial-page-172.png)
+![Official Freenove ultrasonic circuit and breadboard wiring for HC-SR04 on ESP32-S3 GPIO extension board](../course/assets/day-26/circuit-page-172.png)
 
 **Alt text:** Official Freenove diagram showing HC-SR04 VCC connected to 5V, Trig to GPIO 13, Echo to GPIO 14, and GND to ground on the ESP32-S3 GPIO extension board.
 

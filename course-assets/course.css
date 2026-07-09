@@ -1,9 +1,11 @@
 /* ===========================================================================
-   TinySkiff ESP32-S3 Lab · Day 26 — "Echo sounder"
-   Ultrasonic ranging is sonar: ping → echo → time → distance. The page is
-   dressed as a ship's instrument + logbook. Deep-sea ink instrument frames,
+   TinySkiff ESP32-S3 Lab · course design system ("echo sounder")
+   Shared, tokenised styling for every guided day and the course map.
+   Productised from the approved Day 26 prototype (issue #5). The page is
+   dressed as a ship's instrument + logbook: deep-sea ink instrument frames,
    warm nautical chart-paper reading surfaces, an amber sounder-signal accent,
-   teal depth markers, phosphor-green readouts.
+   teal depth markers, phosphor-green readouts. Per-day values (voyage fill,
+   hero instrument, glossary) are injected by the build, never hard-coded here.
    =========================================================================== */
 
 :root {
@@ -392,7 +394,8 @@ h1, h2, h3, h4 {
 .voyage span {
   display: block;
   height: 100%;
-  width: calc(26 / 30 * 100%);
+  /* --voyage-fill is set inline per day (day N of 30); defaults to empty */
+  width: var(--voyage-fill, 0%);
   border-radius: 999px;
   background: linear-gradient(90deg, var(--depth), var(--sounder));
 }
@@ -1230,4 +1233,166 @@ dialog.lightbox.image .lb-close {
   }
   .ping { display: none; }
   .serial .lines span:last-child::after { animation: none; opacity: 1; }
+}
+
+/* ===========================================================================
+   Course map (the voyage) + cross-page nav — added when the prototype was
+   productised. Reuses the same tokens as the lesson pages.
+   =========================================================================== */
+.map-hero { grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.7fr); }
+.map-hero h1 { font-size: clamp(2.6rem, 6vw, 4.6rem); }
+.map-hero h1 em { font-style: italic; color: var(--sounder); }
+
+.pill.pill-link {
+  text-decoration: none;
+  border-color: rgba(111, 230, 176, 0.32);
+  color: #d6ece7;
+  cursor: pointer;
+}
+.pill.pill-link:hover { background: rgba(111, 230, 176, 0.14); color: #eafaf3; }
+
+/* voyage progress instrument on the map hero */
+.map-progress {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--abyss-line);
+  background: linear-gradient(180deg, #0a1c26, #081820);
+  box-shadow: var(--shadow-md), var(--shadow-inset);
+  overflow: hidden;
+}
+.map-progress-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--abyss-line);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #7fa6ab;
+}
+.map-progress-head .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--phosphor);
+  box-shadow: 0 0 10px var(--phosphor);
+  animation: pulse-dot 2.4s ease-in-out infinite;
+}
+.map-progress-body { display: grid; gap: 12px; padding: 18px 16px; }
+.map-progress-count { font-family: var(--mono); font-size: 0.95rem; color: #cfe2e2; }
+.map-progress-count b { color: var(--phosphor); font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+.map-progress .voyage { margin: 0; background: rgba(255, 255, 255, 0.08); }
+.map-progress .voyage span { width: 0%; transition: width 400ms ease; }
+.map-resume {
+  justify-self: start;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--r-md);
+  background: linear-gradient(135deg, var(--sounder), var(--sounder-deep));
+  color: #10202a;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.course-body { margin-top: 30px; display: grid; gap: 30px; }
+.map-note { margin: 0; }
+
+.arc { display: grid; gap: 16px; }
+.arc-head h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+.arc-head p { margin: 6px 0 0; color: var(--ink-soft); max-width: 60ch; }
+
+.day-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 14px;
+}
+.day-tile {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  padding: 16px 16px 15px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: #fff;
+  text-decoration: none;
+  color: var(--ink);
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+}
+.day-tile.is-ready:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--line-strong); }
+.day-tile-num {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--depth-deep);
+}
+.day-tile-title { font-family: var(--display); font-size: 1.08rem; line-height: 1.18; }
+.day-tile-meta {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+}
+.day-tile.is-upcoming { background: #faf6ec; border-style: dashed; color: var(--ink-soft); }
+.day-tile.is-upcoming .day-tile-title { color: var(--ink-soft); }
+/* completion tick (added by course.js when a day is finished) */
+.day-tile-tick {
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--line-strong);
+  background: #fff;
+  transition: all 150ms ease;
+}
+.day-tile.is-done { border-color: rgba(14, 124, 139, 0.35); background: var(--depth-wash); }
+.day-tile.is-done .day-tile-tick {
+  border-color: var(--depth);
+  background: var(--depth);
+}
+.day-tile.is-done .day-tile-tick::after {
+  content: "✓";
+  display: grid; place-items: center;
+  color: #fff; font-size: 0.7rem; font-weight: 700;
+  width: 100%; height: 100%;
+}
+
+/* prev / next day navigation at the foot of a lesson */
+.day-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 2px;
+}
+.day-nav-link {
+  display: grid;
+  gap: 4px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  text-decoration: none;
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+}
+.day-nav-link.next { text-align: right; }
+.day-nav-link.is-empty { border: 0; background: none; box-shadow: none; }
+.day-nav-link:not(.is-empty):hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--line-strong); }
+.day-nav-dir {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--depth-deep);
+  font-weight: 600;
+}
+.day-nav-title { font-family: var(--display); font-size: 1.05rem; }
+
+@media (max-width: 860px) {
+  .map-hero { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .day-nav { grid-template-columns: 1fr; }
+  .day-nav-link.next { text-align: left; }
 }

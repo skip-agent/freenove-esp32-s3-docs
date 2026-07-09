@@ -8,6 +8,9 @@ import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 
+import course_build
+import lesson_schema
+
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "source" / "Freenove_Super_Starter_Kit_for_ESP32_S3-main"
 OUT = ROOT / "docs"
@@ -145,6 +148,7 @@ def render_html(data: dict) -> str:
     <nav class=\"topbar\">
       <a class=\"brand\" href=\"#top\">TinySkiff ESP32-S3 Lab</a>
       <div class=\"navlinks\">
+        <a href=\"./course/\">The 30-day course</a>
         <a href=\"#start\">Start</a>
         <a href=\"#projects\">Projects</a>
         <a href=\"#resources\">Resources</a>
@@ -157,9 +161,9 @@ def render_html(data: dict) -> str:
         <h1>One clean place to start tinkering without spelunking through a 200 MB ZIP.</h1>
         <p class=\"lede\">C/Arduino sketches, MicroPython examples, libraries, setup links, datasheets, and the official docs — organized as a fast searchable launchpad.</p>
         <div class=\"ctaRow\">
-          <a class=\"button primary\" href=\"#projects\">Browse projects</a>
+          <a class=\"button primary\" href=\"./course/\">Start the 30-day course</a>
+          <a class=\"button\" href=\"#projects\">Browse the Library</a>
           <a class=\"button\" href=\"{GITHUB_ZIP}\">Download official ZIP</a>
-          <a class=\"button\" href=\"{ONLINE_BASE}\">Official docs</a>
         </div>
       </div>
       <div class=\"heroCard\">
@@ -269,12 +273,69 @@ def render_html(data: dict) -> str:
 """
 
 
+# Generated outputs this build owns. Everything else under docs/ (the committed
+# docs/wayfinder/ planning docs) is preserved — the build no longer wipes the
+# whole tree.
+GENERATED_FILES = ["index.html", "data.json", "styles.css", "app.js"]
+GENERATED_DIRS = ["assets", "course"]
+
+
+def clean_generated() -> None:
+    OUT.mkdir(parents=True, exist_ok=True)
+    for name in GENERATED_FILES:
+        (OUT / name).unlink(missing_ok=True)
+    for name in GENERATED_DIRS:
+        target = OUT / name
+        if target.exists():
+            shutil.rmtree(target)
+
+
+def build_course(data: dict) -> dict:
+    """Build /course/ from lessons and return a small summary for the build log.
+
+    Also enriches Library sketch entries with the day that teaches them, so the
+    derivation exists in the data (the Library UI cross-link is Phase D).
+    """
+    lessons = lesson_schema.collect_lessons()  # validates; raises on any problem
+    glossary = lesson_schema.load_glossary()
+    course = lesson_schema.load_course()
+    order = course_build.course_day_order(course)
+
+    course_out = OUT / "course"
+    course_build.copy_course_assets(course_out)
+    (course_out / "packets").mkdir(parents=True, exist_ok=True)
+
+    for lesson in lessons:
+        page = course_build.render_lesson(lesson.data, glossary, order)
+        day_dir = course_out / lesson.data["slug"]
+        day_dir.mkdir(parents=True, exist_ok=True)
+        (day_dir / "index.html").write_text(page, encoding="utf-8")
+
+        packet = course_build.emit_packet(lesson.data, glossary)
+        packet_path = course_out / "packets" / f"{lesson.data['lessonCode']}.json"
+        packet_path.write_text(json.dumps(packet, indent=2, ensure_ascii=False), encoding="utf-8")
+
+    (course_out / "index.html").write_text(
+        course_build.render_course_index(course, lessons), encoding="utf-8")
+
+    backlinks = course_build.derive_backlinks(lessons)
+    for sketch in data["projectsC"]:
+        link = backlinks.get(sketch.get("folder"))
+        if link:
+            sketch["taughtInDay"] = link
+
+    return {
+        "lessons": len(lessons),
+        "published": sum(1 for ls in lessons if ls.data.get("status") == "published"),
+        "days_in_spine": len(order),
+        "backlinks": len(backlinks),
+    }
+
+
 def main() -> None:
     if not SRC.exists():
         raise SystemExit(f"Missing source folder: {SRC}")
-    if OUT.exists():
-        shutil.rmtree(OUT)
-    OUT.mkdir(parents=True)
+    clean_generated()
     copy_assets()
     data = {
         "generatedAt": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -283,6 +344,7 @@ def main() -> None:
         "libraries": collect_libraries(),
         "pdfs": collect_pdfs(),
     }
+    course_summary = build_course(data)
     (OUT / "index.html").write_text(render_html(data), encoding="utf-8")
     (OUT / "data.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps({
@@ -291,6 +353,7 @@ def main() -> None:
         "python_projects": len(data["projectsPython"]),
         "libraries": len(data["libraries"]),
         "pdfs": len(data["pdfs"]),
+        "course": course_summary,
     }, indent=2))
 
 

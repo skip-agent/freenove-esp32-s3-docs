@@ -1,0 +1,71 @@
+# The 30-day voyage spine — tinyskiff.course.v1
+# Source of truth for the course map (/course/) and day-to-day prev/next
+# navigation. Every day appears here in order, grouped into arcs. A day links to
+# its guided page only once a matching lessons/day-NN-*.yml is authored AND
+# published; until then the map shows it as an upcoming stop. Slugs here must
+# match the lesson file's slug when it is authored.
+#
+# Derived from the resolved curriculum spine (issue #4).
+
+schema: tinyskiff.course.v1
+course: TinySkiff ESP32-S3 Lab
+totalDays: 30
+
+arcs:
+  - name: First light
+    subtitle: Set up the board and score your first wins.
+    days:
+      - { day: 1,  slug: day-01-unbox,       title: Unbox safely and meet the ESP32-S3 }
+      - { day: 2,  slug: day-02-setup,        title: Install the Arduino IDE and see the board }
+      - { day: 3,  slug: day-03-blink,        title: "Blink: prove the whole chain works" }
+      - { day: 4,  slug: day-04-button,       title: "Button + LED: make input control output" }
+      - { day: 5,  slug: day-05-table-lamp,   title: "Mini table lamp: your first tiny product" }
+
+  - name: Light and motion
+    subtitle: Drive many outputs and shape how they glow.
+    days:
+      - { day: 6,  slug: day-06-led-bar,      title: "LED bar: make motion with many outputs" }
+      - { day: 7,  slug: day-07-breathing,    title: "PWM: fade an LED instead of switching it" }
+      - { day: 8,  slug: day-08-meteor,       title: "Meteor light: reuse PWM across LEDs" }
+      - { day: 9,  slug: day-09-rgb,          title: "RGB LED: mix colour from code" }
+      - { day: 10, slug: day-10-buzzer,       title: "Buzzer: make the board speak in beeps" }
+
+  - name: Talking over serial
+    subtitle: Open a two-way channel to the board.
+    days:
+      - { day: 11, slug: day-11-serial-print, title: "Serial monitor: see what the board says" }
+      - { day: 12, slug: day-12-serial-rw,    title: "Serial read/write: send commands back" }
+
+  - name: Reading the world
+    subtitle: Turn sensors into numbers you can use.
+    days:
+      - { day: 13, slug: day-13-adc,          title: "Potentiometer / ADC: read a changing voltage" }
+      - { day: 14, slug: day-14-touch,        title: "Touch sensor: use your body as input" }
+      - { day: 15, slug: day-15-soft-light,   title: "Soft light: map input to brightness" }
+      - { day: 16, slug: day-16-soft-colour,  title: "Soft colourful light: map input to colour" }
+      - { day: 17, slug: day-17-night-lamp,   title: "Night lamp: respond to ambient light" }
+      - { day: 18, slug: day-18-thermometer,  title: "Thermometer: sense temperature" }
+      - { day: 19, slug: day-19-joystick,     title: "Joystick: read two axes and a button" }
+      - { day: 20, slug: day-20-shift-register, title: "Shift register: many outputs, fewer pins" }
+      - { day: 21, slug: day-21-seven-segment, title: "Seven-segment display: show one clear digit" }
+
+  - name: Making things move
+    subtitle: Add motors, servos, and a real display.
+    days:
+      - { day: 22, slug: day-22-motor,        title: "Motor driver: control motion safely" }
+      - { day: 23, slug: day-23-servo-sweep,  title: "Servo sweep: move to positions" }
+      - { day: 24, slug: day-24-servo-knob,   title: "Servo knob: control position with a knob" }
+      - { day: 25, slug: day-25-lcd,          title: "LCD1602: give the project a display" }
+
+  - name: Sensing distance
+    subtitle: Measure the world by timing sound.
+    days:
+      - { day: 26, slug: day-26-ultrasonic,   title: Measure the room with sound }
+
+  - name: Onto the network
+    subtitle: Go wireless and reach the internet.
+    days:
+      - { day: 27, slug: day-27-ble,          title: "BLE pass-through: talk at short range" }
+      - { day: 28, slug: day-28-bluetooth-led, title: "Bluetooth control: wireless command to output" }
+      - { day: 29, slug: day-29-wifi,         title: "Wi-Fi modes: join a network (AP vs station)" }
+      - { day: 30, slug: day-30-tcpip,        title: "TCP/IP: a mini web-connected device" }

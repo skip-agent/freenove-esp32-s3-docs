@@ -1,3 +1,7 @@
 archives/*.zip
 source/
 .DS_Store
+.venv/
+.wrangler/
+__pycache__/
+*.pyc
