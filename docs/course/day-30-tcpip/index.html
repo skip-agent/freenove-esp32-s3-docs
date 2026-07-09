@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Day 30 · TCP/IP: a mini web-connected device — TinySkiff ESP32-S3 Lab</title>
+  <meta name="description" content="Turn the ESP32-S3 into a TCP server. Join Wi-Fi, read the board&#x27;s IP in Serial Monitor, dial in from Processing&#x27;s sketchWiFi tool, and exchange text between your computer and your board." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../course.css" />
+</head>
+<body>
+  <div class="lesson-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 30 of 30</p>
+        <h1>Put your board<br />on the <em>network</em></h1>
+        <p class="lede">Day thirty — the last leg. The ESP32-S3 joins your Wi-Fi, opens port 80, and waits for your computer to dial in. When a line you type on one machine appears on the other, your board has become what this course promised on day one: a device on the network, with an address, a door, and something to say.
+</p>
+        <div class="meta-row" aria-label="Lesson facts">
+          <span class="pill is-key">About 30 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">Final day — no wiring</span>
+        </div>
+      </div>
+      <div class="hero-side no-instrument">
+        
+        <div class="agent-strip">
+          <div class="lesson-code">
+            <span class="label">Agent assist code</span>
+            <code>TSK-DAY30-TCPIP</code>
+          </div>
+          <button class="copy-prompt" type="button" data-copy="I am doing TinySkiff lesson TSK-DAY30-TCPIP. Pull the lesson packet, then guide me one step at a time. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY30-TCPIP.json">lesson packet</a> and coach you step by step.</p>
+        </div>
+      </div>
+    </header>
+    <div class="layout">
+      <nav class="rail" aria-label="Lesson progress">
+        <div class="rail-head">
+          <strong>Today's route</strong>
+          <span class="day-of">30 / 30</span>
+        </div>
+        <div class="voyage" style="--voyage-fill: 100.0%" aria-hidden="true"><span></span></div>
+        <div class="rail-nav">
+          <a href="#parts"><span class="tick"></span>What you need</a>
+          <a href="#steps"><span class="tick"></span>Build it</a>
+          <a href="#code"><span class="tick"></span>Read the code</a>
+          <a href="#theory"><span class="tick"></span>An address, a port, a service</a>
+          <a href="#test"><span class="tick"></span>Test &amp; debug</a>
+          <a href="#challenge"><span class="tick"></span>Try this</a>
+          <a href="#agent"><span class="tick"></span>Coach me</a>
+        </div>
+      </nav>
+      <main class="lesson-main">
+        <section id="parts" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">01</span> First, know the pieces</p>
+              <h2>What you need</h2>
+              <p class="muted">Three things on the bench, plus one download for your computer — Processing, which arrives in the steps. Tap <em>Define</em> on anything unfamiliar; the answer opens as a field note you can read and dismiss without losing your place.
+</p>
+            </div>
+            <div class="part-grid">
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-esp32-s3-board.jpg" alt="Official manual photo of the ESP32-S3 development board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>ESP32-S3 board <button class="define" data-topic="esp32">Define</button></h3>
+                <p>The brain — today it joins your network and listens.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-arduino-ide.png" alt="Official manual screenshot of the Arduino IDE interface." /><figcaption>Manual screenshot</figcaption></figure>
+                <h3>Arduino IDE <button class="define" data-topic="arduino">Define</button></h3>
+                <p>Uploads the sketch and opens Serial Monitor.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-official-sketch.png" alt="Official manual page showing the WiFi Server sketch and its Serial Monitor output." /><figcaption>Manual sketch</figcaption></figure>
+                <h3>Official sketch <button class="define" data-topic="sketch">Define</button></h3>
+                <p><code>Sketch_24.2_WiFiServer.ino</code></p>
+              </article>
+            </div>
+          </div>
+        </section>
+        <section id="steps" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">02</span> One action at a time</p>
+              <h2>Build it</h2>
+              <p class="muted">All the wiring days led here — today the path is code, one download, and a conversation across your own network. Tap each step as you go to keep your place.
+</p>
+            </div>
+            <div class="steps-progress">
+              <div class="bar" aria-hidden="true"><span id="stepBar"></span></div>
+              <span class="count" id="stepCount">0 / 8 done</span>
+            </div>
+            <ol class="step-list">
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 1 done"></button><p class="text">Open <code>Sketch_24.2_WiFiServer.ino</code> in Arduino IDE.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 2 done"></button><p class="text">Replace the two <code>********</code> placeholders with your own Wi-Fi name and password — the same network your computer is on. <button class="define" data-topic="wifi">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">On your computer, install Processing from processing.org/download.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">In Processing, add the ControlP5 library — Sketch → Import Library → Add Library, then search ControlP5.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Back in the sketch folder, open the bundled <code>sketchWiFi/sketchWiFi.pde</code> in Processing and click Run.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 6 done"></button><p class="text">Upload the Arduino sketch, then open Serial Monitor at <code>115200</code> and watch the board join your network and print its IP address and port 80. <button class="define" data-topic="ipAddress">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 7 done"></button><p class="text">In sketchWiFi, choose <strong>TCP CLIENT</strong> mode, enter the board&#x27;s printed IP and port <code>80</code>, and connect. <button class="define" data-topic="tcp">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 8 done"></button><p class="text">Type a line in sketchWiFi and press Enter — it lands in Serial Monitor. Answer from Serial Monitor&#x27;s send box — it lands in sketchWiFi.</p></li>
+            </ol>
+            <div class="done-banner" id="doneBanner" role="status">
+              <span class="icon" aria-hidden="true">⚓</span>
+              <div><strong>Two machines, one line.</strong><p>Text is crossing your own network between computer and board. Head to Test &amp; debug to confirm the exchange — the last check of the voyage.
+</p></div>
+            </div>
+          </div>
+        </section>
+        <section id="code" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">03</span> Read just enough code</p>
+              <h2>Read the code</h2>
+              <p class="muted">The sketch does two jobs. <code>setup()</code> joins your Wi-Fi as a station, prints the address the router assigned, and starts the server; <code>loop()</code> is a relay, carrying each line from the network to the monitor and each line from the monitor to the network. Switch to MicroPython to see the same idea in raw sockets.
+</p>
+            </div>
+            <div class="tabs" role="tablist" aria-label="Code language">
+              <button class="tab" id="tab-arduino" role="tab" aria-selected="true" aria-controls="panel-arduino">Arduino <span class="badge">Main</span></button><button class="tab" id="tab-micropython" role="tab" aria-selected="false" aria-controls="panel-micropython">MicroPython <span class="badge">Optional</span></button>
+            </div>
+            <div class="tabpanel" id="panel-arduino" role="tabpanel" aria-labelledby="tab-arduino">
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">Sketch_24.2_WiFiServer.ino</span></div>
+<pre><code><span class="tok-key">#define</span> port <span class="tok-num">80</span>
+WiFiServer  <span class="tok-fn">server</span>(port);
+
+WiFi.<span class="tok-fn">begin</span>(ssid_Router, password_Router);
+server.<span class="tok-fn">begin</span>(port);
+
+WiFiClient client = server.<span class="tok-fn">accept</span>();               // listen for incoming clients
+Serial.<span class="tok-fn">println</span>(client.<span class="tok-fn">readStringUntil</span>(&#x27;\n&#x27;)); // print it out the serial monitor
+client.<span class="tok-fn">print</span>(Serial.<span class="tok-fn">readStringUntil</span>(&#x27;\n&#x27;)); // print it out the client.</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>WiFi.begin(ssid_Router, password_Router)</code><span class="note-text">Joins your router&#x27;s network as a station — the router hands the board an IP address. <button class="define" data-topic="stationMode">Define</button></span></div>
+                  <div class="code-note"><code>server.begin(port)</code><span class="note-text">Starts listening at port 80 — a numbered door other machines can knock on. <button class="define" data-topic="tcp">Define</button></span></div>
+                  <div class="code-note"><code>client.print(Serial.readStringUntil(&#x27;\n&#x27;))</code><span class="note-text">Reads the line you typed in Serial Monitor and sends it down the network to the computer. <button class="define" data-topic="serialRead">Define</button></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="tabpanel" id="panel-micropython" role="tabpanel" aria-labelledby="tab-micropython" hidden>
+              <p class="optional-tag">Optional side path · no wiring</p>
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">21.2_TCP_as_Server/TCP_as_Server.py</span></div>
+<pre><code>port           =   <span class="tok-num">8000</span>            #input the remote port
+listenSocket = socket.<span class="tok-fn">socket</span>()
+listenSocket.<span class="tok-fn">bind</span>((ip,port))
+listenSocket.<span class="tok-fn">listen</span>(<span class="tok-num">1</span>)
+<span class="tok-fn">print</span> (&#x27;tcp waiting...&#x27;)
+conn,addr = listenSocket.<span class="tok-fn">accept</span>()
+<span class="tok-fn">print</span>(addr,&quot;connected&quot;)
+conn.<span class="tok-fn">send</span>(&#x27;I am Server&#x27;)</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>listenSocket.bind((ip,port))</code><span class="note-text">Ties the listening socket to the board&#x27;s own address and to port 8000.</span></div>
+                  <div class="code-note"><code>conn.send(&#x27;I am Server&#x27;)</code><span class="note-text">The first line down the wire the moment a client connects.</span></div>
+                </div>
+              </div>
+              <p class="micropython-note">Raw sockets this time, and port 8000 where the C sketch uses 80 — dial whichever port the running code printed. Run it in Thonny if MicroPython is set up; otherwise skip it — it should never block the Arduino-first day.
+</p>
+            </div>
+          </div>
+        </section>
+        <section id="theory" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">04</span> Understand, don&#x27;t memorise</p>
+              <h2>An address, a port, a service</h2>
+              <p class="muted">Strip away the scale, and every connection on the internet is this same four-beat exchange. Today it happens entirely inside your own router.
+</p>
+            </div>
+            <div class="theory-flow" aria-label="Measurement model">
+              <article class="flow-step"><span class="n">Join</span><h3>Station mode</h3><p>The board joins your Wi-Fi and the router hands it an address.</p></article>
+              <article class="flow-step"><span class="n">Listen</span><h3>A door opens</h3><p>server.begin() waits at port 80 — one numbered door at that address.</p></article>
+              <article class="flow-step"><span class="n">Dial</span><h3>The client calls</h3><p>Your computer knocks with the exact IP and port the monitor printed.</p></article>
+              <article class="flow-step"><span class="n">Talk</span><h3>One shared line</h3><p>Both ends read and write the same stream until one hangs up.</p></article>
+            </div>
+            <div class="formula-card">
+              <span class="label">The model</span>
+              <code><b>server</b> listens at an address and port → <b>client</b> dials it → one shared line</code>
+            </div>
+            <div class="two-col" style="margin-top:14px">
+              <article class="mini-card"><h3>Day 29 gave it the address <button class="define" data-topic="ipAddress">Define</button></h3><p>Yesterday the board joined the network and the router handed it a number. Today it opens a door at that number and offers a service — an address, a port, and something listening.</p></article>
+              <article class="mini-card"><h3>What &quot;on the internet&quot; means <button class="define" data-topic="tcp">Define</button></h3><p>Every web server in the world is this same shape at larger scale — an address, a port, a service that answers when dialled. Your board now has all three.</p></article>
+            </div>
+          </div>
+        </section>
+        <section id="test" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">05</span> Know it worked</p>
+              <h2>Test &amp; debug</h2>
+              <p class="muted">Success and recovery sit side by side, so you never have to go hunting when something looks off.
+</p>
+            </div>
+            <div class="test-grid">
+              <div>
+                <span class="readout-title">What you should see</span>
+                <div class="serial" aria-label="Expected Serial Monitor output">
+                  <div class="bar"><span>Serial Monitor</span><span class="baud">115200 baud</span></div>
+                  <div class="lines"><span>Connecting to YourNetworkName</span><span>.....</span><span>WiFi connected.</span><span>IP address: 192.168.1.42</span><span>IP port: 80</span><span>Client connected.</span><span>hello from the chart table</span><span>Client Disconnected.</span></div>
+                </div>
+                <p class="micropython-note">Your address will differ — always dial the one your monitor just printed. The middle lines are whatever the two machines say to each other.
+</p>
+              </div>
+              <div>
+                <span class="checks-title">If it doesn&#x27;t</span>
+                <ul class="checklist">
+                  <li><strong>Dots forever?</strong> Re-check the Wi-Fi name and password in the sketch, confirm the network has a 2.4 GHz band, then press the board&#x27;s reset button.</li>
+                  <li><strong>Processing can&#x27;t connect?</strong> Both machines must be on the same network — and use the IP the monitor just printed, since it changes between networks.</li>
+                  <li><strong>ControlP5 error on Run?</strong> Install the library from Processing&#x27;s Add Library window, then run the sketch again.</li>
+                  <li><strong>Nothing arrives?</strong> Connect before typing, and end every line with Enter.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="challenge" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">06</span> Make the idea yours</p>
+              <h2>Try this: swap the roles</h2>
+              <p class="muted">Same network, one last idea: the roles are a choice. It fits inside today&#x27;s 30 minutes — and it closes the course.
+</p>
+            </div>
+            <div class="two-col">
+              <article class="mini-card"><h3>Let the board dial out <button class="define" data-topic="tcp">Define</button></h3><p>Open <code>Sketch_24.1_WiFiClient.ino</code>, put your computer&#x27;s address in <code>REMOTE_IP</code>, and run sketchWiFi in <strong>TCP SERVER</strong> mode on port 8888. The board dials in and introduces itself — &quot;Hello&quot;, then &quot;This is my IP.&quot;</p></article>
+              <article class="mini-card"><h3>Teach it a word</h3><p>Back in the server sketch, check each incoming line and have the board <code>client.print(&quot;aye\n&quot;)</code> whenever the line contains &quot;ahoy&quot;. A two-word protocol, and it&#x27;s yours.</p></article>
+            </div>
+            <div class="logbook">
+              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
+              <label>What was the first line your board and your computer exchanged?<textarea rows="2"></textarea></label>
+              <label>Which role did you leave the board in — listening or dialling — and why?<textarea rows="2"></textarea></label>
+              <label>Thirty days on, the whole kit is yours. What will you build next?<textarea rows="2"></textarea></label>
+            </div>
+          </div>
+        </section>
+        <section id="agent" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">07</span> Learn it with a hand on the tiller</p>
+              <h2>Coach me through it</h2>
+              <p class="muted">Every lesson ships with a code and a machine-readable packet, so an agent can guide you with full context.
+</p>
+            </div>
+            <div class="agent-grid">
+              <article class="mini-card"><h3>Lesson code</h3><p><code>TSK-DAY30-TCPIP</code></p></article>
+              <article class="mini-card"><h3>Context packet</h3><p><a href="../packets/TSK-DAY30-TCPIP.json">Open the JSON packet →</a></p></article>
+            </div>
+            <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
+              <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
+              <p><strong>How the agent should behave:</strong> guide one step at a time, wait for you to confirm, explain terms on request, and check credentials, the 2.4 GHz band, and the printed IP before changing code.
+</p>
+            </div>
+          </div>
+        </section>
+        <nav class="day-nav" aria-label="Course navigation">
+        <a class="day-nav-link prev" href="../day-29-wifi/">
+          <span class="day-nav-dir">← Day 29</span>
+          <span class="day-nav-title">Put the board on the network</span>
+        </a>
+        <span class="day-nav-link is-empty" aria-hidden="true"></span>
+        </nav>
+      </main>
+    </div>
+    <footer class="colophon">
+      <p><strong>Day 30 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <div class="rule"></div>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — sketch <code>Sketch_24.2_WiFiServer.ino</code>; MicroPython <code>21.2_TCP_as_Server/TCP_as_Server.py</code>. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+    </footer>
+  </div>
+
+  <dialog class="lightbox" id="explainer">
+    <div class="lb-head">
+      <div>
+        <span class="lb-kicker">Field note</span>
+        <h3 id="explainerTitle"></h3>
+      </div>
+      <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="lb-body"><p id="explainerBody"></p></div>
+    <div class="lb-shortcut"><span class="tag">Shortcut</span><span id="explainerShortcut"></span></div>
+  </dialog>
+
+  <dialog class="lightbox image" id="imageBox">
+    <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    <div class="lb-body"><img id="imageBoxImg" alt="" /></div>
+    <p class="lb-cap" id="imageBoxCap"></p>
+  </dialog>
+
+  <div class="toast" id="toast">Prompt copied</div>
+
+  <script id="lesson-data" type="application/json">{"day": 30, "totalDays": 30, "slug": "day-30-tcpip", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "ipAddress": {"title": "IP address", "body": "An IP address is a device's number on a network, like a berth number in a marina. The router assigns one to the board when it joins (yours will differ from any example), and other machines reach the board by that number. The serial monitor prints it so you can copy it.\n", "shortcut": "Your board's address WILL differ from the manual's — always use the one your serial monitor prints."}, "serialRead": {"title": "Serial.readStringUntil()", "body": "readStringUntil('\\n') collects incoming characters into a string and stops at the newline you send when you press Enter. That gives the board one complete message to work with instead of a scatter of single letters.\n", "shortcut": "It gathers what you typed up to the Enter key into one whole message."}, "sketch": {"title": "Official sketch", "body": "A sketch is the Arduino name for a program. This lesson uses Freenove's Sketch_19.1_Ultrasonic_Ranging.ino so you can focus first on wiring, observation, and the measurement model.\n", "shortcut": "Treat the sketch as a working example to read and modify, not a spell to copy blindly."}, "stationMode": {"title": "Station mode", "body": "In station mode the board joins an existing network, like any laptop or phone: it presents the router's name and password, waits for the connection, and the router assigns it an IP address. WiFi.begin() starts the process; WiFi.status() reports when it's connected.\n", "shortcut": "Station = the board joins YOUR network and the router hands it an address."}, "tcp": {"title": "TCP — client and server, ports", "body": "TCP is the internet's reliable pipe. One side listens (the server) at an address and port; the other side dials (the client). A port is a numbered door at an address, so one machine can host many services. Once connected, both ends read and write the same stream — the web itself runs on this.\n", "shortcut": "Server listens at address:port, client dials it. Both sides must be on the same network."}, "wifi": {"title": "Wi-Fi on the ESP32-S3", "body": "The chip has a full Wi-Fi radio and can join networks or create them. One hard rule: it speaks 2.4 GHz only, so a 5 GHz-only network is invisible to it. Check that your router broadcasts a 2.4 GHz band before troubleshooting anything else.\n", "shortcut": "2.4 GHz only — if the board can't find your network, check the band first."}}, "prev": {"day": 29, "slug": "day-29-wifi", "title": "Put the board on the network"}, "next": null}</script>
+  <script src="../course.js"></script>
+</body>
+</html>

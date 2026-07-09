@@ -389,6 +389,18 @@
         "alt": "Official Freenove circuit for the LCD1602: the module's SDA on GPIO 14, SCL on GPIO 13, power on 5V, and ground to GND, shown as both a schematic and a breadboard photo."
       }
     ],
+    "28": [
+      {
+        "asset": "course-assets/assets/day-28/circuit-page-193.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 20 Bluetooth",
+          "page": 193
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF; Project 20.2 Bluetooth Control LED)",
+        "alt": "Official Freenove circuit for the Bluetooth LED: an LED on GPIO 2 through a 220-ohm resistor to ground, shown as both a schematic and a breadboard photo."
+      }
+    ],
     "26": [
       {
         "asset": "course-assets/assets/day-26/circuit-page-172.png",

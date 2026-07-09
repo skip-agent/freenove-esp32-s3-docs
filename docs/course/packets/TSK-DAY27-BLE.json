@@ -1,0 +1,145 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY27-BLE",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 27,
+  "title": "BLE pass-through: talk at short range",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 25,
+  "mission": "Upload the BLE pass-through sketch, find the board with the LightBlue app on your phone, and pass text both ways — type in Serial Monitor and read it on the phone, write on the phone and read it in Serial Monitor.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_20.1_BLE_USART/Sketch_20.1_BLE_USART.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/19.1_BLE/BLE.py",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    },
+    {
+      "name": "Official sketch",
+      "imageAsset": "docs/course/assets/shared/item-official-sketch.png",
+      "explanation": "A sketch is the Arduino name for a program. This lesson uses Freenove's Sketch_19.1_Ultrasonic_Ranging.ino so you can focus first on wiring, observation, and the measurement model."
+    }
+  ],
+  "wiring": [],
+  "coachInstructions": [
+    "Establish which end is failing — board side (Serial Monitor) or phone side (LightBlue) — before changing anything.",
+    "If the name never appears in the app, have the learner power-cycle the board and rescan; remind them BLE devices skip the phone's Settings→Bluetooth pairing list and only show inside a GATT app.",
+    "If nothing reaches the phone, confirm they subscribed to the characteristic ending 0003; if the text is garbled, set Data Format to utf-string.",
+    "If Serial Monitor stays empty, check 115200 baud and that they are writing to the characteristic ending 0002.",
+    "After any disconnect, have them press the board's reset button before reconnecting — this sketch advertises once at boot.",
+    "Keep the Arduino path primary; the MicroPython version broadcasts the shorter name ESP32S3 and is optional only if already set up."
+  ],
+  "steps": [
+    "On your phone, install the free LightBlue app from the iOS App Store or Google Play, and turn Bluetooth on. (On Android, Serial Bluetooth Terminal also works if you already have it.)",
+    "Plug the ESP32-S3 into your computer with a data-capable USB cable.",
+    "Open Sketch_20.1_BLE_USART.ino in Arduino IDE — the BLE libraries ship with the ESP32 board package, so there is nothing extra to install.",
+    "Press Upload, then open Serial Monitor and set the baud rate to 115200.",
+    "Watch for Waiting a client connection to notify... — the board is now broadcasting its name.",
+    "In LightBlue, open the Scan page, swipe down to refresh, and tap ESP32S3_Bluetooth. BLE devices are opened inside a GATT app like this — the name never shows up in your phone's Settings→Bluetooth pairing list.",
+    "To hear the board, open the characteristic ending 0003, set Data Format to utf-string, and tap Subscribe.",
+    "Type a line in Serial Monitor's send box and press Enter — it appears on the phone.",
+    "To talk back, open the characteristic ending 0002, set Data Format to utf-string, type a message, and tap Write.",
+    "Watch your message appear in Serial Monitor."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "setupBLE(\"ESP32S3_Bluetooth\")",
+        "explanation": "The helper shown in the full sketch. It creates the service with a write characteristic for phone→board and a notify characteristic for board→phone, then starts advertising this name."
+      },
+      {
+        "line": "#define CHARACTERISTIC_UUID_RX …",
+        "explanation": "UUIDs are the fixed names each side looks up to find the right data lane — this trio is the widely adopted Nordic UART set."
+      },
+      {
+        "line": "Serial.println(rxload)",
+        "explanation": "Whatever the phone wrote arrives in rxload and prints straight to Serial Monitor."
+      },
+      {
+        "line": "pCharacteristic->notify()",
+        "explanation": "Pushes whatever you typed in Serial Monitor out over the radio to every subscribed phone."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "_UART_UUID = bluetooth.UUID(\"6E400001-…\")",
+        "explanation": "The same Nordic UART service UUID as the Arduino sketch — the phone app sees the same service either way."
+      },
+      {
+        "line": "p.on_write(on_rx)",
+        "explanation": "Registers the function that runs whenever the phone writes — the Python side of the pass-through."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "The board advertises, the phone connects, and two one-way characteristics — write in, notify out — make a serial-style pipe over radio.",
+    "formula": "one write lane in + one notify lane out = a two-way text pipe",
+    "notes": [
+      {
+        "title": "Why the long UUIDs",
+        "body": "A UUID is a name long enough that nobody else's gadget will ever share it by accident. This particular trio is the Nordic UART set — a convention so common that serial-over-BLE apps recognise it on sight."
+      },
+      {
+        "title": "Why you must subscribe",
+        "body": "A notify characteristic only sends to phones that asked. Subscribing is how the phone says \"keep me posted\" — until then, the board's messages have nowhere to go."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "Waiting a client connection to notify...",
+      "hello from the phone"
+    ],
+    "successCriteria": "The waiting line prints once at start-up. After you connect and write from the phone, each message appears as its own line — a stray Test right after connecting is just the sketch's starter value."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "ESP32S3_Bluetooth never appears in LightBlue",
+      "firstChecks": [
+        "Power-cycle the board and swipe down to rescan — it starts advertising at boot. Look for it inside the app; BLE devices skip the phone's Settings→Bluetooth pairing list."
+      ]
+    },
+    {
+      "symptom": "Nothing arrives on the phone",
+      "firstChecks": [
+        "Open the characteristic ending 0003 and tap Subscribe first — notifications only flow to subscribers."
+      ]
+    },
+    {
+      "symptom": "Garbled symbols on the phone",
+      "firstChecks": [
+        "Set the characteristic's Data Format to utf-string."
+      ]
+    },
+    {
+      "symptom": "Nothing lands in Serial Monitor",
+      "firstChecks": [
+        "Confirm 115200 baud, and that you're writing to the characteristic ending 0002."
+      ]
+    },
+    {
+      "symptom": "Can't reconnect after a disconnect",
+      "firstChecks": [
+        "Press the board's reset button, then rescan — this sketch advertises once at boot, a known quirk."
+      ]
+    }
+  ],
+  "challenge": "Rename the broadcast to your boat's name and rescan, then send messages from the far end of your home to find the edge of BLE's range.",
+  "logbookPrompts": [
+    "What name did you broadcast, and how quickly did it show up in a rescan?",
+    "Where in your home did the link drop out?",
+    "What would you want your board to report to your phone in a real project?"
+  ]
+}

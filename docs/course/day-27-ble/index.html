@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Day 27 · BLE pass-through: talk at short range — TinySkiff ESP32-S3 Lab</title>
+  <meta name="description" content="Turn the ESP32-S3 into a BLE serial pipe. Upload the pass-through sketch, connect with the LightBlue phone app, and send text both ways between Serial Monitor and your phone." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../course.css" />
+</head>
+<body>
+  <div class="lesson-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 27 of 30</p>
+        <h1>Talk to your phone<br />over <em>radio</em></h1>
+        <p class="lede">Today the cable stops being the only path. The ESP32-S3&#x27;s built-in Bluetooth Low Energy radio becomes a short-range text line — you type in Serial Monitor and the words land on your phone, then your phone answers back the same way.
+</p>
+        <div class="meta-row" aria-label="Lesson facts">
+          <span class="pill is-key">About 25 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">Bring your phone</span>
+        </div>
+      </div>
+      <div class="hero-side no-instrument">
+        
+        <div class="agent-strip">
+          <div class="lesson-code">
+            <span class="label">Agent assist code</span>
+            <code>TSK-DAY27-BLE</code>
+          </div>
+          <button class="copy-prompt" type="button" data-copy="I am doing TinySkiff lesson TSK-DAY27-BLE. Pull the lesson packet, then guide me one step at a time. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY27-BLE.json">lesson packet</a> and coach you step by step.</p>
+        </div>
+      </div>
+    </header>
+    <div class="layout">
+      <nav class="rail" aria-label="Lesson progress">
+        <div class="rail-head">
+          <strong>Today's route</strong>
+          <span class="day-of">27 / 30</span>
+        </div>
+        <div class="voyage" style="--voyage-fill: 90.0%" aria-hidden="true"><span></span></div>
+        <div class="rail-nav">
+          <a href="#parts"><span class="tick"></span>What you need</a>
+          <a href="#steps"><span class="tick"></span>Build it</a>
+          <a href="#code"><span class="tick"></span>Read the code</a>
+          <a href="#theory"><span class="tick"></span>A serial pipe over radio</a>
+          <a href="#test"><span class="tick"></span>Test &amp; debug</a>
+          <a href="#challenge"><span class="tick"></span>Try this</a>
+          <a href="#agent"><span class="tick"></span>Coach me</a>
+        </div>
+      </nav>
+      <main class="lesson-main">
+        <section id="parts" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">01</span> First, know the pieces</p>
+              <h2>What you need</h2>
+              <p class="muted">Just the board and its USB cable from the kit — plus your phone. Today&#x27;s extra tool is a free app called <strong>LightBlue</strong> (iOS App Store or Google Play) that speaks BLE and lets you see exactly what the board broadcasts. Tap <em>Define</em> on anything unfamiliar — the answer opens as a field note you can read and dismiss without losing your place.
+</p>
+            </div>
+            <div class="part-grid">
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-esp32-s3-board.jpg" alt="Official manual photo of the ESP32-S3 development board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>ESP32-S3 board <button class="define" data-topic="esp32">Define</button></h3>
+                <p>The brain — and today, the radio.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-arduino-ide.png" alt="Official manual screenshot of the Arduino IDE interface." /><figcaption>Manual screenshot</figcaption></figure>
+                <h3>Arduino IDE <button class="define" data-topic="arduino">Define</button></h3>
+                <p>Uploads the sketch and opens Serial Monitor.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-official-sketch.png" alt="Official manual page showing the BLE data pass-through sketch and Serial Monitor output." /><figcaption>Manual sketch</figcaption></figure>
+                <h3>Official sketch <button class="define" data-topic="sketch">Define</button></h3>
+                <p><code>Sketch_20.1_BLE_USART.ino</code></p>
+              </article>
+            </div>
+          </div>
+        </section>
+        <section id="steps" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">02</span> One action at a time</p>
+              <h2>Build it</h2>
+              <p class="muted">Two ends today — the board end in Serial Monitor and the phone end in LightBlue. Tap each step as you go to keep your place; you can finish without opening a single field note.
+</p>
+            </div>
+            <div class="steps-progress">
+              <div class="bar" aria-hidden="true"><span id="stepBar"></span></div>
+              <span class="count" id="stepCount">0 / 10 done</span>
+            </div>
+            <ol class="step-list">
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 1 done"></button><p class="text">On your phone, install the free <strong>LightBlue</strong> app from the iOS App Store or Google Play, and turn Bluetooth on. (On Android, Serial Bluetooth Terminal also works if you already have it.)</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 2 done"></button><p class="text">Plug the ESP32-S3 into your computer with a data-capable USB cable. <button class="define" data-topic="usbData">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">Open <code>Sketch_20.1_BLE_USART.ino</code> in Arduino IDE — the BLE libraries ship with the ESP32 board package, so there is nothing extra to install.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">Press <strong>Upload</strong>, then open Serial Monitor and set the baud rate to <code>115200</code>. <button class="define" data-topic="serial">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Watch for <code>Waiting a client connection to notify...</code> — the board is now broadcasting its name. <button class="define" data-topic="ble">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 6 done"></button><p class="text">In LightBlue, open the Scan page, swipe down to refresh, and tap <strong>ESP32S3_Bluetooth</strong>. BLE devices are opened inside a GATT app like this — the name never shows up in your phone&#x27;s Settings→Bluetooth pairing list.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 7 done"></button><p class="text">To hear the board, open the characteristic ending <strong>0003</strong>, set Data Format to <code>utf-string</code>, and tap <strong>Subscribe</strong>. <button class="define" data-topic="bleCharacteristic">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 8 done"></button><p class="text">Type a line in Serial Monitor&#x27;s send box and press Enter — it appears on the phone.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 9 done"></button><p class="text">To talk back, open the characteristic ending <strong>0002</strong>, set Data Format to <code>utf-string</code>, type a message, and tap <strong>Write</strong>.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 10 done"></button><p class="text">Watch your message appear in Serial Monitor.</p></li>
+            </ol>
+            <div class="done-banner" id="doneBanner" role="status">
+              <span class="icon" aria-hidden="true">📻</span>
+              <div><strong>Radio contact.</strong><p>Your board and your phone are trading text with no cable between them. Head to Test &amp; debug for what each end should show.</p></div>
+            </div>
+          </div>
+        </section>
+        <section id="code" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">03</span> Read just enough code</p>
+              <h2>Read the code</h2>
+              <p class="muted">The sketch is about seventy lines; the parts that matter fit here. A helper called <code>setupBLE()</code> builds the radio&#x27;s public face — it creates the service with a <strong>write</strong> characteristic for phone→board and a <strong>notify</strong> characteristic for board→phone, then starts advertising. The BLE libraries ship with the ESP32 board package, so it compiles as-is.
+</p>
+            </div>
+            <div class="tabs" role="tablist" aria-label="Code language">
+              <button class="tab" id="tab-arduino" role="tab" aria-selected="true" aria-controls="panel-arduino">Arduino <span class="badge">Main</span></button><button class="tab" id="tab-micropython" role="tab" aria-selected="false" aria-controls="panel-micropython">MicroPython <span class="badge">Optional</span></button>
+            </div>
+            <div class="tabpanel" id="panel-arduino" role="tabpanel" aria-labelledby="tab-arduino">
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">Sketch_20.1_BLE_USART.ino</span></div>
+<pre><code><span class="tok-key">#include</span> &quot;BLEDevice.h&quot;
+<span class="tok-key">#include</span> &quot;BLEServer.h&quot;
+
+<span class="tok-key">#define</span> SERVICE_UUID           &quot;<span class="tok-num">6</span>E400001-B5A3-F393-E0A9-E50E24DCCA9E&quot;
+<span class="tok-key">#define</span> CHARACTERISTIC_UUID_RX &quot;<span class="tok-num">6</span>E400002-B5A3-F393-E0A9-E50E24DCCA9E&quot;
+<span class="tok-key">#define</span> CHARACTERISTIC_UUID_TX &quot;<span class="tok-num">6</span>E400003-B5A3-F393-E0A9-E50E24DCCA9E&quot;
+
+<span class="tok-key">void</span> <span class="tok-fn">setup</span>() {
+  Serial.<span class="tok-fn">begin</span>(<span class="tok-num">115200</span>);
+  <span class="tok-fn">setupBLE</span>(&quot;ESP32S3_Bluetooth&quot;);
+}
+
+<span class="tok-key">void</span> <span class="tok-fn">loop</span>() {
+  <span class="tok-key">long</span> now = <span class="tok-fn">millis</span>();
+  <span class="tok-fn">if</span> (now - lastMsg &gt; <span class="tok-num">100</span>) {
+    <span class="tok-fn">if</span> (deviceConnected&amp;&amp;rxload.<span class="tok-fn">length</span>()&gt;<span class="tok-num">0</span>) {
+        Serial.<span class="tok-fn">println</span>(rxload);
+        rxload=&quot;&quot;;
+    }
+    <span class="tok-fn">if</span>(Serial.<span class="tok-fn">available</span>()&gt;<span class="tok-num">0</span>){
+        String str=Serial.<span class="tok-fn">readString</span>();
+        <span class="tok-key">const</span> <span class="tok-key">char</span> *newValue=str.<span class="tok-fn">c_str</span>();
+        pCharacteristic-&gt;<span class="tok-fn">setValue</span>(newValue);
+        pCharacteristic-&gt;<span class="tok-fn">notify</span>();
+    }
+    lastMsg = now;
+  }
+}</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>setupBLE(&quot;ESP32S3_Bluetooth&quot;)</code><span class="note-text">The helper shown in the full sketch. It creates the service with a write characteristic for phone→board and a notify characteristic for board→phone, then starts advertising this name. <button class="define" data-topic="ble">Define</button></span></div>
+                  <div class="code-note"><code>#define CHARACTERISTIC_UUID_RX …</code><span class="note-text">UUIDs are the fixed names each side looks up to find the right data lane — this trio is the widely adopted Nordic UART set. <button class="define" data-topic="uuid">Define</button></span></div>
+                  <div class="code-note"><code>Serial.println(rxload)</code><span class="note-text">Whatever the phone wrote arrives in <code>rxload</code> and prints straight to Serial Monitor. <button class="define" data-topic="serialPrint">Define</button></span></div>
+                  <div class="code-note"><code>pCharacteristic-&gt;notify()</code><span class="note-text">Pushes whatever you typed in Serial Monitor out over the radio to every subscribed phone. <button class="define" data-topic="bleCharacteristic">Define</button></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="tabpanel" id="panel-micropython" role="tabpanel" aria-labelledby="tab-micropython" hidden>
+              <p class="optional-tag">Optional side path · no wiring</p>
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">19.1_BLE/BLE.py</span></div>
+<pre><code>_UART_UUID = bluetooth.<span class="tok-fn">UUID</span>(&quot;<span class="tok-num">6</span>E400001-B5A3-F393-E0A9-E50E24DCCA9E&quot;)
+
+p = <span class="tok-fn">BLESimplePeripheral</span>(ble)
+p.<span class="tok-fn">on_write</span>(on_rx)
+
+<span class="tok-fn">print</span>(&quot;Please use LightBlue to connect to ESP32S3.&quot;)
+
+tx_data = <span class="tok-fn">input</span>(&quot;Enter anything: &quot;)
+p.<span class="tok-fn">send</span>(tx_data)</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>_UART_UUID = bluetooth.UUID(&quot;6E400001-…&quot;)</code><span class="note-text">The same Nordic UART service UUID as the Arduino sketch — the phone app sees the same service either way.</span></div>
+                  <div class="code-note"><code>p.on_write(on_rx)</code><span class="note-text">Registers the function that runs whenever the phone writes — the Python side of the pass-through.</span></div>
+                </div>
+              </div>
+              <p class="micropython-note">Copy <code>ble_advertising.py</code> onto the board alongside <code>BLE.py</code> — the script imports it. This version broadcasts the shorter name <strong>ESP32S3</strong>, so scan for that in LightBlue. If MicroPython isn&#x27;t set up yet, skip this — it should never block the Arduino-first day.
+</p>
+            </div>
+          </div>
+        </section>
+        <section id="theory" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">04</span> Understand, don&#x27;t memorise</p>
+              <h2>A serial pipe over radio</h2>
+              <p class="muted">BLE organises everything a device offers into services, and each service into characteristics — small named mailboxes the phone can read, write, or subscribe to. Today&#x27;s service holds exactly two, one for each direction.
+</p>
+            </div>
+            <div class="theory-flow" aria-label="Measurement model">
+              <article class="flow-step"><span class="n">Advertise</span><h3>The board calls out</h3><p>The sketch broadcasts the name ESP32S3_Bluetooth so nearby phones can find it.</p></article>
+              <article class="flow-step"><span class="n">Connect</span><h3>The phone answers</h3><p>LightBlue opens a connection and finds the service by its UUID.</p></article>
+              <article class="flow-step"><span class="n">Write in</span><h3>Phone → board</h3><p>Text written to the characteristic ending 0002 lands in the sketch and prints to Serial Monitor.</p></article>
+              <article class="flow-step"><span class="n">Notify out</span><h3>Board → phone</h3><p>Text typed in Serial Monitor is pushed through the characteristic ending 0003 to every subscriber.</p></article>
+            </div>
+            <div class="formula-card">
+              <span class="label">Useful model</span>
+              <code>one <b>write</b> lane in + one <b>notify</b> lane out = a two-way text pipe</code>
+            </div>
+            <div class="two-col" style="margin-top:14px">
+              <article class="mini-card"><h3>Why the long UUIDs <button class="define" data-topic="uuid">Define</button></h3><p>A UUID is a name long enough that nobody else&#x27;s gadget will ever share it by accident. This particular trio is the Nordic UART set — a convention so common that serial-over-BLE apps recognise it on sight.</p></article>
+              <article class="mini-card"><h3>Why you must subscribe <button class="define" data-topic="bleCharacteristic">Define</button></h3><p>A notify characteristic only sends to phones that asked. Subscribing is how the phone says &quot;keep me posted&quot; — until then, the board&#x27;s messages have nowhere to go.</p></article>
+            </div>
+          </div>
+        </section>
+        <section id="test" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">05</span> Know it worked</p>
+              <h2>Test &amp; debug</h2>
+              <p class="muted">Success and recovery sit side by side, so you never have to go hunting when something looks off.
+</p>
+            </div>
+            <div class="test-grid">
+              <div>
+                <span class="readout-title">What you should see</span>
+                <div class="serial" aria-label="Expected Serial Monitor output">
+                  <div class="bar"><span>Serial Monitor</span><span class="baud">115200 baud</span></div>
+                  <div class="lines"><span>Waiting a client connection to notify...</span><span>hello from the phone</span></div>
+                </div>
+                <p class="micropython-note">The waiting line prints once at start-up. After you connect and write from the phone, each message appears as its own line — a stray `Test` right after connecting is just the sketch&#x27;s starter value.
+</p>
+              </div>
+              <div>
+                <span class="checks-title">If it doesn&#x27;t</span>
+                <ul class="checklist">
+                  <li><strong>ESP32S3_Bluetooth never appears in LightBlue?</strong> Power-cycle the board and swipe down to rescan — it starts advertising at boot. Look for it inside the app; BLE devices skip the phone&#x27;s Settings→Bluetooth pairing list.</li>
+                  <li><strong>Nothing arrives on the phone?</strong> Open the characteristic ending 0003 and tap Subscribe first — notifications only flow to subscribers.</li>
+                  <li><strong>Garbled symbols on the phone?</strong> Set the characteristic&#x27;s Data Format to utf-string.</li>
+                  <li><strong>Nothing lands in Serial Monitor?</strong> Confirm 115200 baud, and that you&#x27;re writing to the characteristic ending 0002.</li>
+                  <li><strong>Can&#x27;t reconnect after a disconnect?</strong> Press the board&#x27;s reset button, then rescan — this sketch advertises once at boot, a known quirk.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="challenge" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">06</span> Make the idea yours</p>
+              <h2>Try this: name your boat, find the edge</h2>
+              <p class="muted">Same working sketch, two experiments — one line of code, then a walk. It fits inside today&#x27;s 25 minutes.
+</p>
+            </div>
+            <div class="two-col">
+              <article class="mini-card"><h3>Fly your own name <button class="define" data-topic="ble">Define</button></h3><p>Change <code>setupBLE(&quot;ESP32S3_Bluetooth&quot;)</code> to <code>setupBLE(&quot;YourBoatName&quot;)</code>, re-upload, and rescan in LightBlue — your board now broadcasts under its own flag.</p></article>
+              <article class="mini-card"><h3>Find the range edge</h3><p>Stay subscribed on the phone and walk to the far end of your home while a helper (or a repeated send) keeps messages coming from Serial Monitor. Note where they stop arriving.</p></article>
+            </div>
+            <div class="logbook">
+              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
+              <label>What name did you broadcast, and how quickly did it show up in a rescan?<textarea rows="2"></textarea></label>
+              <label>Where in your home did the link drop out?<textarea rows="2"></textarea></label>
+              <label>What would you want your board to report to your phone in a real project?<textarea rows="2"></textarea></label>
+            </div>
+          </div>
+        </section>
+        <section id="agent" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">07</span> Learn it with a hand on the tiller</p>
+              <h2>Coach me through it</h2>
+              <p class="muted">Every lesson ships with a code and a machine-readable packet, so an agent can guide you with full context.
+</p>
+            </div>
+            <div class="agent-grid">
+              <article class="mini-card"><h3>Lesson code</h3><p><code>TSK-DAY27-BLE</code></p></article>
+              <article class="mini-card"><h3>Context packet</h3><p><a href="../packets/TSK-DAY27-BLE.json">Open the JSON packet →</a></p></article>
+            </div>
+            <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
+              <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
+              <p><strong>How the agent should behave:</strong> work one end at a time — board side in Serial Monitor, phone side in LightBlue — confirm the waiting line before touching the app, and treat subscribe, data format, and reset-after-disconnect as the first checks.
+</p>
+            </div>
+          </div>
+        </section>
+        <nav class="day-nav" aria-label="Course navigation">
+        <a class="day-nav-link prev" href="../day-26-ultrasonic/">
+          <span class="day-nav-dir">← Day 26</span>
+          <span class="day-nav-title">Measure the room with sound</span>
+        </a>
+        <a class="day-nav-link next" href="../day-28-bluetooth-led/">
+          <span class="day-nav-dir">Day 28 →</span>
+          <span class="day-nav-title">Switch an LED from your phone</span>
+        </a>
+        </nav>
+      </main>
+    </div>
+    <footer class="colophon">
+      <p><strong>Day 27 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <div class="rule"></div>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — sketch <code>Sketch_20.1_BLE_USART.ino</code>; MicroPython <code>19.1_BLE/BLE.py</code>. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+    </footer>
+  </div>
+
+  <dialog class="lightbox" id="explainer">
+    <div class="lb-head">
+      <div>
+        <span class="lb-kicker">Field note</span>
+        <h3 id="explainerTitle"></h3>
+      </div>
+      <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="lb-body"><p id="explainerBody"></p></div>
+    <div class="lb-shortcut"><span class="tag">Shortcut</span><span id="explainerShortcut"></span></div>
+  </dialog>
+
+  <dialog class="lightbox image" id="imageBox">
+    <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    <div class="lb-body"><img id="imageBoxImg" alt="" /></div>
+    <p class="lb-cap" id="imageBoxCap"></p>
+  </dialog>
+
+  <div class="toast" id="toast">Prompt copied</div>
+
+  <script id="lesson-data" type="application/json">{"day": 27, "totalDays": 30, "slug": "day-27-ble", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "ble": {"title": "Bluetooth Low Energy", "body": "BLE is short-range radio built for small messages. The board runs as a peripheral: it broadcasts its name, a phone connects, and the two exchange data through a service the board offers. This differs from the classic Bluetooth in your phone's pairing menu — a BLE device is opened with a GATT app like LightBlue, and never appears in that menu.\n", "shortcut": "Find the board inside the LightBlue app's scan list, never in the phone's Bluetooth settings."}, "bleCharacteristic": {"title": "Characteristics — write and notify", "body": "A BLE service holds characteristics — named slots the phone can use. This one has two: an RX slot the phone WRITES into (phone → board) and a TX slot the board NOTIFIES through (board → phone, for subscribers). Two one-way lanes make the two-way link.\n", "shortcut": "Phone writes into RX; board notifies out of TX. Subscribe to TX to hear the board."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "serial": {"title": "Serial Monitor", "body": "Serial Monitor is a text window in Arduino IDE. The board can print messages to it over USB. Here, it prints the measured distance so you can see what the sensor is doing.\n", "shortcut": "If the window is blank, check that the baud rate is 115200."}, "serialPrint": {"title": "Serial.println() and printf()", "body": "Serial.println() sends a line of text to the computer and moves to the next line. Serial.printf() does the same but fills in values first — %.1f drops a number in with one decimal place — so the board can report live readings.\n", "shortcut": "println() sends plain lines; printf() slots numbers into a template before sending."}, "sketch": {"title": "Official sketch", "body": "A sketch is the Arduino name for a program. This lesson uses Freenove's Sketch_19.1_Ultrasonic_Ranging.ino so you can focus first on wiring, observation, and the measurement model.\n", "shortcut": "Treat the sketch as a working example to read and modify, not a spell to copy blindly."}, "usbData": {"title": "Data-capable USB cable", "body": "Some USB cables only carry power (for charging), with no data wires inside. Uploading code needs a cable that carries data. A charge-only cable will power the board but never let the IDE talk to it.\n", "shortcut": "If uploads fail on a cable that charges phones fine, suspect the cable first."}, "uuid": {"title": "UUIDs", "body": "A UUID is a long unique number that names a BLE service or characteristic, the way a port number names a TCP service. This sketch uses the widely adopted Nordic UART trio — one UUID for the service, one for RX, one for TX — so serial-style apps recognise it on sight.\n", "shortcut": "The long hex strings are names, copied exactly — one for the service, one per direction."}}, "prev": {"day": 26, "slug": "day-26-ultrasonic", "title": "Measure the room with sound"}, "next": {"day": 28, "slug": "day-28-bluetooth-led", "title": "Switch an LED from your phone"}}</script>
+  <script src="../course.js"></script>
+</body>
+</html>

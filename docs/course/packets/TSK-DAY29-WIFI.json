@@ -1,0 +1,136 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY29-WIFI",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 29,
+  "title": "Put the board on the network",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 25,
+  "mission": "Upload the Wi-Fi station sketch with your own network name and password, watch the ESP32-S3 join your router over Serial Monitor, and read back the IP address it is assigned — then flip the board into access-point mode and join its network from your phone.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_23.1_WiFi_Station/Sketch_23.1_WiFi_Station.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/20.1_Station_mode/Station_mode.py",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    },
+    {
+      "name": "Official sketch",
+      "imageAsset": "docs/course/assets/shared/item-official-sketch.png",
+      "explanation": "A sketch is the Arduino name for a program. This lesson uses Freenove's Sketch_19.1_Ultrasonic_Ranging.ino so you can focus first on wiring, observation, and the measurement model."
+    }
+  ],
+  "wiring": [],
+  "coachInstructions": [
+    "Never ask the learner to paste their Wi-Fi password into the chat; have them edit the two strings in the sketch locally.",
+    "If dots march forever, the network name or password is wrong — have the learner fix both `\"********\"` strings, re-upload, and press reset; the connect loop has no timeout.",
+    "The board joins 2.4 GHz networks only; if it never connects, confirm the router broadcasts a 2.4 GHz band before touching code.",
+    "Remind the learner to keep the double quotes around the credentials and to match the network name exactly, including capitals.",
+    "For the access-point challenge, the password must be at least 8 characters or the network will not appear on the phone; re-upload and rescan after any change.",
+    "Keep the Arduino path primary; MicroPython is optional only if already set up."
+  ],
+  "steps": [
+    "Plug the ESP32-S3 into your computer with a data-capable USB cable.",
+    "Open Sketch_23.1_WiFi_Station.ino in Arduino IDE.",
+    "Replace both \"\" strings with your own Wi-Fi name and password — keep the double quotes, and use your 2.4 GHz network.",
+    "Select your ESP32-S3 board and its port, then press Upload.",
+    "Open Serial Monitor and set the baud rate to 115200.",
+    "Watch Setup start, then dots while the board negotiates, then the IP address your router assigns.",
+    "Write that address in your logbook — Day 30 dials it."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "WiFi.begin(ssid_Router, password_Router)",
+        "explanation": "Asks to join your router by name — station mode — using the credentials you typed into the two strings above."
+      },
+      {
+        "line": "while (WiFi.status() != WL_CONNECTED)",
+        "explanation": "Waits for the router to accept the board, printing a dot every half second — and it will wait forever, so endless dots mean wrong credentials."
+      },
+      {
+        "line": "Serial.println(WiFi.localIP())",
+        "explanation": "Prints the IP address your router assigned — the board's berth number, and the number Day 30 dials."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "network.WLAN(network.STA_IF)",
+        "explanation": "Creates the station interface — MicroPython's handle on the board's radio in join-a-network mode."
+      },
+      {
+        "line": "sta_if.ifconfig()",
+        "explanation": "Returns the board's network details once connected — the first value is its IP address."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "A station joins an existing network and is assigned an address; an access point hosts a network and hands out addresses itself.",
+    "formula": "station = join a network · access point = be the network",
+    "notes": [
+      {
+        "title": "Where the address comes from",
+        "body": "Your router runs a small harbourmaster service called DHCP. Every device that joins gets assigned a free berth — an IP address — which is why the one your board prints will differ from the one in this lesson."
+      },
+      {
+        "title": "Both roles at once",
+        "body": "The third mode, AP+Station (Sketch_23.3_AP_Station), runs both at the same time — the board stays joined to your router while hosting its own network."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "Setup start",
+      "Connecting to YourNetworkName",
+      "......",
+      "Connected, IP address: ",
+      "192.168.1.23",
+      "Setup End"
+    ],
+    "successCriteria": "Your network name and the address itself will differ — the IP is whatever your router assigns. A handful of dots is normal; they should stop within a few seconds."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "Dots marching forever",
+      "firstChecks": [
+        "The network name or password is wrong. Fix both strings in the sketch, re-upload, and press reset — the loop has no timeout."
+      ]
+    },
+    {
+      "symptom": "Your network never connects at all",
+      "firstChecks": [
+        "The board speaks 2.4 GHz Wi-Fi only. Check that your router broadcasts a 2.4 GHz band."
+      ]
+    },
+    {
+      "symptom": "Blank monitor",
+      "firstChecks": [
+        "Confirm 115200 baud, then the board and port."
+      ]
+    },
+    {
+      "symptom": "AP name missing from your phone's list",
+      "firstChecks": [
+        "The access-point password must be at least 8 characters. Re-upload Sketch_23.2 and rescan."
+      ]
+    }
+  ],
+  "challenge": "Flip the board into access-point mode with Sketch_23.2, join WiFi_Name from your phone, then rename the network after your boat and find the board on your router's device list.",
+  "logbookPrompts": [
+    "What IP address did your router assign the board?",
+    "What did you name the board's own network?",
+    "What would you want the board to serve up once your phone can reach it?"
+  ]
+}

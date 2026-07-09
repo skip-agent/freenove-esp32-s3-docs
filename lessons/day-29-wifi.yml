@@ -1,0 +1,264 @@
+# Day 29 — Wi-Fi modes · tinyskiff.lesson.v1
+# One source of truth: this file renders to the guided page
+# (/course/day-29-wifi/), the agent packet (/course/packets/…json), and the
+# course-map entry. The board's radio wakes up — no wiring, just credentials.
+
+schema: tinyskiff.lesson.v1
+lessonCode: TSK-DAY29-WIFI
+day: 29
+slug: day-29-wifi
+title: Put the board on the network
+status: published
+estimatedTimeMinutes: 25
+tracks: { main: arduino, optional: micropython }
+learnerProfile: adult beginner; curious and capable; no electronics assumed
+
+mission: >
+  Upload the Wi-Fi station sketch with your own network name and password, watch
+  the ESP32-S3 join your router over Serial Monitor, and read back the IP
+  address it is assigned — then flip the board into access-point mode and join
+  its network from your phone.
+unlocks: The ESP32-S3 carries its own Wi-Fi radio — it can join your network as a station or host a network of its own as an access point.
+seoDescription: >
+  Connect the ESP32-S3 to your Wi-Fi in station mode, read its IP address in
+  Serial Monitor, then host your own network with soft-AP mode. No wiring — just
+  WiFi.begin, your credentials, and the radio already on the board.
+
+hero:
+  instrument: none
+  headline: Put the board|on the {network}
+  lede: >
+    No wiring today — the radio is already inside the ESP32-S3. You hand the
+    board your Wi-Fi name and password, watch it join your network, and read
+    back the address your router assigns it. That address is the board's berth
+    number, and Day 30 dials it.
+  pills:
+    - { text: About 25 minutes, key: true }
+    - Arduino first
+    - MicroPython optional
+    - No wiring today
+
+parts:
+  intro: >
+    Three things on the bench, plus one you already own: the name and password
+    of your 2.4 GHz Wi-Fi network. Have both written down before you start. Tap
+    *Define* on anything unfamiliar — the answer opens as a field note you can
+    read and dismiss without losing your place.
+  items:
+    - name: ESP32-S3 board
+      image: shared/item-esp32-s3-board.jpg
+      imageKind: Manual photo
+      alt: Official manual photo of the ESP32-S3 development board.
+      blurb: The brain of the build — with a Wi-Fi radio already aboard.
+      explain: esp32
+    - name: Arduino IDE
+      image: shared/item-arduino-ide.png
+      imageKind: Manual screenshot
+      alt: Official manual screenshot of the Arduino IDE interface.
+      blurb: Uploads the sketch and opens Serial Monitor.
+      explain: arduino
+    - name: Official sketch
+      image: shared/item-official-sketch.png
+      imageKind: Manual sketch
+      alt: Official manual page showing the WiFi Station sketch and its Serial Monitor output.
+      blurb: "`Sketch_23.1_WiFi_Station.ino`"
+      explain: sketch
+
+steps:
+  intro: >
+    The whole day is edit two lines, upload, and read the monitor. Tap each step
+    as you go to keep your place — you can finish without opening a single field
+    note.
+  items:
+    - Plug the ESP32-S3 into your computer with a data-capable USB cable. {usbData}
+    - Open `Sketch_23.1_WiFi_Station.ino` in Arduino IDE. {stationMode}
+    - Replace both `"********"` strings with your own Wi-Fi name and password — keep the double quotes, and use your 2.4 GHz network. {wifi}
+    - Select your ESP32-S3 board and its port, then press **Upload**.
+    - Open Serial Monitor and set the baud rate to `115200`. {serial}
+    - Watch `Setup start`, then dots while the board negotiates, then the IP address your router assigns. {ipAddress}
+    - Write that address in your logbook — Day 30 dials it.
+  done:
+    icon: "📶"
+    title: You're aboard the network.
+    body: Your ESP32-S3 holds an address on your Wi-Fi. Head to Test & debug to confirm each line of the monitor.
+
+code:
+  intro: >
+    The sketch is short enough to read whole. Two lines near the top hold the
+    placeholders you replace with your own credentials; `setup()` does all the
+    work and `loop()` stays empty. Switch to MicroPython if you'd rather see the
+    same idea in Python.
+  arduino:
+    file: Sketch_23.1_WiFi_Station.ino
+    sketch: C/Sketches/Sketch_23.1_WiFi_Station/Sketch_23.1_WiFi_Station.ino
+    excerpt: |
+      #include <WiFi.h>
+
+      const char *ssid_Router     = "********"; //Enter the router name
+      const char *password_Router = "********"; //Enter the router password
+
+      void setup(){
+        Serial.begin(115200);
+        delay(2000);
+        Serial.println("Setup start");
+        WiFi.begin(ssid_Router, password_Router);
+        Serial.println(String("Connecting to ")+ssid_Router);
+        while (WiFi.status() != WL_CONNECTED){
+          delay(500);
+          Serial.print(".");
+        }
+        Serial.println("\nConnected, IP address: ");
+        Serial.println(WiFi.localIP());
+        Serial.println("Setup End");
+      }
+
+      void loop() {
+      }
+    notes:
+      - code: WiFi.begin(ssid_Router, password_Router)
+        text: Asks to join your router by name — station mode — using the credentials you typed into the two strings above.
+        explain: stationMode
+      - code: while (WiFi.status() != WL_CONNECTED)
+        text: Waits for the router to accept the board, printing a dot every half second — and it will wait forever, so endless dots mean wrong credentials.
+        explain: wifi
+      - code: Serial.println(WiFi.localIP())
+        text: Prints the IP address your router assigned — the board's berth number, and the number Day 30 dials.
+        explain: ipAddress
+  micropython:
+    file: 20.1_Station_mode/Station_mode.py
+    path: Python/Python_Codes/20.1_Station_mode/Station_mode.py
+    optionalTag: Optional side path · no wiring
+    excerpt: |
+      ssidRouter     = '********' #Enter the router name
+      passwordRouter = '********' #Enter the router password
+
+      def STA_Setup(ssidRouter,passwordRouter):
+          print("Setup start")
+          sta_if = network.WLAN(network.STA_IF)
+          if not sta_if.isconnected():
+              print('connecting to',ssidRouter)
+              sta_if.active(True)
+              sta_if.connect(ssidRouter,passwordRouter)
+              while not sta_if.isconnected():
+                  pass
+          print('Connected, IP address:', sta_if.ifconfig())
+          print("Setup End")
+    notes:
+      - code: network.WLAN(network.STA_IF)
+        text: Creates the station interface — MicroPython's handle on the board's radio in join-a-network mode.
+      - code: sta_if.ifconfig()
+        text: Returns the board's network details once connected — the first value is its IP address.
+    note: >
+      Same radio, same credentials — replace both '********' strings before you
+      run it in Thonny. If MicroPython isn't set up yet, skip this — it should
+      never block the Arduino-first day.
+
+theory:
+  title: One radio, two roles
+  summary: A station joins an existing network and is assigned an address; an access point hosts a network and hands out addresses itself.
+  intro: >
+    Chapter 23 of the manual gives the radio three working modes. Today's upload
+    is station mode — the board joins your network the way your phone does. The
+    challenge flips it to access-point mode, where the board hosts a network of
+    its own.
+  flow:
+    - { n: Ask to join, title: WiFi.begin, body: The board calls your router by name and offers the password. }
+    - { n: Handshake, title: Router checks, body: The router verifies the password and accepts the board onto the network. }
+    - { n: Get an address, title: DHCP assigns, body: The router hands the board an IP address of its own — its berth number. }
+    - { n: Report, title: localIP prints, body: The sketch prints that address so you can write it down for Day 30. }
+  formulaLabel: The two modes
+  formula: "station = **join** a network · access point = **be** the network"
+  notes:
+    - title: Where the address comes from
+      explain: ipAddress
+      body: >
+        Your router runs a small harbourmaster service called DHCP. Every device
+        that joins gets assigned a free berth — an IP address — which is why the
+        one your board prints will differ from the one in this lesson.
+    - title: Both roles at once
+      explain: apMode
+      body: >
+        The third mode, AP+Station (`Sketch_23.3_AP_Station`), runs both at the
+        same time — the board stays joined to your router while hosting its own
+        network.
+
+test:
+  mode: serial
+  intro: >
+    Success and recovery sit side by side, so you never have to go hunting when
+    something looks off.
+  expectedTitle: What you should see
+  baud: 115200
+  expected:
+    - "Setup start"
+    - "Connecting to YourNetworkName"
+    - "......"
+    - "Connected, IP address: "
+    - "192.168.1.23"
+    - "Setup End"
+  expectedNote: >
+    Your network name and the address itself will differ — the IP is whatever
+    your router assigns. A handful of dots is normal; they should stop within a
+    few seconds.
+  checksTitle: If it doesn't
+  checks:
+    - symptom: "Dots marching forever?"
+      fix: "The network name or password is wrong. Fix both strings in the sketch, re-upload, and press reset — the loop has no timeout."
+    - symptom: "Your network never connects at all?"
+      fix: "The board speaks 2.4 GHz Wi-Fi only. Check that your router broadcasts a 2.4 GHz band."
+    - symptom: "Blank monitor?"
+      fix: "Confirm 115200 baud, then the board and port."
+    - symptom: "AP name missing from your phone's list?"
+      fix: "The access-point password must be at least 8 characters. Re-upload Sketch_23.2 and rescan."
+
+challenge:
+  title: "Try this: be the network"
+  railLabel: Try this
+  intro: >
+    Same board, opposite role. The second official sketch turns the ESP32-S3
+    into an access point — a network your phone can see and join. It fits
+    inside today's 25 minutes.
+  summary: Flip the board into access-point mode with Sketch_23.2, join WiFi_Name from your phone, then rename the network after your boat and find the board on your router's device list.
+  cards:
+    - title: Host your own network
+      explain: apMode
+      body: >
+        Upload `Sketch_23.2_WiFi_AP` — the line `WiFi.softAP(ssid_AP,
+        password_AP)` turns the board into an access point, and the monitor
+        prints `Soft-AP IP address = …`. Your phone's Wi-Fi list now shows
+        `WiFi_Name`; join it with the password `12345678`.
+    - title: Fly your own name
+      body: >
+        Change `ssid_AP` to your boat's name, pick a new password of 8 or more
+        characters, and re-upload. Rescan on your phone and there it is.
+    - title: Find the board on the chart
+      explain: ipAddress
+      body: >
+        Back in station mode, open your router's device list and find your
+        board there — the same IP address the monitor printed.
+  logbook:
+    - What IP address did your router assign the board?
+    - What did you name the board's own network?
+    - What would you want the board to serve up once your phone can reach it?
+
+agent:
+  intro: >
+    Every lesson ships with a code and a machine-readable packet, so an agent can
+    guide you with full context.
+  behaviour: >
+    keep credentials private — the learner edits them into the sketch locally,
+    never into chat — and check the 2.4 GHz band, both placeholder strings, and
+    baud rate before changing code.
+  coachInstructions:
+    - Never ask the learner to paste their Wi-Fi password into the chat; have them edit the two strings in the sketch locally.
+    - If dots march forever, the network name or password is wrong — have the learner fix both `"********"` strings, re-upload, and press reset; the connect loop has no timeout.
+    - The board joins 2.4 GHz networks only; if it never connects, confirm the router broadcasts a 2.4 GHz band before touching code.
+    - Remind the learner to keep the double quotes around the credentials and to match the network name exactly, including capitals.
+    - For the access-point challenge, the password must be at least 8 characters or the network will not appear on the phone; re-upload and rescan after any change.
+    - Keep the Arduino path primary; MicroPython is optional only if already set up.
+
+source:
+  license: CC BY-NC-SA 3.0
+  licenseNote: >
+    Based on Freenove official material released under CC BY-NC-SA 3.0; preserve
+    attribution and non-affiliation language.

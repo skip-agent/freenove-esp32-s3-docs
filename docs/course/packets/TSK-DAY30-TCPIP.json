@@ -1,0 +1,140 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY30-TCPIP",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 30,
+  "title": "TCP/IP: a mini web-connected device",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 30,
+  "mission": "Turn the ESP32-S3 into a TCP server on your own Wi-Fi, dial in from your computer with the bundled sketchWiFi tool, and pass lines of text both ways — the final upload of the course, and the moment your board becomes a web-connected device.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_24.2_WiFiServer/Sketch_24.2_WiFiServer.ino",
+    "arduinoVariant": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_24.1_WiFiClient/Sketch_24.1_WiFiClient.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/21.2_TCP_as_Server/TCP_as_Server.py",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    },
+    {
+      "name": "Official sketch",
+      "imageAsset": "docs/course/assets/shared/item-official-sketch.png",
+      "explanation": "A sketch is the Arduino name for a program. This lesson uses Freenove's Sketch_19.1_Ultrasonic_Ranging.ino so you can focus first on wiring, observation, and the measurement model."
+    }
+  ],
+  "wiring": [],
+  "coachInstructions": [
+    "Guide one step at a time and wait for learner confirmation before proceeding.",
+    "Endless dots after upload mean credentials or band — confirm both `********` placeholders were replaced and the network broadcasts 2.4 GHz before touching code.",
+    "If Processing cannot connect, confirm both machines are on the same network and that the learner dialled the exact IP and port the monitor just printed.",
+    "If ControlP5 errors on Run, install it via Processing's Add Library window before debugging anything else.",
+    "If lines go missing, have the learner connect first, then type, and end every line with Enter.",
+    "This is the final day — when the exchange works, invite the learner to log what they'd build next before packing up."
+  ],
+  "steps": [
+    "Open Sketch_24.2_WiFiServer.ino in Arduino IDE.",
+    "Replace the two placeholders with your own Wi-Fi name and password — the same network your computer is on.",
+    "On your computer, install Processing from processing.org/download.",
+    "In Processing, add the ControlP5 library — Sketch → Import Library → Add Library, then search ControlP5.",
+    "Back in the sketch folder, open the bundled sketchWiFi/sketchWiFi.pde in Processing and click Run.",
+    "Upload the Arduino sketch, then open Serial Monitor at 115200 and watch the board join your network and print its IP address and port 80.",
+    "In sketchWiFi, choose TCP CLIENT mode, enter the board's printed IP and port 80, and connect.",
+    "Type a line in sketchWiFi and press Enter — it lands in Serial Monitor. Answer from Serial Monitor's send box — it lands in sketchWiFi."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "WiFi.begin(ssid_Router, password_Router)",
+        "explanation": "Joins your router's network as a station — the router hands the board an IP address."
+      },
+      {
+        "line": "server.begin(port)",
+        "explanation": "Starts listening at port 80 — a numbered door other machines can knock on."
+      },
+      {
+        "line": "client.print(Serial.readStringUntil('\\n'))",
+        "explanation": "Reads the line you typed in Serial Monitor and sends it down the network to the computer."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "listenSocket.bind((ip,port))",
+        "explanation": "Ties the listening socket to the board's own address and to port 8000."
+      },
+      {
+        "line": "conn.send('I am Server')",
+        "explanation": "The first line down the wire the moment a client connects."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "A server listens at an address and port; a client dials it. That is the whole shape of the internet, and your board now has it.",
+    "formula": "server listens at an address and port → client dials it → one shared line",
+    "notes": [
+      {
+        "title": "Day 29 gave it the address",
+        "body": "Yesterday the board joined the network and the router handed it a number. Today it opens a door at that number and offers a service — an address, a port, and something listening."
+      },
+      {
+        "title": "What \"on the internet\" means",
+        "body": "Every web server in the world is this same shape at larger scale — an address, a port, a service that answers when dialled. Your board now has all three."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "Connecting to YourNetworkName",
+      ".....",
+      "WiFi connected.",
+      "IP address: 192.168.1.42",
+      "IP port: 80",
+      "Client connected.",
+      "hello from the chart table",
+      "Client Disconnected."
+    ],
+    "successCriteria": "Your address will differ — always dial the one your monitor just printed. The middle lines are whatever the two machines say to each other."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "Dots forever",
+      "firstChecks": [
+        "Re-check the Wi-Fi name and password in the sketch, confirm the network has a 2.4 GHz band, then press the board's reset button."
+      ]
+    },
+    {
+      "symptom": "Processing can't connect",
+      "firstChecks": [
+        "Both machines must be on the same network — and use the IP the monitor just printed, since it changes between networks."
+      ]
+    },
+    {
+      "symptom": "ControlP5 error on Run",
+      "firstChecks": [
+        "Install the library from Processing's Add Library window, then run the sketch again."
+      ]
+    },
+    {
+      "symptom": "Nothing arrives",
+      "firstChecks": [
+        "Connect before typing, and end every line with Enter."
+      ]
+    }
+  ],
+  "challenge": "Run the client sketch with sketchWiFi as the server, teach the board to answer \"aye\" to \"ahoy\", and note what you'd build next — the whole kit is yours now.",
+  "logbookPrompts": [
+    "What was the first line your board and your computer exchanged?",
+    "Which role did you leave the board in — listening or dialling — and why?",
+    "Thirty days on, the whole kit is yours. What will you build next?"
+  ]
+}
