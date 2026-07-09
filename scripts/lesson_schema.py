@@ -147,6 +147,10 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
     if isinstance(day, int) and isinstance(slug, str) and slug:
         _require(errors, slug.startswith(f"day-{day:02d}-"),
                  f"{code}: slug {slug!r} does not match day {day}")
+    code_match = re.match(r"^TSK-DAY(\d{2})-", str(lesson.get("lessonCode", "")))
+    if code_match and isinstance(day, int):
+        _require(errors, code_match.group(1) == f"{day:02d}",
+                 f"{code}: lessonCode day {code_match.group(1)} does not match day {day}")
     for field in ("title", "mission", "learnerProfile", "unlocks"):
         _require(errors, bool(str(lesson.get(field, "")).strip()),
                  f"{code}: {field} is required")

@@ -79,6 +79,12 @@ class ValidationTests(unittest.TestCase):
         errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
         self.assertTrue(any("tracks.main" in e for e in errors), errors)
 
+    def test_lessoncode_day_must_match_day(self):
+        lesson = load_day26()
+        lesson["lessonCode"] = "TSK-DAY25-ULTRASONIC"  # day is 26
+        errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
+        self.assertTrue(any("lessonCode day" in e for e in errors), errors)
+
     def test_slug_must_match_day(self):
         lesson = load_day26()
         lesson["slug"] = "day-25-ultrasonic"

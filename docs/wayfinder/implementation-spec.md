@@ -58,7 +58,7 @@ Superset of the shipped `tinyskiff.lessonPacket.v0`. Full annotated schema in [s
 
 - **Identity:** `schema`, `lessonCode` (unique, `TSK-DAYNN-…`), `day` (1–30, unique), `slug` (unique, matches folder), `title`, `status` ∈ {draft, review, published}.
 - **Framing:** `mission` (the goal), `estimatedTimeMinutes` (**≤ 30**), `tracks.main = arduino`.
-- **Body slots:** `parts[]` (each with `image`, `imageKind`, `blurb`, optional `explain`), `wiring` (`diagram` with `image`+`alt`+`source{pdf,chapter,page}`, `pins[]`), `safety[]` (only when a real risk exists), `steps[]`, `codeFocus.arduino` (`sketch`, `excerpt`, `notes[]`), optional `codeFocus.micropython`, `theory` (`flow[]`, `formula`, `notes[]`), `test` (`expected[]`, `checks[]`), `challenge`, `logbook[]`.
+- **Body slots** (content sections are objects with an `intro` + items; as implemented — see [site-content-model.md §2](site-content-model.md) and `lessons/day-26-ultrasonic.yml`): `hero`, `parts.items[]` (each with `image`, `imageKind`, `alt`, `blurb`, optional `explain`), `wiring` (`diagram` with `image`+`alt`+`caption`+`source{pdf,chapter,page}`, `pins[]`, optional `safety[]`), `steps.items[]`, `code.arduino` (`sketch`, `excerpt`, `notes[]`), optional `code.micropython`, optional `theory` (`flow[]`, `formula`, `notes[]` — complete if present), `test` (`expected[]`, `checks[]`), `challenge` (`title`, `summary`, `logbook[]`), `agent` (`coachInstructions[]`).
 - **Provenance:** every image carries `alt`; every diagram carries `source`; `source.license` present.
 - **Glossary keys** referenced in any `explain:` field must exist in `_glossary.yml`.
 
@@ -88,7 +88,7 @@ Extend `scripts/build_site.py` (keep Python, per confirmed decision):
 2. `render_lesson(lesson)` → `docs/course/day-NN-slug/index.html` via the productised template.
 3. `render_course_index(lessons)` → `docs/course/index.html` (voyage map).
 4. `emit_packet(lesson)` → `docs/course/packets/<CODE>.json`.
-5. `derive_backlinks(lessons)` — map `codeFocus.sketch` paths to Library entries for "Taught in Day N".
+5. `derive_backlinks(lessons)` — map `code.arduino.sketch` paths to Library entries for "Taught in Day N".
 6. Landing: render `/` course-forward once ≥1 day is published (interim: library-first).
 7. `validate_site.py` gains lesson-schema + invariant checks (≤30 min, alt/source present, unique day/code/slug, glossary keys resolve) so a bad day fails the build.
 

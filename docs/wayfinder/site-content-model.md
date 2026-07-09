@@ -3,7 +3,7 @@
 Resolved for: [Specify the site content model and navigation](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/6)
 Map: [Wayfinder Map: TinySkiff ESP32-S3 guided 30-day tutorial spec](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/1)
 
-Builds on: [lesson voice + day template](lesson-template.md) (#3), [30-day curriculum spine](curriculum-spine.md) (#4), and the approved [Day 26 guided-day prototype](guided-day-prototype-day-26-ultrasonic.html) (#5).
+Builds on: [lesson voice + day template](lesson-template.md) (#3), [30-day curriculum spine](curriculum-spine.md) (#4), and the approved [Day 26 guided-day prototype](guided-day-prototype-day-26-ultrasonic.md) (#5), now generated at [`/course/day-26-ultrasonic/`](../course/day-26-ultrasonic/index.html).
 
 ---
 
@@ -66,82 +66,111 @@ Per-day **folders with `index.html`** give clean, shareable, stable URLs (`/cour
 
 One file per day under `lessons/`. It is a **superset of the existing `tinyskiff.lessonPacket.v0`** already shipped with the prototype, so the packet becomes a projection of the lesson, not a second thing to maintain.
 
-The page has fixed slots (parts, wiring, pins, steps, code focus, theory, test, challenge, logbook, agent). Structured data fills those slots reliably; free prose lives inside fields as short Markdown strings. Recommended authoring format: **YAML** (readable, comments allowed, diff-friendly); the build parses it to the same JSON the packet already uses.
+The page has fixed slots (hero, parts, wiring, pins, steps, code focus, theory, test, challenge + logbook, agent). Content-carrying sections are **objects with an `intro` plus their items** (so each section can hold its own lead prose), not bare lists. Free prose lives inside fields as short Markdown strings supporting `` `code` ``, `**bold**`, `*em*`, and inline `{glossary-key}` explainer chips. Recommended authoring format: **YAML** (readable, comments allowed, diff-friendly); the build parses it to the packet JSON.
+
+The **canonical, complete example is [`lessons/day-26-ultrasonic.yml`](../../lessons/day-26-ultrasonic.yml)** — copy it when authoring a new day. The shape below is abbreviated to the field names the validator enforces (see `scripts/lesson_schema.py`):
 
 ```yaml
 schema: tinyskiff.lesson.v1
-lessonCode: TSK-DAY26-ULTRASONIC        # stable agent-assist code
+lessonCode: TSK-DAY26-ULTRASONIC        # stable agent-assist code; DAYNN must match `day`
 day: 26
-slug: day-26-ultrasonic
+slug: day-26-ultrasonic                 # must match the day's slug in _course.yml
 title: Measure the room with sound
-status: draft | review | published
+status: draft | review | published      # only `published` days render + link
 estimatedTimeMinutes: 30                # template rule: ≤ 30
-tracks: { main: arduino, optional: micropython }
+tracks: { main: arduino, optional: micropython }   # main must be arduino
 learnerProfile: adult beginner; no electronics assumed
-
-mission: >
-  Build a tiny depth sounder with the HC-SR04…            # the goal slot
+mission: >                              # the goal slot (also the packet mission)
+  Build a tiny depth sounder with the HC-SR04…
 unlocks: The board can measure the world by timing a signal out and back.
 
+hero:                                    # → the instrument hero
+  instrument: sounder
+  instrumentTitle: Live echo sounder
+  readout: { label: Distance, value: "24.31", unit: cm }
+  headline: Measure the room|with {sound}    # '|' = line break, '{x}' = emphasis
+  lede: Today you build a tiny depth sounder…
+  pills: [ { text: About 30 minutes, key: true }, Arduino first ]
+
 parts:                                                    # → parts grid
-  - name: HC-SR04 sensor
-    image: shared/item-hcsr04.jpg
-    imageKind: Manual photo
-    blurb: The distance sensor with two round transducers.
-    explain: hcsr04                                       # → glossary key
+  intro: Six things, nothing more…
+  items:
+    - name: HC-SR04 sensor
+      image: shared/item-hcsr04.jpg      # relative to course-assets/assets/
+      imageKind: Manual photo
+      alt: Official manual image of the HC-SR04…   # required (provenance)
+      blurb: The distance sensor with two round transducers.
+      explain: hcsr04                    # → glossary key
 
 wiring:
+  intro: The official Freenove diagram is your chart…
   diagram:
     image: day-26/circuit-page-172.png
-    alt: Official Freenove diagram showing VCC→5V, Trig→GPIO13…
-    source: { pdf: C_Tutorial.pdf, chapter: 19, page: 172 }
+    alt: Official Freenove diagram showing VCC→5V, Trig→GPIO13…   # required
+    caption: Official Freenove circuit — C Tutorial, Chapter 19, page 172.
+    source: { pdf: C_Tutorial.pdf, chapter: 19, chapterTitle: Ultrasonic Ranging, page: 172 }
   pins:                                                   # → interactive pin table
-    - { from: VCC,  to: 5V,      why: Powers the sensor.,             explain: vcc }
-    - { from: Trig, to: GPIO 13, why: Board sends the start pulse.,   explain: trig }
-    - { from: Echo, to: GPIO 14, why: Sensor returns a timed pulse.,  explain: echo }
-    - { from: GND,  to: GND,     why: Shared zero point.,             explain: gnd }
-
-safety:                                                   # inline callouts, only when real
-  - label: Check before power
-    body: Keep pins in module order; unplug USB before moving wires.
+    - { from: VCC, to: 5V, why: Powers the sensor., explain: vcc }
+  safety:                                                 # inline callouts, only when real
+    - { label: Check before power., body: Keep pins in module order; unplug USB first. }
 
 steps:                                                    # → checkable build steps
-  - Place the HC-SR04 so the transducers face outward.
-  - Connect `VCC → 5V`, `Trig → GPIO 13`, `Echo → GPIO 14`, `GND → GND`.
-  - Open Serial Monitor at `115200` baud.                # explainers referenced inline: {serial}
+  intro: This is the main path…
+  items:
+    - Connect `VCC → 5V`, `Trig → GPIO 13`, `Echo → GPIO 14`, `GND → GND`.
+    - Open Serial Monitor at `115200` baud. {serial}     # inline explainer chip
+  done: { title: Sounder's live., body: …, icon: "🌊" }
 
-codeFocus:                                                # → code panel + annotations
+code:                                                     # → code panel + annotations
+  intro: You don't need the whole sketch today…
   arduino:
-    sketch: C/Sketches/Sketch_19.1_Ultrasonic_Ranging/…  # link to full source in Library
+    file: Sketch_19.1_Ultrasonic_Ranging.ino             # display label
+    sketch: C/Sketches/Sketch_19.1_Ultrasonic_Ranging/…  # full source path (Library link)
+    variant: C/Sketches/Sketch_19.2_…                    # optional; → packet
     excerpt: |
       #define trigPin 13
       pingTime = pulseIn(echoPin, HIGH, timeOut);
     notes:
       - { code: "pulseIn(...)", text: Times how long Echo stays HIGH., explain: pulsein }
-  micropython:                                            # optional tab; omit to hide it
-    file: Python/Python_Codes/18.1_Ultrasonic_Ranging/…
-    excerpt: |
-      trigPin = Pin(13, Pin.OUT, 0)
+  micropython:                                            # optional block; omit to hide the tab
+    file: 18.1_Ultrasonic_Ranging/Ultrasonic_Ranging.py
+    path: Python/Python_Codes/18.1_Ultrasonic_Ranging/…  # full source path
+    excerpt: "trigPin = Pin(13, Pin.OUT, 0)"
     notes: [ { code: "Pin(13, Pin.OUT, 0)", text: Trigger output. } ]
+    note: Same pins, same behaviour…                     # closing note
 
-theory:                                                   # the "why it works" layer
-  flow: [ Send a ping, Wait for echo, Measure time, Convert to distance ]
-  formula: distance = speed of sound × echo time ÷ 2
+theory:                                                   # optional; complete if present
+  title: Physics of a ping
+  summary: Send a ping, wait for the echo…                # → packet plainLanguage
+  intro: The whole day is one loop…
+  flow: [ { n: Send a ping, title: Trig fires, body: … } ]
+  formula: distance = **speed of sound** × **echo time** ÷ 2   # **term** → accent
   notes: [ { title: Why readings wobble, body: …, explain: wobble } ]
 
 test:
+  intro: Success and recovery sit side by side…
+  baud: 115200
   expected: [ "Distance: 24.31cm", "Distance: 23.92cm" ]
+  expectedNote: A good reading changes when you move the object.
   checks:
-    - { symptom: 0cm or frozen, fix: Check Trig, Echo, GND, target shape. }
+    - { symptom: "0 cm or frozen?", fix: "Check Trig, Echo, GND, and the target's shape." }
 
 challenge:
-  title: A mini range log
-  body: Measure three targets; choose a keep-out threshold and say why.
+  title: "Try this: a mini range log"
+  railLabel: Try this
+  intro: Same working setup, one new skill…
+  summary: Measure three targets; choose a keep-out threshold and say why.   # → packet
+  cards: [ { title: Measure three targets, body: … } ]
+  logbook: [ What did you measure?, Which reading was most stable? ]
 
-logbook: [ What did you measure?, Which reading was most stable? ]
+agent:
+  intro: Every lesson ships with a code and a machine-readable packet…
+  behaviour: guide one physical step at a time…          # page callout prose
+  coachInstructions: [ Guide one physical step at a time…, … ]   # → packet list
 
 source:                                                   # attribution, always preserved
-  license: CC BY-NC-SA 3.0 (Freenove); TinySkiff not affiliated.
+  license: CC BY-NC-SA 3.0
+  licenseNote: Based on Freenove official material…; preserve attribution.
 ```
 
 **Glossary (`lessons/_glossary.yml`)** holds every explainer once, keyed by topic (`hcsr04`, `trig`, `pulsein`…), each with `title` / `body` / `shortcut`. Lessons reference a key; the build inlines the definition into both the page's lightbox data and the agent packet. Shared terms are written once and reused across all 30 days.
