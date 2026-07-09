@@ -390,6 +390,24 @@ def validate_against_course(lessons: list[Lesson], course: dict) -> list[str]:
     return errors
 
 
+def validate_glossary(glossary: dict) -> list[str]:
+    """Each glossary entry must be a mapping with non-empty title/body/shortcut.
+
+    The render/packet paths dereference these (glossary[key].get("body"), and the
+    explainer lightbox reads title/body/shortcut), so a malformed entry would
+    crash the build or ship a blank explainer.
+    """
+    errors: list[str] = []
+    for key, entry in glossary.items():
+        if not isinstance(entry, dict):
+            errors.append(f"glossary entry {key!r} must be a mapping with title/body/shortcut")
+            continue
+        for field in ("title", "body", "shortcut"):
+            _require(errors, _nonempty(entry.get(field)),
+                     f"glossary entry {key!r} is missing {field}")
+    return errors
+
+
 def collect_lessons() -> list[Lesson]:
     """Load and fully validate every lesson; raise LessonError on any problem."""
     glossary = load_glossary()
@@ -397,6 +415,7 @@ def collect_lessons() -> list[Lesson]:
     lessons = load_lessons()
 
     problems: list[str] = []
+    problems.extend(validate_glossary(glossary))
     for lesson in lessons:
         problems.extend(validate_lesson(lesson.data, glossary_keys))
     problems.extend(validate_corpus(lessons))

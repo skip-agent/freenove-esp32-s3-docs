@@ -187,6 +187,16 @@ class ValidationTests(unittest.TestCase):
         lessons = lesson_schema.collect_lessons()
         self.assertGreaterEqual(len(lessons), 1)
 
+    def test_real_glossary_is_valid(self):
+        self.assertEqual(lesson_schema.validate_glossary(GLOSSARY), [])
+
+    def test_malformed_glossary_entry_fails(self):
+        errors = lesson_schema.validate_glossary({"foo": None, "bar": "x",
+                                                  "baz": {"title": "T", "body": "B"}})
+        self.assertTrue(any("foo" in e and "mapping" in e for e in errors), errors)
+        self.assertTrue(any("bar" in e and "mapping" in e for e in errors), errors)
+        self.assertTrue(any("baz" in e and "shortcut" in e for e in errors), errors)
+
     def test_spine_slug_drift_detected(self):
         drifted = lesson_schema.Lesson(
             path=Path("day-26-ultrasonic.yml"),
