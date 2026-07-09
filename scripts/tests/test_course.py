@@ -183,6 +183,21 @@ class ValidationTests(unittest.TestCase):
         errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
         self.assertTrue(any("challenge.logbook[1]" in e for e in errors), errors)
 
+    def test_optional_list_wrong_type_fails(self):
+        # an optional list written as a mapping/string must be caught, not coerced
+        for path in (("wiring", "safety"), ("challenge", "cards")):
+            lesson = load_day26()
+            lesson[path[0]][path[1]] = {"oops": "mapping-not-list"}
+            errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
+            self.assertTrue(any(f"{path[0]}.{path[1]} must be a list" in e for e in errors),
+                            f"{path}: {errors}")
+
+    def test_code_notes_wrong_type_fails(self):
+        lesson = load_day26()
+        lesson["code"]["arduino"]["notes"] = "not-a-list"
+        errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
+        self.assertTrue(any("code.arduino.notes must be a list" in e for e in errors), errors)
+
     def test_collect_lessons_passes(self):
         lessons = lesson_schema.collect_lessons()
         self.assertGreaterEqual(len(lessons), 1)

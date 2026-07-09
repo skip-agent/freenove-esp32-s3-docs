@@ -283,6 +283,31 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
         if sub is not None and not isinstance(sub, dict):
             err(f"{name} must be a mapping")
 
+    # Every field the renderer iterates must actually be a list when present.
+    # (_as_list would otherwise coerce a stray dict/string to [] and hide it,
+    # while the renderer iterates the raw value and crashes.)
+    list_fields = [
+        ("parts.items", _as_dict(lesson.get("parts")).get("items")),
+        ("wiring.pins", wiring.get("pins")),
+        ("wiring.safety", wiring.get("safety")),
+        ("steps.items", _as_dict(lesson.get("steps")).get("items")),
+        ("code.arduino.notes", arduino.get("notes")),
+        ("code.micropython.notes", micro.get("notes")),
+        ("test.expected", test.get("expected")),
+        ("test.checks", test.get("checks")),
+        ("challenge.cards", challenge.get("cards")),
+        ("challenge.logbook", challenge.get("logbook")),
+        ("agent.coachInstructions", agent.get("coachInstructions")),
+        ("hero.pills", _as_dict(lesson.get("hero")).get("pills")),
+    ]
+    if theory is not None:
+        theory_d = _as_dict(theory)
+        list_fields += [("theory.flow", theory_d.get("flow")),
+                        ("theory.notes", theory_d.get("notes"))]
+    for name, raw in list_fields:
+        if raw is not None and not isinstance(raw, list):
+            err(f"{name} must be a list")
+
     # Lists of mappings — each item must be a mapping with its required fields.
     mapping_specs = {
         "wiring.safety": (_as_list(wiring.get("safety")), ("label", "body")),
