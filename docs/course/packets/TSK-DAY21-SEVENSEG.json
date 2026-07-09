@@ -1,0 +1,185 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY21-SEVENSEG",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 21,
+  "title": "Seven-segment display: show one clear digit",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 30,
+  "mission": "Wire Day 20's 74HC595 to a 7-segment display, upload the Arduino sketch, and watch the display count 0 through F, one character per second — the same three wires from the board now draw a shape you can read at a glance.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "officialPdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+    "chapter": "Chapter 15 74HC595 & 7-Segment Display",
+    "page": 140,
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_15.1_1_Digit_7-Segment_Display/Sketch_15.1_1_Digit_7-Segment_Display.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/14.1_74HC595_and_7_segment_display/74HC595_and_7_segment_display.py",
+    "imageAsset": "docs/course/assets/day-21/circuit-page-140.png",
+    "imageAlt": "Official Freenove circuit for the 7-segment display: a 74HC595 shift register driven from GPIO 12, 13, and 14, its eight outputs wired through 220 ohm resistors to the segments of a one-digit display, shown as both a schematic and a breadboard photo.",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "GPIO extension board",
+      "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
+      "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
+    },
+    {
+      "name": "74HC595 shift register",
+      "imageAsset": "docs/course/assets/shared/item-74hc595.png",
+      "explanation": "The 74HC595 takes data one bit at a time on a single wire and presents it as eight parallel outputs. Three GPIO pins — data, clock, and latch — can drive eight LEDs, and chips can be chained for eight more. It's how a small board controls a big row of outputs."
+    },
+    {
+      "name": "7-segment display",
+      "imageAsset": "docs/course/assets/shared/item-seven-segment.png",
+      "explanation": "Eight LEDs — seven bars in a figure-8 plus a decimal point — share one positive pin (a common anode). Each byte in the code table switches a pattern of segments on with LOW bits, and the lit pattern draws the digit. 0xc0 lights every segment of a \"0\"; 0xff blanks the display."
+    },
+    {
+      "name": "8 × 220 Ω resistors",
+      "imageAsset": "docs/course/assets/shared/item-resistor.png",
+      "explanation": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction."
+    },
+    {
+      "name": "Jumper wires",
+      "imageAsset": "docs/course/assets/shared/item-jumper-wire.png",
+      "explanation": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles."
+    }
+  ],
+  "wiring": [
+    {
+      "partPin": "GPIO 12",
+      "connectTo": "74HC595 DS (pin 14)",
+      "reason": "Carries each bit of the pattern byte into the chip."
+    },
+    {
+      "partPin": "GPIO 13",
+      "connectTo": "74HC595 ST_CP (pin 12)",
+      "reason": "The latch — a low-high pulse shows the finished byte on all eight outputs at once."
+    },
+    {
+      "partPin": "GPIO 14",
+      "connectTo": "74HC595 SH_CP (pin 11)",
+      "reason": "The clock tick that moves each bit one place along."
+    },
+    {
+      "partPin": "74HC595 Q0-Q7",
+      "connectTo": "segments A-G and DP via 220 Ω each",
+      "reason": "Each output drives one segment through its own resistor."
+    },
+    {
+      "partPin": "Display common pins (3 and 8)",
+      "connectTo": "positive rail (3.3V/5V)",
+      "reason": "Feeds the shared anode so a 0 bit can light its segment."
+    }
+  ],
+  "coachInstructions": [
+    "Confirm the three Day 20 control wires first (GPIO 12 to DS, GPIO 13 to ST_CP, GPIO 14 to SH_CP) before touching the eight segment wires.",
+    "The eight resistor paths from Q0-Q7 to the segments are today's main failure surface — have the learner verify them against the diagram one row at a time.",
+    "If every segment is always lit, check the latch wire on GPIO 13 — the patterns are likely never reaching the outputs.",
+    "If one segment never lights, trace that segment's 220 Ω wire back to its Q pin before changing code.",
+    "If the display is completely dark, re-run Day 20's chip power and orientation checks, then confirm the common pins (3 and 8) reach the positive rail.",
+    "Keep the Arduino path primary; the MicroPython version paces at 500 ms per character with no blanking, which is expected."
+  ],
+  "steps": [
+    "Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.",
+    "Straddle the 74HC595 across the breadboard's centre gap with its notch matching the diagram — the same seat as Day 20.",
+    "Place the 7-segment display nearby the way the breadboard photo shows, and find its two common pins (3 and 8).",
+    "Run the three control wires — GPIO 12 to DS, GPIO 13 to ST_CP, GPIO 14 to SH_CP.",
+    "Wire each chip output Q0 through Q7 to its segment through its own 220 Ω resistor, following the diagram one row at a time.",
+    "Wire the display's common pins (3 and 8) to the positive rail so the shared anode has power.",
+    "Compare every wire to the chart before you plug in USB.",
+    "Open Sketch_15.1_1_Digit_7-Segment_Display.ino in Arduino IDE and upload it.",
+    "Watch the display count 0 through F, one character per second."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "byte num[]",
+        "explanation": "Sixteen ready-made segment patterns — one byte per character, 0 through F."
+      },
+      {
+        "line": "shiftOut(dataPin, clockPin, LSBFIRST, value)",
+        "explanation": "Clocks the byte into the chip one bit at a time — the same move as Day 20."
+      },
+      {
+        "line": "writeData(0xff)",
+        "explanation": "All eight bits set to 1 means every segment off — this line blanks the display."
+      },
+      {
+        "line": "delay(1000)",
+        "explanation": "Holds each character on the display for one full second."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "Chip74HC595(12,13,14)",
+        "explanation": "A helper class wraps the chip — same three pins in the same order as the Arduino sketch."
+      },
+      {
+        "line": "chip.shiftOut(0,lists[count])",
+        "explanation": "Sends one pattern byte; the 0 picks lowest-bit-first order, matching LSBFIRST in Arduino."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "Eight segments line up with eight bits, so one byte holds a whole character — and on this display a 0 bit is what lights a segment.",
+    "formula": "character → one byte → eight segments → a shape you can read",
+    "notes": [
+      {
+        "title": "How the byte maps to segments",
+        "body": "From the top bit down the order is DP G F E D C B A. So 0xc0 is 1100 0000 — DP and G stay dark while the other six light up and draw a 0."
+      },
+      {
+        "title": "Why 0 means on",
+        "body": "This display is common anode — every segment's positive side is tied to the rail, so an output has to sit LOW to let current flow and light its segment. 0xff is all HIGH, which is a blank display."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "The display counts 0 1 2 3 4 5 6 7 8 9 then A b C d E F — one character per second.",
+      "After F it wraps back to 0 and the count runs again.",
+      "Each character sits steady for its full second."
+    ],
+    "successCriteria": "Lowercase b and d are deliberate — with all seven segments a capital B would read as 8 and a capital D as 0."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "Every segment lit, all the time",
+      "firstChecks": [
+        "The patterns aren't reaching the chip — check the latch wire on GPIO 13."
+      ]
+    },
+    {
+      "symptom": "One segment never lights",
+      "firstChecks": [
+        "Trace that segment's 220 Ω wire back to its Q pin on the chip."
+      ]
+    },
+    {
+      "symptom": "Shapes are nonsense",
+      "firstChecks": [
+        "Segment wires are on the wrong Q pins — re-check them against the diagram one row at a time."
+      ]
+    },
+    {
+      "symptom": "Display completely dark",
+      "firstChecks": [
+        "Run Day 20's chip power and orientation checklist, then confirm the common pins (3 and 8) reach the positive rail."
+      ]
+    }
+  ],
+  "challenge": "Show your favourite digit from power-on, slow the count, then work out the byte for the letter H and put it on the display.",
+  "logbookPrompts": [
+    "Which character surprised you when it appeared, and why?",
+    "What byte would draw the first letter of your name — and can this display manage it?",
+    "Where in daily life did you last read a seven-segment digit?"
+  ]
+}

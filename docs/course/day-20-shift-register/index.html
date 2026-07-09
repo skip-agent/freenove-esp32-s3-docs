@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Day 20 · Shift register: many outputs, fewer pins — TinySkiff ESP32-S3 Lab</title>
+  <meta name="description" content="Drive an LED bar graph through a 74HC595 shift register on the ESP32-S3. Three GPIOs carry a byte to eight outputs, and a lit LED flows along the bar and back." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../course.css" />
+</head>
+<body>
+  <div class="lesson-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 20 of 30</p>
+        <h1>Eight lights<br />from three <em>wires</em></h1>
+        <p class="lede">Today a chip joins the crew. You feed a 74HC595 one byte over three wires — data, clock, latch — and it fans those eight bits out to the LED bar all at once. The flowing light you built on Day 6 took ten GPIOs; today&#x27;s takes three.
+</p>
+        <div class="meta-row" aria-label="Lesson facts">
+          <span class="pill is-key">About 30 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">The LED bar returns</span>
+        </div>
+      </div>
+      <div class="hero-side no-instrument">
+        
+        <div class="agent-strip">
+          <div class="lesson-code">
+            <span class="label">Agent assist code</span>
+            <code>TSK-DAY20-SHIFTREG</code>
+          </div>
+          <button class="copy-prompt" type="button" data-copy="I am doing TinySkiff lesson TSK-DAY20-SHIFTREG. Pull the lesson packet, then guide me one step at a time. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY20-SHIFTREG.json">lesson packet</a> and coach you step by step.</p>
+        </div>
+      </div>
+    </header>
+    <div class="layout">
+      <nav class="rail" aria-label="Lesson progress">
+        <div class="rail-head">
+          <strong>Today's route</strong>
+          <span class="day-of">20 / 30</span>
+        </div>
+        <div class="voyage" style="--voyage-fill: 66.67%" aria-hidden="true"><span></span></div>
+        <div class="rail-nav">
+          <a href="#parts"><span class="tick"></span>What you need</a>
+          <a href="#wiring"><span class="tick"></span>Chart the circuit</a>
+          <a href="#steps"><span class="tick"></span>Build it</a>
+          <a href="#code"><span class="tick"></span>Read the code</a>
+          <a href="#theory"><span class="tick"></span>Three wires carry a byte</a>
+          <a href="#test"><span class="tick"></span>Test &amp; debug</a>
+          <a href="#challenge"><span class="tick"></span>Try this</a>
+          <a href="#agent"><span class="tick"></span>Coach me</a>
+        </div>
+      </nav>
+      <main class="lesson-main">
+        <section id="parts" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">01</span> First, know the pieces</p>
+              <h2>What you need</h2>
+              <p class="muted">Six things, one of them a chip with sixteen legs. Tap <em>Define</em> on any part you haven&#x27;t met — the answer opens as a field note you can read and dismiss without losing your place.
+</p>
+            </div>
+            <div class="part-grid">
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-esp32-s3-board.jpg" alt="Official manual photo of the ESP32-S3 development board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>ESP32-S3 board <button class="define" data-topic="esp32">Define</button></h3>
+                <p>The brain that runs your uploaded sketch.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-gpio-extension-board.png" alt="Official manual image of the ESP32-S3 GPIO extension board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>GPIO extension board <button class="define" data-topic="gpio">Define</button></h3>
+                <p>Spreads the pins into rows you can reach and label.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-74hc595.png" alt="Official manual illustration of the 74HC595 shift register chip with its sixteen pins numbered." /><figcaption>Manual illustration</figcaption></figure>
+                <h3>74HC595 shift register <button class="define" data-topic="shiftRegister">Define</button></h3>
+                <p>The chip that turns three wires into eight outputs.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-led-bar.png" alt="Official manual photo of a ten-segment LED bar graph module." /><figcaption>Manual photo</figcaption></figure>
+                <h3>LED bar graph <button class="define" data-topic="ledBar">Define</button></h3>
+                <p>The bar from Day 6 — eight of its segments light today.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-resistor.png" alt="Official manual photo of a resistor with coloured value bands." /><figcaption>Manual photo</figcaption></figure>
+                <h3>8 × 220 Ω resistors <button class="define" data-topic="resistor">Define</button></h3>
+                <p>One per segment to keep each LED&#x27;s current gentle.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-jumper-wire.png" alt="Official manual image of a jumper wire." /><figcaption>Manual photo</figcaption></figure>
+                <h3>Jumper wires (about 15) <button class="define" data-topic="jumpers">Define</button></h3>
+                <p>Temporary, solder-free connections — the most you&#x27;ve used so far.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+        <section id="wiring" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">02</span> Make the physical circuit</p>
+              <h2>Chart the circuit</h2>
+              <p class="muted">The official Freenove diagram is your chart — schematic on top, the same circuit built on a breadboard below. Click it to enlarge. The chip sits across the breadboard&#x27;s centre channel, and each connection tells you where the wire goes and why.
+</p>
+            </div>
+            <div class="wire-layout">
+              <figure class="image-frame">
+                <button class="zoom" type="button" data-zoom="../assets/day-20/circuit-page-133.png" data-cap="Official Freenove circuit, C Tutorial Chapter 14, page 133.">
+                  <img src="../assets/day-20/circuit-page-133.png" alt="Official Freenove circuit for the 74HC595 flowing light: the chip straddles the breadboard with GPIO 12 on its data pin, GPIO 13 on its latch pin, and GPIO 14 on its clock pin, and outputs Q0 to Q7 driving the LED bar graph through eight 220 ohm resistors, shown as both a schematic and a breadboard photo." />
+                  <span class="zoom-hint">Click to enlarge</span>
+                </button>
+                <figcaption class="caption">Official Freenove circuit — C Tutorial, Chapter 14 (74HC595 &amp; LED Bar Graph), page 133.</figcaption>
+              </figure>
+              <div class="pin-table" aria-label="Wiring">
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>GPIO 12 <button class="define" data-topic="shiftOut">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">74HC595 DS (pin 14)</span>
+                  <span class="pin-why">Carries the byte into the chip one bit at a time.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>GPIO 13 <button class="define" data-topic="shiftRegister">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">74HC595 ST_CP latch (pin 12)</span>
+                  <span class="pin-why">One rising edge here presents all eight stored bits at once.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>GPIO 14</span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">74HC595 SH_CP clock (pin 11)</span>
+                  <span class="pin-why">Each tick tells the chip to take in the next bit.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>Outputs Q0–Q7 <button class="define" data-topic="ledBar">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">LED bar via 220 Ω each</span>
+                  <span class="pin-why">Eight chip outputs each drive one segment through its own resistor.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>OE (chip pin 13) <button class="define" data-topic="gnd">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GND</span>
+                  <span class="pin-why">Held low so the outputs stay switched on.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>MR (chip pin 10) <button class="define" data-topic="vcc">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">5V</span>
+                  <span class="pin-why">Held high so the chip never clears what it holds.</span>
+                </div>
+              </div>
+            </div>
+            <div class="callout">
+              <div class="icon" aria-hidden="true">⚓</div>
+              <p><strong>Mind the chip&#x27;s notch.</strong> The 74HC595 only works one way round — the half-moon notch at one end marks where pin 1 sits, and it must match the chart. Unplug USB before you move any wire.
+</p>
+            </div>
+          </div>
+        </section>
+        <section id="steps" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">03</span> One action at a time</p>
+              <h2>Build it</h2>
+              <p class="muted">This is the main path — you can finish the day without opening a single field note. Tap each step as you go to keep your place.
+</p>
+            </div>
+            <div class="steps-progress">
+              <div class="bar" aria-hidden="true"><span id="stepBar"></span></div>
+              <span class="count" id="stepCount">0 / 9 done</span>
+            </div>
+            <ol class="step-list">
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 1 done"></button><p class="text">Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 2 done"></button><p class="text">Straddle the 74HC595 across the breadboard&#x27;s centre channel with its notch matching the chart. <button class="define" data-topic="shiftRegister">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">Give the chip power — VCC and MR (pin 10) to 5V, GND and OE (pin 13) to ground.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">Run the three control wires — GPIO 12 to DS (pin 14), GPIO 13 to ST_CP (pin 12), GPIO 14 to SH_CP (pin 11). <button class="define" data-topic="shiftOut">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Connect outputs Q0–Q7 to the LED bar, with a 220 Ω resistor in series for each segment. <button class="define" data-topic="resistor">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 6 done"></button><p class="text">Check the LED bar&#x27;s direction against the chart — you saw on Day 6 how easily it reverses. <button class="define" data-topic="ledBar">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 7 done"></button><p class="text">Compare every wire to the chart before you plug in USB.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 8 done"></button><p class="text">Open <code>Sketch_14.1_FlowingLight02.ino</code> in Arduino IDE and upload it.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 9 done"></button><p class="text">Watch one lit LED run along the bar and back.</p></li>
+            </ol>
+            <div class="done-banner" id="doneBanner" role="status">
+              <span class="icon" aria-hidden="true">💡</span>
+              <div><strong>Three wires carry a byte.</strong><p>The chip is holding eight lights for you. Head to Test &amp; debug to confirm the flow.</p></div>
+            </div>
+          </div>
+        </section>
+        <section id="code" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">04</span> Read just enough code</p>
+              <h2>Read the code</h2>
+              <p class="muted">The sketch keeps one byte, x, and lets its single 1 bit slide left and then right. A small helper, writeTo595, hands each new byte to the chip and latches it onto the outputs. Switch to MicroPython if you&#x27;d rather see the same idea in Python — the wiring never changes.
+</p>
+            </div>
+            <div class="tabs" role="tablist" aria-label="Code language">
+              <button class="tab" id="tab-arduino" role="tab" aria-selected="true" aria-controls="panel-arduino">Arduino <span class="badge">Main</span></button><button class="tab" id="tab-micropython" role="tab" aria-selected="false" aria-controls="panel-micropython">MicroPython <span class="badge">Optional</span></button>
+            </div>
+            <div class="tabpanel" id="panel-arduino" role="tabpanel" aria-labelledby="tab-arduino">
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">Sketch_14.1_FlowingLight02.ino</span></div>
+<pre><code><span class="tok-key">int</span> latchPin = <span class="tok-num">13</span>;          // Pin connected to ST_CP of <span class="tok-num">74</span><span class="tok-fn">HC595</span>(Pin12)
+<span class="tok-key">int</span> clockPin = <span class="tok-num">14</span>;          // Pin connected to SH_CP of <span class="tok-num">74</span><span class="tok-fn">HC595</span>(Pin11)
+<span class="tok-key">int</span> dataPin = <span class="tok-num">12</span>;           // Pin connected to DS of <span class="tok-num">74</span><span class="tok-fn">HC595</span>(Pin14)
+
+<span class="tok-key">void</span> <span class="tok-fn">setup</span>() {
+  // set pins to output
+  <span class="tok-fn">pinMode</span>(latchPin, OUTPUT);
+  <span class="tok-fn">pinMode</span>(clockPin, OUTPUT);
+  <span class="tok-fn">pinMode</span>(dataPin, OUTPUT);
+}
+
+<span class="tok-key">void</span> <span class="tok-fn">loop</span>() {
+  byte x = <span class="tok-num">0</span>x01;    // <span class="tok-num">0</span>b <span class="tok-num">0000</span> <span class="tok-num">0001</span>
+  <span class="tok-fn">for</span> (<span class="tok-key">int</span> j = <span class="tok-num">0</span>; j &lt; <span class="tok-num">8</span>; j++) { // Let led light up from right to left
+    <span class="tok-fn">writeTo595</span>(LSBFIRST, x);
+    x &lt;&lt;= <span class="tok-num">1</span>;
+    <span class="tok-fn">delay</span>(<span class="tok-num">50</span>);
+  }
+  <span class="tok-fn">delay</span>(<span class="tok-num">100</span>);
+  x = <span class="tok-num">0</span>x80;       //<span class="tok-num">0</span>b <span class="tok-num">1000</span> <span class="tok-num">0000</span>
+  <span class="tok-fn">for</span> (<span class="tok-key">int</span> j = <span class="tok-num">0</span>; j &lt; <span class="tok-num">8</span>; j++) { // Let led light up from left to right
+    <span class="tok-fn">writeTo595</span>(LSBFIRST, x);
+    x &gt;&gt;= <span class="tok-num">1</span>;
+    <span class="tok-fn">delay</span>(<span class="tok-num">50</span>);
+  }
+  <span class="tok-fn">delay</span>(<span class="tok-num">100</span>);
+}
+<span class="tok-key">void</span> <span class="tok-fn">writeTo595</span>(<span class="tok-key">int</span> order, byte _data ) {
+  // Output low level to latchPin
+  <span class="tok-fn">digitalWrite</span>(latchPin, LOW);
+  // Send serial data to <span class="tok-num">74</span>HC595
+  <span class="tok-fn">shiftOut</span>(dataPin, clockPin, order, _data);
+  // Output high level to latchPin, and <span class="tok-num">74</span>HC595 will update the data to the parallel output port.
+  <span class="tok-fn">digitalWrite</span>(latchPin, HIGH);
+}</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>shiftOut(dataPin, clockPin, order, _data)</code><span class="note-text">Sends the byte to the chip one bit at a time — data on GPIO 12, a clock tick on GPIO 14 for each bit. <button class="define" data-topic="shiftOut">Define</button></span></div>
+                  <div class="code-note"><code>digitalWrite(latchPin, HIGH)</code><span class="note-text">The rising edge on GPIO 13 moves all eight stored bits to the outputs in one step. <button class="define" data-topic="shiftRegister">Define</button></span></div>
+                  <div class="code-note"><code>x &lt;&lt;= 1</code><span class="note-text">Slides the single 1 bit one place left, so the lit LED takes one step along the bar; delay(50) sets the pace. <button class="define" data-topic="delayMs">Define</button></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="tabpanel" id="panel-micropython" role="tabpanel" aria-labelledby="tab-micropython" hidden>
+              <p class="optional-tag">Optional side path · same circuit</p>
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">13.1_Flowing_Water_Light/Flowing_Water_Light.py</span></div>
+<pre><code>import time
+from my74HC595 import Chip74HC595
+
+chip = <span class="tok-fn">Chip74HC595</span>(<span class="tok-num">12</span>,<span class="tok-num">13</span>,<span class="tok-num">14</span>,-<span class="tok-num">1</span>)
+
+while True:
+    x=<span class="tok-num">0</span>x01
+    for count in <span class="tok-fn">range</span>(<span class="tok-num">8</span>):
+        chip.<span class="tok-fn">shiftOut</span>(<span class="tok-num">1</span>,x)
+        x=x&lt;&lt;<span class="tok-num">1</span>;
+        time.<span class="tok-fn">sleep_ms</span>(<span class="tok-num">300</span>)
+    x=<span class="tok-num">0</span>x01
+    for count in <span class="tok-fn">range</span>(<span class="tok-num">8</span>):
+        chip.<span class="tok-fn">shiftOut</span>(<span class="tok-num">0</span>,x)
+        x=x&lt;&lt;<span class="tok-num">1</span>
+        time.<span class="tok-fn">sleep_ms</span>(<span class="tok-num">300</span>)</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>Chip74HC595(12,13,14,-1)</code><span class="note-text">The module takes its pins in the order data then latch then clock — matching today&#x27;s wiring — with -1 meaning OE is simply wired to ground.</span></div>
+                  <div class="code-note"><code>chip.shiftOut(1,x)</code><span class="note-text">Sends the byte and latches it in one call; the first argument picks which direction the pattern travels.</span></div>
+                </div>
+              </div>
+              <p class="micropython-note">Same wiring, same chip. Here the direction of travel comes from shiftOut&#x27;s first argument — 1 one way, 0 the other — while both loops shift the byte the same way. Run it in Thonny if MicroPython is set up; otherwise skip it — it should never block the Arduino-first path.
+</p>
+            </div>
+          </div>
+        </section>
+        <section id="theory" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">05</span> Understand, don&#x27;t memorise</p>
+              <h2>Three wires carry a byte</h2>
+              <p class="muted">The chip is a small memory with eight outputs. Watch what the three wires each do, and the moving light explains itself.
+</p>
+            </div>
+            <div class="theory-flow" aria-label="Measurement model">
+              <article class="flow-step"><span class="n">Load</span><h3>Bit by bit</h3><p>Each clock tick pushes the next bit of the byte into the chip.</p></article>
+              <article class="flow-step"><span class="n">Latch</span><h3>One edge</h3><p>A rising edge on the latch pin presents all eight bits at once.</p></article>
+              <article class="flow-step"><span class="n">Light</span><h3>Eight outputs</h3><p>Q0 through Q7 each drive one segment of the bar.</p></article>
+              <article class="flow-step"><span class="n">Shift</span><h3>The byte moves</h3><p>x &lt;&lt;= 1 slides the lit bit along and the light follows it.</p></article>
+            </div>
+            <div class="formula-card">
+              <span class="label">The model</span>
+              <code>eight outputs = <b>one byte</b> carried over three wires</code>
+            </div>
+            <div class="two-col" style="margin-top:14px">
+              <article class="mini-card"><h3>Where Day 6&#x27;s ten pins went <button class="define" data-topic="pinArray">Define</button></h3><p>Day 6 gave every segment its own GPIO in a pin array. Today the chip holds all eight states, and the board keeps just three wires — data, clock, and latch.</p></article>
+              <article class="mini-card"><h3>What the latch is for <button class="define" data-topic="shiftRegister">Define</button></h3><p>While bits are still arriving, the outputs hold their previous pattern. The latch edge updates them all in one clean step, so you never see half a byte on the bar.</p></article>
+            </div>
+          </div>
+        </section>
+        <section id="test" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">06</span> Know it worked</p>
+              <h2>Test &amp; debug</h2>
+              <p class="muted">Nothing prints to the screen today — the proof is the light running along the bar in front of you.
+</p>
+            </div>
+            <div class="test-grid">
+              <div>
+                <span class="readout-title">What you should see</span>
+                <div class="observe" aria-label="What you should see">
+                  <div class="bar"><span>LED bar</span></div>
+                  <ul class="observe-lines"><li>One lit LED runs along the bar to one end.</li><li>It turns and runs back to where it started.</li><li>The run repeats forever, with a brief pause at each end.</li></ul>
+                </div>
+                <p class="micropython-note">Eight segments take part — the chip has eight outputs, so two segments of the ten-segment bar stay dark. That&#x27;s correct.</p>
+              </div>
+              <div>
+                <span class="checks-title">If it doesn&#x27;t</span>
+                <ul class="checklist">
+                  <li><strong>Nothing lights at all?</strong> Check the chip&#x27;s orientation by its notch, then its power — VCC and MR to 5V, GND and OE to ground.</li>
+                  <li><strong>Pattern scrambled or jumpy?</strong> Re-check the three control wires — DS on GPIO 12, latch on GPIO 13, clock on GPIO 14.</li>
+                  <li><strong>One LED never lights?</strong> Check that segment&#x27;s 220 Ω resistor and the bar&#x27;s direction, just as on Day 6.</li>
+                  <li><strong>Upload fails?</strong> Swap in a data-capable USB cable.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="challenge" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">07</span> Make the idea yours</p>
+              <h2>Try this: reshape the byte</h2>
+              <p class="muted">Same working circuit, one variable to play with: the byte x. Everything the bar does comes from how you shape and shift it. It fits inside today&#x27;s 30 minutes.
+</p>
+            </div>
+            <div class="two-col">
+              <article class="mini-card"><h3>Change the pace <button class="define" data-topic="delayMs">Define</button></h3><p>Change both <code>delay(50)</code> lines together — try 20 for a sprint, 150 for a stroll — and upload until the flow feels right.</p></article>
+              <article class="mini-card"><h3>Run a pair</h3><p>Start the first loop with <code>x = 0x03</code> so two neighbouring LEDs travel together. Predict what the second loop&#x27;s starting value needs to be before you change it.</p></article>
+              <article class="mini-card"><h3>Fill the bar</h3><p>In the first loop, replace <code>x &lt;&lt;= 1</code> with <code>x = (x &lt;&lt; 1) | 1</code> so each step keeps every light already lit and the bar fills from one end.</p></article>
+            </div>
+            <div class="logbook">
+              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
+              <label>Which speed made the flow easiest to follow, and why?<textarea rows="2"></textarea></label>
+              <label>What starting value made the pair bounce cleanly at both ends?<textarea rows="2"></textarea></label>
+              <label>After eight steps of the fill pattern, what byte is the chip holding?<textarea rows="2"></textarea></label>
+            </div>
+          </div>
+        </section>
+        <section id="agent" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">08</span> Learn it with a hand on the tiller</p>
+              <h2>Coach me through it</h2>
+              <p class="muted">Every lesson ships with a code and a machine-readable packet, so an agent can guide you with full context.
+</p>
+            </div>
+            <div class="agent-grid">
+              <article class="mini-card"><h3>Lesson code</h3><p><code>TSK-DAY20-SHIFTREG</code></p></article>
+              <article class="mini-card"><h3>Context packet</h3><p><a href="../packets/TSK-DAY20-SHIFTREG.json">Open the JSON packet →</a></p></article>
+            </div>
+            <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
+              <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
+              <p><strong>How the agent should behave:</strong> guide one physical connection at a time, wait for you to confirm, explain terms on request, and always check wiring, board, port, and USB before changing code.
+</p>
+            </div>
+          </div>
+        </section>
+        <nav class="day-nav" aria-label="Course navigation">
+        <a class="day-nav-link prev" href="../day-19-joystick/">
+          <span class="day-nav-dir">← Day 19</span>
+          <span class="day-nav-title">Joystick: read two axes and a button</span>
+        </a>
+        <a class="day-nav-link next" href="../day-21-seven-segment/">
+          <span class="day-nav-dir">Day 21 →</span>
+          <span class="day-nav-title">Seven-segment display: show one clear digit</span>
+        </a>
+        </nav>
+      </main>
+    </div>
+    <footer class="colophon">
+      <p><strong>Day 20 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <div class="rule"></div>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — the circuit diagram from C_Tutorial.pdf, Chapter 14, page 133; sketch <code>Sketch_14.1_FlowingLight02.ino</code>; MicroPython <code>13.1_Flowing_Water_Light/Flowing_Water_Light.py</code>. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+    </footer>
+  </div>
+
+  <dialog class="lightbox" id="explainer">
+    <div class="lb-head">
+      <div>
+        <span class="lb-kicker">Field note</span>
+        <h3 id="explainerTitle"></h3>
+      </div>
+      <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="lb-body"><p id="explainerBody"></p></div>
+    <div class="lb-shortcut"><span class="tag">Shortcut</span><span id="explainerShortcut"></span></div>
+  </dialog>
+
+  <dialog class="lightbox image" id="imageBox">
+    <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    <div class="lb-body"><img id="imageBoxImg" alt="" /></div>
+    <p class="lb-cap" id="imageBoxCap"></p>
+  </dialog>
+
+  <div class="toast" id="toast">Prompt copied</div>
+
+  <script id="lesson-data" type="application/json">{"day": 20, "totalDays": 30, "slug": "day-20-shift-register", "explainers": {"delayMs": {"title": "delay()", "body": "delay() pauses the whole program for a number of milliseconds — 1000 is one second. The blink you see is the LED held on for a moment, then off for a moment, on a loop.\n", "shortcut": "The number is milliseconds — 1000 = 1 second, 200 = a fifth of a second."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "gnd": {"title": "Ground / GND", "body": "Ground is the shared zero-voltage reference. The board and sensor need a common ground so a signal like HIGH or LOW means the same thing to both parts.\n", "shortcut": "A missing ground can make everything look haunted. Check it early."}, "gpio": {"title": "GPIO extension board", "body": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself.\n", "shortcut": "When a lesson says GPIO 13, look for the pin labelled 13 on the extension board."}, "jumpers": {"title": "Jumper wires", "body": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles.\n", "shortcut": "If a reading seems impossible, gently reseat the jumper wires before changing code."}, "ledBar": {"title": "LED bar graph", "body": "A LED bar packs ten separate LEDs into one strip, with a row of pins along each edge. Each LED is wired and driven on its own — exactly like the single LED from earlier days, just ten of them in a tidy line.\n", "shortcut": "Ten LEDs in one part. If it stays dark, rotate it 180° — the label direction is easy to get backwards."}, "pinArray": {"title": "An array of pins", "body": "Instead of naming ten pins one by one, the sketch keeps them in a list (an array) and walks the list with a loop. Change the order or length of the list and the pattern changes with it — no rewiring needed.\n", "shortcut": "One loop over a list of pins does the work of ten copied-and-pasted lines."}, "resistor": {"title": "Resistor", "body": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction.\n", "shortcut": "The 220 Ω resistor protects the LED; either way round is fine."}, "shiftOut": {"title": "shiftOut() and the latch", "body": "shiftOut(dataPin, clockPin, LSBFIRST, x) clocks the eight bits of x into the 74HC595 one at a time. The outputs update when the latch pin goes LOW before the shift and HIGH after — that HIGH edge is the moment the new pattern appears on all eight pins at once.\n", "shortcut": "Latch LOW, shift the byte, latch HIGH — the pattern lands on the outputs at the HIGH edge."}, "shiftRegister": {"title": "74HC595 shift register", "body": "The 74HC595 takes data one bit at a time on a single wire and presents it as eight parallel outputs. Three GPIO pins — data, clock, and latch — can drive eight LEDs, and chips can be chained for eight more. It's how a small board controls a big row of outputs.\n", "shortcut": "Three pins in, eight outputs out — the chip holds the pattern for you."}, "vcc": {"title": "VCC / 5V", "body": "VCC is the positive power input for the sensor. In the Freenove circuit, the HC-SR04 is powered from 5V. Power is separate from the signal pins: VCC lets the sensor run; Trig and Echo carry information.\n", "shortcut": "Do not swap VCC and GND. That is the first wiring check."}}, "prev": {"day": 19, "slug": "day-19-joystick", "title": "Joystick: read two axes and a button"}, "next": {"day": 21, "slug": "day-21-seven-segment", "title": "Seven-segment display: show one clear digit"}}</script>
+  <script src="../course.js"></script>
+</body>
+</html>

@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Day 16 · Soft colourful light: map input to colour — TinySkiff ESP32-S3 Lab</title>
+  <meta name="description" content="Wire three potentiometers and an RGB LED to the ESP32-S3, upload the sketch, and mix colours by hand — each knob maps its reading onto one PWM colour channel in real time." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../course.css" />
+</head>
+<body>
+  <div class="lesson-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 16 of 30</p>
+        <h1>Mix your own colour<br />with three <em>knobs</em></h1>
+        <p class="lede">Today the colour mixing moves into your hands. Three knobs each feed a reading to the board, and each reading sets the brightness of one colour in the RGB dome — red, green, and blue on their own channels. Turn them together and you are mixing light the way a deckhand trims three sheets at once.
+</p>
+        <div class="meta-row" aria-label="Lesson facts">
+          <span class="pill is-key">About 25 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">Day 9&#x27;s dome meets Day 15&#x27;s knob</span>
+        </div>
+      </div>
+      <div class="hero-side no-instrument">
+        
+        <div class="agent-strip">
+          <div class="lesson-code">
+            <span class="label">Agent assist code</span>
+            <code>TSK-DAY16-SOFTCOLOUR</code>
+          </div>
+          <button class="copy-prompt" type="button" data-copy="I am doing TinySkiff lesson TSK-DAY16-SOFTCOLOUR. Pull the lesson packet, then guide me one step at a time. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY16-SOFTCOLOUR.json">lesson packet</a> and coach you step by step.</p>
+        </div>
+      </div>
+    </header>
+    <div class="layout">
+      <nav class="rail" aria-label="Lesson progress">
+        <div class="rail-head">
+          <strong>Today's route</strong>
+          <span class="day-of">16 / 30</span>
+        </div>
+        <div class="voyage" style="--voyage-fill: 53.33%" aria-hidden="true"><span></span></div>
+        <div class="rail-nav">
+          <a href="#parts"><span class="tick"></span>What you need</a>
+          <a href="#wiring"><span class="tick"></span>Chart the circuit</a>
+          <a href="#steps"><span class="tick"></span>Build it</a>
+          <a href="#code"><span class="tick"></span>Read the code</a>
+          <a href="#theory"><span class="tick"></span>Three chains, one loop</a>
+          <a href="#test"><span class="tick"></span>Test &amp; debug</a>
+          <a href="#challenge"><span class="tick"></span>Try this</a>
+          <a href="#agent"><span class="tick"></span>Coach me</a>
+        </div>
+      </nav>
+      <main class="lesson-main">
+        <section id="parts" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">01</span> First, know the pieces</p>
+              <h2>What you need</h2>
+              <p class="muted">Seven things, and every one of them has been aboard before. Tap <em>Define</em> on any part you haven&#x27;t met — the answer opens as a field note you can read and dismiss without losing your place.
+</p>
+            </div>
+            <div class="part-grid">
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-esp32-s3-board.jpg" alt="Official manual photo of the ESP32-S3 development board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>ESP32-S3 board <button class="define" data-topic="esp32">Define</button></h3>
+                <p>The brain that runs your uploaded sketch.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-gpio-extension-board.png" alt="Official manual image of the ESP32-S3 GPIO extension board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>GPIO extension board <button class="define" data-topic="gpio">Define</button></h3>
+                <p>Spreads the pins into rows you can reach and label.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-potentiometer.png" alt="Official manual photo of a rotary potentiometer with its three legs visible." /><figcaption>Manual photo</figcaption></figure>
+                <h3>3 × rotary potentiometers <button class="define" data-topic="potentiometer">Define</button></h3>
+                <p>Three knobs — one for each colour channel.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-rgb-led.png" alt="Official manual photo of an RGB LED showing its long common pin and three colour legs." /><figcaption>Manual photo</figcaption></figure>
+                <h3>RGB LED <button class="define" data-topic="rgb">Define</button></h3>
+                <p>Three lights — red, green, blue — in one dome with a shared pin.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-resistor.png" alt="Official manual photo of a resistor with coloured value bands." /><figcaption>Manual photo</figcaption></figure>
+                <h3>3 × 220 Ω resistors <button class="define" data-topic="resistor">Define</button></h3>
+                <p>One in series with each colour leg to keep the current gentle.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-jumper-wire.png" alt="Official manual image of a jumper wire." /><figcaption>Manual photo</figcaption></figure>
+                <h3>Jumper wires <button class="define" data-topic="jumpers">Define</button></h3>
+                <p>Temporary, solder-free connections — thirteen of them today.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-arduino-ide.png" alt="Official manual screenshot of the Arduino IDE interface." /><figcaption>Manual screenshot</figcaption></figure>
+                <h3>Arduino IDE <button class="define" data-topic="arduino">Define</button></h3>
+                <p>Uploads the sketch to the board.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+        <section id="wiring" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">02</span> Make the physical circuit</p>
+              <h2>Chart the circuit</h2>
+              <p class="muted">The official Freenove diagram is your chart — schematic on top, the same circuit built on a breadboard below. Click it to enlarge. The pairing to keep in your head: the knob on GPIO 12 drives the red leg on GPIO 38, 13 drives green on 39, and 14 drives blue on 40.
+</p>
+            </div>
+            <div class="wire-layout">
+              <figure class="image-frame">
+                <button class="zoom" type="button" data-zoom="../assets/day-16/circuit-page-113.png" data-cap="Official Freenove circuit, C Tutorial Chapter 10, page 113.">
+                  <img src="../assets/day-16/circuit-page-113.png" alt="Official Freenove circuit for soft colourful light: three rotary potentiometers with their middle pins on GPIO 12, 13, and 14, and an RGB LED whose red, green, and blue legs run through 220 ohm resistors to GPIO 38, 39, and 40, with the long common pin joined to 3.3 volts, shown as both a schematic and a breadboard photo." />
+                  <span class="zoom-hint">Click to enlarge</span>
+                </button>
+                <figcaption class="caption">Official Freenove circuit — C Tutorial, Chapter 10 (Potentiometer &amp; LED), page 113.</figcaption>
+              </figure>
+              <div class="pin-table" aria-label="Wiring">
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>Red knob middle pin <button class="define" data-topic="adc">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GPIO 12</span>
+                  <span class="pin-why">The board reads this knob to set how much red shows.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>Green knob middle pin <button class="define" data-topic="potentiometer">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GPIO 13</span>
+                  <span class="pin-why">The board reads this knob to set how much green shows.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>Blue knob middle pin</span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GPIO 14</span>
+                  <span class="pin-why">The board reads this knob to set how much blue shows.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>Each knob&#x27;s outer legs <button class="define" data-topic="gnd">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">3.3V and GND</span>
+                  <span class="pin-why">The two ends give the middle pin a full sweep from zero to full voltage.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>Red leg (via 220 Ω) <button class="define" data-topic="pwm">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GPIO 38</span>
+                  <span class="pin-why">PWM on this pin sets the red brightness.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>Green leg (via 220 Ω)</span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GPIO 39</span>
+                  <span class="pin-why">PWM on this pin sets the green brightness.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>Blue leg (via 220 Ω) <button class="define" data-topic="rgb">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GPIO 40</span>
+                  <span class="pin-why">PWM on this pin sets the blue brightness.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>Common (long) pin <button class="define" data-topic="commonAnode">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">3.3V</span>
+                  <span class="pin-why">All three colours share this positive pin so a colour lights when its pin goes LOW.</span>
+                </div>
+              </div>
+            </div>
+            <div class="callout">
+              <div class="icon" aria-hidden="true">⚓</div>
+              <p><strong>The common pin goes to 3.3V.</strong> This is the same common-anode LED as Day 9 — the long common pin goes to 3.3V, the opposite of a single LED&#x27;s ground leg. Each colour leg reaches its own GPIO through a 220 Ω resistor. Unplug USB before you move any wire.
+</p>
+            </div>
+          </div>
+        </section>
+        <section id="steps" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">03</span> One action at a time</p>
+              <h2>Build it</h2>
+              <p class="muted">This is the main path — you can finish the day without opening a single field note. Tap each step as you go to keep your place.
+</p>
+            </div>
+            <div class="steps-progress">
+              <div class="bar" aria-hidden="true"><span id="stepBar"></span></div>
+              <span class="count" id="stepCount">0 / 9 done</span>
+            </div>
+            <ol class="step-list">
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 1 done"></button><p class="text">Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 2 done"></button><p class="text">Place the three potentiometers on the breadboard with room to turn each knob. <button class="define" data-topic="potentiometer">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">Wire each knob&#x27;s outer legs to 3.3V and GND so its middle pin can sweep the full range.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">Run the middle pins to GPIO 12, 13, and 14 — red, green, and blue in that order. <button class="define" data-topic="adc">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Wire the RGB LED&#x27;s red leg through a 220 Ω resistor to GPIO 38, green to GPIO 39, blue to GPIO 40. <button class="define" data-topic="resistor">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 6 done"></button><p class="text">Run the LED&#x27;s long common pin to 3.3V. <button class="define" data-topic="commonAnode">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 7 done"></button><p class="text">Compare every wire to the chart before you plug in USB.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 8 done"></button><p class="text">Open <code>Sketch_10.2_SoftColorfulLight.ino</code> in Arduino IDE and upload it.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 9 done"></button><p class="text">Turn each knob in turn and watch its colour rise and fall in the dome.</p></li>
+            </ol>
+            <div class="done-banner" id="doneBanner" role="status">
+              <span class="icon" aria-hidden="true">💡</span>
+              <div><strong>Your own mixing desk.</strong><p>Three knobs now hold the colour between them. Head to Test &amp; debug to confirm each channel answers its own knob.</p></div>
+            </div>
+          </div>
+        </section>
+        <section id="code" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">04</span> Read just enough code</p>
+              <h2>Read the code</h2>
+              <p class="muted">Day 15 built one chain — read a knob, rescale it, write a brightness. Today the sketch runs that chain three times per pass using three small arrays and one loop. Switch to MicroPython if you&#x27;d rather see the same idea in Python — the wiring never changes.
+</p>
+            </div>
+            <div class="tabs" role="tablist" aria-label="Code language">
+              <button class="tab" id="tab-arduino" role="tab" aria-selected="true" aria-controls="panel-arduino">Arduino <span class="badge">Main</span></button><button class="tab" id="tab-micropython" role="tab" aria-selected="false" aria-controls="panel-micropython">MicroPython <span class="badge">Optional</span></button>
+            </div>
+            <div class="tabpanel" id="panel-arduino" role="tabpanel" aria-labelledby="tab-arduino">
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">Sketch_10.2_SoftColorfulLight.ino</span></div>
+<pre><code><span class="tok-key">const</span> byte adcChns[] = {<span class="tok-num">12</span>, <span class="tok-num">13</span>, <span class="tok-num">14</span>};    // define the adc channels
+<span class="tok-key">const</span> byte ledPins[] = {<span class="tok-num">38</span>, <span class="tok-num">39</span>, <span class="tok-num">40</span>};    // define led pins
+<span class="tok-key">const</span> byte pwmChns[] = { <span class="tok-num">0</span>,  <span class="tok-num">1</span>,  <span class="tok-num">2</span>};    // define the pwm channels
+<span class="tok-key">int</span> colors[] = {<span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>};               // red, green ,blue values of color.
+<span class="tok-key">void</span> <span class="tok-fn">setup</span>() {
+  <span class="tok-fn">for</span> (<span class="tok-key">int</span> i = <span class="tok-num">0</span>; i &lt; <span class="tok-num">3</span>; i++) {         //setup the pwm channels
+    <span class="tok-fn">ledcAttachChannel</span>(ledPins[i], <span class="tok-num">1000</span>, <span class="tok-num">8</span>, pwmChns[i]);//<span class="tok-num">1</span>KHz, <span class="tok-num">8</span><span class="tok-fn">bit</span>(<span class="tok-num">0</span>-<span class="tok-num">255</span>).
+  }
+}
+
+<span class="tok-key">void</span> <span class="tok-fn">loop</span>() {
+  <span class="tok-fn">for</span> (<span class="tok-key">int</span> i = <span class="tok-num">0</span>; i &lt; <span class="tok-num">3</span>; i++) {
+    colors[i] = <span class="tok-fn">map</span>(<span class="tok-fn">analogRead</span>(adcChns[i]), <span class="tok-num">0</span>, <span class="tok-num">4096</span>, <span class="tok-num">0</span>, <span class="tok-num">255</span>); //calculate color value.
+    <span class="tok-fn">ledcWrite</span>(ledPins[i], <span class="tok-num">256</span> - colors[i]);                   //set color
+  }
+  <span class="tok-fn">delay</span>(<span class="tok-num">10</span>);
+}</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>const byte adcChns[] = {12, 13, 14}</code><span class="note-text">Three matched arrays pair each knob with a colour leg — position 0 links the knob on 12 to the red leg on 38 and so on down the line. <button class="define" data-topic="pinArray">Define</button></span></div>
+                  <div class="code-note"><code>colors[i] = map(analogRead(adcChns[i]), 0, 4096, 0, 255)</code><span class="note-text">Reads one knob (0–4095) and rescales it onto the 0–255 brightness range in a single line. <button class="define" data-topic="mapValue">Define</button></span></div>
+                  <div class="code-note"><code>ledcWrite(ledPins[i], 256 - colors[i])</code><span class="note-text">Day 9&#x27;s common-anode inversion — this dome lights when its pin goes LOW so the sketch subtracts the value before writing it. <button class="define" data-topic="commonAnode">Define</button></span></div>
+                  <div class="code-note"><code>ledcAttachChannel(ledPins[i], 1000, 8, pwmChns[i])</code><span class="note-text">Gives each colour leg its own hardware PWM channel at 1 kHz with 8-bit brightness. <button class="define" data-topic="ledc">Define</button></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="tabpanel" id="panel-micropython" role="tabpanel" aria-labelledby="tab-micropython" hidden>
+              <p class="optional-tag">Optional side path · same circuit</p>
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">09.2_Soft_Colorful_Light/Soft_Colorful_Light.py</span></div>
+<pre><code>pwm0=<span class="tok-fn">PWM</span>(<span class="tok-fn">Pin</span>(<span class="tok-num">40</span>,Pin.OUT),<span class="tok-num">10000</span>)
+pwm1=<span class="tok-fn">PWM</span>(<span class="tok-fn">Pin</span>(<span class="tok-num">39</span>,Pin.OUT),<span class="tok-num">10000</span>)
+pwm2=<span class="tok-fn">PWM</span>(<span class="tok-fn">Pin</span>(<span class="tok-num">38</span>,Pin.OUT),<span class="tok-num">10000</span>)
+adc0=<span class="tok-fn">ADC</span>(<span class="tok-fn">Pin</span>(<span class="tok-num">12</span>))
+adc1=<span class="tok-fn">ADC</span>(<span class="tok-fn">Pin</span>(<span class="tok-num">13</span>))
+adc2=<span class="tok-fn">ADC</span>(<span class="tok-fn">Pin</span>(<span class="tok-num">14</span>))
+
+pwm0.<span class="tok-fn">duty</span>(<span class="tok-num">1023</span>-<span class="tok-fn">remap</span>(adc0.<span class="tok-fn">read</span>(),<span class="tok-num">0</span>,<span class="tok-num">4095</span>,<span class="tok-num">0</span>,<span class="tok-num">1023</span>))
+pwm1.<span class="tok-fn">duty</span>(<span class="tok-num">1023</span>-<span class="tok-fn">remap</span>(adc1.<span class="tok-fn">read</span>(),<span class="tok-num">0</span>,<span class="tok-num">4095</span>,<span class="tok-num">0</span>,<span class="tok-num">1023</span>))
+pwm2.<span class="tok-fn">duty</span>(<span class="tok-num">1023</span>-<span class="tok-fn">remap</span>(adc2.<span class="tok-fn">read</span>(),<span class="tok-num">0</span>,<span class="tok-num">4095</span>,<span class="tok-num">0</span>,<span class="tok-num">1023</span>))</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>pwm0.duty(1023-remap(adc0.read(),0,4095,0,1023))</code><span class="note-text">The whole chain in one line — read the knob, rescale to the 10-bit duty range, and subtract for the common-anode dome.</span></div>
+                </div>
+              </div>
+              <p class="micropython-note">Same wiring, one difference to expect: Freenove&#x27;s Python version pairs the knobs to the colours in the reverse order — the knob on GPIO 12 drives the leg on GPIO 40 — and both pairings work fine. Run it in Thonny if MicroPython is set up; otherwise skip it — it should never block the Arduino-first path.
+</p>
+            </div>
+          </div>
+        </section>
+        <section id="theory" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">05</span> Understand, don&#x27;t memorise</p>
+              <h2>Three chains, one loop</h2>
+              <p class="muted">Day 15&#x27;s single control chain — read the knob, rescale the number, write the brightness — appears here three times over, copied by a loop over three arrays.
+</p>
+            </div>
+            <div class="theory-flow" aria-label="Measurement model">
+              <article class="flow-step"><span class="n">Read three</span><h3>Knobs in</h3><p>analogRead measures each knob on GPIO 12 13 14 every pass.</p></article>
+              <article class="flow-step"><span class="n">Rescale</span><h3>map()</h3><p>Each reading up to 4095 becomes a colour value from 0 to 255.</p></article>
+              <article class="flow-step"><span class="n">Invert</span><h3>256 minus</h3><p>The common-anode dome lights when its pin goes LOW so the sketch flips the scale before writing.</p></article>
+              <article class="flow-step"><span class="n">Repeat</span><h3>Every 10 ms</h3><p>The loop refreshes all three channels fast enough that the colour rides your hands.</p></article>
+            </div>
+            <div class="formula-card">
+              <span class="label">The model</span>
+              <code><b>colour</b> = three knob readings → three mapped brightnesses</code>
+            </div>
+            <div class="two-col" style="margin-top:14px">
+              <article class="mini-card"><h3>Why arrays and a loop <button class="define" data-topic="pinArray">Define</button></h3><p>Writing the pins as three matched arrays lets one loop serve every channel. Adding a fourth channel would mean one more entry in each array and nothing else.</p></article>
+              <article class="mini-card"><h3>The same inversion as Day 9 <button class="define" data-topic="commonAnode">Define</button></h3><p>The common pin sits at 3.3V, so a colour is brightest when its own pin is pulled LOW. Subtracting the value from 256 flips the scale so a bigger knob reading still means a brighter colour.</p></article>
+            </div>
+          </div>
+        </section>
+        <section id="test" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">06</span> Know it worked</p>
+              <h2>Test &amp; debug</h2>
+              <p class="muted">Nothing prints to the screen today — the proof is the colour under your fingers.
+</p>
+            </div>
+            <div class="test-grid">
+              <div>
+                <span class="readout-title">What you should see</span>
+                <div class="observe" aria-label="What you should see">
+                  <div class="bar"><span>RGB LED</span></div>
+                  <ul class="observe-lines"><li>Turn one knob and one colour sweeps smoothly from dark to full while the other two hold steady.</li><li>Set the knobs in combinations and the dome mixes the shades — red and green up makes yellow.</li><li>All three knobs up glows white; all three down leaves the dome dark.</li></ul>
+                </div>
+                <p class="micropython-note">Every knob turned down means darkness by design — white takes all three channels at full.</p>
+              </div>
+              <div>
+                <span class="checks-title">If it doesn&#x27;t</span>
+                <ul class="checklist">
+                  <li><strong>One colour never changes?</strong> Check that knob&#x27;s middle wire on GPIO 12, 13, or 14 — the board is reading air.</li>
+                  <li><strong>Turning the red knob changes the wrong colour?</strong> The RGB legs are in the wrong order — red goes to GPIO 38, green to 39, blue to 40.</li>
+                  <li><strong>The dome stays dark with knobs up?</strong> Check the common pin — it goes to 3.3V.</li>
+                  <li><strong>Upload fails?</strong> Swap in a data-capable USB cable.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="challenge" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">07</span> Make the idea yours</p>
+              <h2>Try this: dial a sunset</h2>
+              <p class="muted">Same working circuit, two experiments — one with your hands, one with a single line of code. It fits inside today&#x27;s 25 minutes.
+</p>
+            </div>
+            <div class="two-col">
+              <article class="mini-card"><h3>Dial a sunset <button class="define" data-topic="rgb">Define</button></h3><p>Turn the knobs until the dome glows sunset orange — red high, green partway, blue low. Write down roughly where each knob sits, as three numbers from 0 to 255.</p></article>
+              <article class="mini-card"><h3>Two-knob mixer <button class="define" data-topic="pinArray">Define</button></h3><p>In the loop, make the blue channel reuse the green knob&#x27;s value — set <code>colors[2] = colors[1]</code> after the map line — and the mix now lives on two knobs.</p></article>
+            </div>
+            <div class="logbook">
+              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
+              <label>What three numbers made your sunset orange?<textarea rows="2"></textarea></label>
+              <label>Which colour surprised you most when you mixed it?<textarea rows="2"></textarea></label>
+              <label>With blue riding the green knob, which colours could you no longer reach?<textarea rows="2"></textarea></label>
+            </div>
+          </div>
+        </section>
+        <section id="agent" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">08</span> Learn it with a hand on the tiller</p>
+              <h2>Coach me through it</h2>
+              <p class="muted">Every lesson ships with a code and a machine-readable packet, so an agent can guide you with full context.
+</p>
+            </div>
+            <div class="agent-grid">
+              <article class="mini-card"><h3>Lesson code</h3><p><code>TSK-DAY16-SOFTCOLOUR</code></p></article>
+              <article class="mini-card"><h3>Context packet</h3><p><a href="../packets/TSK-DAY16-SOFTCOLOUR.json">Open the JSON packet →</a></p></article>
+            </div>
+            <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
+              <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
+              <p><strong>How the agent should behave:</strong> guide one physical connection at a time, wait for you to confirm, explain the knob-to-colour pairing on request, and always check wiring, board, port, and USB before changing code.
+</p>
+            </div>
+          </div>
+        </section>
+        <nav class="day-nav" aria-label="Course navigation">
+        <a class="day-nav-link prev" href="../day-15-soft-light/">
+          <span class="day-nav-dir">← Day 15</span>
+          <span class="day-nav-title">Soft light: map input to brightness</span>
+        </a>
+        <a class="day-nav-link next" href="../day-17-night-lamp/">
+          <span class="day-nav-dir">Day 17 →</span>
+          <span class="day-nav-title">Night lamp: respond to ambient light</span>
+        </a>
+        </nav>
+      </main>
+    </div>
+    <footer class="colophon">
+      <p><strong>Day 16 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <div class="rule"></div>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — the circuit diagram from C_Tutorial.pdf, Chapter 10, page 113; sketch <code>Sketch_10.2_SoftColorfulLight.ino</code>; MicroPython <code>09.2_Soft_Colorful_Light/Soft_Colorful_Light.py</code>. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+    </footer>
+  </div>
+
+  <dialog class="lightbox" id="explainer">
+    <div class="lb-head">
+      <div>
+        <span class="lb-kicker">Field note</span>
+        <h3 id="explainerTitle"></h3>
+      </div>
+      <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="lb-body"><p id="explainerBody"></p></div>
+    <div class="lb-shortcut"><span class="tag">Shortcut</span><span id="explainerShortcut"></span></div>
+  </dialog>
+
+  <dialog class="lightbox image" id="imageBox">
+    <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    <div class="lb-body"><img id="imageBoxImg" alt="" /></div>
+    <p class="lb-cap" id="imageBoxCap"></p>
+  </dialog>
+
+  <div class="toast" id="toast">Prompt copied</div>
+
+  <script id="lesson-data" type="application/json">{"day": 16, "totalDays": 30, "slug": "day-16-soft-colour", "explainers": {"adc": {"title": "ADC — analogRead()", "body": "Digital pins read only HIGH or LOW. An ADC (analog-to-digital converter) pin measures the actual voltage and hands your code a number: 0 volts reads 0, 3.3 volts reads 4095, and everything in between lands proportionally. That number is what analogRead() returns.\n", "shortcut": "analogRead() turns a voltage into a number from 0 to 4095."}, "arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "commonAnode": {"title": "Common anode — why brightness looks inverted", "body": "In this RGB LED all three colours share one positive pin, so a colour lights when its own pin is pulled LOW, not HIGH. The sketch writes 255 minus your value, so 255 still means \"brightest\" to you even though the hardware works upside down.\n", "shortcut": "A bigger number still means brighter — the 255 − value in code hides the inversion."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "gnd": {"title": "Ground / GND", "body": "Ground is the shared zero-voltage reference. The board and sensor need a common ground so a signal like HIGH or LOW means the same thing to both parts.\n", "shortcut": "A missing ground can make everything look haunted. Check it early."}, "gpio": {"title": "GPIO extension board", "body": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself.\n", "shortcut": "When a lesson says GPIO 13, look for the pin labelled 13 on the extension board."}, "jumpers": {"title": "Jumper wires", "body": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles.\n", "shortcut": "If a reading seems impossible, gently reseat the jumper wires before changing code."}, "ledc": {"title": "ledcWrite() and PWM channels", "body": "The ESP32-S3 has hardware PWM \"channels\" (its LEDC controller). You attach a pin to a channel once, then ledcWrite() sets its level. The board does the fast switching for you, so your loop just names a brightness number.\n", "shortcut": "Attach the pin to a channel once; then ledcWrite(pin, level) sets brightness."}, "mapValue": {"title": "map() and constrain()", "body": "map(value, 0, 4095, 0, 255) rescales a number from one range into another — here squeezing the ADC's 0–4095 into PWM's 0–255. constrain(value, low, high) clamps a number so it stays inside a window before you map it. The two together turn any sensor range into any output range.\n", "shortcut": "constrain() fences the value in; map() rescales it to the range you need."}, "pinArray": {"title": "An array of pins", "body": "Instead of naming ten pins one by one, the sketch keeps them in a list (an array) and walks the list with a loop. Change the order or length of the list and the pattern changes with it — no rewiring needed.\n", "shortcut": "One loop over a list of pins does the work of ten copied-and-pasted lines."}, "potentiometer": {"title": "Potentiometer", "body": "A potentiometer is a resistor with a third pin on a movable contact. Turning the shaft slides that contact along the resistor, so the voltage on the middle pin sweeps smoothly between the two ends. Wire the ends to 3.3V and ground and the knob becomes a voltage dial your ADC pin can read.\n", "shortcut": "The middle pin carries the voltage the knob is dialled to."}, "pwm": {"title": "PWM — dimming by blinking", "body": "A pin is only ever fully on or fully off. But if it flicks on and off thousands of times a second, your eye blends it into a steady in-between brightness. The share of time it stays on is the duty cycle — more on-time looks brighter.\n", "shortcut": "PWM fakes \"half on\" by switching fast. Duty 0 = off, maximum = brightest."}, "resistor": {"title": "Resistor", "body": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction.\n", "shortcut": "The 220 Ω resistor protects the LED; either way round is fine."}, "rgb": {"title": "RGB colour mixing", "body": "An RGB LED is three tiny LEDs — red, green, and blue — in one dome. Set each one's brightness with PWM and your eye blends them into a single colour. All off is dark; all full is white; everything else is a mix — the same trick a screen uses.\n", "shortcut": "Red + green + blue at different brightnesses makes any colour."}}, "prev": {"day": 15, "slug": "day-15-soft-light", "title": "Soft light: map input to brightness"}, "next": {"day": 17, "slug": "day-17-night-lamp", "title": "Night lamp: respond to ambient light"}}</script>
+  <script src="../course.js"></script>
+</body>
+</html>

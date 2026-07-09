@@ -86,6 +86,42 @@
       "origin": "Freenove manual — NPN transistor (S8050) component photo (C Tutorial, Chapter 6 Buzzer, page 79)",
       "kind": "kit-item photo",
       "alt": "Official manual photo of an NPN transistor with its three legs labelled emitter, base, and collector."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-potentiometer.png",
+      "origin": "Freenove manual — rotary potentiometer component illustration (C Tutorial, Chapter 8 AD Converter, page 95)",
+      "kind": "kit-item photo",
+      "alt": "Official manual illustration of a rotary potentiometer with rotation arrows and its three pins labelled 1, 3, and 2."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-photoresistor.png",
+      "origin": "Freenove manual — photoresistor component photo (C Tutorial, Chapter 11 Photoresistor & LED, page 117)",
+      "kind": "kit-item photo",
+      "alt": "Official manual photo of a photoresistor with its two legs labelled 1 and 2."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-thermistor.png",
+      "origin": "Freenove manual — thermistor component photo (C Tutorial, Chapter 12 Thermistor, page 122)",
+      "kind": "kit-item photo",
+      "alt": "Official manual photo of a bead thermistor with two long legs."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-joystick.png",
+      "origin": "Freenove manual — joystick module photo with X/Y axes (C Tutorial, Chapter 13 Joystick, page 127)",
+      "kind": "kit-item photo",
+      "alt": "Official manual photo of a joystick module with X and Y axis arrows and its five pins labelled 1 to 5."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-74hc595.png",
+      "origin": "Freenove manual — 74HC595 chip illustration (C Tutorial, Chapter 14 74HC595 & LED Bar Graph, page 132)",
+      "kind": "kit-item photo",
+      "alt": "Official manual illustration of the 74HC595 shift register chip with its sixteen pins numbered."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-seven-segment.png",
+      "origin": "Freenove manual — 7-segment display module photo (C Tutorial, Chapter 15 74HC595 & 7-Segment Display, page 138)",
+      "kind": "kit-item photo",
+      "alt": "Official manual photo of a one-digit seven-segment display module with its pins numbered 10, 6, 1, and 5 at the corners."
     }
   ],
   "days": {
@@ -171,6 +207,114 @@
         },
         "kind": "per-day circuit diagram (cropped from the official PDF; the table lamp reuses Project 2.1's circuit)",
         "alt": "Official Freenove circuit for Button & LED: an LED on GPIO 2 through a 220-ohm resistor to ground, and a push button on GPIO 13 with 10k-ohm resistors, shown as both a schematic and a breadboard photo."
+      }
+    ],
+    "13": [
+      {
+        "asset": "course-assets/assets/day-13/circuit-page-96.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 8 AD Converter",
+          "page": 96
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF)",
+        "alt": "Official Freenove circuit for the potentiometer: its two outer pins to 3.3V and ground and its middle pin to GPIO 1, shown as both a schematic and a breadboard photo."
+      }
+    ],
+    "14": [
+      {
+        "asset": "course-assets/assets/day-14/circuit-page-105.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 9 Touch Sensor",
+          "page": 105
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF; Project 9.2 Touch Lamp)",
+        "alt": "Official Freenove circuit for the touch lamp: a jumper wire on GPIO 14 as the touch pad and an LED on GPIO 21 through a 220-ohm resistor, shown as both a schematic and a breadboard photo."
+      }
+    ],
+    "15": [
+      {
+        "asset": "course-assets/assets/day-15/circuit-page-110.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 10 Potentiometer & LED",
+          "page": 110
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF)",
+        "alt": "Official Freenove circuit for the soft light: a potentiometer feeding GPIO 1 and an LED on GPIO 14 through a 220-ohm resistor, shown as both a schematic and a breadboard photo."
+      }
+    ],
+    "16": [
+      {
+        "asset": "course-assets/assets/day-16/circuit-page-113.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 10 Potentiometer & LED",
+          "page": 113
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF; Project 10.2 Soft Colorful Light)",
+        "alt": "Official Freenove circuit for the soft colourful light: three potentiometers feeding GPIO 12, 13, and 14 and an RGB LED on GPIO 38, 39, and 40 through 220-ohm resistors, shown as both a schematic and a breadboard photo."
+      }
+    ],
+    "17": [
+      {
+        "asset": "course-assets/assets/day-17/circuit-page-118.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 11 Photoresistor & LED",
+          "page": 118
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF)",
+        "alt": "Official Freenove circuit for the night lamp: a photoresistor and 10k-ohm resistor divider feeding GPIO 1 and an LED on GPIO 14 through a 220-ohm resistor, shown as both a schematic and a breadboard photo."
+      }
+    ],
+    "18": [
+      {
+        "asset": "course-assets/assets/day-18/circuit-page-123.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 12 Thermistor",
+          "page": 123
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF)",
+        "alt": "Official Freenove circuit for the thermometer: a thermistor and 10k-ohm resistor divider feeding GPIO 1, shown as both a schematic and a breadboard photo."
+      }
+    ],
+    "19": [
+      {
+        "asset": "course-assets/assets/day-19/circuit-page-128.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 13 Joystick",
+          "page": 128
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF)",
+        "alt": "Official Freenove circuit for the joystick: VRX to GPIO 14, VRY to GPIO 13, SW to GPIO 12, +5V to 3.3V, and GND to ground, shown as both a schematic and a breadboard photo."
+      }
+    ],
+    "20": [
+      {
+        "asset": "course-assets/assets/day-20/circuit-page-133.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 14 74HC595 & LED Bar Graph",
+          "page": 133
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF)",
+        "alt": "Official Freenove circuit for the 74HC595 flowing light: the shift register driven from GPIO 12, 13, and 14 and its eight outputs driving the LED bar through 220-ohm resistors, shown as both a schematic and a breadboard photo."
+      }
+    ],
+    "21": [
+      {
+        "asset": "course-assets/assets/day-21/circuit-page-140.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 15 74HC595 & 7-Segment Display",
+          "page": 140
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF)",
+        "alt": "Official Freenove circuit for the seven-segment display: the 74HC595 driven from GPIO 12, 13, and 14 with its outputs driving the display's segments through 220-ohm resistors, shown as both a schematic and a breadboard photo."
       }
     ],
     "26": [

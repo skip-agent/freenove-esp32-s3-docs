@@ -1,0 +1,162 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY14-TOUCH",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 14,
+  "title": "Touch sensor: use your body as input",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 25,
+  "mission": "Wire an LED to GPIO 21, leave one bare jumper on GPIO 14 as a touch pad, and upload the sketch that flips the lamp every time your fingertip taps the wire — your body becomes part of the circuit.",
+  "mainPath": "Arduino/C++",
+  "sourceMetadata": {
+    "officialPdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+    "chapter": "Chapter 9 Touch Sensor",
+    "page": 105,
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_09.2_TouchLamp/Sketch_09.2_TouchLamp.ino",
+    "imageAsset": "docs/course/assets/day-14/circuit-page-105.png",
+    "imageAlt": "Official Freenove circuit for the touch lamp: a bare jumper wire on GPIO 14 acting as a touch pad, and a LED on GPIO 21 through a 220 ohm resistor to ground, shown as both a schematic and a breadboard photo.",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "GPIO extension board",
+      "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
+      "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
+    },
+    {
+      "name": "LED",
+      "imageAsset": "docs/course/assets/shared/item-led.png",
+      "explanation": "A LED is a one-way light. It only lights when its longer leg (the +) faces the pin and its shorter leg (the −) faces ground. Too much current burns it out, so a LED always sits behind a resistor."
+    },
+    {
+      "name": "220 Ω resistor",
+      "imageAsset": "docs/course/assets/shared/item-resistor.png",
+      "explanation": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction."
+    },
+    {
+      "name": "3 × jumper wires",
+      "imageAsset": "docs/course/assets/shared/item-jumper-wire.png",
+      "explanation": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    }
+  ],
+  "wiring": [
+    {
+      "partPin": "Bare jumper end",
+      "connectTo": "GPIO 14 (T14)",
+      "reason": "The exposed metal tip is the touch pad your fingertip charges."
+    },
+    {
+      "partPin": "LED long leg (+)",
+      "connectTo": "GPIO 21 via 220 Ω",
+      "reason": "This pin holds the lamp on or off between touches."
+    },
+    {
+      "partPin": "LED short leg (−)",
+      "connectTo": "GND",
+      "reason": "Completes the LED's path back to zero volts."
+    }
+  ],
+  "coachInstructions": [
+    "Reassure the learner there is no sensor module to find — the touch pad is a single bare-ended jumper on GPIO 14.",
+    "Keep the two pins straight — T14 is GPIO 14 for the touch pad and the LED lives on GPIO 21; never let them swap in conversation or wiring.",
+    "On this board a touch RAISES the touchRead value (idle in the tens of thousands, touch above 200000); correct any advice claiming readings near zero mean touch.",
+    "If the LED never flips, have the learner upload Sketch_09.1_TouchRead and compare their own idle and touched numbers against PRESS_VAL and RELEASE_VAL before changing wiring.",
+    "If the LED flickers, coach them to hold the jumper by its insulation and touch only the bare metal tip, deliberately.",
+    "If the Serial Monitor shows nothing, check 115200 baud, the board, and the port before touching code."
+  ],
+  "steps": [
+    "Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.",
+    "Place the LED so its long leg (+) is on the GPIO 21 side and its short leg (−) heads toward ground.",
+    "Put the 220 Ω resistor in series between GPIO 21 and the LED's long leg.",
+    "Push one end of a jumper into GPIO 14 and leave its other end free in the air — that bare metal tip is your touch pad.",
+    "Compare every wire to the chart, then plug in USB.",
+    "Open Sketch_09.1_TouchRead.ino first, upload it, and open Serial Monitor at 115200 — note the reading when the wire is alone and when you pinch its bare tip.",
+    "Open Sketch_09.2_TouchLamp.ino and upload it.",
+    "Tap the bare tip — the LED flips on. Tap again — it flips off."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "touchRead(T14)",
+        "explanation": "Measures the charge on touch pin T14, which is GPIO 14 — your fingertip drives this number far higher."
+      },
+      {
+        "line": "touchRead(T14) > PRESS_VAL",
+        "explanation": "On this board a reading above 200000 counts as a touch; a reading below 60000 counts as a release."
+      },
+      {
+        "line": "bool isProcessed",
+        "explanation": "Remembers that the current touch has already been handled, so one tap flips the lamp exactly once."
+      },
+      {
+        "line": "digitalWrite(pin, !digitalRead(pin))",
+        "explanation": "Reads the LED pin's current state and writes the opposite — the flip itself."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "Your fingertip adds capacitance the pin can measure; two thresholds and one remembered flag turn that raw number into a clean toggle.",
+    "formula": "touch raises the reading — above 200000 is a press and below 60000 is a release",
+    "notes": [
+      {
+        "title": "On this board a touch pushes the number up",
+        "body": "Idle, the pin reads in the tens of thousands; a firm touch climbs past 200000. Older ESP32 chips reported touch as a drop toward zero, and some reference text still describes that behaviour — on your S3, trust the thresholds in the sketch."
+      },
+      {
+        "title": "The same trick as the table lamp",
+        "body": "The isProcessed flag plays the role debounce played on Day 5 — it holds the memory of one press so a long touch counts as a single tap."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "Tap the bare end of the wire — the LED flips on and stays on.",
+      "Tap it again — the LED flips off.",
+      "Serial Monitor at 115200 echoes each touch with \"Touch detected! \" and each let-go with \"Released! \"."
+    ],
+    "successCriteria": "This lamp latches — the LED holds its state between taps, with your fingertip doing the whole job of a button."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "LED never flips",
+      "firstChecks": [
+        "The thresholds may sit wrong for your setup — upload Sketch_09.1_TouchRead and read your own touched and untouched numbers."
+      ]
+    },
+    {
+      "symptom": "LED flickers wildly",
+      "firstChecks": [
+        "Hold the wire by its insulation and touch only the bare metal end, deliberately."
+      ]
+    },
+    {
+      "symptom": "Nothing on the Serial Monitor",
+      "firstChecks": [
+        "Set the monitor to 115200 baud, then re-check the board and port selections."
+      ]
+    },
+    {
+      "symptom": "Upload fails",
+      "firstChecks": [
+        "Swap in a data-capable USB cable."
+      ]
+    }
+  ],
+  "challenge": "Read your own touch numbers with Sketch_09.1_TouchRead, re-tune PRESS_VAL and RELEASE_VAL, then set the lamp to answer only a firm grip.",
+  "logbookPrompts": [
+    "What did your untouched and touched readings turn out to be?",
+    "Where did you finally set PRESS_VAL and RELEASE_VAL, and why?",
+    "What everyday device would feel better with a touch control like this?"
+  ]
+}

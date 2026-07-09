@@ -1,0 +1,181 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY15-SOFTLIGHT",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 15,
+  "title": "Soft light: map input to brightness",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 20,
+  "mission": "Wire a potentiometer to one pin and an LED to another, upload the Arduino sketch, and turn the knob to set the LED's brightness — the reading on one pin drives the glow on the other, live.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "officialPdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+    "chapter": "Chapter 10 Potentiometer & LED",
+    "page": 110,
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_10.1_SoftLight/Sketch_10.1_SoftLight.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/09.1_Soft_LED/Soft_LED.py",
+    "imageAsset": "docs/course/assets/day-15/circuit-page-110.png",
+    "imageAlt": "Official Freenove circuit for Soft Light: a potentiometer with its outer pins on 3.3V and ground and its middle pin on GPIO 1, and an LED on GPIO 14 through a 220 ohm resistor to ground, shown as both a schematic and a breadboard photo.",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "GPIO extension board",
+      "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
+      "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
+    },
+    {
+      "name": "Rotary potentiometer",
+      "imageAsset": "docs/course/assets/shared/item-potentiometer.png",
+      "explanation": "A potentiometer is a resistor with a third pin on a movable contact. Turning the shaft slides that contact along the resistor, so the voltage on the middle pin sweeps smoothly between the two ends. Wire the ends to 3.3V and ground and the knob becomes a voltage dial your ADC pin can read."
+    },
+    {
+      "name": "LED",
+      "imageAsset": "docs/course/assets/shared/item-led.png",
+      "explanation": "A LED is a one-way light. It only lights when its longer leg (the +) faces the pin and its shorter leg (the −) faces ground. Too much current burns it out, so a LED always sits behind a resistor."
+    },
+    {
+      "name": "220 Ω resistor",
+      "imageAsset": "docs/course/assets/shared/item-resistor.png",
+      "explanation": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction."
+    },
+    {
+      "name": "5 jumper wires",
+      "imageAsset": "docs/course/assets/shared/item-jumper-wire.png",
+      "explanation": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles."
+    }
+  ],
+  "wiring": [
+    {
+      "partPin": "Pot middle pin",
+      "connectTo": "GPIO 1",
+      "reason": "The board reads the knob's voltage here."
+    },
+    {
+      "partPin": "Pot outer pin",
+      "connectTo": "3.3V",
+      "reason": "Gives the knob its top voltage."
+    },
+    {
+      "partPin": "Pot other outer pin",
+      "connectTo": "GND",
+      "reason": "Gives the knob its bottom voltage."
+    },
+    {
+      "partPin": "LED long leg (+)",
+      "connectTo": "GPIO 14 via 220 Ω",
+      "reason": "This pin shades the LED with PWM."
+    },
+    {
+      "partPin": "LED short leg (−)",
+      "connectTo": "GND",
+      "reason": "Completes the LED's path back to zero volts."
+    }
+  ],
+  "coachInstructions": [
+    "Guide one physical connection at a time and wait for learner confirmation before proceeding.",
+    "The pot's middle pin goes to GPIO 1. One page of the manual's prose names a different pin; the code uses GPIO 1 and the code is truth — always route the middle pin to GPIO 1.",
+    "If the LED is stuck at full or stuck dark at every position, suspect the middle-pin wire on GPIO 1 first.",
+    "If turning the knob changes nothing at all, check the outer pot pins on 3.3V and GND.",
+    "If the LED never lights, check its direction, the 220 Ω resistor, and the GPIO 14 wire before changing code.",
+    "If asked why there's no map() call, explain that 12-bit PWM matches the 12-bit ADC so the raw reading is already a valid duty; the MicroPython path remaps to 0–1023 and its numbers will differ."
+  ],
+  "steps": [
+    "Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.",
+    "Stand the potentiometer on the breadboard so each of its three pins lands in its own row.",
+    "Wire one outer pot pin to 3.3V and the other outer pin to GND.",
+    "Run the pot's middle pin to GPIO 1 — this is the wire the board reads.",
+    "Place the LED so its long leg (+) is on the GPIO 14 side and its short leg (−) heads toward ground.",
+    "Put the 220 Ω resistor in series between GPIO 14 and the LED's long leg.",
+    "Compare every wire to the chart before you plug in USB.",
+    "Open Sketch_10.1_SoftLight.ino in Arduino IDE and upload it.",
+    "Turn the knob slowly from end to end and watch the LED follow your hand."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "ledcAttachChannel(PIN_LED, 1000, 12, CHAN)",
+        "explanation": "Sets up PWM on GPIO 14 at 12-bit resolution, so brightness runs 0 to 4095 — the same span the ADC produces."
+      },
+      {
+        "line": "analogRead(PIN_ANALOG_IN)",
+        "explanation": "Reads the knob's voltage on GPIO 1 as a number from 0 to 4095."
+      },
+      {
+        "line": "ledcWrite(PIN_LED, pwmVal)",
+        "explanation": "Sets the LED's duty to that number. The two scales match, so the raw reading passes straight through as a brightness — the \"re-map\" comment overstates what this line does."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "adc.width(ADC.WIDTH_12BIT)",
+        "explanation": "Sets the ADC to 12 bits so readings run 0 to 4095 — the same span the Arduino sketch reads."
+      },
+      {
+        "line": "remap(adcValue,0,4095,0,1023)",
+        "explanation": "MicroPython's duty here is 10-bit, so the reading is squeezed from 0–4095 down to 0–1023 before it drives the LED."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "The knob's voltage becomes a number, the number becomes a duty, and the duty becomes brightness — a complete control chain in four lines.",
+    "formula": "knob voltage → ADC number → PWM duty → brightness",
+    "notes": [
+      {
+        "title": "Why there's no map() call",
+        "body": "The sketch sets the PWM to 12 bits on purpose. Both scales run 0 to 4095, so the ADC reading is already a valid duty and passes through untouched. When the scales differ — as in the MicroPython version — you remap first."
+      },
+      {
+        "title": "What the potentiometer is doing",
+        "body": "Its two outer pins hold 3.3V and 0V across a resistive track, and the middle pin slides along that track as you turn — picking off any voltage in between."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "Turn the knob to one end — the LED sits dark.",
+      "Turn it to the other end — the LED reaches full brightness.",
+      "Everywhere in between, the brightness follows the knob smoothly, with no jumps or dead spots."
+    ],
+    "successCriteria": "Which end is dark depends on which outer pin you wired to GND — either way round is a working circuit."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "LED stuck at full or stuck dark",
+      "firstChecks": [
+        "Check the pot's middle-pin wire — it must reach GPIO 1."
+      ]
+    },
+    {
+      "symptom": "Turning the knob changes nothing",
+      "firstChecks": [
+        "Check the outer pot pins — one to 3.3V, one to GND."
+      ]
+    },
+    {
+      "symptom": "LED dark at every knob position",
+      "firstChecks": [
+        "Check the LED's direction and the 220 Ω resistor on the GPIO 14 side."
+      ]
+    },
+    {
+      "symptom": "Upload fails",
+      "firstChecks": [
+        "Swap in a data-capable USB cable."
+      ]
+    }
+  ],
+  "challenge": "Reverse the knob so turning up dims the light, then turn the smooth fade into a three-step lamp with if-bands.",
+  "logbookPrompts": [
+    "Which way round did your knob end up — clockwise for brighter or for dimmer?",
+    "Where did you put the band edges for the three-step lamp, and how did it feel to use?",
+    "What in your home would you rather control with a knob like this?"
+  ]
+}

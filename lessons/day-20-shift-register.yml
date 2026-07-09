@@ -1,0 +1,305 @@
+# Day 20 — Shift register · tinyskiff.lesson.v1
+# One source of truth: this file renders to the guided page
+# (/course/day-20-shift-register/), the agent packet, and the course-map entry.
+# The first chip day — three GPIOs drive eight outputs through a 74HC595.
+
+schema: tinyskiff.lesson.v1
+lessonCode: TSK-DAY20-SHIFTREG
+day: 20
+slug: day-20-shift-register
+title: "Shift register: many outputs, fewer pins"
+status: published
+estimatedTimeMinutes: 30
+tracks: { main: arduino, optional: micropython }
+learnerProfile: adult beginner; curious and capable; no electronics assumed
+
+mission: >
+  Wire a 74HC595 shift register between three GPIOs and the LED bar, upload the
+  Arduino sketch, and watch a single lit LED flow along the bar and back — eight
+  lights driven through one chip from just three pins.
+unlocks: A shift register takes a byte over three wires and fans it out to eight outputs, so a handful of pins can drive a whole bank of lights.
+seoDescription: >
+  Drive an LED bar graph through a 74HC595 shift register on the ESP32-S3. Three
+  GPIOs carry a byte to eight outputs, and a lit LED flows along the bar and back.
+
+hero:
+  instrument: none
+  headline: Eight lights|from three {wires}
+  lede: >
+    Today a chip joins the crew. You feed a 74HC595 one byte over three wires —
+    data, clock, latch — and it fans those eight bits out to the LED bar all at
+    once. The flowing light you built on Day 6 took ten GPIOs; today's takes
+    three.
+  pills:
+    - { text: About 30 minutes, key: true }
+    - Arduino first
+    - MicroPython optional
+    - The LED bar returns
+
+parts:
+  intro: >
+    Six things, one of them a chip with sixteen legs. Tap *Define* on any part
+    you haven't met — the answer opens as a field note you can read and dismiss
+    without losing your place.
+  items:
+    - name: ESP32-S3 board
+      image: shared/item-esp32-s3-board.jpg
+      imageKind: Manual photo
+      alt: Official manual photo of the ESP32-S3 development board.
+      blurb: The brain that runs your uploaded sketch.
+      explain: esp32
+    - name: GPIO extension board
+      image: shared/item-gpio-extension-board.png
+      imageKind: Manual photo
+      alt: Official manual image of the ESP32-S3 GPIO extension board.
+      blurb: Spreads the pins into rows you can reach and label.
+      explain: gpio
+    - name: 74HC595 shift register
+      image: shared/item-74hc595.png
+      imageKind: Manual illustration
+      alt: Official manual illustration of the 74HC595 shift register chip with its sixteen pins numbered.
+      blurb: The chip that turns three wires into eight outputs.
+      explain: shiftRegister
+    - name: LED bar graph
+      image: shared/item-led-bar.png
+      imageKind: Manual photo
+      alt: Official manual photo of a ten-segment LED bar graph module.
+      blurb: The bar from Day 6 — eight of its segments light today.
+      explain: ledBar
+    - name: 8 × 220 Ω resistors
+      image: shared/item-resistor.png
+      imageKind: Manual photo
+      alt: Official manual photo of a resistor with coloured value bands.
+      blurb: One per segment to keep each LED's current gentle.
+      explain: resistor
+    - name: Jumper wires (about 15)
+      image: shared/item-jumper-wire.png
+      imageKind: Manual photo
+      alt: Official manual image of a jumper wire.
+      blurb: Temporary, solder-free connections — the most you've used so far.
+      explain: jumpers
+
+wiring:
+  intro: >
+    The official Freenove diagram is your chart — schematic on top, the same
+    circuit built on a breadboard below. Click it to enlarge. The chip sits
+    across the breadboard's centre channel, and each connection tells you where
+    the wire goes and why.
+  diagram:
+    image: day-20/circuit-page-133.png
+    alt: >-
+      Official Freenove circuit for the 74HC595 flowing light: the chip straddles
+      the breadboard with GPIO 12 on its data pin, GPIO 13 on its latch pin, and
+      GPIO 14 on its clock pin, and outputs Q0 to Q7 driving the LED bar graph
+      through eight 220 ohm resistors, shown as both a schematic and a breadboard
+      photo.
+    caption: Official Freenove circuit — C Tutorial, Chapter 14 (74HC595 & LED Bar Graph), page 133.
+    zoomCaption: Official Freenove circuit, C Tutorial Chapter 14, page 133.
+    source: { pdf: C_Tutorial.pdf, chapter: 14, chapterTitle: 74HC595 & LED Bar Graph, page: 133 }
+  pins:
+    - { from: GPIO 12, to: 74HC595 DS (pin 14), why: Carries the byte into the chip one bit at a time., explain: shiftOut }
+    - { from: GPIO 13, to: 74HC595 ST_CP latch (pin 12), why: One rising edge here presents all eight stored bits at once., explain: shiftRegister }
+    - { from: GPIO 14, to: 74HC595 SH_CP clock (pin 11), why: Each tick tells the chip to take in the next bit. }
+    - { from: Outputs Q0–Q7, to: LED bar via 220 Ω each, why: Eight chip outputs each drive one segment through its own resistor., explain: ledBar }
+    - { from: OE (chip pin 13), to: GND, why: Held low so the outputs stay switched on., explain: gnd }
+    - { from: MR (chip pin 10), to: 5V, why: Held high so the chip never clears what it holds., explain: vcc }
+  safety:
+    - label: Mind the chip's notch.
+      icon: "⚓"
+      body: >
+        The 74HC595 only works one way round — the half-moon notch at one end
+        marks where pin 1 sits, and it must match the chart. Unplug USB before
+        you move any wire.
+
+steps:
+  intro: >
+    This is the main path — you can finish the day without opening a single field
+    note. Tap each step as you go to keep your place.
+  items:
+    - Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.
+    - Straddle the 74HC595 across the breadboard's centre channel with its notch matching the chart. {shiftRegister}
+    - Give the chip power — VCC and MR (pin 10) to 5V, GND and OE (pin 13) to ground.
+    - Run the three control wires — GPIO 12 to DS (pin 14), GPIO 13 to ST_CP (pin 12), GPIO 14 to SH_CP (pin 11). {shiftOut}
+    - Connect outputs Q0–Q7 to the LED bar, with a 220 Ω resistor in series for each segment. {resistor}
+    - Check the LED bar's direction against the chart — you saw on Day 6 how easily it reverses. {ledBar}
+    - Compare every wire to the chart before you plug in USB.
+    - Open `Sketch_14.1_FlowingLight02.ino` in Arduino IDE and upload it.
+    - Watch one lit LED run along the bar and back.
+  done:
+    icon: "💡"
+    title: Three wires carry a byte.
+    body: The chip is holding eight lights for you. Head to Test & debug to confirm the flow.
+
+code:
+  intro: >
+    The sketch keeps one byte, x, and lets its single 1 bit slide left and then
+    right. A small helper, writeTo595, hands each new byte to the chip and
+    latches it onto the outputs. Switch to MicroPython if you'd rather see the
+    same idea in Python — the wiring never changes.
+  arduino:
+    file: Sketch_14.1_FlowingLight02.ino
+    sketch: C/Sketches/Sketch_14.1_FlowingLight02/Sketch_14.1_FlowingLight02.ino
+    excerpt: |
+      int latchPin = 13;          // Pin connected to ST_CP of 74HC595(Pin12)
+      int clockPin = 14;          // Pin connected to SH_CP of 74HC595(Pin11)
+      int dataPin = 12;           // Pin connected to DS of 74HC595(Pin14)
+
+      void setup() {
+        // set pins to output
+        pinMode(latchPin, OUTPUT);
+        pinMode(clockPin, OUTPUT);
+        pinMode(dataPin, OUTPUT);
+      }
+
+      void loop() {
+        byte x = 0x01;    // 0b 0000 0001
+        for (int j = 0; j < 8; j++) { // Let led light up from right to left
+          writeTo595(LSBFIRST, x);
+          x <<= 1;
+          delay(50);
+        }
+        delay(100);
+        x = 0x80;       //0b 1000 0000
+        for (int j = 0; j < 8; j++) { // Let led light up from left to right
+          writeTo595(LSBFIRST, x);
+          x >>= 1;
+          delay(50);
+        }
+        delay(100);
+      }
+      void writeTo595(int order, byte _data ) {
+        // Output low level to latchPin
+        digitalWrite(latchPin, LOW);
+        // Send serial data to 74HC595
+        shiftOut(dataPin, clockPin, order, _data);
+        // Output high level to latchPin, and 74HC595 will update the data to the parallel output port.
+        digitalWrite(latchPin, HIGH);
+      }
+    notes:
+      - code: shiftOut(dataPin, clockPin, order, _data)
+        text: Sends the byte to the chip one bit at a time — data on GPIO 12, a clock tick on GPIO 14 for each bit.
+        explain: shiftOut
+      - code: digitalWrite(latchPin, HIGH)
+        text: The rising edge on GPIO 13 moves all eight stored bits to the outputs in one step.
+        explain: shiftRegister
+      - code: x <<= 1
+        text: Slides the single 1 bit one place left, so the lit LED takes one step along the bar; delay(50) sets the pace.
+        explain: delayMs
+  micropython:
+    file: 13.1_Flowing_Water_Light/Flowing_Water_Light.py
+    path: Python/Python_Codes/13.1_Flowing_Water_Light/Flowing_Water_Light.py
+    optionalTag: Optional side path · same circuit
+    excerpt: |
+      import time
+      from my74HC595 import Chip74HC595
+
+      chip = Chip74HC595(12,13,14,-1)
+
+      while True:
+          x=0x01
+          for count in range(8):
+              chip.shiftOut(1,x)
+              x=x<<1;
+              time.sleep_ms(300)
+          x=0x01
+          for count in range(8):
+              chip.shiftOut(0,x)
+              x=x<<1
+              time.sleep_ms(300)
+    notes:
+      - code: Chip74HC595(12,13,14,-1)
+        text: The module takes its pins in the order data then latch then clock — matching today's wiring — with -1 meaning OE is simply wired to ground.
+      - code: chip.shiftOut(1,x)
+        text: Sends the byte and latches it in one call; the first argument picks which direction the pattern travels.
+    note: >
+      Same wiring, same chip. Here the direction of travel comes from shiftOut's
+      first argument — 1 one way, 0 the other — while both loops shift the byte
+      the same way. Run it in Thonny if MicroPython is set up; otherwise skip
+      it — it should never block the Arduino-first path.
+
+theory:
+  title: Three wires carry a byte
+  summary: The board clocks eight bits into the chip one at a time, and a single latch edge lights all eight outputs together.
+  intro: >
+    The chip is a small memory with eight outputs. Watch what the three wires
+    each do, and the moving light explains itself.
+  flow:
+    - { n: Load, title: Bit by bit, body: Each clock tick pushes the next bit of the byte into the chip. }
+    - { n: Latch, title: One edge, body: A rising edge on the latch pin presents all eight bits at once. }
+    - { n: Light, title: Eight outputs, body: Q0 through Q7 each drive one segment of the bar. }
+    - { n: Shift, title: The byte moves, body: x <<= 1 slides the lit bit along and the light follows it. }
+  formulaLabel: The model
+  formula: eight outputs = **one byte** carried over three wires
+  notes:
+    - title: Where Day 6's ten pins went
+      explain: pinArray
+      body: Day 6 gave every segment its own GPIO in a pin array. Today the chip holds all eight states, and the board keeps just three wires — data, clock, and latch.
+    - title: What the latch is for
+      explain: shiftRegister
+      body: While bits are still arriving, the outputs hold their previous pattern. The latch edge updates them all in one clean step, so you never see half a byte on the bar.
+
+test:
+  mode: visual
+  intro: >
+    Nothing prints to the screen today — the proof is the light running along the
+    bar in front of you.
+  expectedTitle: What you should see
+  readoutLabel: LED bar
+  expected:
+    - One lit LED runs along the bar to one end.
+    - It turns and runs back to where it started.
+    - The run repeats forever, with a brief pause at each end.
+  expectedNote: Eight segments take part — the chip has eight outputs, so two segments of the ten-segment bar stay dark. That's correct.
+  checksTitle: If it doesn't
+  checks:
+    - symptom: "Nothing lights at all?"
+      fix: "Check the chip's orientation by its notch, then its power — VCC and MR to 5V, GND and OE to ground."
+    - symptom: "Pattern scrambled or jumpy?"
+      fix: "Re-check the three control wires — DS on GPIO 12, latch on GPIO 13, clock on GPIO 14."
+    - symptom: "One LED never lights?"
+      fix: "Check that segment's 220 Ω resistor and the bar's direction, just as on Day 6."
+    - symptom: "Upload fails?"
+      fix: "Swap in a data-capable USB cable."
+
+challenge:
+  title: "Try this: reshape the byte"
+  railLabel: Try this
+  intro: >
+    Same working circuit, one variable to play with: the byte x. Everything the
+    bar does comes from how you shape and shift it. It fits inside today's 30
+    minutes.
+  summary: Change the flow speed, send two lit LEDs travelling together, then fill the bar step by step — all by reshaping the byte x.
+  cards:
+    - title: Change the pace
+      explain: delayMs
+      body: Change both `delay(50)` lines together — try 20 for a sprint, 150 for a stroll — and upload until the flow feels right.
+    - title: Run a pair
+      body: Start the first loop with `x = 0x03` so two neighbouring LEDs travel together. Predict what the second loop's starting value needs to be before you change it.
+    - title: Fill the bar
+      body: In the first loop, replace `x <<= 1` with `x = (x << 1) | 1` so each step keeps every light already lit and the bar fills from one end.
+  logbook:
+    - Which speed made the flow easiest to follow, and why?
+    - What starting value made the pair bounce cleanly at both ends?
+    - After eight steps of the fill pattern, what byte is the chip holding?
+
+agent:
+  intro: >
+    Every lesson ships with a code and a machine-readable packet, so an agent can
+    guide you with full context.
+  behaviour: >
+    guide one physical connection at a time, wait for you to confirm, explain
+    terms on request, and always check wiring, board, port, and USB before
+    changing code.
+  coachInstructions:
+    - Guide one physical connection at a time — about fifteen jumpers is the most wiring so far — and wait for learner confirmation before proceeding.
+    - The chip's half-moon notch sets its orientation; verify it matches the chart before checking anything else.
+    - If nothing lights, check the chip's power first — VCC and MR (pin 10) to 5V, GND and OE (pin 13) to ground — before touching code.
+    - If the pattern is scrambled, verify the three control wires against the sketch — data on GPIO 12, latch on GPIO 13, clock on GPIO 14.
+    - If a single LED stays dark, check that segment's 220 Ω resistor and the bar's direction, which the learner met on Day 6.
+    - Keep the Arduino path primary; MicroPython is optional only if already set up, and its library takes pins in the order data then latch then clock.
+
+source:
+  license: CC BY-NC-SA 3.0
+  licenseNote: >
+    Based on Freenove official material released under CC BY-NC-SA 3.0; preserve
+    attribution and non-affiliation language.

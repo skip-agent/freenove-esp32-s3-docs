@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Day 14 · Touch sensor: use your body as input — TinySkiff ESP32-S3 Lab</title>
+  <meta name="description" content="Build a touch lamp on the ESP32-S3 — a bare jumper on GPIO 14 senses your fingertip and toggles an LED on GPIO 21. Calibrate with touchRead, then tune the touch and release thresholds to fit your own hand." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../course.css" />
+</head>
+<body>
+  <div class="lesson-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 14 of 30</p>
+        <h1>Make your fingertip<br />the <em>switch</em></h1>
+        <p class="lede">Today your own fingertip becomes the switch. One bare jumper on GPIO 14 acts as a touch pad, and the sketch watches the tiny charge your skin adds to it — one tap flips the LED on, the next tap flips it off.
+</p>
+        <div class="meta-row" aria-label="Lesson facts">
+          <span class="pill is-key">About 25 minutes</span><span class="pill">Arduino first</span><span class="pill">No electronics assumed</span><span class="pill">Your finger is the button</span>
+        </div>
+      </div>
+      <div class="hero-side no-instrument">
+        
+        <div class="agent-strip">
+          <div class="lesson-code">
+            <span class="label">Agent assist code</span>
+            <code>TSK-DAY14-TOUCH</code>
+          </div>
+          <button class="copy-prompt" type="button" data-copy="I am doing TinySkiff lesson TSK-DAY14-TOUCH. Pull the lesson packet, then guide me one step at a time. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY14-TOUCH.json">lesson packet</a> and coach you step by step.</p>
+        </div>
+      </div>
+    </header>
+    <div class="layout">
+      <nav class="rail" aria-label="Lesson progress">
+        <div class="rail-head">
+          <strong>Today's route</strong>
+          <span class="day-of">14 / 30</span>
+        </div>
+        <div class="voyage" style="--voyage-fill: 46.67%" aria-hidden="true"><span></span></div>
+        <div class="rail-nav">
+          <a href="#parts"><span class="tick"></span>What you need</a>
+          <a href="#wiring"><span class="tick"></span>Chart the circuit</a>
+          <a href="#steps"><span class="tick"></span>Build it</a>
+          <a href="#code"><span class="tick"></span>Read the code</a>
+          <a href="#theory"><span class="tick"></span>A pin that feels your fingertip</a>
+          <a href="#test"><span class="tick"></span>Test &amp; debug</a>
+          <a href="#challenge"><span class="tick"></span>Try this</a>
+          <a href="#agent"><span class="tick"></span>Coach me</a>
+        </div>
+      </nav>
+      <main class="lesson-main">
+        <section id="parts" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">01</span> First, know the pieces</p>
+              <h2>What you need</h2>
+              <p class="muted">Six things, and one of them doubles as the sensor. Tap <em>Define</em> on any part you haven&#x27;t met — the answer opens as a field note you can read and dismiss without losing your place.
+</p>
+            </div>
+            <div class="part-grid">
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-esp32-s3-board.jpg" alt="Official manual photo of the ESP32-S3 development board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>ESP32-S3 board <button class="define" data-topic="esp32">Define</button></h3>
+                <p>The brain that runs your uploaded sketch.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-gpio-extension-board.png" alt="Official manual image of the ESP32-S3 GPIO extension board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>GPIO extension board <button class="define" data-topic="gpio">Define</button></h3>
+                <p>Spreads the pins into rows you can reach and label.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-led.png" alt="Official manual photo of a red LED with its longer positive leg and shorter negative leg labelled." /><figcaption>Manual photo</figcaption></figure>
+                <h3>LED <button class="define" data-topic="led">Define</button></h3>
+                <p>The lamp you&#x27;ll flip with a tap — it only works one way round.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-resistor.png" alt="Official manual photo of a resistor with coloured value bands." /><figcaption>Manual photo</figcaption></figure>
+                <h3>220 Ω resistor <button class="define" data-topic="resistor">Define</button></h3>
+                <p>Sits in series with the LED to keep the current gentle.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-jumper-wire.png" alt="Official manual image of a jumper wire." /><figcaption>Manual photo</figcaption></figure>
+                <h3>3 × jumper wires <button class="define" data-topic="jumpers">Define</button></h3>
+                <p>Two carry the LED circuit; the third sits alone on GPIO 14 with its free end bare — that tip is the touch pad.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-arduino-ide.png" alt="Official manual screenshot of the Arduino IDE interface." /><figcaption>Manual screenshot</figcaption></figure>
+                <h3>Arduino IDE <button class="define" data-topic="arduino">Define</button></h3>
+                <p>Uploads the sketch to the board.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+        <section id="wiring" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">02</span> Make the physical circuit</p>
+              <h2>Chart the circuit</h2>
+              <p class="muted">The official Freenove diagram is your chart — schematic on top, the same circuit built on a breadboard below. Click it to enlarge. The touch pad is the simplest sensor of the whole course — a single jumper with a bare end.
+</p>
+            </div>
+            <div class="wire-layout">
+              <figure class="image-frame">
+                <button class="zoom" type="button" data-zoom="../assets/day-14/circuit-page-105.png" data-cap="Official Freenove circuit, C Tutorial Chapter 9, page 105.">
+                  <img src="../assets/day-14/circuit-page-105.png" alt="Official Freenove circuit for the touch lamp: a bare jumper wire on GPIO 14 acting as a touch pad, and a LED on GPIO 21 through a 220 ohm resistor to ground, shown as both a schematic and a breadboard photo." />
+                  <span class="zoom-hint">Click to enlarge</span>
+                </button>
+                <figcaption class="caption">Official Freenove circuit — C Tutorial, Chapter 9 (Touch Sensor), page 105.</figcaption>
+              </figure>
+              <div class="pin-table" aria-label="Wiring">
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>Bare jumper end <button class="define" data-topic="touchPin">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GPIO 14 (T14)</span>
+                  <span class="pin-why">The exposed metal tip is the touch pad your fingertip charges.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>LED long leg (+) <button class="define" data-topic="led">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GPIO 21 via 220 Ω</span>
+                  <span class="pin-why">This pin holds the lamp on or off between touches.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>LED short leg (−) <button class="define" data-topic="gnd">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GND</span>
+                  <span class="pin-why">Completes the LED&#x27;s path back to zero volts.</span>
+                </div>
+              </div>
+            </div>
+            <div class="callout">
+              <div class="icon" aria-hidden="true">⚓</div>
+              <p><strong>Keep the touch wire to itself.</strong> The free end of the GPIO 14 jumper is for your skin only — keep it clear of 3.3V, 5V, and every other pin. Unplug USB before you move any wire.
+</p>
+            </div>
+          </div>
+        </section>
+        <section id="steps" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">03</span> One action at a time</p>
+              <h2>Build it</h2>
+              <p class="muted">This is the main path — you can finish the day without opening a single field note. Tap each step as you go to keep your place.
+</p>
+            </div>
+            <div class="steps-progress">
+              <div class="bar" aria-hidden="true"><span id="stepBar"></span></div>
+              <span class="count" id="stepCount">0 / 8 done</span>
+            </div>
+            <ol class="step-list">
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 1 done"></button><p class="text">Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 2 done"></button><p class="text">Place the LED so its long leg (+) is on the GPIO 21 side and its short leg (−) heads toward ground. <button class="define" data-topic="led">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">Put the 220 Ω resistor in series between GPIO 21 and the LED&#x27;s long leg. <button class="define" data-topic="resistor">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">Push one end of a jumper into GPIO 14 and leave its other end free in the air — that bare metal tip is your touch pad. <button class="define" data-topic="touchPin">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Compare every wire to the chart, then plug in USB.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 6 done"></button><p class="text">Open <code>Sketch_09.1_TouchRead.ino</code> first, upload it, and open Serial Monitor at 115200 — note the reading when the wire is alone and when you pinch its bare tip. <button class="define" data-topic="serial">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 7 done"></button><p class="text">Open <code>Sketch_09.2_TouchLamp.ino</code> and upload it.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 8 done"></button><p class="text">Tap the bare tip — the LED flips on. Tap again — it flips off. <button class="define" data-topic="toggle">Define</button></p></li>
+            </ol>
+            <div class="done-banner" id="doneBanner" role="status">
+              <span class="icon" aria-hidden="true">💡</span>
+              <div><strong>The wire feels you.</strong><p>One tap on, one tap off — the board is reading your fingertip directly. Head to Test &amp; debug to confirm the toggle.</p></div>
+            </div>
+          </div>
+        </section>
+        <section id="code" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">04</span> Read just enough code</p>
+              <h2>Read the code</h2>
+              <p class="muted">Two sketches today. <code>Sketch_09.1_TouchRead.ino</code> is the calibration tool — it prints the raw touch reading once a second so you can see your own numbers. The lamp itself is 9.2, shown below — two thresholds, a remembered flag, and a tiny helper that flips the LED.
+</p>
+            </div>
+            <div class="tabs" role="tablist" aria-label="Code language">
+              <button class="tab" id="tab-arduino" role="tab" aria-selected="true" aria-controls="panel-arduino">Arduino <span class="badge">Main</span></button>
+            </div>
+            <div class="tabpanel" id="panel-arduino" role="tabpanel" aria-labelledby="tab-arduino">
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">Sketch_09.2_TouchLamp.ino</span></div>
+<pre><code><span class="tok-key">#define</span> PIN_LED     <span class="tok-num">21</span>
+<span class="tok-key">#define</span> PRESS_VAL   <span class="tok-num">200000</span>	  //Set a threshold to judge touch
+<span class="tok-key">#define</span> RELEASE_VAL <span class="tok-num">60000</span>	    //Set a threshold to judge release
+
+<span class="tok-key">bool</span> isProcessed = false;
+<span class="tok-key">void</span> <span class="tok-fn">setup</span>() {
+  Serial.<span class="tok-fn">begin</span>(<span class="tok-num">115200</span>);
+  <span class="tok-fn">pinMode</span>(PIN_LED, OUTPUT);
+}
+<span class="tok-key">void</span> <span class="tok-fn">loop</span>() {
+  <span class="tok-fn">if</span> (<span class="tok-fn">touchRead</span>(T14) &gt; PRESS_VAL) {
+    <span class="tok-fn">if</span> (!isProcessed) {
+      isProcessed = true;
+      Serial.<span class="tok-fn">println</span>(&quot;Touch detected! &quot;);
+      <span class="tok-fn">reverseGPIO</span>(PIN_LED);
+    }
+  }
+  <span class="tok-fn">if</span> (<span class="tok-fn">touchRead</span>(T14) &lt; RELEASE_VAL) {
+    <span class="tok-fn">if</span> (isProcessed) {
+      isProcessed = false;
+      Serial.<span class="tok-fn">println</span>(&quot;Released! &quot;);
+    }
+  }
+}
+
+<span class="tok-key">void</span> <span class="tok-fn">reverseGPIO</span>(<span class="tok-key">int</span> pin) {
+  <span class="tok-fn">digitalWrite</span>(pin, !<span class="tok-fn">digitalRead</span>(pin));
+}</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>touchRead(T14)</code><span class="note-text">Measures the charge on touch pin T14, which is GPIO 14 — your fingertip drives this number far higher. <button class="define" data-topic="touchPin">Define</button></span></div>
+                  <div class="code-note"><code>touchRead(T14) &gt; PRESS_VAL</code><span class="note-text">On this board a reading above 200000 counts as a touch; a reading below 60000 counts as a release. <button class="define" data-topic="threshold">Define</button></span></div>
+                  <div class="code-note"><code>bool isProcessed</code><span class="note-text">Remembers that the current touch has already been handled, so one tap flips the lamp exactly once. <button class="define" data-topic="toggle">Define</button></span></div>
+                  <div class="code-note"><code>digitalWrite(pin, !digitalRead(pin))</code><span class="note-text">Reads the LED pin&#x27;s current state and writes the opposite — the flip itself. <button class="define" data-topic="digitalWrite">Define</button></span></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+        <section id="theory" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">05</span> Understand, don&#x27;t memorise</p>
+              <h2>A pin that feels your fingertip</h2>
+              <p class="muted">Your skin holds a small electric charge, and pressing it against the bare wire lets the pin feel that extra capacitance as a bigger number. The rest is bookkeeping the sketch does for you.
+</p>
+            </div>
+            <div class="theory-flow" aria-label="Measurement model">
+              <article class="flow-step"><span class="n">Sense</span><h3>touchRead</h3><p>The pin measures how much charge the bare wire is soaking up.</p></article>
+              <article class="flow-step"><span class="n">Compare</span><h3>Two thresholds</h3><p>Above 200000 counts as a touch and below 60000 counts as a release.</p></article>
+              <article class="flow-step"><span class="n">Remember</span><h3>isProcessed</h3><p>A flag makes sure each touch flips the lamp exactly once.</p></article>
+              <article class="flow-step"><span class="n">Act</span><h3>Flip</h3><p>reverseGPIO reads the LED pin and writes the opposite state.</p></article>
+            </div>
+            <div class="formula-card">
+              <span class="label">The model</span>
+              <code>touch raises the reading — <b>above 200000</b> is a press and <b>below 60000</b> is a release</code>
+            </div>
+            <div class="two-col" style="margin-top:14px">
+              <article class="mini-card"><h3>On this board a touch pushes the number up <button class="define" data-topic="touchPin">Define</button></h3><p>Idle, the pin reads in the tens of thousands; a firm touch climbs past 200000. Older ESP32 chips reported touch as a drop toward zero, and some reference text still describes that behaviour — on your S3, trust the thresholds in the sketch.
+</p></article>
+              <article class="mini-card"><h3>The same trick as the table lamp <button class="define" data-topic="toggle">Define</button></h3><p>The isProcessed flag plays the role debounce played on Day 5 — it holds the memory of one press so a long touch counts as a single tap.
+</p></article>
+            </div>
+          </div>
+        </section>
+        <section id="test" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">06</span> Know it worked</p>
+              <h2>Test &amp; debug</h2>
+              <p class="muted">The Serial Monitor is your calibration tool today — the proof is the LED answering your fingertip.
+</p>
+            </div>
+            <div class="test-grid">
+              <div>
+                <span class="readout-title">What you should see</span>
+                <div class="observe" aria-label="What you should see">
+                  <div class="bar"><span>LED</span></div>
+                  <ul class="observe-lines"><li>Tap the bare end of the wire — the LED flips on and stays on.</li><li>Tap it again — the LED flips off.</li><li>Serial Monitor at 115200 echoes each touch with &quot;Touch detected! &quot; and each let-go with &quot;Released! &quot;.</li></ul>
+                </div>
+                <p class="micropython-note">This lamp latches — the LED holds its state between taps, with your fingertip doing the whole job of a button.</p>
+              </div>
+              <div>
+                <span class="checks-title">If it doesn&#x27;t</span>
+                <ul class="checklist">
+                  <li><strong>LED never flips?</strong> The thresholds may sit wrong for your setup — upload Sketch_09.1_TouchRead and read your own touched and untouched numbers.</li>
+                  <li><strong>LED flickers wildly?</strong> Hold the wire by its insulation and touch only the bare metal end, deliberately.</li>
+                  <li><strong>Nothing on the Serial Monitor?</strong> Set the monitor to 115200 baud, then re-check the board and port selections.</li>
+                  <li><strong>Upload fails?</strong> Swap in a data-capable USB cable.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="challenge" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">07</span> Make the idea yours</p>
+              <h2>Try this: tune it to your own hand</h2>
+              <p class="muted">Same working circuit, two numbers to make your own. The stock thresholds fit most hands; yours deserve a proper fit. It sits inside today&#x27;s 25 minutes.
+</p>
+            </div>
+            <div class="two-col">
+              <article class="mini-card"><h3>Read your numbers <button class="define" data-topic="threshold">Define</button></h3><p>Upload <code>Sketch_09.1_TouchRead.ino</code> again and write down two values — the reading with the wire alone and the reading with your fingertip pinching the bare tip. Set PRESS_VAL a little under your touched value and RELEASE_VAL a little over your idle value, then re-upload the lamp.
+</p></article>
+              <article class="mini-card"><h3>Demand a firm grip</h3><p>Raise PRESS_VAL step by step until a light brush does nothing and only a firm, deliberate grip flips the lamp. You&#x27;ve just designed how the switch should feel.
+</p></article>
+            </div>
+            <div class="logbook">
+              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
+              <label>What did your untouched and touched readings turn out to be?<textarea rows="2"></textarea></label>
+              <label>Where did you finally set PRESS_VAL and RELEASE_VAL, and why?<textarea rows="2"></textarea></label>
+              <label>What everyday device would feel better with a touch control like this?<textarea rows="2"></textarea></label>
+            </div>
+          </div>
+        </section>
+        <section id="agent" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">08</span> Learn it with a hand on the tiller</p>
+              <h2>Coach me through it</h2>
+              <p class="muted">Every lesson ships with a code and a machine-readable packet, so an agent can guide you with full context.
+</p>
+            </div>
+            <div class="agent-grid">
+              <article class="mini-card"><h3>Lesson code</h3><p><code>TSK-DAY14-TOUCH</code></p></article>
+              <article class="mini-card"><h3>Context packet</h3><p><a href="../packets/TSK-DAY14-TOUCH.json">Open the JSON packet →</a></p></article>
+            </div>
+            <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
+              <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
+              <p><strong>How the agent should behave:</strong> guide one physical connection at a time, wait for you to confirm, explain terms on request, and always check wiring, board, port, and USB before changing code.
+</p>
+            </div>
+          </div>
+        </section>
+        <nav class="day-nav" aria-label="Course navigation">
+        <a class="day-nav-link prev" href="../day-13-adc/">
+          <span class="day-nav-dir">← Day 13</span>
+          <span class="day-nav-title">Read a knob as a number</span>
+        </a>
+        <a class="day-nav-link next" href="../day-15-soft-light/">
+          <span class="day-nav-dir">Day 15 →</span>
+          <span class="day-nav-title">Soft light: map input to brightness</span>
+        </a>
+        </nav>
+      </main>
+    </div>
+    <footer class="colophon">
+      <p><strong>Day 14 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <div class="rule"></div>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — the circuit diagram from C_Tutorial.pdf, Chapter 9, page 105; sketch <code>Sketch_09.2_TouchLamp.ino</code>. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+    </footer>
+  </div>
+
+  <dialog class="lightbox" id="explainer">
+    <div class="lb-head">
+      <div>
+        <span class="lb-kicker">Field note</span>
+        <h3 id="explainerTitle"></h3>
+      </div>
+      <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="lb-body"><p id="explainerBody"></p></div>
+    <div class="lb-shortcut"><span class="tag">Shortcut</span><span id="explainerShortcut"></span></div>
+  </dialog>
+
+  <dialog class="lightbox image" id="imageBox">
+    <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    <div class="lb-body"><img id="imageBoxImg" alt="" /></div>
+    <p class="lb-cap" id="imageBoxCap"></p>
+  </dialog>
+
+  <div class="toast" id="toast">Prompt copied</div>
+
+  <script id="lesson-data" type="application/json">{"day": 14, "totalDays": 30, "slug": "day-14-touch", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "digitalWrite": {"title": "digitalWrite()", "body": "digitalWrite() sets a pin fully on or fully off. HIGH puts voltage on the pin (LED on); LOW removes it (LED off). It is the simplest way for code to change something in the physical world.\n", "shortcut": "HIGH = on, LOW = off. No in-between — that is what PWM is for later."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "gnd": {"title": "Ground / GND", "body": "Ground is the shared zero-voltage reference. The board and sensor need a common ground so a signal like HIGH or LOW means the same thing to both parts.\n", "shortcut": "A missing ground can make everything look haunted. Check it early."}, "gpio": {"title": "GPIO extension board", "body": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself.\n", "shortcut": "When a lesson says GPIO 13, look for the pin labelled 13 on the extension board."}, "jumpers": {"title": "Jumper wires", "body": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles.\n", "shortcut": "If a reading seems impossible, gently reseat the jumper wires before changing code."}, "led": {"title": "LED", "body": "A LED is a one-way light. It only lights when its longer leg (the +) faces the pin and its shorter leg (the −) faces ground. Too much current burns it out, so a LED always sits behind a resistor.\n", "shortcut": "Long leg toward the pin side; short leg toward ground."}, "resistor": {"title": "Resistor", "body": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction.\n", "shortcut": "The 220 Ω resistor protects the LED; either way round is fine."}, "serial": {"title": "Serial Monitor", "body": "Serial Monitor is a text window in Arduino IDE. The board can print messages to it over USB. Here, it prints the measured distance so you can see what the sensor is doing.\n", "shortcut": "If the window is blank, check that the baud rate is 115200."}, "threshold": {"title": "Threshold", "body": "A threshold turns a measurement into a decision. For example: if distance is less than 15 cm, beep. That pattern is the bridge from reading a sensor to building an interactive device.\n", "shortcut": "Pick a threshold that would make sense in a real project, not a random number."}, "toggle": {"title": "Toggle", "body": "A toggle flips a remembered state each time, instead of following the button live. Press once and the LED latches on; press again and it latches off. That memory is what turns a momentary button into a lamp switch.\n", "shortcut": "Button-and-LED reacts while held; the lamp remembers and flips."}, "touchPin": {"title": "Touch pins — touchRead()", "body": "Several ESP32-S3 pins can sense the touch of your skin through its electrical capacitance. touchRead(T14) returns a number from the pin behind the alias T14 — GPIO 14 — and on this board that number jumps far higher the moment a fingertip lands on the wire.\n", "shortcut": "On this board a touch reads as a much BIGGER number — check your own values with 9.1 before trusting a threshold."}}, "prev": {"day": 13, "slug": "day-13-adc", "title": "Read a knob as a number"}, "next": {"day": 15, "slug": "day-15-soft-light", "title": "Soft light: map input to brightness"}}</script>
+  <script src="../course.js"></script>
+</body>
+</html>

@@ -1,0 +1,268 @@
+# Day 18 — Thermometer · tinyskiff.lesson.v1
+# One source of truth: this file renders to the guided page
+# (/course/day-18-thermometer/), the agent packet, and the course-map entry.
+# The first temperature day — a thermistor divider plus the B-equation turns
+# heat into printed degrees.
+
+schema: tinyskiff.lesson.v1
+lessonCode: TSK-DAY18-THERMOMETER
+day: 18
+slug: day-18-thermometer
+title: "Thermometer: sense temperature"
+status: published
+estimatedTimeMinutes: 25
+tracks: { main: arduino, optional: micropython }
+learnerProfile: adult beginner; curious and capable; no electronics assumed
+
+mission: >
+  Build a working thermometer from a thermistor and a 10 kΩ resistor, upload the
+  Arduino sketch, and watch live temperature readings print in Serial Monitor —
+  then pinch the bead and see the number climb.
+unlocks: The ESP32-S3 can measure temperature by reading how a thermistor's resistance shifts with heat — the divider turns resistance into voltage and four lines of maths turn voltage into degrees.
+seoDescription: >
+  Build an ESP32-S3 thermometer with a thermistor and a 10 kΩ voltage divider.
+  Wire it, upload the sketch, and read live temperature in Serial Monitor.
+
+hero:
+  instrument: none
+  headline: Turn heat into|a {number}
+  lede: >
+    Today you build a thermometer. A thermistor changes its resistance as the air
+    around it warms or cools, and the ESP32-S3 reads that change and prints the
+    temperature once a second. Pinch the little bead and watch the number climb —
+    the same sensing that tells a skipper the engine room is running warm.
+  pills:
+    - { text: About 25 minutes, key: true }
+    - Arduino first
+    - MicroPython optional
+    - No electronics assumed
+
+parts:
+  intro: >
+    Six things, nothing more. Tap *Define* on any part you haven't met — the
+    answer opens as a field note you can read and dismiss without losing your
+    place.
+  items:
+    - name: ESP32-S3 board
+      image: shared/item-esp32-s3-board.jpg
+      imageKind: Manual photo
+      alt: Official manual photo of the ESP32-S3 development board.
+      blurb: The brain that runs your uploaded sketch.
+      explain: esp32
+    - name: GPIO extension board
+      image: shared/item-gpio-extension-board.png
+      imageKind: Manual photo
+      alt: Official manual image of the ESP32-S3 GPIO extension board.
+      blurb: Spreads the pins into rows you can reach and label.
+      explain: gpio
+    - name: Thermistor
+      image: shared/item-thermistor.png
+      imageKind: Manual photo
+      alt: Official manual photo of a bead thermistor with two long legs.
+      blurb: A small bead whose resistance falls as it warms — today's sensor.
+      explain: thermistor
+    - name: 10 kΩ resistor
+      image: shared/item-resistor.png
+      imageKind: Manual photo
+      alt: Official manual photo of a resistor with coloured value bands.
+      blurb: The steady half of the divider that turns resistance into voltage.
+      explain: resistor
+    - name: 3 jumper wires
+      image: shared/item-jumper-wire.png
+      imageKind: Manual photo
+      alt: Official manual image of a jumper wire.
+      blurb: Temporary, solder-free connections.
+      explain: jumpers
+    - name: Arduino IDE
+      image: shared/item-arduino-ide.png
+      imageKind: Manual screenshot
+      alt: Official manual screenshot of the Arduino IDE interface.
+      blurb: Uploads code and opens Serial Monitor.
+      explain: arduino
+
+wiring:
+  intro: >
+    The official Freenove diagram is your chart — schematic on top, the same
+    circuit built on a breadboard below. Click it to enlarge. Two parts in a
+    line make the divider; one wire taps its midpoint.
+  diagram:
+    image: day-18/circuit-page-123.png
+    alt: >-
+      Official Freenove circuit for the thermometer: a 10 kilo-ohm resistor from
+      3.3V down to GPIO 1, and a thermistor from that same point to ground,
+      shown as both a schematic and a breadboard photo.
+    caption: Official Freenove circuit — C Tutorial, Chapter 12 (Thermistor), page 123.
+    zoomCaption: Official Freenove circuit, C Tutorial Chapter 12, page 123.
+    source: { pdf: C_Tutorial.pdf, chapter: 12, chapterTitle: Thermistor, page: 123 }
+  pins:
+    - { from: 10 kΩ resistor leg, to: 3.3V, why: Feeds the divider from a steady 3.3 volts., explain: voltageDivider }
+    - { from: Divider midpoint, to: GPIO 1, why: The ADC pin reads the voltage where resistor meets thermistor., explain: adc }
+    - { from: Thermistor far leg, to: GND, why: Completes the divider's path back to zero volts., explain: gnd }
+  safety:
+    - label: Check before power.
+      icon: "⚓"
+      body: >
+        The thermistor has no polarity — either leg can face either way — but
+        the midpoint wire must land on GPIO 1. Unplug USB before you move any
+        wire.
+
+steps:
+  intro: >
+    This is the main path — you can finish the day without opening a single field
+    note. Tap each step as you go to keep your place.
+  items:
+    - Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.
+    - Push the thermistor into the breadboard with its two legs in separate rows. {thermistor}
+    - Place the 10 kΩ resistor so one leg shares a row with one thermistor leg — that shared row is the divider's midpoint. {voltageDivider}
+    - Run a jumper from 3.3V to the resistor's free leg.
+    - Run a jumper from the midpoint row to GPIO 1. {adc}
+    - Run a jumper from the thermistor's free leg to GND.
+    - Compare every wire to the chart, then plug in USB.
+    - Open `Sketch_12.1_Thermometer.ino` in Arduino IDE and upload it.
+    - Open Serial Monitor and set the baud rate to `115200`. {serial}
+    - Pinch the thermistor's bead between two fingers and watch the temperature climb.
+  done:
+    icon: "🌡️"
+    title: Degrees on deck.
+    body: Your board is reading real temperature once a second. Head to Test & debug to confirm the numbers make sense.
+
+code:
+  intro: >
+    The whole loop is four working lines — a chain that walks from a raw ADC
+    count to volts, to ohms, to degrees. Switch to MicroPython if you'd rather
+    see the same chain in Python; the wiring never changes.
+  arduino:
+    file: Sketch_12.1_Thermometer.ino
+    sketch: C/Sketches/Sketch_12.1_Thermometer/Sketch_12.1_Thermometer.ino
+    excerpt: |
+      #define PIN_ANALOG_IN   1
+      void setup() {
+        Serial.begin(115200);
+      }
+
+      void loop() {
+        int adcValue = analogRead(PIN_ANALOG_IN);                       //read ADC pin
+        double voltage = (float)adcValue / 4095.0 * 3.3;                // calculate voltage
+        double Rt = 10 * voltage / (3.3 - voltage);                     //calculate resistance value of thermistor
+        double tempK = 1 / (1 / (273.15 + 25) + log(Rt / 10) / 3950.0); //calculate temperature (Kelvin)
+        double tempC = tempK - 273.15;                                  //calculate temperature (Celsius)
+        Serial.printf("ADC value : %d,\tVoltage : %.2fV, \tTemperature : %.2fC\n", adcValue, voltage, tempC);
+        delay(1000);
+      }
+    notes:
+      - code: analogRead(PIN_ANALOG_IN)
+        text: Reads the divider midpoint on GPIO 1 as a number from 0 to 4095.
+        explain: adc
+      - code: double Rt = 10 * voltage / (3.3 - voltage)
+        text: Works the divider maths backwards to recover the thermistor's resistance in kilo-ohms.
+        explain: voltageDivider
+      - code: log(Rt / 10) / 3950.0
+        text: The B-equation — B is 3950 for this bead — maps that resistance onto temperature in Kelvin; subtracting 273.15 lands it in Celsius.
+        explain: thermistor
+  micropython:
+    file: 11.1_Thermometer/Thermometer.py
+    path: Python/Python_Codes/11.1_Thermometer/Thermometer.py
+    optionalTag: Optional side path · same circuit
+    excerpt: |
+      adc=ADC(Pin(1))
+      adc.atten(ADC.ATTN_11DB)
+      adc.width(ADC.WIDTH_12BIT)
+
+      adcValue=adc.read()
+      voltage=adcValue/4095*3.3
+      Rt=10*voltage/(3.3-voltage)
+      tempK=(1/(1/(273.15+25)+(math.log(Rt/10))/3950))
+      tempC=tempK-273.15
+    notes:
+      - code: adc.atten(ADC.ATTN_11DB)
+        text: Opens the pin to the full 0–3.3 V range so the divider's whole swing is readable.
+      - code: Rt=10*voltage/(3.3-voltage)
+        text: The same divider arithmetic as the Arduino sketch — volts back into kilo-ohms.
+    note: >
+      Same pin, same maths, same printout. Run it in Thonny and compare the
+      temperature with the Arduino version. If MicroPython isn't set up yet,
+      skip this — it should never block the Arduino-first day.
+
+theory:
+  title: Four lines from heat to degrees
+  summary: The thermistor's resistance moves with temperature; the divider turns resistance into voltage; the B-equation turns it back into degrees.
+  intro: >
+    The sketch walks one chain, once a second. Each line hands its answer to the
+    next — count to volts, volts to ohms, ohms to degrees.
+  flow:
+    - { n: Read, title: ADC in, body: analogRead samples the midpoint and returns a count from 0 to 4095. }
+    - { n: Volts, title: Count → volts, body: Dividing by 4095 and scaling by 3.3 gives the real voltage at the pin. }
+    - { n: Ohms, title: Volts → ohms, body: The divider maths recovers the thermistor's resistance from that voltage. }
+    - { n: Degrees, title: Ohms → degrees, body: The B-equation with B 3950 turns resistance into Kelvin and then Celsius. }
+  formulaLabel: The chain
+  formula: ADC count → **volts** → **ohms** → **degrees**
+  notes:
+    - title: Why resistance moves
+      explain: thermistor
+      body: A thermistor is made of a material whose electrons flow more freely as it warms, so its resistance drops as temperature rises. At 25 °C this bead sits near 10 kΩ.
+    - title: What the 10 kΩ partner does
+      explain: voltageDivider
+      body: The ADC measures voltage. Stacking the fixed resistor above the thermistor makes a divider whose midpoint voltage tracks the changing resistance — the translation the pin can actually read.
+
+test:
+  mode: serial
+  intro: >
+    Success and recovery sit side by side, so you never have to go hunting when
+    something looks off.
+  expectedTitle: What you should see
+  baud: 115200
+  expected:
+    - "ADC value : 2185,\tVoltage : 1.76V, \tTemperature : 22.00C"
+    - "ADC value : 2100,\tVoltage : 1.69V, \tTemperature : 23.85C"
+    - "ADC value : 2048,\tVoltage : 1.65V, \tTemperature : 24.99C"
+  expectedNote: A steady room line first — somewhere around 20 to 26 °C. Pinch the bead and the temperature climbs a few degrees; let go and it eases back down.
+  checksTitle: If it doesn't
+  checks:
+    - symptom: "Temperature wildly wrong — near -273 or nan?"
+      fix: "Check the midpoint wire on GPIO 1 and that the 10 kΩ resistor is in the divider."
+    - symptom: "Values frozen while you pinch?"
+      fix: "Reseat the thermistor's legs — one has likely lifted out of its row."
+    - symptom: "Garbled text?"
+      fix: "Set Serial Monitor to 115200 baud to match the sketch."
+    - symptom: "Upload fails?"
+      fix: "Swap in a data-capable USB cable."
+
+challenge:
+  title: "Try this: keep a temperature log"
+  railLabel: Try this
+  intro: >
+    Same working circuit, one new habit: treating a live number as data worth
+    recording. It fits inside today's 25 minutes.
+  summary: Log your room's reading morning and evening, add a Fahrenheit line to the printout, then hold the bead and time how long it takes to read body-warm.
+  cards:
+    - title: Morning vs evening
+      body: Note the room reading when you start the day and again after dark. A degree or two of drift is real weather moving through your space.
+    - title: Add Fahrenheit
+      explain: serialPrint
+      body: Add `double tempF = tempC * 1.8 + 32;` after the Celsius line and print it too — one more field in the printf.
+  logbook:
+    - What did your room read this morning and this evening?
+    - How long did the bead take to reach body-warm while you held it?
+    - Where on a boat — or in your home — would a temperature sensor earn its keep?
+
+agent:
+  intro: >
+    Every lesson ships with a code and a machine-readable packet, so an agent can
+    guide you with full context.
+  behaviour: >
+    guide one physical connection at a time, wait for you to confirm, read the
+    printed numbers to diagnose the divider, and always check wiring, board,
+    port, and USB before changing code.
+  coachInstructions:
+    - Guide one physical connection at a time and wait for learner confirmation before proceeding.
+    - The divider's layout is the day's main trap — 10 kΩ to 3.3V, thermistor to GND, and the row where they meet to GPIO 1.
+    - A reading near -273 or nan means the divider is open or shorted; check the GPIO 1 midpoint wire and the 10 kΩ resistor before changing code.
+    - If values freeze or ignore a pinch, have the learner reseat the thermistor's legs in their breadboard rows.
+    - Coach the pinch itself — fingers on the bead so body heat transfers; a climb of a few degrees is success.
+    - Keep the Arduino path primary; MicroPython is optional only if already set up.
+
+source:
+  license: CC BY-NC-SA 3.0
+  licenseNote: >
+    Based on Freenove official material released under CC BY-NC-SA 3.0; preserve
+    attribution and non-affiliation language.

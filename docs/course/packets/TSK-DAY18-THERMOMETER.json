@@ -1,0 +1,172 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY18-THERMOMETER",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 18,
+  "title": "Thermometer: sense temperature",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 25,
+  "mission": "Build a working thermometer from a thermistor and a 10 kΩ resistor, upload the Arduino sketch, and watch live temperature readings print in Serial Monitor — then pinch the bead and see the number climb.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "officialPdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+    "chapter": "Chapter 12 Thermistor",
+    "page": 123,
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_12.1_Thermometer/Sketch_12.1_Thermometer.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/11.1_Thermometer/Thermometer.py",
+    "imageAsset": "docs/course/assets/day-18/circuit-page-123.png",
+    "imageAlt": "Official Freenove circuit for the thermometer: a 10 kilo-ohm resistor from 3.3V down to GPIO 1, and a thermistor from that same point to ground, shown as both a schematic and a breadboard photo.",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "GPIO extension board",
+      "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
+      "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
+    },
+    {
+      "name": "Thermistor",
+      "imageAsset": "docs/course/assets/shared/item-thermistor.png",
+      "explanation": "A thermistor changes resistance with temperature. In a voltage divider its changing resistance becomes a changing ADC voltage, and a short formula (the B-equation, with B=3950 for this part) converts that resistance back into degrees. That's the whole thermometer."
+    },
+    {
+      "name": "10 kΩ resistor",
+      "imageAsset": "docs/course/assets/shared/item-resistor.png",
+      "explanation": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction."
+    },
+    {
+      "name": "3 jumper wires",
+      "imageAsset": "docs/course/assets/shared/item-jumper-wire.png",
+      "explanation": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    }
+  ],
+  "wiring": [
+    {
+      "partPin": "10 kΩ resistor leg",
+      "connectTo": "3.3V",
+      "reason": "Feeds the divider from a steady 3.3 volts."
+    },
+    {
+      "partPin": "Divider midpoint",
+      "connectTo": "GPIO 1",
+      "reason": "The ADC pin reads the voltage where resistor meets thermistor."
+    },
+    {
+      "partPin": "Thermistor far leg",
+      "connectTo": "GND",
+      "reason": "Completes the divider's path back to zero volts."
+    }
+  ],
+  "coachInstructions": [
+    "Guide one physical connection at a time and wait for learner confirmation before proceeding.",
+    "The divider's layout is the day's main trap — 10 kΩ to 3.3V, thermistor to GND, and the row where they meet to GPIO 1.",
+    "A reading near -273 or nan means the divider is open or shorted; check the GPIO 1 midpoint wire and the 10 kΩ resistor before changing code.",
+    "If values freeze or ignore a pinch, have the learner reseat the thermistor's legs in their breadboard rows.",
+    "Coach the pinch itself — fingers on the bead so body heat transfers; a climb of a few degrees is success.",
+    "Keep the Arduino path primary; MicroPython is optional only if already set up."
+  ],
+  "steps": [
+    "Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.",
+    "Push the thermistor into the breadboard with its two legs in separate rows.",
+    "Place the 10 kΩ resistor so one leg shares a row with one thermistor leg — that shared row is the divider's midpoint.",
+    "Run a jumper from 3.3V to the resistor's free leg.",
+    "Run a jumper from the midpoint row to GPIO 1.",
+    "Run a jumper from the thermistor's free leg to GND.",
+    "Compare every wire to the chart, then plug in USB.",
+    "Open Sketch_12.1_Thermometer.ino in Arduino IDE and upload it.",
+    "Open Serial Monitor and set the baud rate to 115200.",
+    "Pinch the thermistor's bead between two fingers and watch the temperature climb."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "analogRead(PIN_ANALOG_IN)",
+        "explanation": "Reads the divider midpoint on GPIO 1 as a number from 0 to 4095."
+      },
+      {
+        "line": "double Rt = 10 * voltage / (3.3 - voltage)",
+        "explanation": "Works the divider maths backwards to recover the thermistor's resistance in kilo-ohms."
+      },
+      {
+        "line": "log(Rt / 10) / 3950.0",
+        "explanation": "The B-equation — B is 3950 for this bead — maps that resistance onto temperature in Kelvin; subtracting 273.15 lands it in Celsius."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "adc.atten(ADC.ATTN_11DB)",
+        "explanation": "Opens the pin to the full 0–3.3 V range so the divider's whole swing is readable."
+      },
+      {
+        "line": "Rt=10*voltage/(3.3-voltage)",
+        "explanation": "The same divider arithmetic as the Arduino sketch — volts back into kilo-ohms."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "The thermistor's resistance moves with temperature; the divider turns resistance into voltage; the B-equation turns it back into degrees.",
+    "formula": "ADC count → volts → ohms → degrees",
+    "notes": [
+      {
+        "title": "Why resistance moves",
+        "body": "A thermistor is made of a material whose electrons flow more freely as it warms, so its resistance drops as temperature rises. At 25 °C this bead sits near 10 kΩ."
+      },
+      {
+        "title": "What the 10 kΩ partner does",
+        "body": "The ADC measures voltage. Stacking the fixed resistor above the thermistor makes a divider whose midpoint voltage tracks the changing resistance — the translation the pin can actually read."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "ADC value : 2185,\tVoltage : 1.76V, \tTemperature : 22.00C",
+      "ADC value : 2100,\tVoltage : 1.69V, \tTemperature : 23.85C",
+      "ADC value : 2048,\tVoltage : 1.65V, \tTemperature : 24.99C"
+    ],
+    "successCriteria": "A steady room line first — somewhere around 20 to 26 °C. Pinch the bead and the temperature climbs a few degrees; let go and it eases back down."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "Temperature wildly wrong — near -273 or nan",
+      "firstChecks": [
+        "Check the midpoint wire on GPIO 1 and that the 10 kΩ resistor is in the divider."
+      ]
+    },
+    {
+      "symptom": "Values frozen while you pinch",
+      "firstChecks": [
+        "Reseat the thermistor's legs — one has likely lifted out of its row."
+      ]
+    },
+    {
+      "symptom": "Garbled text",
+      "firstChecks": [
+        "Set Serial Monitor to 115200 baud to match the sketch."
+      ]
+    },
+    {
+      "symptom": "Upload fails",
+      "firstChecks": [
+        "Swap in a data-capable USB cable."
+      ]
+    }
+  ],
+  "challenge": "Log your room's reading morning and evening, add a Fahrenheit line to the printout, then hold the bead and time how long it takes to read body-warm.",
+  "logbookPrompts": [
+    "What did your room read this morning and this evening?",
+    "How long did the bead take to reach body-warm while you held it?",
+    "Where on a boat — or in your home — would a temperature sensor earn its keep?"
+  ]
+}

@@ -1,0 +1,273 @@
+# Day 14 — Touch sensor · tinyskiff.lesson.v1
+# One source of truth: this file renders to the guided page
+# (/course/day-14-touch/), the agent packet, and the course-map entry.
+# The first body-as-input day — a bare wire on GPIO 14 senses your fingertip.
+
+schema: tinyskiff.lesson.v1
+lessonCode: TSK-DAY14-TOUCH
+day: 14
+slug: day-14-touch
+title: 'Touch sensor: use your body as input'
+status: published
+estimatedTimeMinutes: 25
+tracks: { main: arduino }
+learnerProfile: adult beginner; curious and capable; no electronics assumed
+
+mission: >
+  Wire an LED to GPIO 21, leave one bare jumper on GPIO 14 as a touch pad, and
+  upload the sketch that flips the lamp every time your fingertip taps the wire —
+  your body becomes part of the circuit.
+unlocks: A pin can sense the charge your skin carries, so a bare wire can do the whole job of a button.
+seoDescription: >
+  Build a touch lamp on the ESP32-S3 — a bare jumper on GPIO 14 senses your
+  fingertip and toggles an LED on GPIO 21. Calibrate with touchRead, then tune
+  the touch and release thresholds to fit your own hand.
+
+hero:
+  instrument: none
+  headline: Make your fingertip|the {switch}
+  lede: >
+    Today your own fingertip becomes the switch. One bare jumper on GPIO 14 acts
+    as a touch pad, and the sketch watches the tiny charge your skin adds to it —
+    one tap flips the LED on, the next tap flips it off.
+  pills:
+    - { text: About 25 minutes, key: true }
+    - Arduino first
+    - No electronics assumed
+    - Your finger is the button
+
+parts:
+  intro: >
+    Six things, and one of them doubles as the sensor. Tap *Define* on any part
+    you haven't met — the answer opens as a field note you can read and dismiss
+    without losing your place.
+  items:
+    - name: ESP32-S3 board
+      image: shared/item-esp32-s3-board.jpg
+      imageKind: Manual photo
+      alt: Official manual photo of the ESP32-S3 development board.
+      blurb: The brain that runs your uploaded sketch.
+      explain: esp32
+    - name: GPIO extension board
+      image: shared/item-gpio-extension-board.png
+      imageKind: Manual photo
+      alt: Official manual image of the ESP32-S3 GPIO extension board.
+      blurb: Spreads the pins into rows you can reach and label.
+      explain: gpio
+    - name: LED
+      image: shared/item-led.png
+      imageKind: Manual photo
+      alt: Official manual photo of a red LED with its longer positive leg and shorter negative leg labelled.
+      blurb: The lamp you'll flip with a tap — it only works one way round.
+      explain: led
+    - name: 220 Ω resistor
+      image: shared/item-resistor.png
+      imageKind: Manual photo
+      alt: Official manual photo of a resistor with coloured value bands.
+      blurb: Sits in series with the LED to keep the current gentle.
+      explain: resistor
+    - name: 3 × jumper wires
+      image: shared/item-jumper-wire.png
+      imageKind: Manual photo
+      alt: Official manual image of a jumper wire.
+      blurb: Two carry the LED circuit; the third sits alone on GPIO 14 with its free end bare — that tip is the touch pad.
+      explain: jumpers
+    - name: Arduino IDE
+      image: shared/item-arduino-ide.png
+      imageKind: Manual screenshot
+      alt: Official manual screenshot of the Arduino IDE interface.
+      blurb: Uploads the sketch to the board.
+      explain: arduino
+
+wiring:
+  intro: >
+    The official Freenove diagram is your chart — schematic on top, the same
+    circuit built on a breadboard below. Click it to enlarge. The touch pad is
+    the simplest sensor of the whole course — a single jumper with a bare end.
+  diagram:
+    image: day-14/circuit-page-105.png
+    alt: >-
+      Official Freenove circuit for the touch lamp: a bare jumper wire on GPIO 14
+      acting as a touch pad, and a LED on GPIO 21 through a 220 ohm resistor to
+      ground, shown as both a schematic and a breadboard photo.
+    caption: Official Freenove circuit — C Tutorial, Chapter 9 (Touch Sensor), page 105.
+    zoomCaption: Official Freenove circuit, C Tutorial Chapter 9, page 105.
+    source: { pdf: C_Tutorial.pdf, chapter: 9, chapterTitle: Touch Sensor, page: 105 }
+  pins:
+    - { from: Bare jumper end, to: GPIO 14 (T14), why: The exposed metal tip is the touch pad your fingertip charges., explain: touchPin }
+    - { from: LED long leg (+), to: GPIO 21 via 220 Ω, why: This pin holds the lamp on or off between touches., explain: led }
+    - { from: LED short leg (−), to: GND, why: Completes the LED's path back to zero volts., explain: gnd }
+  safety:
+    - label: Keep the touch wire to itself.
+      icon: "⚓"
+      body: >
+        The free end of the GPIO 14 jumper is for your skin only — keep it clear
+        of 3.3V, 5V, and every other pin. Unplug USB before you move any wire.
+
+steps:
+  intro: >
+    This is the main path — you can finish the day without opening a single field
+    note. Tap each step as you go to keep your place.
+  items:
+    - Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.
+    - Place the LED so its long leg (+) is on the GPIO 21 side and its short leg (−) heads toward ground. {led}
+    - Put the 220 Ω resistor in series between GPIO 21 and the LED's long leg. {resistor}
+    - Push one end of a jumper into GPIO 14 and leave its other end free in the air — that bare metal tip is your touch pad. {touchPin}
+    - Compare every wire to the chart, then plug in USB.
+    - Open `Sketch_09.1_TouchRead.ino` first, upload it, and open Serial Monitor at 115200 — note the reading when the wire is alone and when you pinch its bare tip. {serial}
+    - Open `Sketch_09.2_TouchLamp.ino` and upload it.
+    - Tap the bare tip — the LED flips on. Tap again — it flips off. {toggle}
+  done:
+    icon: "💡"
+    title: The wire feels you.
+    body: One tap on, one tap off — the board is reading your fingertip directly. Head to Test & debug to confirm the toggle.
+
+code:
+  intro: >
+    Two sketches today. `Sketch_09.1_TouchRead.ino` is the calibration tool — it
+    prints the raw touch reading once a second so you can see your own numbers.
+    The lamp itself is 9.2, shown below — two thresholds, a remembered flag, and
+    a tiny helper that flips the LED.
+  arduino:
+    file: Sketch_09.2_TouchLamp.ino
+    sketch: C/Sketches/Sketch_09.2_TouchLamp/Sketch_09.2_TouchLamp.ino
+    excerpt: |
+      #define PIN_LED     21
+      #define PRESS_VAL   200000	  //Set a threshold to judge touch
+      #define RELEASE_VAL 60000	    //Set a threshold to judge release
+
+      bool isProcessed = false;
+      void setup() {
+        Serial.begin(115200);
+        pinMode(PIN_LED, OUTPUT);
+      }
+      void loop() {
+        if (touchRead(T14) > PRESS_VAL) {
+          if (!isProcessed) {
+            isProcessed = true;
+            Serial.println("Touch detected! ");
+            reverseGPIO(PIN_LED);
+          }
+        }
+        if (touchRead(T14) < RELEASE_VAL) {
+          if (isProcessed) {
+            isProcessed = false;
+            Serial.println("Released! ");
+          }
+        }
+      }
+
+      void reverseGPIO(int pin) {
+        digitalWrite(pin, !digitalRead(pin));
+      }
+    notes:
+      - code: touchRead(T14)
+        text: Measures the charge on touch pin T14, which is GPIO 14 — your fingertip drives this number far higher.
+        explain: touchPin
+      - code: touchRead(T14) > PRESS_VAL
+        text: On this board a reading above 200000 counts as a touch; a reading below 60000 counts as a release.
+        explain: threshold
+      - code: bool isProcessed
+        text: Remembers that the current touch has already been handled, so one tap flips the lamp exactly once.
+        explain: toggle
+      - code: digitalWrite(pin, !digitalRead(pin))
+        text: Reads the LED pin's current state and writes the opposite — the flip itself.
+        explain: digitalWrite
+
+theory:
+  title: A pin that feels your fingertip
+  summary: Your fingertip adds capacitance the pin can measure; two thresholds and one remembered flag turn that raw number into a clean toggle.
+  intro: >
+    Your skin holds a small electric charge, and pressing it against the bare
+    wire lets the pin feel that extra capacitance as a bigger number. The rest
+    is bookkeeping the sketch does for you.
+  flow:
+    - { n: Sense, title: touchRead, body: The pin measures how much charge the bare wire is soaking up. }
+    - { n: Compare, title: Two thresholds, body: Above 200000 counts as a touch and below 60000 counts as a release. }
+    - { n: Remember, title: isProcessed, body: A flag makes sure each touch flips the lamp exactly once. }
+    - { n: Act, title: Flip, body: reverseGPIO reads the LED pin and writes the opposite state. }
+  formulaLabel: The model
+  formula: touch raises the reading — **above 200000** is a press and **below 60000** is a release
+  notes:
+    - title: On this board a touch pushes the number up
+      explain: touchPin
+      body: >
+        Idle, the pin reads in the tens of thousands; a firm touch climbs past
+        200000. Older ESP32 chips reported touch as a drop toward zero, and some
+        reference text still describes that behaviour — on your S3, trust the
+        thresholds in the sketch.
+    - title: The same trick as the table lamp
+      explain: toggle
+      body: >
+        The isProcessed flag plays the role debounce played on Day 5 — it holds
+        the memory of one press so a long touch counts as a single tap.
+
+test:
+  mode: visual
+  intro: >
+    The Serial Monitor is your calibration tool today — the proof is the LED
+    answering your fingertip.
+  expectedTitle: What you should see
+  readoutLabel: LED
+  expected:
+    - Tap the bare end of the wire — the LED flips on and stays on.
+    - Tap it again — the LED flips off.
+    - Serial Monitor at 115200 echoes each touch with "Touch detected! " and each let-go with "Released! ".
+  expectedNote: This lamp latches — the LED holds its state between taps, with your fingertip doing the whole job of a button.
+  checksTitle: If it doesn't
+  checks:
+    - symptom: "LED never flips?"
+      fix: "The thresholds may sit wrong for your setup — upload Sketch_09.1_TouchRead and read your own touched and untouched numbers."
+    - symptom: "LED flickers wildly?"
+      fix: "Hold the wire by its insulation and touch only the bare metal end, deliberately."
+    - symptom: "Nothing on the Serial Monitor?"
+      fix: "Set the monitor to 115200 baud, then re-check the board and port selections."
+    - symptom: "Upload fails?"
+      fix: "Swap in a data-capable USB cable."
+
+challenge:
+  title: "Try this: tune it to your own hand"
+  railLabel: Try this
+  intro: >
+    Same working circuit, two numbers to make your own. The stock thresholds fit
+    most hands; yours deserve a proper fit. It sits inside today's 25 minutes.
+  summary: Read your own touch numbers with Sketch_09.1_TouchRead, re-tune PRESS_VAL and RELEASE_VAL, then set the lamp to answer only a firm grip.
+  cards:
+    - title: Read your numbers
+      explain: threshold
+      body: >
+        Upload `Sketch_09.1_TouchRead.ino` again and write down two values — the
+        reading with the wire alone and the reading with your fingertip pinching
+        the bare tip. Set PRESS_VAL a little under your touched value and
+        RELEASE_VAL a little over your idle value, then re-upload the lamp.
+    - title: Demand a firm grip
+      body: >
+        Raise PRESS_VAL step by step until a light brush does nothing and only a
+        firm, deliberate grip flips the lamp. You've just designed how the switch
+        should feel.
+  logbook:
+    - What did your untouched and touched readings turn out to be?
+    - Where did you finally set PRESS_VAL and RELEASE_VAL, and why?
+    - What everyday device would feel better with a touch control like this?
+
+agent:
+  intro: >
+    Every lesson ships with a code and a machine-readable packet, so an agent can
+    guide you with full context.
+  behaviour: >
+    guide one physical connection at a time, wait for you to confirm, explain
+    terms on request, and always check wiring, board, port, and USB before
+    changing code.
+  coachInstructions:
+    - Reassure the learner there is no sensor module to find — the touch pad is a single bare-ended jumper on GPIO 14.
+    - Keep the two pins straight — T14 is GPIO 14 for the touch pad and the LED lives on GPIO 21; never let them swap in conversation or wiring.
+    - On this board a touch RAISES the touchRead value (idle in the tens of thousands, touch above 200000); correct any advice claiming readings near zero mean touch.
+    - If the LED never flips, have the learner upload Sketch_09.1_TouchRead and compare their own idle and touched numbers against PRESS_VAL and RELEASE_VAL before changing wiring.
+    - If the LED flickers, coach them to hold the jumper by its insulation and touch only the bare metal tip, deliberately.
+    - If the Serial Monitor shows nothing, check 115200 baud, the board, and the port before touching code.
+
+source:
+  license: CC BY-NC-SA 3.0
+  licenseNote: >
+    Based on Freenove official material released under CC BY-NC-SA 3.0; preserve
+    attribution and non-affiliation language.
