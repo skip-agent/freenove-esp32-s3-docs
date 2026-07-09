@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-08T20:14:40+00:00",
+  "generatedAt": "2026-07-09T09:00:56+00:00",
   "projectsC": [
     {
       "track": "C / Arduino",
@@ -323,7 +323,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : Ultrasonic Ranging\n  Description : Use the ultrasonic module to measure the distance.\n  Auther      : www.freenove.com\n  Modification: 2022/10/25\n**********************************************************************/\n#define trigPin 13 // define TrigPin\n#define echoPin 14 // define EchoPin.\n#define MAX_DISTANCE 700 // Maximum sensor distance is rated at 400-500cm.\n//timeOut= 2*MAX_DISTANCE /100 /340 *1000000 = MAX_DISTANCE*58.8\nfloat timeOut = MAX_DISTANCE * 60; \nint soundVelocity = 340; // define sound speed=340m/s\n\nvoid setup() {\n  pinMode(trigPin,OUTPUT);// set trigPin to output mode\n  pinMode(echoPin,INPUT); // set echoPin to input mode\n  Serial.begin(115200);   // Open serial monitor at 115200 baud to see ping results.\n}\n\nvoid loop() {\n  delay(100); // Wait 100ms between pings (about 20 pings/sec). \n  Serial.printf(\"Distance: \");\n  Serial.print(getSonar()); // Send ping, get distance in cm and print result \n  Serial.println(\"cm\");\n}\n\nfloat getSonar() {\n  unsigned long pingTime;\n  float distance;\n  // make trigPin output high level lasting for 10μs to triger HC_SR04\n  digitalWrite(trigPin, HIGH); \n  delayMicroseconds(10);\n  digitalWrite(trigPin, LOW);\n  // Wait HC-SR04 returning to the high level and measure out this waitting time\n  pingTime = pulseIn(echoPin, HIGH, timeOut); \n  // calculate the distance according to the time\n  distance = (float)pingTime * soundVelocity / 2 / 10000; \n  return distance; // return the distance value\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_19.1_Ultrasonic_Ranging",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 26,
+        "slug": "day-26-ultrasonic",
+        "title": "Measure the room with sound"
+      }
     },
     {
       "track": "C / Arduino",

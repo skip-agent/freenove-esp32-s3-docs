@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The voyage — TinySkiff ESP32-S3 Lab</title>
+  <meta name="description" content="A guided 30-day, Arduino-first course for the Freenove Super Starter Kit for ESP32-S3. Each day is a complete win in about 30 minutes." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./course.css" />
+</head>
+<body>
+  <div class="lesson-shell">
+    <header class="hero map-hero">
+      <div class="hero-copy">
+        <p class="eyebrow">TinySkiff ESP32-S3 Lab</p>
+        <h1>The <em>voyage</em></h1>
+        <p class="lede">A guided 30-day, Arduino-first course. Each day is one complete win in about 30 minutes — wire it, run it, understand it, then try one small thing of your own.</p>
+        <div class="meta-row" aria-label="Course facts">
+          <span class="pill is-key">30 days</span>
+          <span class="pill">Arduino first</span>
+          <span class="pill">No electronics assumed</span>
+          <a class="pill pill-link" href="../index.html">Browse the Library →</a>
+        </div>
+      </div>
+      <div class="hero-side">
+        <div class="map-progress" id="mapProgress">
+          <div class="map-progress-head"><span>Your voyage</span><span class="dot" aria-hidden="true"></span></div>
+          <div class="map-progress-body">
+            <span class="map-progress-count"><b id="doneCount">0</b> / 30 days done</span>
+            <div class="voyage" id="mapVoyage"><span></span></div>
+            <a class="map-resume" id="mapResume" href="#" hidden>Resume →</a>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="course-body">
+      <p class="map-note muted">1 of 30 days are ready to sail. The rest are charted and on the way.</p>
+      <section class="arc">
+        <div class="arc-head">
+          <h2>First light</h2>
+          <p>Set up the board and score your first wins.</p>
+        </div>
+        <div class="day-grid">
+          <div class="day-tile is-upcoming" data-day="1" aria-disabled="true">
+            <span class="day-tile-num">Day 1</span>
+            <span class="day-tile-title">Unbox safely and meet the ESP32-S3</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="2" aria-disabled="true">
+            <span class="day-tile-num">Day 2</span>
+            <span class="day-tile-title">Install the Arduino IDE and see the board</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="3" aria-disabled="true">
+            <span class="day-tile-num">Day 3</span>
+            <span class="day-tile-title">Blink: prove the whole chain works</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="4" aria-disabled="true">
+            <span class="day-tile-num">Day 4</span>
+            <span class="day-tile-title">Button + LED: make input control output</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="5" aria-disabled="true">
+            <span class="day-tile-num">Day 5</span>
+            <span class="day-tile-title">Mini table lamp: your first tiny product</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+        </div>
+      </section>
+      <section class="arc">
+        <div class="arc-head">
+          <h2>Light and motion</h2>
+          <p>Drive many outputs and shape how they glow.</p>
+        </div>
+        <div class="day-grid">
+          <div class="day-tile is-upcoming" data-day="6" aria-disabled="true">
+            <span class="day-tile-num">Day 6</span>
+            <span class="day-tile-title">LED bar: make motion with many outputs</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="7" aria-disabled="true">
+            <span class="day-tile-num">Day 7</span>
+            <span class="day-tile-title">PWM: fade an LED instead of switching it</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="8" aria-disabled="true">
+            <span class="day-tile-num">Day 8</span>
+            <span class="day-tile-title">Meteor light: reuse PWM across LEDs</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="9" aria-disabled="true">
+            <span class="day-tile-num">Day 9</span>
+            <span class="day-tile-title">RGB LED: mix colour from code</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="10" aria-disabled="true">
+            <span class="day-tile-num">Day 10</span>
+            <span class="day-tile-title">Buzzer: make the board speak in beeps</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+        </div>
+      </section>
+      <section class="arc">
+        <div class="arc-head">
+          <h2>Talking over serial</h2>
+          <p>Open a two-way channel to the board.</p>
+        </div>
+        <div class="day-grid">
+          <div class="day-tile is-upcoming" data-day="11" aria-disabled="true">
+            <span class="day-tile-num">Day 11</span>
+            <span class="day-tile-title">Serial monitor: see what the board says</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="12" aria-disabled="true">
+            <span class="day-tile-num">Day 12</span>
+            <span class="day-tile-title">Serial read/write: send commands back</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+        </div>
+      </section>
+      <section class="arc">
+        <div class="arc-head">
+          <h2>Reading the world</h2>
+          <p>Turn sensors into numbers you can use.</p>
+        </div>
+        <div class="day-grid">
+          <div class="day-tile is-upcoming" data-day="13" aria-disabled="true">
+            <span class="day-tile-num">Day 13</span>
+            <span class="day-tile-title">Potentiometer / ADC: read a changing voltage</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="14" aria-disabled="true">
+            <span class="day-tile-num">Day 14</span>
+            <span class="day-tile-title">Touch sensor: use your body as input</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="15" aria-disabled="true">
+            <span class="day-tile-num">Day 15</span>
+            <span class="day-tile-title">Soft light: map input to brightness</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="16" aria-disabled="true">
+            <span class="day-tile-num">Day 16</span>
+            <span class="day-tile-title">Soft colourful light: map input to colour</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="17" aria-disabled="true">
+            <span class="day-tile-num">Day 17</span>
+            <span class="day-tile-title">Night lamp: respond to ambient light</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="18" aria-disabled="true">
+            <span class="day-tile-num">Day 18</span>
+            <span class="day-tile-title">Thermometer: sense temperature</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="19" aria-disabled="true">
+            <span class="day-tile-num">Day 19</span>
+            <span class="day-tile-title">Joystick: read two axes and a button</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="20" aria-disabled="true">
+            <span class="day-tile-num">Day 20</span>
+            <span class="day-tile-title">Shift register: many outputs, fewer pins</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="21" aria-disabled="true">
+            <span class="day-tile-num">Day 21</span>
+            <span class="day-tile-title">Seven-segment display: show one clear digit</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+        </div>
+      </section>
+      <section class="arc">
+        <div class="arc-head">
+          <h2>Making things move</h2>
+          <p>Add motors, servos, and a real display.</p>
+        </div>
+        <div class="day-grid">
+          <div class="day-tile is-upcoming" data-day="22" aria-disabled="true">
+            <span class="day-tile-num">Day 22</span>
+            <span class="day-tile-title">Motor driver: control motion safely</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="23" aria-disabled="true">
+            <span class="day-tile-num">Day 23</span>
+            <span class="day-tile-title">Servo sweep: move to positions</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="24" aria-disabled="true">
+            <span class="day-tile-num">Day 24</span>
+            <span class="day-tile-title">Servo knob: control position with a knob</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="25" aria-disabled="true">
+            <span class="day-tile-num">Day 25</span>
+            <span class="day-tile-title">LCD1602: give the project a display</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+        </div>
+      </section>
+      <section class="arc">
+        <div class="arc-head">
+          <h2>Sensing distance</h2>
+          <p>Measure the world by timing sound.</p>
+        </div>
+        <div class="day-grid">
+          <a class="day-tile is-ready" href="day-26-ultrasonic/" data-day="26">
+            <span class="day-tile-num">Day 26</span>
+            <span class="day-tile-tick" aria-hidden="true"></span>
+            <span class="day-tile-title">Measure the room with sound</span>
+            <span class="day-tile-meta">About 30 min · Ready</span>
+          </a>
+        </div>
+      </section>
+      <section class="arc">
+        <div class="arc-head">
+          <h2>Onto the network</h2>
+          <p>Go wireless and reach the internet.</p>
+        </div>
+        <div class="day-grid">
+          <div class="day-tile is-upcoming" data-day="27" aria-disabled="true">
+            <span class="day-tile-num">Day 27</span>
+            <span class="day-tile-title">BLE pass-through: talk at short range</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="28" aria-disabled="true">
+            <span class="day-tile-num">Day 28</span>
+            <span class="day-tile-title">Bluetooth control: wireless command to output</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="29" aria-disabled="true">
+            <span class="day-tile-num">Day 29</span>
+            <span class="day-tile-title">Wi-Fi modes: join a network (AP vs station)</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+          <div class="day-tile is-upcoming" data-day="30" aria-disabled="true">
+            <span class="day-tile-num">Day 30</span>
+            <span class="day-tile-title">TCP/IP: a mini web-connected device</span>
+            <span class="day-tile-meta">Upcoming</span>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="colophon">
+      <p><strong>TinySkiff ESP32-S3 Lab.</strong> A guided course built on the official Freenove Super Starter Kit for ESP32-S3 material, released under CC BY-NC-SA 3.0. Not affiliated with or endorsed by Freenove.</p>
+    </footer>
+  </div>
+  <script id="course-data" type="application/json">{"totalDays": 30, "published": [26], "slugs": {"26": "day-26-ultrasonic"}}</script>
+  <script src="./course.js"></script>
+</body>
+</html>

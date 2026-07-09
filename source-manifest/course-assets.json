@@ -1,0 +1,57 @@
+{
+  "_comment": "Provenance for every image used by the guided course. Kit-item photos are reusable across days (course-assets/assets/shared/); per-day diagrams are extracted from the official Freenove PDFs (course-assets/assets/day-NN/). Every entry records where it came from so attribution stays honest (CC BY-NC-SA 3.0). See docs/wayfinder/asset-workflow.md.",
+  "license": "CC BY-NC-SA 3.0 (Freenove); TinySkiff not affiliated.",
+  "sourceArchive": "freenove-source.json",
+  "shared": [
+    {
+      "asset": "course-assets/assets/shared/item-esp32-s3-board.jpg",
+      "origin": "Freenove manual — ESP32-S3 development board photo",
+      "kind": "kit-item photo",
+      "alt": "Official manual photo of the ESP32-S3 development board."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-gpio-extension-board.png",
+      "origin": "Freenove manual — GPIO extension board image",
+      "kind": "kit-item photo",
+      "alt": "Official manual image of the ESP32-S3 GPIO extension board."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-hcsr04-ultrasonic-sensor.jpg",
+      "origin": "Freenove manual — HC-SR04 ultrasonic sensor image",
+      "kind": "kit-item photo",
+      "alt": "Official manual image of the HC-SR04 ultrasonic distance sensor."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-jumper-wire.png",
+      "origin": "Freenove manual — jumper wire image",
+      "kind": "kit-item photo",
+      "alt": "Official manual image of a jumper wire."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-arduino-ide.png",
+      "origin": "Freenove manual — Arduino IDE screenshot",
+      "kind": "kit-item screenshot",
+      "alt": "Official manual screenshot of the Arduino IDE interface."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-official-sketch.png",
+      "origin": "Freenove manual — Ultrasonic Ranging sketch + Serial Monitor page",
+      "kind": "kit-item screenshot",
+      "alt": "Official manual page showing the Ultrasonic Ranging sketch and Serial Monitor output."
+    }
+  ],
+  "days": {
+    "26": [
+      {
+        "asset": "course-assets/assets/day-26/circuit-page-172.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 19 Ultrasonic Ranging",
+          "page": 172
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF)",
+        "alt": "Official Freenove diagram showing HC-SR04 VCC connected to 5V, Trig to GPIO 13, Echo to GPIO 14, and GND to ground on the ESP32-S3 GPIO extension board."
+      }
+    ]
+  }
+}

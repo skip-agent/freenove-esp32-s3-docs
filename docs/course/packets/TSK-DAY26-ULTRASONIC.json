@@ -1,0 +1,174 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY26-ULTRASONIC",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 26,
+  "title": "Measure the room with sound",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 30,
+  "mission": "Build a tiny digital tape measure with the HC-SR04 ultrasonic sensor, upload the Arduino sketch, and watch distance readings appear in Serial Monitor.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "officialPdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+    "chapter": "Chapter 19 Ultrasonic Ranging",
+    "page": 172,
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_19.1_Ultrasonic_Ranging/Sketch_19.1_Ultrasonic_Ranging.ino",
+    "arduinoVariant": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_19.2_Ultrasonic_Ranging/Sketch_19.2_Ultrasonic_Ranging.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/18.1_Ultrasonic_Ranging/Ultrasonic_Ranging.py",
+    "imageAsset": "docs/course/assets/day-26/circuit-page-172.png",
+    "imageAlt": "Official Freenove diagram showing HC-SR04 VCC connected to 5V, Trig to GPIO 13, Echo to GPIO 14, and GND to ground on the ESP32-S3 GPIO extension board.",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "GPIO extension board",
+      "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
+      "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
+    },
+    {
+      "name": "HC-SR04 sensor",
+      "imageAsset": "docs/course/assets/shared/item-hcsr04-ultrasonic-sensor.jpg",
+      "explanation": "The HC-SR04 is a distance sensor. One round transducer sends a sound pulse above human hearing, and the other listens for the echo. The board measures the echo time and turns it into distance."
+    },
+    {
+      "name": "4 jumper wires",
+      "imageAsset": "docs/course/assets/shared/item-jumper-wire.png",
+      "explanation": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    },
+    {
+      "name": "Official sketch",
+      "imageAsset": "docs/course/assets/shared/item-official-sketch.png",
+      "explanation": "A sketch is the Arduino name for a program. This lesson uses Freenove's Sketch_19.1_Ultrasonic_Ranging.ino so you can focus first on wiring, observation, and the measurement model."
+    }
+  ],
+  "wiring": [
+    {
+      "partPin": "VCC",
+      "connectTo": "5V",
+      "reason": "Powers the ultrasonic sensor."
+    },
+    {
+      "partPin": "Trig",
+      "connectTo": "GPIO 13",
+      "reason": "The board sends a short \"start\" pulse here."
+    },
+    {
+      "partPin": "Echo",
+      "connectTo": "GPIO 14",
+      "reason": "The sensor returns a timed pulse here."
+    },
+    {
+      "partPin": "GND",
+      "connectTo": "GND",
+      "reason": "Gives board and sensor the same zero point."
+    }
+  ],
+  "coachInstructions": [
+    "Guide one physical step at a time and wait for learner confirmation before proceeding.",
+    "Offer short explanations on request; do not dump theory before the learner has a working circuit.",
+    "If the learner is stuck, check wiring, board/port, baud rate, and USB cable before changing code.",
+    "Preserve a working baseline before suggesting modifications.",
+    "Keep the Arduino path primary; MicroPython is optional only if already set up."
+  ],
+  "steps": [
+    "Place the HC-SR04 so the two round transducers face outward, away from loose wires.",
+    "Connect VCC → 5V, Trig → GPIO 13, Echo → GPIO 14, and GND → GND.",
+    "Pause and compare your wiring to the chart before powering or uploading.",
+    "Open Sketch_19.1_Ultrasonic_Ranging.ino in Arduino IDE.",
+    "Upload the sketch to the ESP32-S3.",
+    "Open Serial Monitor and set the baud rate to 115200.",
+    "Hold a flat object 10–30 cm in front of the sensor and move it slowly closer and farther."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "#define trigPin 13",
+        "explanation": "Names GPIO 13 trigPin so the rest of the sketch reads plainly."
+      },
+      {
+        "line": "pulseIn(echoPin, HIGH, timeOut)",
+        "explanation": "Times how long Echo stays HIGH — that's the raw measurement."
+      },
+      {
+        "line": "… / 2 / 10000",
+        "explanation": "Sound goes out and back, so halve it; the / 10000 just lands the answer in centimetres."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "Pin(13, Pin.OUT, 0)",
+        "explanation": "Sets GPIO 13 as the trigger output — the board's side of the ping."
+      },
+      {
+        "line": "Pin(14, Pin.IN, 0)",
+        "explanation": "Sets GPIO 14 as the echo input — where the return pulse arrives."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "Send a ping, wait for the echo, measure the time, and convert time into distance.",
+    "formula": "distance = speed of sound × echo time ÷ 2",
+    "notes": [
+      {
+        "title": "Why readings wobble",
+        "body": "Real sensors react to object shape, angle, movement, and air. A little wobble is normal — watch the trend, not one number."
+      },
+      {
+        "title": "Why flat targets help",
+        "body": "Flat objects bounce more sound straight back. Curved or soft ones scatter it, so the echo gets weaker."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "Distance: 24.31cm",
+      "Distance: 23.92cm",
+      "Distance: 24.08cm"
+    ],
+    "successCriteria": "A good reading changes when you move the object. Small wobble is fine."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "0 cm or frozen",
+      "firstChecks": [
+        "Check Trig, Echo, GND, and the target's shape."
+      ]
+    },
+    {
+      "symptom": "Blank monitor",
+      "firstChecks": [
+        "Confirm 115200 baud, then the board and port."
+      ]
+    },
+    {
+      "symptom": "Upload fails",
+      "firstChecks": [
+        "Swap in a data-capable USB cable."
+      ]
+    },
+    {
+      "symptom": "Readings jump",
+      "firstChecks": [
+        "Aim straight at a flat object."
+      ]
+    }
+  ],
+  "challenge": "Measure three targets, record expected and actual distances, then choose a keep-out-zone threshold and explain why.",
+  "logbookPrompts": [
+    "What did you measure today?",
+    "Which reading seemed most stable?",
+    "What would you build if the sensor could warn you something's too close?"
+  ]
+}
