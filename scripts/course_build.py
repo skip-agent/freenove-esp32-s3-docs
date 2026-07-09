@@ -794,13 +794,19 @@ def emit_packet(lesson: dict, glossary: dict) -> dict:
             {"line": n.get("code"), "explanation": plain_text(n.get("text"))}
             for n in micro["notes"]
         ]
-    packet["theoryModel"] = {
-        "plainLanguage": plain_text(theory.get("summary"))
-        or "; ".join(str(f.get("title")) for f in theory.get("flow") or []),
-        "formula": plain_text(theory.get("formula")),
-        "notes": [{"title": n.get("title"), "body": plain_text(n.get("body"))}
-                  for n in theory.get("notes") or []],
-    }
+    # theoryModel is a generalized projection: `notes[]` supersedes the shipped
+    # prototype's day-specific keys (whyDivideByTwo / whyReadingsWobble), whose
+    # content survives here and in codeFocus. A generator can't emit bespoke
+    # per-day keys, and the spec (site-content-model §7) mandates a v0 projection.
+    # Omitted entirely for days that carry no theory (e.g. setup days).
+    if theory:
+        packet["theoryModel"] = {
+            "plainLanguage": plain_text(theory.get("summary"))
+            or "; ".join(str(f.get("title")) for f in theory.get("flow") or []),
+            "formula": plain_text(theory.get("formula")),
+            "notes": [{"title": n.get("title"), "body": plain_text(n.get("body"))}
+                      for n in theory.get("notes") or []],
+        }
     packet["test"] = {
         "expectedOutputExample": list(test.get("expected") or []),
         "successCriteria": plain_text(test.get("expectedNote")),

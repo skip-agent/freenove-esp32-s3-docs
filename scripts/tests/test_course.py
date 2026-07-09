@@ -61,6 +61,18 @@ class ValidationTests(unittest.TestCase):
         errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
         self.assertTrue(any("does-not-exist" in e for e in errors), errors)
 
+    def test_incomplete_theory_fails(self):
+        lesson = load_day26()
+        del lesson["theory"]["formula"]
+        errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
+        self.assertTrue(any("theory.formula" in e for e in errors), errors)
+
+    def test_absent_theory_is_ok(self):
+        lesson = load_day26()
+        del lesson["theory"]
+        errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
+        self.assertEqual(errors, [], f"theory is optional: {errors}")
+
     def test_bad_track_fails(self):
         lesson = load_day26()
         lesson["tracks"]["main"] = "micropython"
@@ -244,6 +256,17 @@ class PacketTests(unittest.TestCase):
         meta = self.packet["sourceMetadata"]
         self.assertTrue(meta["arduinoSketch"].endswith("Sketch_19.1_Ultrasonic_Ranging.ino"))
         self.assertEqual(meta["page"], 172)
+        self.assertEqual(meta["chapter"], "Chapter 19 Ultrasonic Ranging")
+
+    def test_theory_model_present_when_theory_present(self):
+        self.assertIn("theoryModel", self.packet)
+        self.assertTrue(self.packet["theoryModel"]["plainLanguage"])
+
+    def test_theory_model_omitted_when_absent(self):
+        lesson = load_day26()
+        del lesson["theory"]
+        packet = course_build.emit_packet(lesson, GLOSSARY)
+        self.assertNotIn("theoryModel", packet)
 
 
 class BacklinkTests(unittest.TestCase):

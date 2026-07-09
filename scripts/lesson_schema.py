@@ -198,6 +198,14 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
         _require(errors, bool(str(arduino.get(field, "")).strip()),
                  f"{code}: code.arduino.{field} is required")
 
+    # Theory is optional (setup days may have none), but must be complete if present
+    theory = lesson.get("theory")
+    if theory is not None:
+        _require(errors, len(theory.get("flow") or []) > 0,
+                 f"{code}: theory.flow must be non-empty when theory is present")
+        _require(errors, bool(str(theory.get("formula", "")).strip()),
+                 f"{code}: theory.formula is required when theory is present")
+
     # Test
     test = lesson.get("test") or {}
     _require(errors, len(test.get("expected") or []) > 0,

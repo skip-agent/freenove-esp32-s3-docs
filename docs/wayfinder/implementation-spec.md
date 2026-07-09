@@ -9,7 +9,7 @@ This is the capstone. It folds every resolved decision into one document an impl
 - [#2 Source inventory](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/2) — official C/Arduino material is the backbone; MicroPython optional; PDF diagrams must be extracted.
 - [#3 Lesson voice + day template](lesson-template.md) — friendly workshop guide; mission-card day.
 - [#4 30-day curriculum spine](curriculum-spine.md) — the day-by-day plan.
-- [#5 Guided-day prototype](guided-day-prototype-day-26-ultrasonic.html) — the approved "echo-sounder" design system (Day 26, shipped).
+- [#5 Guided-day prototype](guided-day-prototype-day-26-ultrasonic.md) — the approved "echo-sounder" design system (Day 26); now generated at [`/course/day-26-ultrasonic/`](../course/day-26-ultrasonic/index.html).
 - [#6 Site content model + navigation](site-content-model.md) — two surfaces, one static site; `tinyskiff.lesson.v1`; four decisions confirmed.
 
 ---
