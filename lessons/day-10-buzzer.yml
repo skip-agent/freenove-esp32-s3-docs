@@ -1,0 +1,285 @@
+# Day 10 — Buzzer · tinyskiff.lesson.v1
+# One source of truth: this file renders to the guided page
+# (/course/day-10-buzzer/), the agent packet, and the course-map entry.
+# The board gets a voice — and a transistor lets a pin drive a load it can't power directly.
+
+schema: tinyskiff.lesson.v1
+lessonCode: TSK-DAY10-BUZZER
+day: 10
+slug: day-10-buzzer
+title: Give the board a voice
+status: published
+estimatedTimeMinutes: 25
+tracks: { main: arduino, optional: micropython }
+learnerProfile: adult beginner; curious and capable; no electronics assumed
+
+mission: >
+  Wire an active buzzer through an NPN transistor, add a push button, upload the
+  Arduino sketch, and turn your board into a doorbell — press for a beep, let go
+  for silence.
+unlocks: A pin can make sound, and a transistor lets that pin switch a load it could never power on its own.
+seoDescription: >
+  Wire an active buzzer and an NPN transistor to the ESP32-S3, add a push button,
+  and build a doorbell — press to beep. Your first circuit that makes sound and
+  switches a bigger load through a transistor.
+
+hero:
+  instrument: none
+  headline: Give the board|a {voice}
+  lede: >
+    Today the board makes sound. You wire an active buzzer through a small
+    transistor, add a push button, and upload a sketch that beeps the moment you
+    press — a doorbell you built yourself. The transistor is the new trick: it
+    lets a gentle pin switch a load the pin could never drive alone.
+  pills:
+    - { text: About 25 minutes, key: true }
+    - Arduino first
+    - MicroPython optional
+    - No electronics assumed
+
+parts:
+  intro: >
+    Nine things, most of them tiny. Tap *Define* on any part you haven't met —
+    the answer opens as a field note you can read and dismiss without losing your
+    place.
+  items:
+    - name: ESP32-S3 board
+      image: shared/item-esp32-s3-board.jpg
+      imageKind: Manual photo
+      alt: Official manual photo of the ESP32-S3 development board.
+      blurb: The brain that runs your uploaded sketch.
+      explain: esp32
+    - name: GPIO extension board
+      image: shared/item-gpio-extension-board.png
+      imageKind: Manual photo
+      alt: Official manual image of the ESP32-S3 GPIO extension board.
+      blurb: Spreads the pins into rows you can reach and label.
+      explain: gpio
+    - name: Active buzzer
+      image: shared/item-buzzer.png
+      imageKind: Manual photo
+      alt: Official manual photo of a small round active buzzer.
+      blurb: Makes one fixed tone whenever it gets power.
+      explain: buzzer
+    - name: NPN transistor
+      image: shared/item-transistor.png
+      imageKind: Manual photo
+      alt: Official manual photo of an NPN transistor with three legs.
+      blurb: A tiny switch the pin controls to drive the buzzer.
+      explain: transistor
+    - name: Push button
+      image: shared/item-push-button.png
+      imageKind: Manual photo
+      alt: Official manual photo of a four-pin push button switch with its pin pairs labelled 1 and 2.
+      blurb: A four-pin switch that closes the circuit when pressed.
+      explain: pushButton
+    - name: 1 kΩ resistor
+      image: shared/item-resistor.png
+      imageKind: Manual photo
+      alt: Official manual photo of a resistor with coloured value bands.
+      blurb: Sits between the pin and the transistor's base to keep the current gentle.
+      explain: resistor
+    - name: 2 × 10 kΩ resistors
+      image: shared/item-resistor.png
+      imageKind: Manual photo
+      alt: Official manual photo of a resistor with coloured value bands.
+      blurb: Hold the button's pin at a steady level until you press.
+      explain: pullResistor
+    - name: Jumper wires
+      image: shared/item-jumper-wire.png
+      imageKind: Manual photo
+      alt: Official manual image of a jumper wire.
+      blurb: Temporary, solder-free connections.
+      explain: jumpers
+    - name: Arduino IDE
+      image: shared/item-arduino-ide.png
+      imageKind: Manual screenshot
+      alt: Official manual screenshot of the Arduino IDE interface.
+      blurb: Uploads the sketch to the board.
+      explain: arduino
+
+wiring:
+  intro: >
+    The official Freenove diagram is your chart — schematic on top, the same
+    circuit built on a breadboard below. Click it to enlarge. Each connection
+    tells you where the wire goes and why.
+  diagram:
+    image: day-10/circuit-page-80.png
+    alt: >-
+      Official Freenove circuit for the Buzzer: an active buzzer driven from GPIO
+      14 through an NPN transistor with a 1 kilo-ohm resistor on its base and the
+      buzzer powered from the 5V rail, plus a push button on GPIO 21 held by 10
+      kilo-ohm resistors, shown as both a schematic and a breadboard photo.
+    caption: Official Freenove circuit — C Tutorial, Chapter 6 (Buzzer), page 80.
+    zoomCaption: Official Freenove circuit, C Tutorial Chapter 6, page 80.
+    source: { pdf: C_Tutorial.pdf, chapter: 6, chapterTitle: Buzzer, page: 80 }
+  pins:
+    - { from: Buzzer +, to: 5V rail, why: The buzzer draws more current than a pin can give so it runs off 5V., explain: buzzer }
+    - { from: Transistor base (via 1 kΩ), to: GPIO 14, why: The pin switches the buzzer through the transistor., explain: transistor }
+    - { from: Push button, to: GPIO 21, why: The board reads this pin to catch the press., explain: digitalRead }
+    - { from: 10 kΩ resistor, to: 3.3V, why: Holds GPIO 21 HIGH until a press pulls it LOW., explain: pullResistor }
+  safety:
+    - label: Mind the transistor's legs.
+      icon: "⚓"
+      body: >
+        The transistor's three legs have their own jobs — emitter, base, and
+        collector — so get them the right way round against the chart. Unplug USB
+        before you move any wire.
+
+steps:
+  intro: >
+    This is the main path — you can finish the day without opening a single field
+    note. Tap each step as you go to keep your place.
+  items:
+    - Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.
+    - Place the transistor on the breadboard and note its three legs — emitter, base, and collector. {transistor}
+    - Wire the buzzer's + pin to the 5V rail and its other pin down to the transistor.
+    - Connect the transistor's base to GPIO 14 through the 1 kΩ resistor.
+    - Wire the push button so one side reaches GPIO 21, then add its 10 kΩ pull-up to 3.3V. {pullResistor}
+    - Compare every wire to the chart before you plug in USB.
+    - Open `Sketch_06.1_Doorbell.ino` in Arduino IDE and upload it.
+    - Press the button and listen.
+  done:
+    icon: "💡"
+    title: The board can speak.
+    body: Press for a beep, release for silence — your first doorbell. Head to Test & debug to confirm the sound.
+
+code:
+  intro: >
+    The whole sketch is short. Two lines set the pins up; the loop just asks the
+    button and answers with the buzzer. Switch to MicroPython if you'd rather see
+    the same idea in Python — the wiring never changes.
+  arduino:
+    file: Sketch_06.1_Doorbell.ino
+    sketch: C/Sketches/Sketch_06.1_Doorbell/Sketch_06.1_Doorbell.ino
+    variant: C/Sketches/Sketch_06.2_Alertor/Sketch_06.2_Alertor.ino
+    excerpt: |
+      #define PIN_BUZZER 14
+      #define PIN_BUTTON 21
+
+      void setup() {
+        pinMode(PIN_BUZZER, OUTPUT);
+        pinMode(PIN_BUTTON, INPUT);
+      }
+
+      void loop() {
+        if (digitalRead(PIN_BUTTON) == LOW) {
+          digitalWrite(PIN_BUZZER, HIGH);   // pressed -> beep
+        } else {
+          digitalWrite(PIN_BUZZER, LOW);    // released -> silent
+        }
+      }
+    notes:
+      - code: digitalRead(PIN_BUTTON) == LOW
+        text: True only while the button is held — a press pulls GPIO 21 LOW.
+        explain: digitalRead
+      - code: digitalWrite(PIN_BUZZER, HIGH)
+        text: Sends the pin HIGH, which switches the buzzer on through the transistor.
+        explain: transistor
+      - code: ledcWriteTone(channel, freq)
+        text: The passive-buzzer variant (`Sketch_06.2_Alertor`) uses ledcWriteTone to choose the pitch and sweep a siren.
+        explain: tone
+  micropython:
+    file: 06.1_Doorbell/Doorbell.py
+    path: Python/Python_Codes/06.1_Doorbell/Doorbell.py
+    optionalTag: Optional side path · same circuit
+    excerpt: |
+      button = Pin(21, Pin.IN, Pin.PULL_UP)
+      activeBuzzer = Pin(14, Pin.OUT)
+
+      if not button.value():
+          activeBuzzer.value(1)
+      else:
+          activeBuzzer.value(0)
+    notes:
+      - code: Pin(21, Pin.IN, Pin.PULL_UP)
+        text: Reads GPIO 21 as an input with a built-in pull-up — the same job the 10 kΩ resistor does in hardware.
+      - code: activeBuzzer = Pin(14, Pin.OUT)
+        text: Drives GPIO 14, which switches the buzzer through the transistor.
+    note: >
+      Same pins, same wiring. The passive-buzzer version uses `PWM(Pin(14), 2000)`
+      and `.freq(...)` to pick the pitch. Run it in Thonny if MicroPython is set
+      up; otherwise skip it — it should never block the Arduino-first path.
+
+theory:
+  title: Active buzzers, passive buzzers, and the transistor
+  summary: The pin reads the button and switches a transistor, and the transistor drives the 5V buzzer the pin couldn't power alone.
+  intro: >
+    There's no trick here — the pin does the deciding, and a small transistor does
+    the heavy lifting the pin can't.
+  flow:
+    - { n: Sense, title: Button in, body: digitalRead checks GPIO 21 many times a second. }
+    - { n: Trickle, title: Weak pin, body: The pin can only supply a trickle of current on its own. }
+    - { n: Switch, title: Transistor, body: The transistor uses that trickle to switch the 5V buzzer. }
+    - { n: Silence, title: Release, body: Let go and the transistor opens so the buzzer goes silent. }
+  formulaLabel: The model
+  formula: press → **transistor** switches 5V → buzzer sounds
+  notes:
+    - title: Active vs passive buzzers
+      explain: buzzer
+      body: An active buzzer has its own oscillator and plays one fixed tone. A passive buzzer is silent until you feed it a changing signal, so you choose the pitch.
+    - title: What the transistor is for
+      explain: transistor
+      body: The pin can't supply the buzzer's current. The transistor lets the small pin signal switch the larger 5V current on and off.
+
+test:
+  mode: visual
+  intro: >
+    Nothing prints to the screen today — the proof is the sound under your finger.
+  expectedTitle: What you should hear
+  readoutLabel: Buzzer
+  expected:
+    - Press and hold the button — a steady beep sounds at once.
+    - Let go — silence.
+    - Every press sounds the same note, for as long as the board has power.
+  expectedNote: An active buzzer plays one fixed tone — choosing the pitch is the passive-buzzer variant's job.
+  checksTitle: If it doesn't
+  checks:
+    - symptom: "No sound at all?"
+      fix: "Check the transistor legs are the right way round, and that the buzzer + goes to 5V."
+    - symptom: "Always sounding?"
+      fix: "The button or its 10 kΩ pull-up is likely miswired on GPIO 21."
+    - symptom: "Very faint?"
+      fix: "The buzzer may be on 3.3V instead of 5V — move it to the 5V rail."
+    - symptom: "Upload fails?"
+      fix: "Swap in a data-capable USB cable."
+
+challenge:
+  title: "Try this: invent a signal"
+  railLabel: Try this
+  intro: >
+    Same working circuit, one new idea: giving a sound a meaning. It fits inside
+    today's 30 minutes.
+  summary: Design a two-beep pattern that means something, then try the passive buzzer to hear a pitch you control.
+  cards:
+    - title: Invent a signal
+      body: Design a two-beep pattern — short-short, or short-long — and write down what it means. Press it out by hand and see if a listener can read it.
+    - title: Hear a siren
+      explain: tone
+      body: Swap in the passive buzzer and upload `Sketch_06.2_Alertor.ino` to hear a siren instead of a single note. Notice how choosing the pitch changes everything.
+  logbook:
+    - What did your two-beep signal mean, and could someone else read it?
+    - What was the transistor doing every time the buzzer sounded?
+    - Where in daily life does one fixed tone do a whole job?
+
+agent:
+  intro: >
+    Every lesson ships with a code and a machine-readable packet, so an agent can
+    guide you with full context.
+  behaviour: >
+    guide one physical connection at a time, wait for you to confirm, explain
+    terms on request, and always check the transistor orientation, wiring, board,
+    port, and USB before changing code.
+  coachInstructions:
+    - Guide one physical connection at a time and wait for learner confirmation before proceeding.
+    - Check the transistor's orientation first — emitter, base, and collector each have a job, and a reversed transistor is the most common cause of no sound.
+    - Confirm the buzzer's + pin goes to the 5V rail, not 3.3V, or the sound will be faint or absent.
+    - If there is no sound, check the transistor legs and the 5V buzzer connection before changing code.
+    - If the buzzer always sounds, suspect the button wiring or its 10 kΩ pull-up on GPIO 21.
+    - Keep the Arduino path primary; MicroPython and the passive-buzzer siren are optional only if already set up.
+
+source:
+  license: CC BY-NC-SA 3.0
+  licenseNote: >
+    Based on Freenove official material released under CC BY-NC-SA 3.0; preserve
+    attribution and non-affiliation language.

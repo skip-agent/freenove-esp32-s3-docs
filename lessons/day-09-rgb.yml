@@ -1,0 +1,266 @@
+# Day 9 — RGB LED · tinyskiff.lesson.v1
+# One source of truth: this file renders to the guided page
+# (/course/day-09-rgb/), the agent packet, and the course-map entry.
+# Three PWM channels in one dome — the day colour becomes something you mix.
+
+schema: tinyskiff.lesson.v1
+lessonCode: TSK-DAY09-RGB
+day: 9
+slug: day-09-rgb
+title: Mix any colour from three lights
+status: published
+estimatedTimeMinutes: 25
+tracks: { main: arduino, optional: micropython }
+learnerProfile: adult beginner; curious and capable; no electronics assumed
+
+mission: >
+  Wire an RGB LED — three tiny lights in one dome — to three PWM pins, upload the
+  Arduino sketch, and watch the board mix red, green, and blue into a stream of
+  random colours you never wired by hand.
+unlocks: A colour is just three brightnesses set at once, so three PWM channels can paint any shade you ask for.
+seoDescription: >
+  Wire a common-anode RGB LED to the ESP32-S3, upload the sketch, and mix any
+  colour from three PWM channels — red, green, and blue set to brightnesses that
+  blend in your eye.
+
+hero:
+  instrument: none
+  headline: Mix any colour|from three {lights}
+  lede: >
+    Today the board becomes a painter. You wire one small dome that holds three
+    lights — red, green, and blue — to three PWM pins, then upload a sketch that
+    sets each brightness and lets your eye blend them into a single colour.
+  pills:
+    - { text: About 25 minutes, key: true }
+    - Arduino first
+    - MicroPython optional
+    - No electronics assumed
+
+parts:
+  intro: >
+    Six things, most of them small. Tap *Define* on any part you haven't met —
+    the answer opens as a field note you can read and dismiss without losing your
+    place.
+  items:
+    - name: ESP32-S3 board
+      image: shared/item-esp32-s3-board.jpg
+      imageKind: Manual photo
+      alt: Official manual photo of the ESP32-S3 development board.
+      blurb: The brain that runs your uploaded sketch.
+      explain: esp32
+    - name: GPIO extension board
+      image: shared/item-gpio-extension-board.png
+      imageKind: Manual photo
+      alt: Official manual image of the ESP32-S3 GPIO extension board.
+      blurb: Spreads the pins into rows you can reach and label.
+      explain: gpio
+    - name: RGB LED
+      image: shared/item-rgb-led.png
+      imageKind: Manual photo
+      alt: Official manual photo of an RGB LED showing its long common pin and three colour legs.
+      blurb: Three lights — red, green, blue — in one dome with a shared pin.
+      explain: rgb
+    - name: 3 × 220 Ω resistors
+      image: shared/item-resistor.png
+      imageKind: Manual photo
+      alt: Official manual photo of a resistor with coloured value bands.
+      blurb: One in series with each colour leg to keep the current gentle.
+      explain: resistor
+    - name: Jumper wires
+      image: shared/item-jumper-wire.png
+      imageKind: Manual photo
+      alt: Official manual image of a jumper wire.
+      blurb: Temporary, solder-free connections.
+      explain: jumpers
+    - name: Arduino IDE
+      image: shared/item-arduino-ide.png
+      imageKind: Manual screenshot
+      alt: Official manual screenshot of the Arduino IDE interface.
+      blurb: Uploads the sketch to the board.
+      explain: arduino
+
+wiring:
+  intro: >
+    The official Freenove diagram is your chart — schematic on top, the same
+    circuit built on a breadboard below. Click it to enlarge. Each connection
+    tells you where the wire goes and why.
+  diagram:
+    image: day-09/circuit-page-72.png
+    alt: >-
+      Official Freenove circuit for the RGB LED: a red, a green, and a blue leg
+      each running through its own 220 ohm resistor to a separate GPIO pin, with
+      the long common pin joined to 3.3 volts, shown as both a schematic and a
+      breadboard photo.
+    caption: Official Freenove circuit — C Tutorial, Chapter 5 (RGB LED), page 72.
+    zoomCaption: Official Freenove circuit, C Tutorial Chapter 5, page 72.
+    source: { pdf: C_Tutorial.pdf, chapter: 5, chapterTitle: RGB LED, page: 72 }
+  pins:
+    - { from: Red leg (via 220 Ω), to: GPIO 38, why: One PWM channel sets how much red shows., explain: rgb }
+    - { from: Green leg (via 220 Ω), to: GPIO 39, why: One PWM channel sets how much green shows., explain: rgb }
+    - { from: Blue leg (via 220 Ω), to: GPIO 40, why: One PWM channel sets how much blue shows., explain: rgb }
+    - { from: Common (long) pin, to: 3.3V, why: All three share this positive pin so a colour lights when its pin goes LOW., explain: commonAnode }
+  safety:
+    - label: The common pin goes to 3.3V.
+      icon: "⚓"
+      body: >
+        This is a common-anode LED, so the long common pin goes to 3.3V and not to
+        ground — the opposite of a single LED. Each colour leg reaches its own GPIO
+        through a 220 Ω resistor. Unplug USB before you move any wire.
+
+steps:
+  intro: >
+    This is the main path — you can finish the day without opening a single field
+    note. Tap each step as you go to keep your place.
+  items:
+    - Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.
+    - Find the RGB LED's long pin — that's the common one shared by all three colours. {commonAnode}
+    - Wire the red leg through a 220 Ω resistor to GPIO 38. {resistor}
+    - Wire the green leg through a 220 Ω resistor to GPIO 39.
+    - Wire the blue leg through a 220 Ω resistor to GPIO 40.
+    - Run the long common pin to 3.3V, not to ground.
+    - Compare every wire to the chart before you plug in USB.
+    - Open `Sketch_05.1_RandomColorLight.ino` in Arduino IDE and upload it.
+    - Watch the dome change colour again and again.
+  done:
+    icon: "💡"
+    title: One dome, every colour.
+    body: The board is mixing red, green, and blue for you now. Head to Test & debug to confirm the colours keep changing.
+
+code:
+  intro: >
+    The sketch sets up three PWM channels, then paints a colour by giving each one
+    a brightness. Switch to MicroPython if you'd rather see the same idea in Python
+    — the wiring never changes.
+  arduino:
+    file: Sketch_05.1_RandomColorLight.ino
+    sketch: C/Sketches/Sketch_05.1_RandomColorLight/Sketch_05.1_RandomColorLight.ino
+    variant: C/Sketches/Sketch_05.2_GradientColorLight/Sketch_05.2_GradientColorLight.ino
+    excerpt: |
+      const byte ledPins[] = {38, 39, 40};   // R, G, B
+      const byte chns[]    = {0, 1, 2};
+
+      void setup() {
+        for (int i = 0; i < 3; i++) {
+          ledcAttachChannel(ledPins[i], 1000, 8, chns[i]);
+        }
+      }
+
+      void loop() {
+        int red   = random(0, 256);
+        int green = random(0, 256);
+        int blue  = random(0, 256);
+
+        ledcWrite(ledPins[0], 255 - red);    // common anode: LOW = brighter
+        ledcWrite(ledPins[1], 255 - green);
+        ledcWrite(ledPins[2], 255 - blue);
+        delay(200);
+      }
+    notes:
+      - code: const byte ledPins[] = {38, 39, 40}
+        text: The three pins are the red, green, and blue legs in that order.
+        explain: rgb
+      - code: ledcWrite(ledPins[0], 255 - red)
+        text: Writes 255 minus the value because this common-anode LED lights when its pin goes LOW.
+        explain: commonAnode
+      - code: red = random(0, 256)
+        text: Each colour gets a fresh brightness from 0 to 255, and setting all three at once mixes the shade.
+        explain: pwm
+  micropython:
+    file: 05.1_RandomColorLight/RandomColorLight.py
+    path: Python/Python_Codes/05.1_RandomColorLight/RandomColorLight.py
+    optionalTag: Optional side path · same circuit
+    excerpt: |
+      pins = [38, 39, 40]   # R, G, B
+      pwm0 = PWM(Pin(pins[0]), freq=1000)
+
+      r = random.randint(0, 1023)
+      pwm0.duty(1023 - r)    # common anode: invert with 1023 - value
+    notes:
+      - code: pwm0.duty(1023 - r)
+        text: MicroPython's duty here is 10-bit, so it inverts with 1023 minus the value instead of 255.
+    note: >
+      Same pins, same wiring. Run it in Thonny if MicroPython is set up; otherwise
+      skip it — it should never block the Arduino-first path.
+
+theory:
+  title: One colour from three primaries
+  summary: Set a brightness for red, green, and blue at once, and your eye blends them into a single colour.
+  intro: >
+    There's no trick here — three small lights sit close together and PWM sets how
+    bright each one glows.
+  flow:
+    - { n: Three lights, title: One dome, body: Red green and blue sit side by side under one lens. }
+    - { n: Set levels, title: PWM each, body: A PWM channel dials each colour from off to full. }
+    - { n: Blend, title: Your eye, body: The three glows overlap and read as one colour. }
+    - { n: All full, title: White, body: Red green and blue at full together look white. }
+  formulaLabel: The model
+  formula: colour = **red** + **green** + **blue** at chosen brightnesses
+  notes:
+    - title: Why the code inverts each value
+      explain: commonAnode
+      body: The common pin sits at 3.3V, so a colour is brightest when its own pin is pulled LOW. Writing 255 minus the brightness flips the scale so bigger still means brighter.
+    - title: Three lights in one part
+      explain: rgb
+      body: An RGB LED is three coloured LEDs packaged together, each with its own leg and a shared common pin.
+
+test:
+  mode: visual
+  intro: >
+    Nothing prints to the screen today — the proof is the colour in the dome.
+  expectedTitle: What you should see
+  readoutLabel: RGB LED
+  expected:
+    - The RGB LED glows a colour.
+    - Every fraction of a second it jumps to a new random colour.
+    - It keeps changing for as long as the board has power.
+  expectedNote: The colours look random on purpose — each one is a fresh mix of red, green, and blue.
+  checksTitle: If it doesn't
+  checks:
+    - symptom: "Only one colour ever appears?"
+      fix: "Check that colour's 220 Ω resistor and its GPIO wire — the other two legs may not be reaching their pins."
+    - symptom: "Nothing lights at all?"
+      fix: "Check the common pin — it goes to 3.3V, not to ground."
+    - symptom: "A colour is stuck full-on?"
+      fix: "Suspect the common-anode wiring or the wrong leg on that pin."
+    - symptom: "Upload fails?"
+      fix: "Swap in a data-capable USB cable."
+
+challenge:
+  title: "Try this: choose a status colour"
+  railLabel: Try this
+  intro: >
+    Same working circuit, one design choice: picking a colour that carries meaning.
+    It fits inside today's 25 minutes.
+  summary: Choose a colour that would mean ready or warning, record its red, green, and blue numbers, then try the gradient variant.
+  cards:
+    - title: Name a colour
+      explain: rgb
+      body: Decide on a colour that would read as ready or as a warning, then write down the red, green, and blue numbers from 0 to 255 that would make it.
+    - title: Let it drift
+      body: Upload the gradient variant `Sketch_05.2_GradientColorLight.ino` and watch the colour slide smoothly instead of jumping.
+  logbook:
+    - What red, green, and blue numbers did you pick for your status colour?
+    - How did the gradient sketch feel different from the random one?
+    - What in a real gadget would you want an RGB light to tell you?
+
+agent:
+  intro: >
+    Every lesson ships with a code and a machine-readable packet, so an agent can
+    guide you with full context.
+  behaviour: >
+    guide one physical connection at a time, wait for you to confirm, explain the
+    common-anode inversion on request, and always check the common pin, wiring,
+    board, and USB before changing code.
+  coachInstructions:
+    - Guide one physical connection at a time and wait for learner confirmation before proceeding.
+    - Stress that this is a common-anode LED — the long common pin goes to 3.3V, not to ground.
+    - Explain the 255 minus value inversion only when asked; it is why a colour lights when its pin goes LOW.
+    - If only one colour appears, check that colour's 220 Ω resistor and GPIO wire before changing code.
+    - If nothing lights, check the common pin reaches 3.3V; if a colour is stuck on, suspect common-anode wiring or the wrong leg.
+    - Keep the Arduino path primary; MicroPython is optional only if already set up.
+
+source:
+  license: CC BY-NC-SA 3.0
+  licenseNote: >
+    Based on Freenove official material released under CC BY-NC-SA 3.0; preserve
+    attribution and non-affiliation language.

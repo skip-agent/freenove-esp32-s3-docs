@@ -1,0 +1,173 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY09-RGB",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 9,
+  "title": "Mix any colour from three lights",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 25,
+  "mission": "Wire an RGB LED — three tiny lights in one dome — to three PWM pins, upload the Arduino sketch, and watch the board mix red, green, and blue into a stream of random colours you never wired by hand.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "officialPdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+    "chapter": "Chapter 5 RGB LED",
+    "page": 72,
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_05.1_RandomColorLight/Sketch_05.1_RandomColorLight.ino",
+    "arduinoVariant": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_05.2_GradientColorLight/Sketch_05.2_GradientColorLight.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/05.1_RandomColorLight/RandomColorLight.py",
+    "imageAsset": "docs/course/assets/day-09/circuit-page-72.png",
+    "imageAlt": "Official Freenove circuit for the RGB LED: a red, a green, and a blue leg each running through its own 220 ohm resistor to a separate GPIO pin, with the long common pin joined to 3.3 volts, shown as both a schematic and a breadboard photo.",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "GPIO extension board",
+      "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
+      "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
+    },
+    {
+      "name": "RGB LED",
+      "imageAsset": "docs/course/assets/shared/item-rgb-led.png",
+      "explanation": "An RGB LED is three tiny LEDs — red, green, and blue — in one dome. Set each one's brightness with PWM and your eye blends them into a single colour. All off is dark; all full is white; everything else is a mix — the same trick a screen uses."
+    },
+    {
+      "name": "3 × 220 Ω resistors",
+      "imageAsset": "docs/course/assets/shared/item-resistor.png",
+      "explanation": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction."
+    },
+    {
+      "name": "Jumper wires",
+      "imageAsset": "docs/course/assets/shared/item-jumper-wire.png",
+      "explanation": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    }
+  ],
+  "wiring": [
+    {
+      "partPin": "Red leg (via 220 Ω)",
+      "connectTo": "GPIO 38",
+      "reason": "One PWM channel sets how much red shows."
+    },
+    {
+      "partPin": "Green leg (via 220 Ω)",
+      "connectTo": "GPIO 39",
+      "reason": "One PWM channel sets how much green shows."
+    },
+    {
+      "partPin": "Blue leg (via 220 Ω)",
+      "connectTo": "GPIO 40",
+      "reason": "One PWM channel sets how much blue shows."
+    },
+    {
+      "partPin": "Common (long) pin",
+      "connectTo": "3.3V",
+      "reason": "All three share this positive pin so a colour lights when its pin goes LOW."
+    }
+  ],
+  "coachInstructions": [
+    "Guide one physical connection at a time and wait for learner confirmation before proceeding.",
+    "Stress that this is a common-anode LED — the long common pin goes to 3.3V, not to ground.",
+    "Explain the 255 minus value inversion only when asked; it is why a colour lights when its pin goes LOW.",
+    "If only one colour appears, check that colour's 220 Ω resistor and GPIO wire before changing code.",
+    "If nothing lights, check the common pin reaches 3.3V; if a colour is stuck on, suspect common-anode wiring or the wrong leg.",
+    "Keep the Arduino path primary; MicroPython is optional only if already set up."
+  ],
+  "steps": [
+    "Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.",
+    "Find the RGB LED's long pin — that's the common one shared by all three colours.",
+    "Wire the red leg through a 220 Ω resistor to GPIO 38.",
+    "Wire the green leg through a 220 Ω resistor to GPIO 39.",
+    "Wire the blue leg through a 220 Ω resistor to GPIO 40.",
+    "Run the long common pin to 3.3V, not to ground.",
+    "Compare every wire to the chart before you plug in USB.",
+    "Open Sketch_05.1_RandomColorLight.ino in Arduino IDE and upload it.",
+    "Watch the dome change colour again and again."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "const byte ledPins[] = {38, 39, 40}",
+        "explanation": "The three pins are the red, green, and blue legs in that order."
+      },
+      {
+        "line": "ledcWrite(ledPins[0], 255 - red)",
+        "explanation": "Writes 255 minus the value because this common-anode LED lights when its pin goes LOW."
+      },
+      {
+        "line": "red = random(0, 256)",
+        "explanation": "Each colour gets a fresh brightness from 0 to 255, and setting all three at once mixes the shade."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "pwm0.duty(1023 - r)",
+        "explanation": "MicroPython's duty here is 10-bit, so it inverts with 1023 minus the value instead of 255."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "Set a brightness for red, green, and blue at once, and your eye blends them into a single colour.",
+    "formula": "colour = red + green + blue at chosen brightnesses",
+    "notes": [
+      {
+        "title": "Why the code inverts each value",
+        "body": "The common pin sits at 3.3V, so a colour is brightest when its own pin is pulled LOW. Writing 255 minus the brightness flips the scale so bigger still means brighter."
+      },
+      {
+        "title": "Three lights in one part",
+        "body": "An RGB LED is three coloured LEDs packaged together, each with its own leg and a shared common pin."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "The RGB LED glows a colour.",
+      "Every fraction of a second it jumps to a new random colour.",
+      "It keeps changing for as long as the board has power."
+    ],
+    "successCriteria": "The colours look random on purpose — each one is a fresh mix of red, green, and blue."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "Only one colour ever appears",
+      "firstChecks": [
+        "Check that colour's 220 Ω resistor and its GPIO wire — the other two legs may not be reaching their pins."
+      ]
+    },
+    {
+      "symptom": "Nothing lights at all",
+      "firstChecks": [
+        "Check the common pin — it goes to 3.3V, not to ground."
+      ]
+    },
+    {
+      "symptom": "A colour is stuck full-on",
+      "firstChecks": [
+        "Suspect the common-anode wiring or the wrong leg on that pin."
+      ]
+    },
+    {
+      "symptom": "Upload fails",
+      "firstChecks": [
+        "Swap in a data-capable USB cable."
+      ]
+    }
+  ],
+  "challenge": "Choose a colour that would mean ready or warning, record its red, green, and blue numbers, then try the gradient variant.",
+  "logbookPrompts": [
+    "What red, green, and blue numbers did you pick for your status colour?",
+    "How did the gradient sketch feel different from the random one?",
+    "What in a real gadget would you want an RGB light to tell you?"
+  ]
+}

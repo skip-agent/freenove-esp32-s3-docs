@@ -1,0 +1,157 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY07-BREATHE",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 7,
+  "title": "Make an LED breathe",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 20,
+  "mission": "Wire the same single LED as Blink, upload the Arduino sketch, and watch it fade up to full and back down to dark over and over — your first pin that does more than switch on and off.",
+  "mainPath": "Arduino/C++",
+  "optionalSidePath": "MicroPython",
+  "sourceMetadata": {
+    "officialPdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+    "chapter": "Chapter 4 Analog & PWM",
+    "page": 62,
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_04.1_BreathingLight/Sketch_04.1_BreathingLight.ino",
+    "micropythonFile": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/Python/Python_Codes/04.1_BreatheLight/BreatheLight.py",
+    "imageAsset": "docs/course/assets/day-07/circuit-page-62.png",
+    "imageAlt": "Official Freenove circuit for a breathing LED: a single LED on GPIO 2 through a 220 ohm resistor to ground, shown as both a schematic and a breadboard photo.",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "GPIO extension board",
+      "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
+      "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
+    },
+    {
+      "name": "LED",
+      "imageAsset": "docs/course/assets/shared/item-led.png",
+      "explanation": "A LED is a one-way light. It only lights when its longer leg (the +) faces the pin and its shorter leg (the −) faces ground. Too much current burns it out, so a LED always sits behind a resistor."
+    },
+    {
+      "name": "220 Ω resistor",
+      "imageAsset": "docs/course/assets/shared/item-resistor.png",
+      "explanation": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction."
+    },
+    {
+      "name": "Jumper wires",
+      "imageAsset": "docs/course/assets/shared/item-jumper-wire.png",
+      "explanation": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    }
+  ],
+  "wiring": [
+    {
+      "partPin": "LED long leg (+)",
+      "connectTo": "GPIO 2 via 220 Ω",
+      "reason": "This pin fades the LED with PWM."
+    },
+    {
+      "partPin": "LED short leg (−)",
+      "connectTo": "GND",
+      "reason": "Completes the LED's path back to zero volts."
+    }
+  ],
+  "coachInstructions": [
+    "Keep the day light on theory; let the learner see the LED breathe before explaining how PWM works.",
+    "Confirm this is the same single-LED circuit as Blink — LED direction and the 220 Ω series resistor are the usual first mistakes.",
+    "If the LED snaps hard on and off instead of fading, suspect the Blink sketch is still loaded and have them re-upload 04.1.",
+    "If the LED stays dim or dark, check the 220 Ω resistor, the GPIO 2 wire, and the LED's direction before changing code.",
+    "Before any speed change, preserve the working sketch, then adjust only the two delay values together.",
+    "Keep the Arduino path primary; MicroPython is optional only if already set up, and its 0–1023 duty is expected to differ from Arduino's 0–255."
+  ],
+  "steps": [
+    "Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.",
+    "Place the LED so its long leg (+) is on the GPIO 2 side and its short leg (−) heads toward ground.",
+    "Put the 220 Ω resistor in series between GPIO 2 and the LED's long leg.",
+    "Compare every wire to the chart before you plug in USB.",
+    "Open Sketch_04.1_BreathingLight.ino in Arduino IDE and upload it.",
+    "Watch the LED fade up and down, over and over."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "ledcAttachChannel(PIN_LED, FRQ, PWM_BIT, CHN)",
+        "explanation": "Attaches GPIO 2 to a hardware PWM channel so the board can switch it fast on its own."
+      },
+      {
+        "line": "ledcWrite(PIN_LED, i)",
+        "explanation": "Sets the brightness from 0 (dark) to 255 (full) by changing how much of each instant the pin is on."
+      },
+      {
+        "line": "for (int i = 0; i < 255; i++)",
+        "explanation": "The first loop sweeps brightness up and the second sweeps it back down; delay(10) sets how fast each step passes."
+      }
+    ],
+    "micropython": [
+      {
+        "line": "PWM(Pin(2), 10000)",
+        "explanation": "Sets up PWM on GPIO 2 at 10 kHz — the same fast-switching trick the Arduino sketch uses."
+      },
+      {
+        "line": "pwm.duty(i)",
+        "explanation": "Sets brightness by duty, which is how much of each instant the pin is on."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "The pin is still only on or off — switching it quickly and holding on longer looks brighter to your eye.",
+    "formula": "brightness = duty cycle = the share of each instant the pin is on",
+    "notes": [
+      {
+        "title": "What PWM actually does",
+        "body": "Pulse-width modulation switches the pin on and off so fast that your eye blends the flicker into a steady, dimmable glow."
+      },
+      {
+        "title": "Why a channel",
+        "body": "The ESP32-S3 has dedicated PWM hardware that keeps switching the pin on its own, so the sketch only has to set a brightness and move on."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "The LED brightens smoothly from dark up to full.",
+      "Then it dims smoothly back down to dark.",
+      "It repeats, over and over, like slow breathing."
+    ],
+    "successCriteria": "The change should be a smooth slide, never a hard on/off snap. If it snaps, you're likely still running the Blink sketch."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "LED just blinks hard on and off",
+      "firstChecks": [
+        "You may be on the Blink sketch — re-upload Sketch_04.1_BreathingLight."
+      ]
+    },
+    {
+      "symptom": "LED stays dim or dark",
+      "firstChecks": [
+        "Check the 220 Ω resistor and the GPIO 2 wire, then the LED's direction."
+      ]
+    },
+    {
+      "symptom": "Upload fails",
+      "firstChecks": [
+        "Swap in a data-capable USB cable."
+      ]
+    }
+  ],
+  "challenge": "Change the delay in the fade loops to find a resting-breath rhythm, then make the light pause at full before it fades back.",
+  "logbookPrompts": [
+    "What fade speed felt most like a calm, resting breath?",
+    "How did a pause at full brightness change the feel of the breath?",
+    "Where in daily life have you seen a light breathe like this?"
+  ]
+}

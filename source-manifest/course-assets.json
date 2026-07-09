@@ -62,9 +62,93 @@
       "origin": "Freenove manual — push button component photo (C Tutorial, Chapter 2 Button & LED, page 48)",
       "kind": "kit-item photo",
       "alt": "Official manual photo of a four-pin push button switch with its pin pairs labelled 1 and 2."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-led-bar.png",
+      "origin": "Freenove manual — LED bar graph component photo (C Tutorial, Chapter 3 LED Bar, page 55)",
+      "kind": "kit-item photo",
+      "alt": "Official manual photo of a ten-segment LED bar graph with its two rows of pins numbered 1-10 and 11-20."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-rgb-led.png",
+      "origin": "Freenove manual — RGB LED component photo (C Tutorial, Chapter 5 RGB LED, page 71)",
+      "kind": "kit-item photo",
+      "alt": "Official manual photo of a four-pin RGB LED, with its longer common pin and separate red, green, and blue legs."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-buzzer.png",
+      "origin": "Freenove manual — active buzzer component photo (C Tutorial, Chapter 6 Buzzer, page 78)",
+      "kind": "kit-item photo",
+      "alt": "Official manual photo of a round active buzzer with its two pins labelled 1 and 2."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-transistor.png",
+      "origin": "Freenove manual — NPN transistor (S8050) component photo (C Tutorial, Chapter 6 Buzzer, page 79)",
+      "kind": "kit-item photo",
+      "alt": "Official manual photo of an NPN transistor with its three legs labelled emitter, base, and collector."
     }
   ],
   "days": {
+    "6": [
+      {
+        "asset": "course-assets/assets/day-06/circuit-page-56.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 3 LED Bar",
+          "page": 56
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF)",
+        "alt": "Official Freenove circuit for the LED bar: ten LED-bar segments each driven from a GPIO pin through its own 220-ohm resistor to ground, shown as both a schematic and a breadboard photo."
+      }
+    ],
+    "7": [
+      {
+        "asset": "course-assets/assets/day-07/circuit-page-62.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 4 Analog & PWM",
+          "page": 62
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF; the same single-LED circuit as Blink)",
+        "alt": "Official Freenove circuit for the breathing light: a single LED on GPIO 2 through a 220-ohm resistor to ground, shown as both a schematic and a breadboard photo."
+      }
+    ],
+    "8": [
+      {
+        "asset": "course-assets/assets/day-08/circuit-page-56.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 4 Analog & PWM",
+          "page": 56
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF; the meteor light reuses the Chapter 3 LED-bar circuit, page 56 / page 66)",
+        "alt": "Official Freenove LED-bar circuit: LED-bar segments each driven from a GPIO pin through a 220-ohm resistor to ground, shown as both a schematic and a breadboard photo."
+      }
+    ],
+    "9": [
+      {
+        "asset": "course-assets/assets/day-09/circuit-page-72.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 5 RGB LED",
+          "page": 72
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF)",
+        "alt": "Official Freenove circuit for the RGB LED: the red, green, and blue legs each driven from a GPIO pin through a 220-ohm resistor, with the common pin to 3.3V, shown as both a schematic and a breadboard photo."
+      }
+    ],
+    "10": [
+      {
+        "asset": "course-assets/assets/day-10/circuit-page-80.png",
+        "origin": {
+          "pdf": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/C_Tutorial.pdf",
+          "chapter": "Chapter 6 Buzzer",
+          "page": 80
+        },
+        "kind": "per-day circuit diagram (cropped from the official PDF)",
+        "alt": "Official Freenove circuit for the buzzer: an active buzzer driven from GPIO 14 through an NPN transistor and a 1k-ohm resistor, and a push button on GPIO 21 held by 10k-ohm resistors, shown as both a schematic and a breadboard photo."
+      }
+    ],
     "4": [
       {
         "asset": "course-assets/assets/day-04/circuit-page-48.png",

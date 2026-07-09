@@ -1,0 +1,266 @@
+# Day 6 — LED bar · tinyskiff.lesson.v1
+# One source of truth: this file renders to the guided page
+# (/course/day-06-led-bar/), the agent packet, and the course-map entry.
+# Ten outputs at once — one array, one loop, a light that sweeps.
+
+schema: tinyskiff.lesson.v1
+lessonCode: TSK-DAY06-LEDBAR
+day: 6
+slug: day-06-led-bar
+title: Make ten lights flow like water
+status: published
+estimatedTimeMinutes: 25
+tracks: { main: arduino, optional: micropython }
+learnerProfile: adult beginner; curious and capable; no electronics assumed
+
+mission: >
+  Wire a ten-segment LED bar — each segment on its own pin through its own
+  220 Ω resistor — upload the Arduino sketch, and watch a single lit segment
+  sweep along the bar and back, over and over.
+unlocks: One list of pins and one loop can drive ten outputs, so you stop repeating yourself and start thinking in patterns.
+seoDescription: >
+  Wire a ten-segment LED bar to the ESP32-S3, upload the sketch, and watch a
+  lit segment flow along the bar and back — your first many-output circuit
+  driven by a pin array and a loop.
+
+hero:
+  instrument: none
+  headline: Ten lights|that {flow}
+  lede: >
+    Today one light moves. You wire ten LED segments, each on its own pin, then
+    upload a sketch that lights them one at a time down the bar and back — the
+    first circuit where a list of pins and a single loop do the work of ten.
+  pills:
+    - { text: About 25 minutes, key: true }
+    - Arduino first
+    - MicroPython optional
+    - No electronics assumed
+
+parts:
+  intro: >
+    Six things, and ten of one of them. Tap *Define* on any part you haven't met
+    — the answer opens as a field note you can read and dismiss without losing
+    your place.
+  items:
+    - name: ESP32-S3 board
+      image: shared/item-esp32-s3-board.jpg
+      imageKind: Manual photo
+      alt: Official manual photo of the ESP32-S3 development board.
+      blurb: The brain that runs your uploaded sketch.
+      explain: esp32
+    - name: GPIO extension board
+      image: shared/item-gpio-extension-board.png
+      imageKind: Manual photo
+      alt: Official manual image of the ESP32-S3 GPIO extension board.
+      blurb: Spreads the pins into rows you can reach and label.
+      explain: gpio
+    - name: LED bar graph
+      image: shared/item-led-bar.png
+      imageKind: Manual photo
+      alt: Official manual photo of a ten-segment LED bar graph module.
+      blurb: Ten small LEDs in one strip, each its own segment.
+      explain: ledBar
+    - name: 10 × 220 Ω resistors
+      image: shared/item-resistor.png
+      imageKind: Manual photo
+      alt: Official manual photo of a resistor with coloured value bands.
+      blurb: One in series with each segment to keep every current gentle.
+      explain: resistor
+    - name: Jumper wires
+      image: shared/item-jumper-wire.png
+      imageKind: Manual photo
+      alt: Official manual image of a jumper wire.
+      blurb: Temporary, solder-free connections.
+      explain: jumpers
+    - name: Arduino IDE
+      image: shared/item-arduino-ide.png
+      imageKind: Manual screenshot
+      alt: Official manual screenshot of the Arduino IDE interface.
+      blurb: Uploads the sketch to the board.
+      explain: arduino
+
+wiring:
+  intro: >
+    The official Freenove diagram is your chart — schematic on top, the same
+    circuit built on a breadboard below. Click it to enlarge. Ten segments look
+    like a lot, but each one is the same small connection repeated.
+  diagram:
+    image: day-06/circuit-page-56.png
+    alt: >-
+      Official Freenove circuit for the LED Bar: ten LED segments, each driven
+      from its own GPIO pin through a 220 ohm resistor and returning through a
+      shared common row to ground, shown as both a schematic and a breadboard
+      photo.
+    caption: Official Freenove circuit — C Tutorial, Chapter 3 (LED Bar), page 56.
+    zoomCaption: Official Freenove circuit, C Tutorial Chapter 3, page 56.
+    source: { pdf: C_Tutorial.pdf, chapter: 3, chapterTitle: LED Bar, page: 56 }
+  pins:
+    - { from: 10 bar segments (via 220 Ω each), to: GPIO 21 47 48 38 39 40 41 42 2 1, why: Each pin lights one segment of the bar., explain: pinArray }
+    - { from: Bar common row, to: GND, why: Returns every segment to zero volts., explain: gnd }
+  safety:
+    - label: The bar can go in backwards.
+      icon: "⚓"
+      body: >
+        The LED bar's label direction is easy to reverse. If the whole bar stays
+        dark once you upload, rotate it 180° in the breadboard and try again.
+        Unplug USB before you move any wire.
+
+steps:
+  intro: >
+    This is the main path — you can finish the day without opening a single field
+    note. Tap each step as you go to keep your place.
+  items:
+    - Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.
+    - Place the LED bar across the breadboard's centre channel so each segment has its own row. {ledBar}
+    - Wire each segment through its own 220 Ω resistor to its GPIO pin, working along the list in order. {pinArray}
+    - Wire the bar's common row to ground so every segment shares the same return.
+    - Compare every wire to the chart before you plug in USB.
+    - Open `Sketch_03.1_FlowingLight.ino` in Arduino IDE and upload it.
+    - Watch a single lit segment sweep along the bar and back.
+  done:
+    icon: "💡"
+    title: Ten pins, one motion.
+    body: A list of pins and a loop are now driving the whole bar. Head to Test & debug to confirm the flowing sweep.
+
+code:
+  intro: >
+    The sketch stays short even with ten LEDs, because the pins live in one list
+    and a loop walks it. Switch to MicroPython if you'd rather see the same idea
+    in Python — the wiring never changes.
+  arduino:
+    file: Sketch_03.1_FlowingLight.ino
+    sketch: C/Sketches/Sketch_03.1_FlowingLight/Sketch_03.1_FlowingLight.ino
+    excerpt: |
+      byte ledPins[] = {21, 47, 48, 38, 39, 40, 41, 42, 2, 1};
+      int ledCounts;
+
+      void setup() {
+        ledCounts = sizeof(ledPins);
+        for (int i = 0; i < ledCounts; i++) {
+          pinMode(ledPins[i], OUTPUT);
+        }
+      }
+
+      void loop() {
+        for (int i = 0; i < ledCounts; i++) {       // forward sweep
+          digitalWrite(ledPins[i], HIGH);
+          delay(100);
+          digitalWrite(ledPins[i], LOW);
+        }
+        for (int i = ledCounts - 1; i > -1; i--) {  // reverse sweep
+          digitalWrite(ledPins[i], HIGH);
+          delay(100);
+          digitalWrite(ledPins[i], LOW);
+        }
+      }
+    notes:
+      - code: byte ledPins[] = {21, 47, 48, 38, 39, 40, 41, 42, 2, 1}
+        text: One list holds all ten pins in bar order, so the loop can reach each by number.
+        explain: pinArray
+      - code: digitalWrite(ledPins[i], HIGH)
+        text: Lights whichever segment the loop is pointing at right now; the next line turns it off.
+        explain: digitalWrite
+      - code: for (int i = ledCounts - 1; i > -1; i--)
+        text: Walks the same list backwards, which is what sends the light flowing back the other way.
+        explain: pinArray
+  micropython:
+    file: 03.1_FlowingLight/FlowingLight.py
+    path: Python/Python_Codes/03.1_FlowingLight/FlowingLight.py
+    optionalTag: Optional side path · same circuit
+    excerpt: |
+      pins = [21, 47, 48, 38, 39, 40, 41, 42, 2, 1]
+
+      while True:
+          for i in range(len(pins)):
+              led = Pin(pins[i], Pin.OUT)
+              led.value(1)
+              time.sleep_ms(100)
+              led.value(0)
+    notes:
+      - code: pins = [21, 47, 48, 38, 39, 40, 41, 42, 2, 1]
+        text: The same list of pins in Python, in the same bar order.
+        explain: pinArray
+      - code: led = Pin(pins[i], Pin.OUT)
+        text: Picks one pin from the list and drives it, then the loop moves to the next.
+    note: >
+      Same pins, same wiring. Run it in Thonny if MicroPython is set up; otherwise
+      skip it — it should never block the Arduino-first path.
+
+theory:
+  title: One list, one loop
+  summary: Keep the pins in an array, then walk the list to light them in turn — forward, then back.
+  intro: >
+    There's no trick here — the loop just points at one pin after another and
+    lights whatever it's pointing at, faster than the eye separates.
+  flow:
+    - { n: List, title: the pin array, body: All ten pins sit in one array in bar order. }
+    - { n: Light, title: HIGH, body: The loop lights the pin it's pointing at right now. }
+    - { n: Step, title: i++, body: It turns that one off and moves to the next pin. }
+    - { n: Sweep, title: back again, body: A second loop walks the list in reverse so the light flows back. }
+  formulaLabel: The model
+  formula: one array of pins → walk it forward → walk it back → repeat
+  notes:
+    - title: Why a pin array
+      explain: pinArray
+      body: Ten separate variables would mean ten copies of every line. One array lets a single loop stand in for all of them.
+
+test:
+  mode: visual
+  intro: >
+    Nothing prints to the screen today — the proof is the moving light on the bar.
+  expectedTitle: What you should see
+  readoutLabel: LED bar
+  expected:
+    - One lit segment starts at one end of the bar.
+    - It travels along the bar a segment at a time to the far end.
+    - Then it flows back the other way, and repeats for as long as the board has power.
+  expectedNote: Only one segment is lit at any instant — the flow is that single light moving, not a growing row.
+  checksTitle: If it doesn't
+  checks:
+    - symptom: "Whole bar stays dark?"
+      fix: "Rotate the LED bar 180° — its direction is easy to reverse — then re-check the common row to ground."
+    - symptom: "One segment never lights?"
+      fix: "Check that segment's own 220 Ω resistor and its jumper to its GPIO pin."
+    - symptom: "Nothing happens at all?"
+      fix: "Re-check the common row to ground, then that the sketch uploaded."
+    - symptom: "Upload fails?"
+      fix: "Swap in a data-capable USB cable."
+
+challenge:
+  title: "Try this: bend the flow"
+  railLabel: Try this
+  intro: >
+    Same working circuit, two small edits to the sketch. Both fit inside today's
+    time and leave the wiring untouched.
+  summary: Reverse the direction the light flows, then change how fast it moves by editing the delay, and note what each edit does.
+  cards:
+    - title: Reverse the flow
+      body: Swap which loop runs first so the light starts its sweep from the other end. Predict which end it begins from before you upload.
+    - title: Change the speed
+      explain: delayMs
+      body: Set every `delay(100)` to a larger or smaller number and upload. Find the speed where the flow still reads as a single moving light.
+  logbook:
+    - Which delay made the flow feel best, and why?
+    - What changed when you ran the reverse loop first?
+    - What real-world display works like this moving bar?
+
+agent:
+  intro: >
+    Every lesson ships with a code and a machine-readable packet, so an agent can
+    guide you with full context.
+  behaviour: >
+    guide one segment at a time, wait for you to confirm, explain terms on
+    request, and always check wiring, board, port, and USB before changing code.
+  coachInstructions:
+    - Guide one segment at a time and wait for learner confirmation before moving to the next; ten connections are easy to lose track of.
+    - Remind the learner that each segment needs its own 220 Ω series resistor — a shared or missing resistor is the common mistake here.
+    - If the whole bar stays dark, have the learner rotate the LED bar 180° and re-check the common row to ground before changing code.
+    - If one segment never lights, check that segment's resistor and its jumper to its GPIO pin, not the whole circuit.
+    - Explain the pin array and the forward and reverse loops on request; do not dump theory before the learner has a working circuit.
+    - Keep the Arduino path primary; MicroPython is optional only if already set up.
+
+source:
+  license: CC BY-NC-SA 3.0
+  licenseNote: >-
+    Based on Freenove official material released under CC BY-NC-SA 3.0; preserve
+    attribution and non-affiliation language.
