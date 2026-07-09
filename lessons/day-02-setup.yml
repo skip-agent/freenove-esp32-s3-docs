@@ -1,0 +1,142 @@
+# Day 2 — Install the Arduino IDE and see the board · tinyskiff.lesson.v1
+# A setup day: no wiring, no sketch to write. The proof is that the board
+# appears as a port in the IDE, so `test.mode: visual`.
+
+schema: tinyskiff.lesson.v1
+lessonCode: TSK-DAY02-SETUP
+day: 2
+slug: day-02-setup
+title: Install the Arduino IDE and see the board
+status: published
+estimatedTimeMinutes: 25
+tracks: { main: arduino }
+learnerProfile: adult beginner; curious and capable; no electronics assumed
+
+mission: >
+  Install the Arduino IDE, add support for the ESP32-S3, and confirm your
+  computer can see the board. Get this right once and every later day is just
+  open-upload-watch.
+unlocks: Your computer and the board can talk. From here, uploading code is a two-click habit.
+seoDescription: >
+  Day 2 of the TinySkiff ESP32-S3 course: install the Arduino IDE, add the ESP32
+  board package and CH343 driver if needed, and confirm the board appears as a port.
+
+hero:
+  instrument: none
+  headline: Get the toolchain|talking {once}
+  lede: >
+    This is the one genuinely fiddly day — installing software and a driver. It's
+    worth doing slowly, because once your board shows up as a port, you never
+    have to think about setup again.
+  pills:
+    - { text: About 25 minutes, key: true }
+    - Software only
+    - Nothing to wire
+    - Do it once
+
+parts:
+  intro: >
+    Everything today is on your computer and the cable. Tap *Define* on anything
+    unfamiliar.
+  items:
+    - name: ESP32-S3 board
+      image: shared/item-esp32-s3-board.jpg
+      imageKind: Manual photo
+      alt: Official manual photo of the ESP32-S3 development board.
+      blurb: The board you'll get your computer to recognise.
+      explain: esp32
+    - name: Arduino IDE
+      image: shared/item-arduino-ide.png
+      imageKind: Manual screenshot
+      alt: Official manual screenshot of the Arduino IDE interface.
+      blurb: The free app that will compile and upload your code.
+      explain: arduino
+
+steps:
+  intro: >
+    Follow these in order. If a step stalls, the Test & debug section below is
+    where the common snags live.
+  items:
+    - Download and install the Arduino IDE from arduino.cc for your operating system.
+    - In Preferences, add the ESP32 boards URL, then install the ESP32 package from Boards Manager. {boardPackage}
+    - If your system needs it, install the CH343 USB driver. {usbDriver}
+    - Plug the board in with a data-capable USB-C cable. {usbData}
+    - Choose your ESP32-S3 under Tools → Board, then pick its Port. {serialPort}
+  done:
+    icon: "🔌"
+    title: Handshake complete.
+    body: Your board is a selectable port now. Day 3 sends it its first code.
+
+theory:
+  title: Board vs port
+  summary: One setting says what the chip is; the other says where to find it.
+  intro: >
+    Two settings trip people up on Day 2. They sound similar but do different
+    jobs, and both have to be right before anything uploads.
+  flow:
+    - { n: Board package, title: Teach the IDE, body: Adds the know-how to compile for the ESP32-S3. }
+    - { n: Board setting,  title: What it is, body: Tells the IDE which chip you're targeting. }
+    - { n: Port setting,   title: Where it is, body: Tells the IDE which USB connection to use. }
+    - { n: Driver,         title: If unseen,  body: Lets the computer recognise the board's USB chip. }
+  formulaLabel: The rule
+  formula: "**right board** + **right port** = uploads work"
+  notes:
+    - title: Why a port might not appear
+      explain: usbDriver
+      body: A missing driver or a charge-only cable are the two usual reasons the board never shows up.
+
+test:
+  mode: visual
+  intro: >
+    There's no sketch to run yet. Success is simply that the IDE can see the board.
+  expectedTitle: How you know it worked
+  readoutLabel: Tools → Port
+  expected:
+    - Your ESP32-S3 appears as a selectable port in Tools → Port.
+    - The board name is selectable under Tools → Board.
+    - No error appears when you select them.
+  expectedNote: You don't need to upload anything today — seeing the port is the whole win.
+  checksTitle: If it doesn't
+  checks:
+    - symptom: "No port appears?"
+      fix: "Install the CH343 driver, then unplug and replug the board."
+    - symptom: "Only a charging sound, no port?"
+      fix: "Swap in a data-capable USB-C cable — some only carry power."
+    - symptom: "Board not in the list?"
+      fix: "Re-open Boards Manager and confirm the ESP32 package finished installing."
+
+challenge:
+  title: "Try this: break it, then fix it"
+  railLabel: Try this
+  intro: >
+    The best way to trust a setting is to change it and put it back. You'll
+    recognise the mistake instantly next time it happens by accident.
+  summary: Deliberately select the wrong port, notice what changes, then restore the correct board and port.
+  cards:
+    - title: Pick the wrong port
+      body: Choose a different port (or none). Notice the IDE has nowhere to send code.
+    - title: Put it right
+      body: Reselect your ESP32-S3 board and its real port. That pairing is your normal starting point every day.
+  logbook:
+    - What board and port did you end up selecting?
+    - Did you need the CH343 driver on your system?
+    - What was the trickiest part of setup, so you remember it next time?
+
+agent:
+  intro: >
+    Every lesson ships with a code and a machine-readable packet, so an agent can
+    guide you with full context.
+  behaviour: >
+    walk the install one step at a time, and when the board doesn't appear, check
+    driver, cable, board, and port in that order before anything else.
+  coachInstructions:
+    - Walk the install one step at a time; this is the fiddliest day of the course.
+    - If no port appears, check the CH343 driver, then a data-capable cable, then board and port selection.
+    - There is no code to upload today — confirming the board appears as a port is the success condition.
+    - Reassure the learner that this setup is a one-time cost.
+
+source:
+  license: CC BY-NC-SA 3.0
+  licenseNote: >
+    Based on Freenove official material released under CC BY-NC-SA 3.0; preserve
+    attribution and non-affiliation language.

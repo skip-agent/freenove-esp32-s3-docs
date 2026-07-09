@@ -1,0 +1,58 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY01-UNBOX",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 1,
+  "title": "Unbox safely and meet the ESP32-S3",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 15,
+  "mission": "Open the kit, find the board at the heart of it, and learn to handle it safely. Nothing to wire or upload yet — today is about getting your bearings.",
+  "mainPath": "Arduino/C++",
+  "sourceMetadata": {
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "GPIO extension board",
+      "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
+      "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
+    },
+    {
+      "name": "Pinout map",
+      "imageAsset": "docs/course/assets/shared/item-pinout.png",
+      "explanation": "A pinout is a labelled drawing of the board that names every pin — power, ground, USB, and the numbered GPIO pins your code uses. You will reach for it constantly once you start wiring, so it is worth knowing where it lives."
+    }
+  ],
+  "wiring": [],
+  "coachInstructions": [
+    "This is an orientation day — there is nothing to wire or upload.",
+    "Help the learner identify parts and find the board's USB port and onboard LED.",
+    "Reinforce safe handling — hold by the edges, mind static — briefly, not as a lecture.",
+    "Point to the pinout map as the reference they'll use once wiring begins."
+  ],
+  "steps": [
+    "Open the kit and lay the parts out where you can see them.",
+    "Find the ESP32-S3 board and hold it by the edges.",
+    "Locate the USB port on the board — that's how code and power arrive.",
+    "Find the tiny onboard LED near the chip; you'll blink it on Day 3.",
+    "Open the pinout map and notice the numbered GPIO pins along the sides."
+  ],
+  "codeFocus": {},
+  "test": {
+    "expectedOutputExample": [],
+    "successCriteria": ""
+  },
+  "troubleshooting": [],
+  "challenge": "Identify three parts from the kit by name, and trace the path a signal takes from the USB port into the board.",
+  "logbookPrompts": [
+    "Which three parts did you name?",
+    "Where is the board's USB port, and where is the onboard LED?",
+    "What's one thing about the board that surprised you?"
+  ]
+}

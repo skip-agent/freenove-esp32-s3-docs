@@ -499,16 +499,22 @@ def _colophon(lesson: dict, day: int, total: int) -> str:
     diagram = (lesson.get("wiring") or {}).get("diagram") or {}
     src = diagram.get("source") or {}
     license_name = (lesson.get("source") or {}).get("license", "")
+    # Build the source clause only from what this day actually uses, so setup
+    # and onboard-LED days don't render an empty "Chapter , page ." fragment.
     bits = []
+    if src.get("pdf") and src.get("chapter") and src.get("page"):
+        bits.append(f'the circuit diagram from {esc(src.get("pdf"))}, '
+                    f'Chapter {esc(src.get("chapter"))}, page {esc(src.get("page"))}')
     if arduino.get("file"):
         bits.append(f'sketch <code>{esc(arduino["file"])}</code>')
     if micro.get("file"):
         bits.append(f'MicroPython <code>{esc(micro["file"])}</code>')
-    sketch_line = ("; " + "; ".join(bits)) if bits else ""
+    detail = (" — " + "; ".join(bits)) if bits else ""
+    license_clause = f" Released under {esc(license_name)}." if license_name else ""
     return f"""    <footer class="colophon">
       <p><strong>Day {day} of {total} · {esc(COURSE_TITLE)}.</strong> <a href="../">Back to the course map</a>.</p>
       <div class="rule"></div>
-      <p>Circuit diagram and code based on official Freenove Super Starter Kit for ESP32-S3 material — {esc(src.get("pdf"))}, Chapter {esc(src.get("chapter"))}, page {esc(src.get("page"))}{sketch_line}. Released under {esc(license_name)}. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material{detail}.{license_clause} TinySkiff is not affiliated with or endorsed by Freenove.</p>
     </footer>"""
 
 

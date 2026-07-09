@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Day 1 · Unbox safely and meet the ESP32-S3 — TinySkiff ESP32-S3 Lab</title>
+  <meta name="description" content="Day 1 of the TinySkiff ESP32-S3 course: unbox the kit, meet the board, learn to handle it safely, and find the pinout you&#x27;ll use all course." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../course.css" />
+</head>
+<body>
+  <div class="lesson-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 1 of 30</p>
+        <h1>Meet the board<br />before you <em>build</em></h1>
+        <p class="lede">Every day after this one starts with the same small computer in your hand. Fifteen minutes now to know what it is, how to hold it, and where its labels live will save you a dozen puzzled moments later.
+</p>
+        <div class="meta-row" aria-label="Lesson facts">
+          <span class="pill is-key">About 15 minutes</span><span class="pill">No tools needed</span><span class="pill">Nothing to wire</span><span class="pill">No electronics assumed</span>
+        </div>
+      </div>
+      <div class="hero-side no-instrument">
+        
+        <div class="agent-strip">
+          <div class="lesson-code">
+            <span class="label">Agent assist code</span>
+            <code>TSK-DAY01-UNBOX</code>
+          </div>
+          <button class="copy-prompt" type="button" data-copy="I am doing TinySkiff lesson TSK-DAY01-UNBOX. Pull the lesson packet, then guide me one step at a time. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY01-UNBOX.json">lesson packet</a> and coach you step by step.</p>
+        </div>
+      </div>
+    </header>
+    <div class="layout">
+      <nav class="rail" aria-label="Lesson progress">
+        <div class="rail-head">
+          <strong>Today's route</strong>
+          <span class="day-of">1 / 30</span>
+        </div>
+        <div class="voyage" style="--voyage-fill: 3.33%" aria-hidden="true"><span></span></div>
+        <div class="rail-nav">
+          <a href="#parts"><span class="tick"></span>What you need</a>
+          <a href="#steps"><span class="tick"></span>Build it</a>
+          <a href="#challenge"><span class="tick"></span>Try this</a>
+          <a href="#agent"><span class="tick"></span>Coach me</a>
+        </div>
+      </nav>
+      <main class="lesson-main">
+        <section id="parts" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">01</span> First, know the pieces</p>
+              <h2>What you need</h2>
+              <p class="muted">Tip the kit out and find these three. Tap <em>Define</em> on anything unfamiliar — the answer opens as a field note you can read and dismiss.
+</p>
+            </div>
+            <div class="part-grid">
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-esp32-s3-board.jpg" alt="Official manual photo of the ESP32-S3 development board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>ESP32-S3 board <button class="define" data-topic="esp32">Define</button></h3>
+                <p>The small computer at the centre of every project this course.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-gpio-extension-board.png" alt="Official manual image of the ESP32-S3 GPIO extension board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>GPIO extension board <button class="define" data-topic="gpio">Define</button></h3>
+                <p>Spreads the board&#x27;s pins into labelled rows you can reach.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-pinout.png" alt="Official ESP32-S3 pinout diagram labelling every GPIO, power, and USB pin on the board." /><figcaption>Manual reference</figcaption></figure>
+                <h3>Pinout map <button class="define" data-topic="pinout">Define</button></h3>
+                <p>The labelled map of every pin. Keep it close once wiring starts.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+        <section id="steps" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">02</span> One action at a time</p>
+              <h2>Build it</h2>
+              <p class="muted">No rush and no risk today — just find things and look closely.
+</p>
+            </div>
+            <div class="steps-progress">
+              <div class="bar" aria-hidden="true"><span id="stepBar"></span></div>
+              <span class="count" id="stepCount">0 / 5 done</span>
+            </div>
+            <ol class="step-list">
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 1 done"></button><p class="text">Open the kit and lay the parts out where you can see them.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 2 done"></button><p class="text">Find the ESP32-S3 board and hold it by the edges. <button class="define" data-topic="esd">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">Locate the USB port on the board — that&#x27;s how code and power arrive. <button class="define" data-topic="usbData">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">Find the tiny onboard LED near the chip; you&#x27;ll blink it on Day 3.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Open the pinout map and notice the numbered GPIO pins along the sides. <button class="define" data-topic="pinout">Define</button></p></li>
+            </ol>
+            <div class="done-banner" id="doneBanner" role="status">
+              <span class="icon" aria-hidden="true">🧭</span>
+              <div><strong>You&#x27;ve got your bearings.</strong><p>You can recognise the board, its port, and its pin labels. Day 2 gets the software talking to it.</p></div>
+            </div>
+          </div>
+        </section>
+        <section id="challenge" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">03</span> Make the idea yours</p>
+              <h2>Try this: name three parts</h2>
+              <p class="muted">A tiny memory exercise — no pressure, just a way to make the board feel familiar before you start using it.
+</p>
+            </div>
+            <div class="two-col">
+              <article class="mini-card"><h3>Name three parts</h3><p>Pick any three pieces and name them out loud. Check the kit&#x27;s parts list if you&#x27;re unsure.</p></article>
+              <article class="mini-card"><h3>Trace the USB path</h3><p>Follow where the USB port leads on the board. That&#x27;s the road your code travels in on.</p></article>
+            </div>
+            <div class="logbook">
+              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
+              <label>Which three parts did you name?<textarea rows="2"></textarea></label>
+              <label>Where is the board&#x27;s USB port, and where is the onboard LED?<textarea rows="2"></textarea></label>
+              <label>What&#x27;s one thing about the board that surprised you?<textarea rows="2"></textarea></label>
+            </div>
+          </div>
+        </section>
+        <section id="agent" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">04</span> Learn it with a hand on the tiller</p>
+              <h2>Coach me through it</h2>
+              <p class="muted">Every lesson ships with a code and a machine-readable packet, so an agent can guide you with full context.
+</p>
+            </div>
+            <div class="agent-grid">
+              <article class="mini-card"><h3>Lesson code</h3><p><code>TSK-DAY01-UNBOX</code></p></article>
+              <article class="mini-card"><h3>Context packet</h3><p><a href="../packets/TSK-DAY01-UNBOX.json">Open the JSON packet →</a></p></article>
+            </div>
+            <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
+              <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
+              <p><strong>How the agent should behave:</strong> keep it calm and orientation-only, name parts on request, and reinforce safe handling (edges, static) without turning it into a lecture.
+</p>
+            </div>
+          </div>
+        </section>
+        <nav class="day-nav" aria-label="Course navigation">
+        <span class="day-nav-link is-empty" aria-hidden="true"></span>
+        <a class="day-nav-link next" href="../day-02-setup/">
+          <span class="day-nav-dir">Day 2 →</span>
+          <span class="day-nav-title">Install the Arduino IDE and see the board</span>
+        </a>
+        </nav>
+      </main>
+    </div>
+    <footer class="colophon">
+      <p><strong>Day 1 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <div class="rule"></div>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+    </footer>
+  </div>
+
+  <dialog class="lightbox" id="explainer">
+    <div class="lb-head">
+      <div>
+        <span class="lb-kicker">Field note</span>
+        <h3 id="explainerTitle"></h3>
+      </div>
+      <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="lb-body"><p id="explainerBody"></p></div>
+    <div class="lb-shortcut"><span class="tag">Shortcut</span><span id="explainerShortcut"></span></div>
+  </dialog>
+
+  <dialog class="lightbox image" id="imageBox">
+    <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    <div class="lb-body"><img id="imageBoxImg" alt="" /></div>
+    <p class="lb-cap" id="imageBoxCap"></p>
+  </dialog>
+
+  <div class="toast" id="toast">Prompt copied</div>
+
+  <script id="lesson-data" type="application/json">{"day": 1, "totalDays": 30, "slug": "day-01-unbox", "explainers": {"esd": {"title": "Static electricity (ESD)", "body": "A bare circuit board can be harmed by a static shock you cannot feel. Touch something metal and grounded before handling the board, hold it by the edges, and keep it off wool or fluffy surfaces.\n", "shortcut": "Touch metal first, hold by the edges."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "gpio": {"title": "GPIO extension board", "body": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself.\n", "shortcut": "When a lesson says GPIO 13, look for the pin labelled 13 on the extension board."}, "pinout": {"title": "Pinout map", "body": "A pinout is a labelled drawing of the board that names every pin — power, ground, USB, and the numbered GPIO pins your code uses. You will reach for it constantly once you start wiring, so it is worth knowing where it lives.\n", "shortcut": "When a lesson says GPIO 13, the pinout shows you which physical pin that is."}, "usbData": {"title": "Data-capable USB cable", "body": "Some USB cables only carry power (for charging), with no data wires inside. Uploading code needs a cable that carries data. A charge-only cable will power the board but never let the IDE talk to it.\n", "shortcut": "If uploads fail on a cable that charges phones fine, suspect the cable first."}}, "prev": null, "next": {"day": 2, "slug": "day-02-setup", "title": "Install the Arduino IDE and see the board"}}</script>
+  <script src="../course.js"></script>
+</body>
+</html>

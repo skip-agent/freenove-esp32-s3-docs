@@ -1,0 +1,86 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY02-SETUP",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 2,
+  "title": "Install the Arduino IDE and see the board",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 25,
+  "mission": "Install the Arduino IDE, add support for the ESP32-S3, and confirm your computer can see the board. Get this right once and every later day is just open-upload-watch.",
+  "mainPath": "Arduino/C++",
+  "sourceMetadata": {
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    }
+  ],
+  "wiring": [],
+  "coachInstructions": [
+    "Walk the install one step at a time; this is the fiddliest day of the course.",
+    "If no port appears, check the CH343 driver, then a data-capable cable, then board and port selection.",
+    "There is no code to upload today — confirming the board appears as a port is the success condition.",
+    "Reassure the learner that this setup is a one-time cost."
+  ],
+  "steps": [
+    "Download and install the Arduino IDE from arduino.cc for your operating system.",
+    "In Preferences, add the ESP32 boards URL, then install the ESP32 package from Boards Manager.",
+    "If your system needs it, install the CH343 USB driver.",
+    "Plug the board in with a data-capable USB-C cable.",
+    "Choose your ESP32-S3 under Tools → Board, then pick its Port."
+  ],
+  "codeFocus": {},
+  "theoryModel": {
+    "plainLanguage": "One setting says what the chip is; the other says where to find it.",
+    "formula": "right board + right port = uploads work",
+    "notes": [
+      {
+        "title": "Why a port might not appear",
+        "body": "A missing driver or a charge-only cable are the two usual reasons the board never shows up."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "Your ESP32-S3 appears as a selectable port in Tools → Port.",
+      "The board name is selectable under Tools → Board.",
+      "No error appears when you select them."
+    ],
+    "successCriteria": "You don't need to upload anything today — seeing the port is the whole win."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "No port appears",
+      "firstChecks": [
+        "Install the CH343 driver, then unplug and replug the board."
+      ]
+    },
+    {
+      "symptom": "Only a charging sound, no port",
+      "firstChecks": [
+        "Swap in a data-capable USB-C cable — some only carry power."
+      ]
+    },
+    {
+      "symptom": "Board not in the list",
+      "firstChecks": [
+        "Re-open Boards Manager and confirm the ESP32 package finished installing."
+      ]
+    }
+  ],
+  "challenge": "Deliberately select the wrong port, notice what changes, then restore the correct board and port.",
+  "logbookPrompts": [
+    "What board and port did you end up selecting?",
+    "Did you need the CH343 driver on your system?",
+    "What was the trickiest part of setup, so you remember it next time?"
+  ]
+}
