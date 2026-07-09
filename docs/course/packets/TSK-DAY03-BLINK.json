@@ -1,0 +1,111 @@
+{
+  "schema": "tinyskiff.lessonPacket.v0",
+  "lessonCode": "TSK-DAY03-BLINK",
+  "course": "TinySkiff ESP32-S3 Lab",
+  "day": 3,
+  "title": "Blink: prove the whole chain works",
+  "status": "published",
+  "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
+  "estimatedTimeMinutes": 15,
+  "mission": "Make the ESP32-S3's own onboard LED blink from code you upload — proof that your computer, the USB cable, the board, and the Arduino toolchain all talk to each other.",
+  "mainPath": "Arduino/C++",
+  "sourceMetadata": {
+    "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_01.1_Blink/Sketch_01.1_Blink.ino",
+    "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
+  },
+  "parts": [
+    {
+      "name": "ESP32-S3 board",
+      "imageAsset": "docs/course/assets/shared/item-esp32-s3-board.jpg",
+      "explanation": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time."
+    },
+    {
+      "name": "Arduino IDE",
+      "imageAsset": "docs/course/assets/shared/item-arduino-ide.png",
+      "explanation": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor."
+    },
+    {
+      "name": "Official sketch",
+      "imageAsset": "docs/course/assets/shared/item-official-sketch.png",
+      "explanation": "A sketch is the Arduino name for a program. This lesson uses Freenove's Sketch_19.1_Ultrasonic_Ranging.ino so you can focus first on wiring, observation, and the measurement model."
+    }
+  ],
+  "wiring": [],
+  "coachInstructions": [
+    "Keep the day to upload-and-watch; there is nothing to wire.",
+    "If nothing blinks, check board, port, and a data-capable cable before changing code.",
+    "Explain setup() vs loop() and the delay numbers on request; do not front-load theory.",
+    "For the challenge, have the learner change only the delay values and re-upload, preserving the working sketch."
+  ],
+  "steps": [
+    "Plug the ESP32-S3 into your computer with a data-capable USB-C cable.",
+    "In Arduino IDE, select your ESP32-S3 board and the port it appears on.",
+    "Open Sketch_01.1_Blink.ino.",
+    "Press Upload and wait for the IDE to say Done uploading.",
+    "Watch the small onboard LED near the chip start to blink."
+  ],
+  "codeFocus": {
+    "arduino": [
+      {
+        "line": "#define LED_BUILTIN 2",
+        "explanation": "Names the onboard LED's pin so the rest of the sketch reads plainly."
+      },
+      {
+        "line": "pinMode(LED_BUILTIN, OUTPUT)",
+        "explanation": "Runs once in setup() to say this pin will push signal out."
+      },
+      {
+        "line": "digitalWrite(LED_BUILTIN, HIGH)",
+        "explanation": "Turns the LED on; LOW turns it off."
+      },
+      {
+        "line": "delay(1000)",
+        "explanation": "Holds that state for one second before the next line."
+      }
+    ]
+  },
+  "theoryModel": {
+    "plainLanguage": "Get ready once, then repeat on-wait-off-wait forever.",
+    "formula": "one blink = 1 s on + 1 s off = a 2-second cycle",
+    "notes": [
+      {
+        "title": "setup() vs loop()",
+        "body": "setup() gets things ready a single time; loop() is the part that keeps running."
+      }
+    ]
+  },
+  "test": {
+    "expectedOutputExample": [
+      "The small onboard LED turns on for one second.",
+      "Then off for one second.",
+      "Then it repeats, steady, for as long as the board has power."
+    ],
+    "successCriteria": "The larger LED that stays lit is the power light — look for the smaller one that blinks."
+  },
+  "troubleshooting": [
+    {
+      "symptom": "Nothing blinks",
+      "firstChecks": [
+        "Confirm the right board and port are selected, then upload again."
+      ]
+    },
+    {
+      "symptom": "No Done uploading",
+      "firstChecks": [
+        "Try a different USB-C cable — some are charge-only and carry no data."
+      ]
+    },
+    {
+      "symptom": "One LED glows steady",
+      "firstChecks": [
+        "That's the power LED. The blink is a second, smaller LED near the chip."
+      ]
+    }
+  ],
+  "challenge": "Change the delay values and find a rhythm that feels like a calm heartbeat, then note the two numbers you chose.",
+  "logbookPrompts": [
+    "What delay felt most like a heartbeat?",
+    "What was the fastest blink you could still see as separate flashes?",
+    "What would you want this LED to tell you in a real project?"
+  ]
+}

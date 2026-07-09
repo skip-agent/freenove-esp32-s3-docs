@@ -139,3 +139,43 @@ threshold:
     less than 15 cm, beep. That pattern is the bridge from reading a sensor to
     building an interactive device.
   shortcut: Pick a threshold that would make sense in a real project, not a random number.
+
+ledBuiltin:
+  title: The onboard LED
+  body: >
+    Most ESP32-S3 boards have a small LED wired to a GPIO pin at the factory, so
+    you can prove code runs without wiring anything. In this sketch it is named
+    LED_BUILTIN, which stands for GPIO 2 on this board.
+  shortcut: Look for the small LED near the chip — not the steady power LED.
+
+pinMode:
+  title: pinMode()
+  body: >
+    pinMode() tells the board how you will use a pin before you use it. OUTPUT
+    means the board will push a signal out of the pin — here, enough to light the
+    LED. The other common mode, INPUT, is for reading a signal in.
+  shortcut: Set a pin's direction once in setup(), before the loop uses it.
+
+digitalWrite:
+  title: digitalWrite()
+  body: >
+    digitalWrite() sets a pin fully on or fully off. HIGH puts voltage on the pin
+    (LED on); LOW removes it (LED off). It is the simplest way for code to change
+    something in the physical world.
+  shortcut: HIGH = on, LOW = off. No in-between — that is what PWM is for later.
+
+delayMs:
+  title: delay()
+  body: >
+    delay() pauses the whole program for a number of milliseconds — 1000 is one
+    second. The blink you see is the LED held on for a moment, then off for a
+    moment, on a loop.
+  shortcut: "The number is milliseconds — 1000 = 1 second, 200 = a fifth of a second."
+
+setupLoop:
+  title: setup() and loop()
+  body: >
+    Every Arduino sketch has two parts. setup() runs once when the board powers
+    on or resets — a good place to prepare pins. loop() runs again and again,
+    forever, as fast as the board can, which is what makes the LED keep blinking.
+  shortcut: setup() = get ready once; loop() = do this over and over.

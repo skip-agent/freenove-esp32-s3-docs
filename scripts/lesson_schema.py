@@ -228,12 +228,14 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
     steps = _as_list(_as_dict(lesson.get("steps")).get("items"))
     _require(errors, len(steps) > 0, f"{code}: steps.items must be non-empty")
 
-    # Code focus — Arduino is required; MicroPython optional but complete if present
+    # Code focus — optional (setup days write no code), but complete when
+    # present: Arduino required, MicroPython optional but complete if present.
     code_block = _as_dict(lesson.get("code"))
     arduino = _as_dict(code_block.get("arduino"))
-    for field in ("sketch", "excerpt"):
-        _require(errors, _nonempty(arduino.get(field)),
-                 f"{code}: code.arduino.{field} is required")
+    if lesson.get("code") is not None:
+        for field in ("sketch", "excerpt"):
+            _require(errors, _nonempty(arduino.get(field)),
+                     f"{code}: code.arduino.{field} is required when a code block is present")
     if code_block.get("micropython") is not None:
         micro_block = _as_dict(code_block.get("micropython"))
         for field in ("file", "path", "excerpt"):
@@ -249,12 +251,19 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
         _require(errors, _nonempty(theory.get("formula")),
                  f"{code}: theory.formula is required when theory is present")
 
-    # Test
+    # Test — optional (setup days prove nothing to run), but complete when
+    # present. `mode` picks the render: "serial" (a Serial Monitor readout,
+    # the default) or "visual" (an honest what-you-should-see/hear panel for
+    # days whose result is a blink, colour, sound, or movement).
     test = _as_dict(lesson.get("test"))
-    _require(errors, len(_as_list(test.get("expected"))) > 0,
-             f"{code}: test.expected must be non-empty")
-    _require(errors, len(_as_list(test.get("checks"))) > 0,
-             f"{code}: test.checks must be non-empty")
+    if lesson.get("test") is not None:
+        _require(errors, len(_as_list(test.get("expected"))) > 0,
+                 f"{code}: test.expected must be non-empty when a test block is present")
+        _require(errors, len(_as_list(test.get("checks"))) > 0,
+                 f"{code}: test.checks must be non-empty when a test block is present")
+        if test.get("mode") is not None:
+            _require(errors, test.get("mode") in ("serial", "visual"),
+                     f"{code}: test.mode must be 'serial' or 'visual'")
 
     # Challenge + logbook
     challenge = _as_dict(lesson.get("challenge"))

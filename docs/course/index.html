@@ -36,7 +36,7 @@
       </div>
     </header>
     <main class="course-body">
-      <p class="map-note muted">1 of 30 days are ready to sail. The rest are charted and on the way.</p>
+      <p class="map-note muted">2 of 30 days are ready to sail. The rest are charted and on the way.</p>
       <section class="arc">
         <div class="arc-head">
           <h2>First light</h2>
@@ -53,11 +53,12 @@
             <span class="day-tile-title">Install the Arduino IDE and see the board</span>
             <span class="day-tile-meta">Upcoming</span>
           </div>
-          <div class="day-tile is-upcoming" data-day="3" aria-disabled="true">
+          <a class="day-tile is-ready" href="day-03-blink/" data-day="3">
             <span class="day-tile-num">Day 3</span>
+            <span class="day-tile-tick" aria-hidden="true"></span>
             <span class="day-tile-title">Blink: prove the whole chain works</span>
-            <span class="day-tile-meta">Upcoming</span>
-          </div>
+            <span class="day-tile-meta">About 15 min · Ready</span>
+          </a>
           <div class="day-tile is-upcoming" data-day="4" aria-disabled="true">
             <span class="day-tile-num">Day 4</span>
             <span class="day-tile-title">Button + LED: make input control output</span>
@@ -249,7 +250,7 @@
       <p><strong>TinySkiff ESP32-S3 Lab.</strong> A guided course built on the official Freenove Super Starter Kit for ESP32-S3 material, released under CC BY-NC-SA 3.0. Not affiliated with or endorsed by Freenove.</p>
     </footer>
   </div>
-  <script id="course-data" type="application/json">{"totalDays": 30, "published": [26], "slugs": {"26": "day-26-ultrasonic"}}</script>
+  <script id="course-data" type="application/json">{"totalDays": 30, "published": [3, 26], "slugs": {"3": "day-03-blink", "26": "day-26-ultrasonic"}}</script>
   <script src="./course.js"></script>
 </body>
 </html>

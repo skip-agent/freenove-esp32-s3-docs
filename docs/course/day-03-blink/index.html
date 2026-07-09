@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Day 3 · Blink: prove the whole chain works — TinySkiff ESP32-S3 Lab</title>
+  <meta name="description" content="Upload your first sketch and blink the ESP32-S3&#x27;s onboard LED. No wiring — just proof that your computer, cable, board, and Arduino IDE all work together." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../course.css" />
+</head>
+<body>
+  <div class="lesson-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 3 of 30</p>
+        <h1>Prove the whole chain<br />with one <em>blink</em></h1>
+        <p class="lede">No wiring today. You upload five short lines and the board&#x27;s own tiny LED starts blinking — the smallest possible proof that everything from your keyboard to the chip is connected and listening.
+</p>
+        <div class="meta-row" aria-label="Lesson facts">
+          <span class="pill is-key">About 15 minutes</span><span class="pill">Arduino first</span><span class="pill">No wiring today</span><span class="pill">No electronics assumed</span>
+        </div>
+      </div>
+      <div class="hero-side no-instrument">
+        
+        <div class="agent-strip">
+          <div class="lesson-code">
+            <span class="label">Agent assist code</span>
+            <code>TSK-DAY03-BLINK</code>
+          </div>
+          <button class="copy-prompt" type="button" data-copy="I am doing TinySkiff lesson TSK-DAY03-BLINK. Pull the lesson packet, then guide me one step at a time. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY03-BLINK.json">lesson packet</a> and coach you step by step.</p>
+        </div>
+      </div>
+    </header>
+    <div class="layout">
+      <nav class="rail" aria-label="Lesson progress">
+        <div class="rail-head">
+          <strong>Today's route</strong>
+          <span class="day-of">3 / 30</span>
+        </div>
+        <div class="voyage" style="--voyage-fill: 10.0%" aria-hidden="true"><span></span></div>
+        <div class="rail-nav">
+          <a href="#parts"><span class="tick"></span>What you need</a>
+          <a href="#steps"><span class="tick"></span>Build it</a>
+          <a href="#code"><span class="tick"></span>Read the code</a>
+          <a href="#theory"><span class="tick"></span>Why it blinks</a>
+          <a href="#test"><span class="tick"></span>Test &amp; debug</a>
+          <a href="#challenge"><span class="tick"></span>Try this</a>
+          <a href="#agent"><span class="tick"></span>Coach me</a>
+        </div>
+      </nav>
+      <main class="lesson-main">
+        <section id="parts" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">01</span> First, know the pieces</p>
+              <h2>What you need</h2>
+              <p class="muted">Almost nothing today — the LED you&#x27;ll blink is already on the board. Tap <em>Define</em> on anything unfamiliar; the answer opens as a field note.
+</p>
+            </div>
+            <div class="part-grid">
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-esp32-s3-board.jpg" alt="Official manual photo of the ESP32-S3 development board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>ESP32-S3 board <button class="define" data-topic="esp32">Define</button></h3>
+                <p>The board — and the small onboard LED you&#x27;ll blink.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-arduino-ide.png" alt="Official manual screenshot of the Arduino IDE interface." /><figcaption>Manual screenshot</figcaption></figure>
+                <h3>Arduino IDE <button class="define" data-topic="arduino">Define</button></h3>
+                <p>Opens the sketch, uploads it, and reports &quot;Done uploading.&quot;</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-official-sketch.png" alt="Official manual page showing an Arduino Blink sketch." /><figcaption>Manual sketch</figcaption></figure>
+                <h3>Official sketch <button class="define" data-topic="sketch">Define</button></h3>
+                <p><code>Sketch_01.1_Blink.ino</code></p>
+              </article>
+            </div>
+          </div>
+        </section>
+        <section id="steps" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">02</span> One action at a time</p>
+              <h2>Build it</h2>
+              <p class="muted">The whole day is upload-and-watch. Tap each step as you go to keep your place — you can finish without opening a single field note.
+</p>
+            </div>
+            <div class="steps-progress">
+              <div class="bar" aria-hidden="true"><span id="stepBar"></span></div>
+              <span class="count" id="stepCount">0 / 5 done</span>
+            </div>
+            <ol class="step-list">
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 1 done"></button><p class="text">Plug the ESP32-S3 into your computer with a data-capable USB-C cable.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 2 done"></button><p class="text">In Arduino IDE, select your ESP32-S3 board and the port it appears on.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">Open <code>Sketch_01.1_Blink.ino</code>.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">Press <strong>Upload</strong> and wait for the IDE to say <code>Done uploading</code>.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Watch the small onboard LED near the chip start to blink. <button class="define" data-topic="ledBuiltin">Define</button></p></li>
+            </ol>
+            <div class="done-banner" id="doneBanner" role="status">
+              <span class="icon" aria-hidden="true">💡</span>
+              <div><strong>It&#x27;s alive.</strong><p>Your code is running on the board. Every later day starts from this exact upload-and-watch loop.</p></div>
+            </div>
+          </div>
+        </section>
+        <section id="code" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">03</span> Read just enough code</p>
+              <h2>Read the code</h2>
+              <p class="muted">Five short lines. Two of them run once to get ready; three of them repeat forever. That&#x27;s the shape of nearly every Arduino sketch.
+</p>
+            </div>
+            <div class="tabs" role="tablist" aria-label="Code language">
+              <button class="tab" id="tab-arduino" role="tab" aria-selected="true" aria-controls="panel-arduino">Arduino <span class="badge">Main</span></button>
+            </div>
+            <div class="tabpanel" id="panel-arduino" role="tabpanel" aria-labelledby="tab-arduino">
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">Sketch_01.1_Blink.ino</span></div>
+<pre><code><span class="tok-key">#define</span> LED_BUILTIN <span class="tok-num">2</span>
+
+<span class="tok-key">void</span> <span class="tok-fn">setup</span>() {
+  <span class="tok-fn">pinMode</span>(LED_BUILTIN, OUTPUT);
+}
+
+<span class="tok-key">void</span> <span class="tok-fn">loop</span>() {
+  <span class="tok-fn">digitalWrite</span>(LED_BUILTIN, HIGH);   // on
+  <span class="tok-fn">delay</span>(<span class="tok-num">1000</span>);                       // wait <span class="tok-num">1</span> second
+  <span class="tok-fn">digitalWrite</span>(LED_BUILTIN, LOW);    // off
+  <span class="tok-fn">delay</span>(<span class="tok-num">1000</span>);                       // wait <span class="tok-num">1</span> second
+}</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>#define LED_BUILTIN 2</code><span class="note-text">Names the onboard LED&#x27;s pin so the rest of the sketch reads plainly. <button class="define" data-topic="define">Define</button></span></div>
+                  <div class="code-note"><code>pinMode(LED_BUILTIN, OUTPUT)</code><span class="note-text">Runs once in <code>setup()</code> to say this pin will push signal out. <button class="define" data-topic="pinMode">Define</button></span></div>
+                  <div class="code-note"><code>digitalWrite(LED_BUILTIN, HIGH)</code><span class="note-text">Turns the LED on; <code>LOW</code> turns it off. <button class="define" data-topic="digitalWrite">Define</button></span></div>
+                  <div class="code-note"><code>delay(1000)</code><span class="note-text">Holds that state for one second before the next line. <button class="define" data-topic="delayMs">Define</button></span></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+        <section id="theory" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">04</span> Understand, don&#x27;t memorise</p>
+              <h2>Why it blinks</h2>
+              <p class="muted">There&#x27;s no magic here — just two functions the board runs in a fixed order, over and over.
+</p>
+            </div>
+            <div class="theory-flow" aria-label="Measurement model">
+              <article class="flow-step"><span class="n">Run once</span><h3>setup()</h3><p>The board prepares the pin as an output.</p></article>
+              <article class="flow-step"><span class="n">Then loop</span><h3>loop()</h3><p>Everything inside runs again and again without stopping.</p></article>
+              <article class="flow-step"><span class="n">Light on</span><h3>HIGH + delay</h3><p>Voltage on the pin lights the LED; delay holds it there.</p></article>
+              <article class="flow-step"><span class="n">Light off</span><h3>LOW + delay</h3><p>Voltage off; delay holds the dark before it repeats.</p></article>
+            </div>
+            <div class="formula-card">
+              <span class="label">The rhythm</span>
+              <code>one blink = <b>1 s on</b> + <b>1 s off</b> = a 2-second cycle</code>
+            </div>
+            <div class="two-col" style="margin-top:14px">
+              <article class="mini-card"><h3>setup() vs loop() <button class="define" data-topic="setupLoop">Define</button></h3><p>setup() gets things ready a single time; loop() is the part that keeps running.</p></article>
+            </div>
+          </div>
+        </section>
+        <section id="test" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">05</span> Know it worked</p>
+              <h2>Test &amp; debug</h2>
+              <p class="muted">Nothing prints to the screen today — the proof is on the board itself.
+</p>
+            </div>
+            <div class="test-grid">
+              <div>
+                <span class="readout-title">What you should see</span>
+                <div class="observe" aria-label="What you should see">
+                  <div class="bar"><span>Onboard LED</span></div>
+                  <ul class="observe-lines"><li>The small onboard LED turns on for one second.</li><li>Then off for one second.</li><li>Then it repeats, steady, for as long as the board has power.</li></ul>
+                </div>
+                <p class="micropython-note">The larger LED that stays lit is the power light — look for the smaller one that blinks.</p>
+              </div>
+              <div>
+                <span class="checks-title">If it doesn&#x27;t</span>
+                <ul class="checklist">
+                  <li><strong>Nothing blinks?</strong> Confirm the right board and port are selected, then upload again.</li>
+                  <li><strong>No `Done uploading`?</strong> Try a different USB-C cable — some are charge-only and carry no data.</li>
+                  <li><strong>One LED glows steady?</strong> That&#x27;s the power LED. The blink is a second, smaller LED near the chip.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="challenge" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">06</span> Make the idea yours</p>
+              <h2>Try this: find a heartbeat</h2>
+              <p class="muted">Same sketch, one small change: the two delay numbers. Timing is what gives a blink its character.
+</p>
+            </div>
+            <div class="two-col">
+              <article class="mini-card"><h3>Speed it up</h3><p>Set both <code>delay(1000)</code> lines to <code>delay(200)</code> and upload. Notice how different 200 feels.</p></article>
+              <article class="mini-card"><h3>Find a heartbeat <button class="define" data-topic="delayMs">Define</button></h3><p>Adjust the two numbers until the blink feels like a resting pulse. Write down what you landed on.</p></article>
+            </div>
+            <div class="logbook">
+              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
+              <label>What delay felt most like a heartbeat?<textarea rows="2"></textarea></label>
+              <label>What was the fastest blink you could still see as separate flashes?<textarea rows="2"></textarea></label>
+              <label>What would you want this LED to tell you in a real project?<textarea rows="2"></textarea></label>
+            </div>
+          </div>
+        </section>
+        <section id="agent" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">07</span> Learn it with a hand on the tiller</p>
+              <h2>Coach me through it</h2>
+              <p class="muted">Every lesson ships with a code and a machine-readable packet, so an agent can guide you with full context.
+</p>
+            </div>
+            <div class="agent-grid">
+              <article class="mini-card"><h3>Lesson code</h3><p><code>TSK-DAY03-BLINK</code></p></article>
+              <article class="mini-card"><h3>Context packet</h3><p><a href="../packets/TSK-DAY03-BLINK.json">Open the JSON packet →</a></p></article>
+            </div>
+            <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
+              <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
+              <p><strong>How the agent should behave:</strong> keep it to upload-and-watch, check board and port and cable before touching code, and explain setup()/loop() and the delay numbers on request.
+</p>
+            </div>
+          </div>
+        </section>
+        <nav class="day-nav" aria-label="Course navigation">
+        <span class="day-nav-link is-empty" aria-hidden="true"></span>
+        <a class="day-nav-link next" href="../day-26-ultrasonic/">
+          <span class="day-nav-dir">Day 26 →</span>
+          <span class="day-nav-title">Measure the room with sound</span>
+        </a>
+        </nav>
+      </main>
+    </div>
+    <footer class="colophon">
+      <p><strong>Day 3 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <div class="rule"></div>
+      <p>Circuit diagram and code based on official Freenove Super Starter Kit for ESP32-S3 material — , Chapter , page ; sketch <code>Sketch_01.1_Blink.ino</code>. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+    </footer>
+  </div>
+
+  <dialog class="lightbox" id="explainer">
+    <div class="lb-head">
+      <div>
+        <span class="lb-kicker">Field note</span>
+        <h3 id="explainerTitle"></h3>
+      </div>
+      <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="lb-body"><p id="explainerBody"></p></div>
+    <div class="lb-shortcut"><span class="tag">Shortcut</span><span id="explainerShortcut"></span></div>
+  </dialog>
+
+  <dialog class="lightbox image" id="imageBox">
+    <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    <div class="lb-body"><img id="imageBoxImg" alt="" /></div>
+    <p class="lb-cap" id="imageBoxCap"></p>
+  </dialog>
+
+  <div class="toast" id="toast">Prompt copied</div>
+
+  <script id="lesson-data" type="application/json">{"day": 3, "totalDays": 30, "slug": "day-03-blink", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "define": {"title": "#define", "body": "#define creates a nickname before the code is compiled. #define trigPin 13 means: whenever the sketch says trigPin, use the number 13. It makes the code easier to read.\n", "shortcut": "Nicknames matter because physical pin numbers are easy to forget."}, "delayMs": {"title": "delay()", "body": "delay() pauses the whole program for a number of milliseconds — 1000 is one second. The blink you see is the LED held on for a moment, then off for a moment, on a loop.\n", "shortcut": "The number is milliseconds — 1000 = 1 second, 200 = a fifth of a second."}, "digitalWrite": {"title": "digitalWrite()", "body": "digitalWrite() sets a pin fully on or fully off. HIGH puts voltage on the pin (LED on); LOW removes it (LED off). It is the simplest way for code to change something in the physical world.\n", "shortcut": "HIGH = on, LOW = off. No in-between — that is what PWM is for later."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "ledBuiltin": {"title": "The onboard LED", "body": "Most ESP32-S3 boards have a small LED wired to a GPIO pin at the factory, so you can prove code runs without wiring anything. In this sketch it is named LED_BUILTIN, which stands for GPIO 2 on this board.\n", "shortcut": "Look for the small LED near the chip — not the steady power LED."}, "pinMode": {"title": "pinMode()", "body": "pinMode() tells the board how you will use a pin before you use it. OUTPUT means the board will push a signal out of the pin — here, enough to light the LED. The other common mode, INPUT, is for reading a signal in.\n", "shortcut": "Set a pin's direction once in setup(), before the loop uses it."}, "setupLoop": {"title": "setup() and loop()", "body": "Every Arduino sketch has two parts. setup() runs once when the board powers on or resets — a good place to prepare pins. loop() runs again and again, forever, as fast as the board can, which is what makes the LED keep blinking.\n", "shortcut": "setup() = get ready once; loop() = do this over and over."}, "sketch": {"title": "Official sketch", "body": "A sketch is the Arduino name for a program. This lesson uses Freenove's Sketch_19.1_Ultrasonic_Ranging.ino so you can focus first on wiring, observation, and the measurement model.\n", "shortcut": "Treat the sketch as a working example to read and modify, not a spell to copy blindly."}}, "prev": null, "next": {"day": 26, "slug": "day-26-ultrasonic", "title": "Measure the room with sound"}}</script>
+  <script src="../course.js"></script>
+</body>
+</html>

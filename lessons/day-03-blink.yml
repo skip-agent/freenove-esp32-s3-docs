@@ -1,0 +1,184 @@
+# Day 3 — Blink · tinyskiff.lesson.v1
+# One source of truth: this file renders to the guided page
+# (/course/day-03-blink/), the agent packet, and the course-map entry.
+# A no-wiring, visual-result day — the first real win of the course.
+
+schema: tinyskiff.lesson.v1
+lessonCode: TSK-DAY03-BLINK
+day: 3
+slug: day-03-blink
+title: "Blink: prove the whole chain works"
+status: published
+estimatedTimeMinutes: 15
+tracks: { main: arduino }
+learnerProfile: adult beginner; curious and capable; no electronics assumed
+
+mission: >
+  Make the ESP32-S3's own onboard LED blink from code you upload — proof that
+  your computer, the USB cable, the board, and the Arduino toolchain all talk to
+  each other.
+unlocks: The whole chain works end to end, and a single pin can switch something on and off on a schedule you control.
+seoDescription: >
+  Upload your first sketch and blink the ESP32-S3's onboard LED. No wiring — just
+  proof that your computer, cable, board, and Arduino IDE all work together.
+
+hero:
+  instrument: none
+  headline: Prove the whole chain|with one {blink}
+  lede: >
+    No wiring today. You upload five short lines and the board's own tiny LED
+    starts blinking — the smallest possible proof that everything from your
+    keyboard to the chip is connected and listening.
+  pills:
+    - { text: About 15 minutes, key: true }
+    - Arduino first
+    - No wiring today
+    - No electronics assumed
+
+parts:
+  intro: >
+    Almost nothing today — the LED you'll blink is already on the board. Tap
+    *Define* on anything unfamiliar; the answer opens as a field note.
+  items:
+    - name: ESP32-S3 board
+      image: shared/item-esp32-s3-board.jpg
+      imageKind: Manual photo
+      alt: Official manual photo of the ESP32-S3 development board.
+      blurb: The board — and the small onboard LED you'll blink.
+      explain: esp32
+    - name: Arduino IDE
+      image: shared/item-arduino-ide.png
+      imageKind: Manual screenshot
+      alt: Official manual screenshot of the Arduino IDE interface.
+      blurb: Opens the sketch, uploads it, and reports "Done uploading."
+      explain: arduino
+    - name: Official sketch
+      image: shared/item-official-sketch.png
+      imageKind: Manual sketch
+      alt: Official manual page showing an Arduino Blink sketch.
+      blurb: "`Sketch_01.1_Blink.ino`"
+      explain: sketch
+
+steps:
+  intro: >
+    The whole day is upload-and-watch. Tap each step as you go to keep your
+    place — you can finish without opening a single field note.
+  items:
+    - Plug the ESP32-S3 into your computer with a data-capable USB-C cable.
+    - In Arduino IDE, select your ESP32-S3 board and the port it appears on.
+    - Open `Sketch_01.1_Blink.ino`.
+    - Press **Upload** and wait for the IDE to say `Done uploading`.
+    - Watch the small onboard LED near the chip start to blink. {ledBuiltin}
+  done:
+    icon: "💡"
+    title: It's alive.
+    body: Your code is running on the board. Every later day starts from this exact upload-and-watch loop.
+
+code:
+  intro: >
+    Five short lines. Two of them run once to get ready; three of them repeat
+    forever. That's the shape of nearly every Arduino sketch.
+  arduino:
+    file: Sketch_01.1_Blink.ino
+    sketch: C/Sketches/Sketch_01.1_Blink/Sketch_01.1_Blink.ino
+    excerpt: |
+      #define LED_BUILTIN 2
+
+      void setup() {
+        pinMode(LED_BUILTIN, OUTPUT);
+      }
+
+      void loop() {
+        digitalWrite(LED_BUILTIN, HIGH);   // on
+        delay(1000);                       // wait 1 second
+        digitalWrite(LED_BUILTIN, LOW);    // off
+        delay(1000);                       // wait 1 second
+      }
+    notes:
+      - code: "#define LED_BUILTIN 2"
+        text: Names the onboard LED's pin so the rest of the sketch reads plainly.
+        explain: define
+      - code: pinMode(LED_BUILTIN, OUTPUT)
+        text: Runs once in `setup()` to say this pin will push signal out.
+        explain: pinMode
+      - code: digitalWrite(LED_BUILTIN, HIGH)
+        text: Turns the LED on; `LOW` turns it off.
+        explain: digitalWrite
+      - code: delay(1000)
+        text: Holds that state for one second before the next line.
+        explain: delayMs
+
+theory:
+  title: Why it blinks
+  summary: Get ready once, then repeat on-wait-off-wait forever.
+  intro: >
+    There's no magic here — just two functions the board runs in a fixed order,
+    over and over.
+  flow:
+    - { n: Run once,  title: setup(),      body: The board prepares the pin as an output. }
+    - { n: Then loop, title: loop(),       body: Everything inside runs again and again without stopping. }
+    - { n: Light on,  title: HIGH + delay, body: Voltage on the pin lights the LED; delay holds it there. }
+    - { n: Light off, title: LOW + delay,  body: Voltage off; delay holds the dark before it repeats. }
+  formulaLabel: The rhythm
+  formula: one blink = **1 s on** + **1 s off** = a 2-second cycle
+  notes:
+    - title: setup() vs loop()
+      explain: setupLoop
+      body: setup() gets things ready a single time; loop() is the part that keeps running.
+
+test:
+  mode: visual
+  intro: >
+    Nothing prints to the screen today — the proof is on the board itself.
+  expectedTitle: What you should see
+  readoutLabel: Onboard LED
+  expected:
+    - The small onboard LED turns on for one second.
+    - Then off for one second.
+    - Then it repeats, steady, for as long as the board has power.
+  expectedNote: The larger LED that stays lit is the power light — look for the smaller one that blinks.
+  checksTitle: If it doesn't
+  checks:
+    - symptom: "Nothing blinks?"
+      fix: "Confirm the right board and port are selected, then upload again."
+    - symptom: "No `Done uploading`?"
+      fix: "Try a different USB-C cable — some are charge-only and carry no data."
+    - symptom: "One LED glows steady?"
+      fix: "That's the power LED. The blink is a second, smaller LED near the chip."
+
+challenge:
+  title: "Try this: find a heartbeat"
+  railLabel: Try this
+  intro: >
+    Same sketch, one small change: the two delay numbers. Timing is what gives a
+    blink its character.
+  summary: Change the delay values and find a rhythm that feels like a calm heartbeat, then note the two numbers you chose.
+  cards:
+    - title: Speed it up
+      body: Set both `delay(1000)` lines to `delay(200)` and upload. Notice how different 200 feels.
+    - title: Find a heartbeat
+      explain: delayMs
+      body: Adjust the two numbers until the blink feels like a resting pulse. Write down what you landed on.
+  logbook:
+    - What delay felt most like a heartbeat?
+    - What was the fastest blink you could still see as separate flashes?
+    - What would you want this LED to tell you in a real project?
+
+agent:
+  intro: >
+    Every lesson ships with a code and a machine-readable packet, so an agent can
+    guide you with full context.
+  behaviour: >
+    keep it to upload-and-watch, check board and port and cable before touching
+    code, and explain setup()/loop() and the delay numbers on request.
+  coachInstructions:
+    - Keep the day to upload-and-watch; there is nothing to wire.
+    - If nothing blinks, check board, port, and a data-capable cable before changing code.
+    - Explain setup() vs loop() and the delay numbers on request; do not front-load theory.
+    - For the challenge, have the learner change only the delay values and re-upload, preserving the working sketch.
+
+source:
+  license: CC BY-NC-SA 3.0
+  licenseNote: >
+    Based on Freenove official material released under CC BY-NC-SA 3.0; preserve
+    attribution and non-affiliation language.
