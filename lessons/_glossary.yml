@@ -179,3 +179,51 @@ setupLoop:
     on or resets — a good place to prepare pins. loop() runs again and again,
     forever, as fast as the board can, which is what makes the LED keep blinking.
   shortcut: setup() = get ready once; loop() = do this over and over.
+
+pinout:
+  title: Pinout map
+  body: >
+    A pinout is a labelled drawing of the board that names every pin — power,
+    ground, USB, and the numbered GPIO pins your code uses. You will reach for it
+    constantly once you start wiring, so it is worth knowing where it lives.
+  shortcut: When a lesson says GPIO 13, the pinout shows you which physical pin that is.
+
+usbData:
+  title: Data-capable USB cable
+  body: >
+    Some USB cables only carry power (for charging), with no data wires inside.
+    Uploading code needs a cable that carries data. A charge-only cable will
+    power the board but never let the IDE talk to it.
+  shortcut: If uploads fail on a cable that charges phones fine, suspect the cable first.
+
+esd:
+  title: Static electricity (ESD)
+  body: >
+    A bare circuit board can be harmed by a static shock you cannot feel. Touch
+    something metal and grounded before handling the board, hold it by the edges,
+    and keep it off wool or fluffy surfaces.
+  shortcut: Touch metal first, hold by the edges.
+
+boardPackage:
+  title: ESP32 board package
+  body: >
+    Arduino IDE does not know about the ESP32-S3 until you add a board package —
+    a bundle that teaches the IDE how to compile and upload for this chip. You
+    install it once from the Boards Manager.
+  shortcut: Install the ESP32 boards package once, then pick your board from the list.
+
+serialPort:
+  title: Port
+  body: >
+    The port is the connection the IDE uses to reach your board over USB. After
+    you plug the board in, you pick it from Tools then Port. If nothing uploads,
+    the wrong port (or none) is a common cause.
+  shortcut: Board tells the IDE what chip; Port tells it where to find it.
+
+usbDriver:
+  title: USB driver (CH343)
+  body: >
+    A driver lets your computer recognise the board's USB-to-serial chip. Most
+    modern systems include it, but some (often macOS) need the CH343 driver
+    installed once before the board shows up as a port.
+  shortcut: No port appears after plugging in? Install the CH343 driver, then replug.

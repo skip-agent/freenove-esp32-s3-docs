@@ -1,0 +1,108 @@
+# Day 1 — Unbox and meet the ESP32-S3 · tinyskiff.lesson.v1
+# An orientation day: no wiring, no code, no upload. Parts + steps + a small
+# challenge. Renders to /course/day-01-unbox/, the agent packet, and the map.
+
+schema: tinyskiff.lesson.v1
+lessonCode: TSK-DAY01-UNBOX
+day: 1
+slug: day-01-unbox
+title: Unbox safely and meet the ESP32-S3
+status: published
+estimatedTimeMinutes: 15
+tracks: { main: arduino }
+learnerProfile: adult beginner; curious and capable; no electronics assumed
+
+mission: >
+  Open the kit, find the board at the heart of it, and learn to handle it safely.
+  Nothing to wire or upload yet — today is about getting your bearings.
+unlocks: You can recognise the board, its USB port, and where to find the pin labels you'll use every day from here.
+seoDescription: >
+  Day 1 of the TinySkiff ESP32-S3 course: unbox the kit, meet the board, learn
+  to handle it safely, and find the pinout you'll use all course.
+
+hero:
+  instrument: none
+  headline: Meet the board|before you {build}
+  lede: >
+    Every day after this one starts with the same small computer in your hand.
+    Fifteen minutes now to know what it is, how to hold it, and where its labels
+    live will save you a dozen puzzled moments later.
+  pills:
+    - { text: About 15 minutes, key: true }
+    - No tools needed
+    - Nothing to wire
+    - No electronics assumed
+
+parts:
+  intro: >
+    Tip the kit out and find these three. Tap *Define* on anything unfamiliar —
+    the answer opens as a field note you can read and dismiss.
+  items:
+    - name: ESP32-S3 board
+      image: shared/item-esp32-s3-board.jpg
+      imageKind: Manual photo
+      alt: Official manual photo of the ESP32-S3 development board.
+      blurb: The small computer at the centre of every project this course.
+      explain: esp32
+    - name: GPIO extension board
+      image: shared/item-gpio-extension-board.png
+      imageKind: Manual photo
+      alt: Official manual image of the ESP32-S3 GPIO extension board.
+      blurb: Spreads the board's pins into labelled rows you can reach.
+      explain: gpio
+    - name: Pinout map
+      image: shared/item-pinout.png
+      imageKind: Manual reference
+      alt: Official ESP32-S3 pinout diagram labelling every GPIO, power, and USB pin on the board.
+      blurb: The labelled map of every pin. Keep it close once wiring starts.
+      explain: pinout
+
+steps:
+  intro: >
+    No rush and no risk today — just find things and look closely.
+  items:
+    - Open the kit and lay the parts out where you can see them.
+    - Find the ESP32-S3 board and hold it by the edges. {esd}
+    - Locate the USB port on the board — that's how code and power arrive. {usbData}
+    - Find the tiny onboard LED near the chip; you'll blink it on Day 3.
+    - Open the pinout map and notice the numbered GPIO pins along the sides. {pinout}
+  done:
+    icon: "🧭"
+    title: You've got your bearings.
+    body: You can recognise the board, its port, and its pin labels. Day 2 gets the software talking to it.
+
+challenge:
+  title: "Try this: name three parts"
+  railLabel: Try this
+  intro: >
+    A tiny memory exercise — no pressure, just a way to make the board feel
+    familiar before you start using it.
+  summary: Identify three parts from the kit by name, and trace the path a signal takes from the USB port into the board.
+  cards:
+    - title: Name three parts
+      body: Pick any three pieces and name them out loud. Check the kit's parts list if you're unsure.
+    - title: Trace the USB path
+      body: Follow where the USB port leads on the board. That's the road your code travels in on.
+  logbook:
+    - Which three parts did you name?
+    - Where is the board's USB port, and where is the onboard LED?
+    - What's one thing about the board that surprised you?
+
+agent:
+  intro: >
+    Every lesson ships with a code and a machine-readable packet, so an agent can
+    guide you with full context.
+  behaviour: >
+    keep it calm and orientation-only, name parts on request, and reinforce safe
+    handling (edges, static) without turning it into a lecture.
+  coachInstructions:
+    - This is an orientation day — there is nothing to wire or upload.
+    - Help the learner identify parts and find the board's USB port and onboard LED.
+    - Reinforce safe handling — hold by the edges, mind static — briefly, not as a lecture.
+    - Point to the pinout map as the reference they'll use once wiring begins.
+
+source:
+  license: CC BY-NC-SA 3.0
+  licenseNote: >
+    Based on Freenove official material released under CC BY-NC-SA 3.0; preserve
+    attribution and non-affiliation language.

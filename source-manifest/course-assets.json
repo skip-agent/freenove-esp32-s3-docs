@@ -38,6 +38,12 @@
       "origin": "Freenove manual — Ultrasonic Ranging sketch + Serial Monitor page",
       "kind": "kit-item screenshot",
       "alt": "Official manual page showing the Ultrasonic Ranging sketch and Serial Monitor output."
+    },
+    {
+      "asset": "course-assets/assets/shared/item-pinout.png",
+      "origin": "Freenove Super Starter Kit for ESP32-S3 — ESP32S3_Pinout.png",
+      "kind": "kit-item reference",
+      "alt": "Official ESP32-S3 pinout diagram labelling every GPIO, power, and USB pin on the board."
     }
   ],
   "days": {

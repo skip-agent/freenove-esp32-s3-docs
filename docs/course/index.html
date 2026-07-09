@@ -36,23 +36,25 @@
       </div>
     </header>
     <main class="course-body">
-      <p class="map-note muted">2 of 30 days are ready to sail. The rest are charted and on the way.</p>
+      <p class="map-note muted">4 of 30 days are ready to sail. The rest are charted and on the way.</p>
       <section class="arc">
         <div class="arc-head">
           <h2>First light</h2>
           <p>Set up the board and score your first wins.</p>
         </div>
         <div class="day-grid">
-          <div class="day-tile is-upcoming" data-day="1" aria-disabled="true">
+          <a class="day-tile is-ready" href="day-01-unbox/" data-day="1">
             <span class="day-tile-num">Day 1</span>
+            <span class="day-tile-tick" aria-hidden="true"></span>
             <span class="day-tile-title">Unbox safely and meet the ESP32-S3</span>
-            <span class="day-tile-meta">Upcoming</span>
-          </div>
-          <div class="day-tile is-upcoming" data-day="2" aria-disabled="true">
+            <span class="day-tile-meta">About 15 min · Ready</span>
+          </a>
+          <a class="day-tile is-ready" href="day-02-setup/" data-day="2">
             <span class="day-tile-num">Day 2</span>
+            <span class="day-tile-tick" aria-hidden="true"></span>
             <span class="day-tile-title">Install the Arduino IDE and see the board</span>
-            <span class="day-tile-meta">Upcoming</span>
-          </div>
+            <span class="day-tile-meta">About 25 min · Ready</span>
+          </a>
           <a class="day-tile is-ready" href="day-03-blink/" data-day="3">
             <span class="day-tile-num">Day 3</span>
             <span class="day-tile-tick" aria-hidden="true"></span>
@@ -250,7 +252,7 @@
       <p><strong>TinySkiff ESP32-S3 Lab.</strong> A guided course built on the official Freenove Super Starter Kit for ESP32-S3 material, released under CC BY-NC-SA 3.0. Not affiliated with or endorsed by Freenove.</p>
     </footer>
   </div>
-  <script id="course-data" type="application/json">{"totalDays": 30, "published": [3, 26], "slugs": {"3": "day-03-blink", "26": "day-26-ultrasonic"}}</script>
+  <script id="course-data" type="application/json">{"totalDays": 30, "published": [1, 2, 3, 26], "slugs": {"1": "day-01-unbox", "2": "day-02-setup", "3": "day-03-blink", "26": "day-26-ultrasonic"}}</script>
   <script src="./course.js"></script>
 </body>
 </html>

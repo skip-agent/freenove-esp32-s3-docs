@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Day 2 · Install the Arduino IDE and see the board — TinySkiff ESP32-S3 Lab</title>
+  <meta name="description" content="Day 2 of the TinySkiff ESP32-S3 course: install the Arduino IDE, add the ESP32 board package and CH343 driver if needed, and confirm the board appears as a port." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../course.css" />
+</head>
+<body>
+  <div class="lesson-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 2 of 30</p>
+        <h1>Get the toolchain<br />talking <em>once</em></h1>
+        <p class="lede">This is the one genuinely fiddly day — installing software and a driver. It&#x27;s worth doing slowly, because once your board shows up as a port, you never have to think about setup again.
+</p>
+        <div class="meta-row" aria-label="Lesson facts">
+          <span class="pill is-key">About 25 minutes</span><span class="pill">Software only</span><span class="pill">Nothing to wire</span><span class="pill">Do it once</span>
+        </div>
+      </div>
+      <div class="hero-side no-instrument">
+        
+        <div class="agent-strip">
+          <div class="lesson-code">
+            <span class="label">Agent assist code</span>
+            <code>TSK-DAY02-SETUP</code>
+          </div>
+          <button class="copy-prompt" type="button" data-copy="I am doing TinySkiff lesson TSK-DAY02-SETUP. Pull the lesson packet, then guide me one step at a time. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY02-SETUP.json">lesson packet</a> and coach you step by step.</p>
+        </div>
+      </div>
+    </header>
+    <div class="layout">
+      <nav class="rail" aria-label="Lesson progress">
+        <div class="rail-head">
+          <strong>Today's route</strong>
+          <span class="day-of">2 / 30</span>
+        </div>
+        <div class="voyage" style="--voyage-fill: 6.67%" aria-hidden="true"><span></span></div>
+        <div class="rail-nav">
+          <a href="#parts"><span class="tick"></span>What you need</a>
+          <a href="#steps"><span class="tick"></span>Build it</a>
+          <a href="#theory"><span class="tick"></span>Board vs port</a>
+          <a href="#test"><span class="tick"></span>Test &amp; debug</a>
+          <a href="#challenge"><span class="tick"></span>Try this</a>
+          <a href="#agent"><span class="tick"></span>Coach me</a>
+        </div>
+      </nav>
+      <main class="lesson-main">
+        <section id="parts" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">01</span> First, know the pieces</p>
+              <h2>What you need</h2>
+              <p class="muted">Everything today is on your computer and the cable. Tap <em>Define</em> on anything unfamiliar.
+</p>
+            </div>
+            <div class="part-grid">
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-esp32-s3-board.jpg" alt="Official manual photo of the ESP32-S3 development board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>ESP32-S3 board <button class="define" data-topic="esp32">Define</button></h3>
+                <p>The board you&#x27;ll get your computer to recognise.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="../assets/shared/item-arduino-ide.png" alt="Official manual screenshot of the Arduino IDE interface." /><figcaption>Manual screenshot</figcaption></figure>
+                <h3>Arduino IDE <button class="define" data-topic="arduino">Define</button></h3>
+                <p>The free app that will compile and upload your code.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+        <section id="steps" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">02</span> One action at a time</p>
+              <h2>Build it</h2>
+              <p class="muted">Follow these in order. If a step stalls, the Test &amp; debug section below is where the common snags live.
+</p>
+            </div>
+            <div class="steps-progress">
+              <div class="bar" aria-hidden="true"><span id="stepBar"></span></div>
+              <span class="count" id="stepCount">0 / 5 done</span>
+            </div>
+            <ol class="step-list">
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 1 done"></button><p class="text">Download and install the Arduino IDE from arduino.cc for your operating system.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 2 done"></button><p class="text">In Preferences, add the ESP32 boards URL, then install the ESP32 package from Boards Manager. <button class="define" data-topic="boardPackage">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">If your system needs it, install the CH343 USB driver. <button class="define" data-topic="usbDriver">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">Plug the board in with a data-capable USB-C cable. <button class="define" data-topic="usbData">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Choose your ESP32-S3 under Tools → Board, then pick its Port. <button class="define" data-topic="serialPort">Define</button></p></li>
+            </ol>
+            <div class="done-banner" id="doneBanner" role="status">
+              <span class="icon" aria-hidden="true">🔌</span>
+              <div><strong>Handshake complete.</strong><p>Your board is a selectable port now. Day 3 sends it its first code.</p></div>
+            </div>
+          </div>
+        </section>
+        <section id="theory" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">03</span> Understand, don&#x27;t memorise</p>
+              <h2>Board vs port</h2>
+              <p class="muted">Two settings trip people up on Day 2. They sound similar but do different jobs, and both have to be right before anything uploads.
+</p>
+            </div>
+            <div class="theory-flow" aria-label="Measurement model">
+              <article class="flow-step"><span class="n">Board package</span><h3>Teach the IDE</h3><p>Adds the know-how to compile for the ESP32-S3.</p></article>
+              <article class="flow-step"><span class="n">Board setting</span><h3>What it is</h3><p>Tells the IDE which chip you&#x27;re targeting.</p></article>
+              <article class="flow-step"><span class="n">Port setting</span><h3>Where it is</h3><p>Tells the IDE which USB connection to use.</p></article>
+              <article class="flow-step"><span class="n">Driver</span><h3>If unseen</h3><p>Lets the computer recognise the board&#x27;s USB chip.</p></article>
+            </div>
+            <div class="formula-card">
+              <span class="label">The rule</span>
+              <code><b>right board</b> + <b>right port</b> = uploads work</code>
+            </div>
+            <div class="two-col" style="margin-top:14px">
+              <article class="mini-card"><h3>Why a port might not appear <button class="define" data-topic="usbDriver">Define</button></h3><p>A missing driver or a charge-only cable are the two usual reasons the board never shows up.</p></article>
+            </div>
+          </div>
+        </section>
+        <section id="test" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">04</span> Know it worked</p>
+              <h2>Test &amp; debug</h2>
+              <p class="muted">There&#x27;s no sketch to run yet. Success is simply that the IDE can see the board.
+</p>
+            </div>
+            <div class="test-grid">
+              <div>
+                <span class="readout-title">How you know it worked</span>
+                <div class="observe" aria-label="What you should see">
+                  <div class="bar"><span>Tools → Port</span></div>
+                  <ul class="observe-lines"><li>Your ESP32-S3 appears as a selectable port in Tools → Port.</li><li>The board name is selectable under Tools → Board.</li><li>No error appears when you select them.</li></ul>
+                </div>
+                <p class="micropython-note">You don&#x27;t need to upload anything today — seeing the port is the whole win.</p>
+              </div>
+              <div>
+                <span class="checks-title">If it doesn&#x27;t</span>
+                <ul class="checklist">
+                  <li><strong>No port appears?</strong> Install the CH343 driver, then unplug and replug the board.</li>
+                  <li><strong>Only a charging sound, no port?</strong> Swap in a data-capable USB-C cable — some only carry power.</li>
+                  <li><strong>Board not in the list?</strong> Re-open Boards Manager and confirm the ESP32 package finished installing.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="challenge" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">05</span> Make the idea yours</p>
+              <h2>Try this: break it, then fix it</h2>
+              <p class="muted">The best way to trust a setting is to change it and put it back. You&#x27;ll recognise the mistake instantly next time it happens by accident.
+</p>
+            </div>
+            <div class="two-col">
+              <article class="mini-card"><h3>Pick the wrong port</h3><p>Choose a different port (or none). Notice the IDE has nowhere to send code.</p></article>
+              <article class="mini-card"><h3>Put it right</h3><p>Reselect your ESP32-S3 board and its real port. That pairing is your normal starting point every day.</p></article>
+            </div>
+            <div class="logbook">
+              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
+              <label>What board and port did you end up selecting?<textarea rows="2"></textarea></label>
+              <label>Did you need the CH343 driver on your system?<textarea rows="2"></textarea></label>
+              <label>What was the trickiest part of setup, so you remember it next time?<textarea rows="2"></textarea></label>
+            </div>
+          </div>
+        </section>
+        <section id="agent" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">06</span> Learn it with a hand on the tiller</p>
+              <h2>Coach me through it</h2>
+              <p class="muted">Every lesson ships with a code and a machine-readable packet, so an agent can guide you with full context.
+</p>
+            </div>
+            <div class="agent-grid">
+              <article class="mini-card"><h3>Lesson code</h3><p><code>TSK-DAY02-SETUP</code></p></article>
+              <article class="mini-card"><h3>Context packet</h3><p><a href="../packets/TSK-DAY02-SETUP.json">Open the JSON packet →</a></p></article>
+            </div>
+            <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
+              <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
+              <p><strong>How the agent should behave:</strong> walk the install one step at a time, and when the board doesn&#x27;t appear, check driver, cable, board, and port in that order before anything else.
+</p>
+            </div>
+          </div>
+        </section>
+        <nav class="day-nav" aria-label="Course navigation">
+        <a class="day-nav-link prev" href="../day-01-unbox/">
+          <span class="day-nav-dir">← Day 1</span>
+          <span class="day-nav-title">Unbox safely and meet the ESP32-S3</span>
+        </a>
+        <a class="day-nav-link next" href="../day-03-blink/">
+          <span class="day-nav-dir">Day 3 →</span>
+          <span class="day-nav-title">Blink: prove the whole chain works</span>
+        </a>
+        </nav>
+      </main>
+    </div>
+    <footer class="colophon">
+      <p><strong>Day 2 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <div class="rule"></div>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+    </footer>
+  </div>
+
+  <dialog class="lightbox" id="explainer">
+    <div class="lb-head">
+      <div>
+        <span class="lb-kicker">Field note</span>
+        <h3 id="explainerTitle"></h3>
+      </div>
+      <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="lb-body"><p id="explainerBody"></p></div>
+    <div class="lb-shortcut"><span class="tag">Shortcut</span><span id="explainerShortcut"></span></div>
+  </dialog>
+
+  <dialog class="lightbox image" id="imageBox">
+    <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    <div class="lb-body"><img id="imageBoxImg" alt="" /></div>
+    <p class="lb-cap" id="imageBoxCap"></p>
+  </dialog>
+
+  <div class="toast" id="toast">Prompt copied</div>
+
+  <script id="lesson-data" type="application/json">{"day": 2, "totalDays": 30, "slug": "day-02-setup", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "boardPackage": {"title": "ESP32 board package", "body": "Arduino IDE does not know about the ESP32-S3 until you add a board package — a bundle that teaches the IDE how to compile and upload for this chip. You install it once from the Boards Manager.\n", "shortcut": "Install the ESP32 boards package once, then pick your board from the list."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "serialPort": {"title": "Port", "body": "The port is the connection the IDE uses to reach your board over USB. After you plug the board in, you pick it from Tools then Port. If nothing uploads, the wrong port (or none) is a common cause.\n", "shortcut": "Board tells the IDE what chip; Port tells it where to find it."}, "usbData": {"title": "Data-capable USB cable", "body": "Some USB cables only carry power (for charging), with no data wires inside. Uploading code needs a cable that carries data. A charge-only cable will power the board but never let the IDE talk to it.\n", "shortcut": "If uploads fail on a cable that charges phones fine, suspect the cable first."}, "usbDriver": {"title": "USB driver (CH343)", "body": "A driver lets your computer recognise the board's USB-to-serial chip. Most modern systems include it, but some (often macOS) need the CH343 driver installed once before the board shows up as a port.\n", "shortcut": "No port appears after plugging in? Install the CH343 driver, then replug."}}, "prev": {"day": 1, "slug": "day-01-unbox", "title": "Unbox safely and meet the ESP32-S3"}, "next": {"day": 3, "slug": "day-03-blink", "title": "Blink: prove the whole chain works"}}</script>
+  <script src="../course.js"></script>
+</body>
+</html>
