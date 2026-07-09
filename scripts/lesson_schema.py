@@ -257,6 +257,34 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
     _require(errors, bool(str(source.get("license", "")).strip()),
              f"{code}: source.license is required")
 
+    # Shape guard — every list/sub-block the renderer dereferences with .get must
+    # hold mappings, so a malformed authoring shape fails here with a clear error
+    # rather than crashing render (the build aborts on any error before rendering).
+    micro = _as_dict(_as_dict(lesson.get("code")).get("micropython"))
+    for name, sub in (("hero", lesson.get("hero")),
+                      ("hero.readout", _as_dict(lesson.get("hero")).get("readout")),
+                      ("steps.done", _as_dict(lesson.get("steps")).get("done")),
+                      ("code.micropython", lesson.get("code", {}).get("micropython")
+                          if isinstance(lesson.get("code"), dict) else None)):
+        if sub is not None and not isinstance(sub, dict):
+            err(f"{name} must be a mapping")
+    mapping_lists = {
+        "wiring.safety": _as_list(wiring.get("safety")),
+        "code.arduino.notes": _as_list(arduino.get("notes")),
+        "code.micropython.notes": _as_list(micro.get("notes")),
+        "test.checks": _as_list(test.get("checks")),
+        "challenge.cards": _as_list(challenge.get("cards")),
+        "hero.pills": [p for p in _as_list(_as_dict(lesson.get("hero")).get("pills"))
+                       if not isinstance(p, str)],  # strings are allowed here
+    }
+    if theory is not None:
+        theory_d = _as_dict(theory)
+        mapping_lists["theory.flow"] = _as_list(theory_d.get("flow"))
+        mapping_lists["theory.notes"] = _as_list(theory_d.get("notes"))
+    for name, items in mapping_lists.items():
+        for i, item in enumerate(items):
+            _require_mapping(item, f"{name}[{i}]")
+
     # Every referenced glossary key must resolve
     for topic in sorted(referenced_topics(lesson)):
         _require(errors, topic in glossary_keys,

@@ -116,6 +116,29 @@ class ValidationTests(unittest.TestCase):
         errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
         self.assertTrue(any("must be a mapping" in e for e in errors), errors)
 
+    def test_malformed_nested_lists_reported(self):
+        # every render-dereferenced list is guarded, so a string where a
+        # {symptom, fix} / note / card mapping is expected is caught, not crashed.
+        for path, bad in (
+            (("test", "checks"), ["oops"]),
+            (("challenge", "cards"), ["oops"]),
+            (("theory", "notes"), ["oops"]),
+        ):
+            lesson = load_day26()
+            lesson[path[0]][path[1]] = bad
+            try:
+                errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
+            except AttributeError as exc:  # pragma: no cover
+                self.fail(f"validator crashed on {path}: {exc}")
+            self.assertTrue(any("must be a mapping" in e for e in errors),
+                            f"{path}: {errors}")
+
+    def test_malformed_subblock_reported(self):
+        lesson = load_day26()
+        lesson["hero"]["readout"] = "nope"
+        errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
+        self.assertTrue(any("hero.readout must be a mapping" in e for e in errors), errors)
+
     def test_collect_lessons_passes(self):
         lessons = lesson_schema.collect_lessons()
         self.assertGreaterEqual(len(lessons), 1)
