@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Day 26 · Measure the room with sound — TinySkiff ESP32-S3 Lab</title>
+  <meta name="description" content="Build a tiny digital tape measure with the HC-SR04 ultrasonic sensor. Wire it, upload the sketch, and watch distance readings appear in Serial Monitor." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="prototype-preview.css" />
+</head>
+<body>
+  <div class="lesson-shell">
+
+    <!-- ============================ HERO: THE SOUNDER ==================== -->
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 26 of 30</p>
+        <h1>Measure the room<br />with <em>sound</em></h1>
+        <p class="lede">Today you build a tiny depth sounder. The HC-SR04 sends a ping you can’t hear, listens for the echo, and the ESP32-S3 times the round trip to work out how far away things are — the same trick a boat uses to read the water beneath it.</p>
+        <div class="meta-row" aria-label="Lesson facts">
+          <span class="pill is-key">About 30 minutes</span>
+          <span class="pill">Arduino first</span>
+          <span class="pill">MicroPython optional</span>
+          <span class="pill">No electronics assumed</span>
+        </div>
+      </div>
+
+      <div class="hero-side">
+        <div class="sounder" role="img" aria-label="Animated depth sounder: a sensor sends pings toward a target and reads back a live distance in centimetres.">
+          <div class="sounder-head"><span>Live echo sounder</span><span class="dot" aria-hidden="true"></span></div>
+          <div class="sounder-stage" aria-hidden="true">
+            <span class="sounder-sensor"></span>
+            <span class="ping"></span><span class="ping"></span><span class="ping"></span>
+            <span class="sounder-target" id="sounderTarget"></span>
+          </div>
+          <div class="sounder-readout">
+            <span class="label">Distance</span>
+            <span class="value" id="sounderValue">24.31<small>cm</small></span>
+          </div>
+        </div>
+
+        <div class="agent-strip">
+          <div class="lesson-code">
+            <span class="label">Agent assist code</span>
+            <code>TSK-DAY26-ULTRASONIC</code>
+          </div>
+          <button class="copy-prompt" type="button" data-copy="I am doing TinySkiff lesson TSK-DAY26-ULTRASONIC. Pull the lesson packet, then guide me one step at a time. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <p class="agent-note">Hand this to an agent so it can pull the <a href="agent-lesson-packets/TSK-DAY26-ULTRASONIC.json">lesson packet</a> and coach you step by step.</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- ============================ LAYOUT ============================= -->
+    <div class="layout">
+      <nav class="rail" aria-label="Lesson progress">
+        <div class="rail-head">
+          <strong>Today’s route</strong>
+          <span class="day-of">26 / 30</span>
+        </div>
+        <div class="voyage" aria-hidden="true"><span></span></div>
+        <div class="rail-nav">
+          <a href="#parts"><span class="tick"></span>What you need</a>
+          <a href="#wiring"><span class="tick"></span>Chart the circuit</a>
+          <a href="#steps"><span class="tick"></span>Build it</a>
+          <a href="#code"><span class="tick"></span>Read the code</a>
+          <a href="#theory"><span class="tick"></span>Physics of a ping</a>
+          <a href="#test"><span class="tick"></span>Test &amp; debug</a>
+          <a href="#challenge"><span class="tick"></span>Try this</a>
+          <a href="#agent"><span class="tick"></span>Coach me</a>
+        </div>
+      </nav>
+
+      <main class="lesson-main">
+
+        <!-- ---------------------- PARTS ---------------------- -->
+        <section id="parts" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">01</span> First, know the pieces</p>
+              <h2>What you need</h2>
+              <p class="muted">Six things, nothing more. Tap <em>Define</em> on any part you haven’t met — the answer opens as a field note you can read and dismiss without losing your place.</p>
+            </div>
+            <div class="part-grid">
+              <article class="part-card">
+                <figure class="part-photo"><img src="assets/item-esp32-s3-board.jpg" alt="Official manual photo of the ESP32-S3 development board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>ESP32-S3 board <button class="define" data-topic="esp32">Define</button></h3>
+                <p>The brain that runs your uploaded sketch.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="assets/item-gpio-extension-board.png" alt="Official manual image of the ESP32-S3 GPIO extension board." /><figcaption>Manual photo</figcaption></figure>
+                <h3>GPIO extension board <button class="define" data-topic="gpio">Define</button></h3>
+                <p>Spreads the pins into rows you can reach and label.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="assets/item-hcsr04-ultrasonic-sensor.jpg" alt="Official manual image of the HC-SR04 ultrasonic distance sensor." /><figcaption>Manual photo</figcaption></figure>
+                <h3>HC-SR04 sensor <button class="define" data-topic="hcsr04">Define</button></h3>
+                <p>The distance sensor with two round transducers.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="assets/item-jumper-wire.png" alt="Official manual image of a jumper wire." /><figcaption>Manual photo</figcaption></figure>
+                <h3>4 jumper wires <button class="define" data-topic="jumpers">Define</button></h3>
+                <p>Temporary, solder-free connections.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="assets/item-arduino-ide.png" alt="Official manual screenshot of the Arduino IDE interface." /><figcaption>Manual screenshot</figcaption></figure>
+                <h3>Arduino IDE <button class="define" data-topic="arduino">Define</button></h3>
+                <p>Uploads code and opens Serial Monitor.</p>
+              </article>
+              <article class="part-card">
+                <figure class="part-photo"><img src="assets/item-official-sketch.png" alt="Official manual page showing the Ultrasonic Ranging sketch and Serial Monitor output." /><figcaption>Manual sketch</figcaption></figure>
+                <h3>Official sketch <button class="define" data-topic="sketch">Define</button></h3>
+                <p><code>Sketch_19.1_Ultrasonic_Ranging.ino</code></p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------------------- WIRING ---------------------- -->
+        <section id="wiring" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">02</span> Make the physical circuit</p>
+              <h2>Chart the circuit</h2>
+              <p class="muted">The official Freenove diagram is your chart. Click it to enlarge. Each connection below tells you where the wire goes and why it’s there — hover a row to light it up.</p>
+            </div>
+            <div class="wire-layout">
+              <figure class="image-frame">
+                <button class="zoom" type="button" data-zoom="assets/prototype-day-26-ultrasonic-c-tutorial-page-172.png" data-cap="Official Freenove circuit, C Tutorial Chapter 19, page 172.">
+                  <img src="assets/prototype-day-26-ultrasonic-c-tutorial-page-172.png" alt="Official Freenove diagram showing HC-SR04 VCC connected to 5V, Trig to GPIO 13, Echo to GPIO 14, and GND to ground on the ESP32-S3 GPIO extension board." />
+                  <span class="zoom-hint">Click to enlarge</span>
+                </button>
+                <figcaption class="caption">Official Freenove circuit — C Tutorial, Chapter 19, page 172. Production lessons keep this source and attribution.</figcaption>
+              </figure>
+              <div class="pin-table" aria-label="HC-SR04 wiring">
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>VCC <button class="define" data-topic="vcc">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">5V</span>
+                  <span class="pin-why">Powers the ultrasonic sensor.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>Trig <button class="define" data-topic="trig">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GPIO 13</span>
+                  <span class="pin-why">The board sends a short “start” pulse here.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>Echo <button class="define" data-topic="echo">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GPIO 14</span>
+                  <span class="pin-why">The sensor returns a timed pulse here.</span>
+                </div>
+                <div class="pin-row">
+                  <span class="pin-name"><span class="pin-dot"></span>GND <button class="define" data-topic="gnd">Define</button></span>
+                  <span class="pin-arrow">→</span><span class="pin-dest">GND</span>
+                  <span class="pin-why">Gives board and sensor the same zero point.</span>
+                </div>
+              </div>
+            </div>
+            <div class="callout">
+              <div class="icon" aria-hidden="true">⚓</div>
+              <p><strong>Check before power.</strong> Keep the sensor pins in the order printed on the module — VCC, Trig, Echo, GND — and unplug USB before you move any wire.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------------------- BUILD STEPS ---------------------- -->
+        <section id="steps" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">03</span> One action at a time</p>
+              <h2>Build it</h2>
+              <p class="muted">This is the main path — you can finish the day without opening a single field note. Tap each step as you go to keep your place.</p>
+            </div>
+            <div class="steps-progress">
+              <div class="bar" aria-hidden="true"><span id="stepBar"></span></div>
+              <span class="count" id="stepCount">0 / 7 done</span>
+            </div>
+            <ol class="step-list">
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 1 done"></button><p class="text">Place the HC-SR04 so the two round transducers face outward, away from loose wires.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 2 done"></button><p class="text">Connect <code>VCC → 5V</code>, <code>Trig → GPIO 13</code>, <code>Echo → GPIO 14</code>, and <code>GND → GND</code>.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">Pause and compare your wiring to the chart before powering or uploading.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">Open <code>Sketch_19.1_Ultrasonic_Ranging.ino</code> in Arduino IDE.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Upload the sketch to the ESP32-S3.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 6 done"></button><p class="text">Open Serial Monitor and set the baud rate to <code>115200</code>. <button class="define" data-topic="serial">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 7 done"></button><p class="text">Hold a flat object 10–30 cm in front of the sensor and move it slowly closer and farther.</p></li>
+            </ol>
+            <div class="done-banner" id="doneBanner" role="status">
+              <span class="icon" aria-hidden="true">🌊</span>
+              <div><strong>Sounder’s live.</strong><p>Your ESP32-S3 is now reading the room by ear. Head to Test &amp; debug to confirm the numbers.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------------------- CODE FOCUS ---------------------- -->
+        <section id="code" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">04</span> Read just enough code</p>
+              <h2>Read the code</h2>
+              <p class="muted">You don’t need the whole sketch today — just four lines that do the real work. Switch to MicroPython if you’d rather see the same idea in Python; the wiring never changes.</p>
+            </div>
+
+            <div class="tabs" role="tablist" aria-label="Code language">
+              <button class="tab" id="tab-arduino" role="tab" aria-selected="true" aria-controls="panel-arduino">Arduino <span class="badge">Main</span></button>
+              <button class="tab" id="tab-micropython" role="tab" aria-selected="false" aria-controls="panel-micropython">MicroPython <span class="badge">Optional</span></button>
+            </div>
+
+            <!-- Arduino panel -->
+            <div class="tabpanel" id="panel-arduino" role="tabpanel" aria-labelledby="tab-arduino">
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">Sketch_19.1_Ultrasonic_Ranging.ino</span></div>
+<pre><code><span class="tok-key">#define</span> trigPin <span class="tok-num">13</span>
+<span class="tok-key">#define</span> echoPin <span class="tok-num">14</span>
+
+pingTime = <span class="tok-fn">pulseIn</span>(echoPin, HIGH, timeOut);
+distance = (<span class="tok-key">float</span>)pingTime * soundVelocity / <span class="tok-num">2</span> / <span class="tok-num">10000</span>;</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>#define trigPin 13</code><span class="note-text">Names GPIO 13 <code>trigPin</code> so the rest of the sketch reads plainly. <button class="define" data-topic="define">Define</button></span></div>
+                  <div class="code-note"><code>pulseIn(echoPin, HIGH, timeOut)</code><span class="note-text">Times how long Echo stays HIGH — that’s the raw measurement. <button class="define" data-topic="pulsein">Define</button></span></div>
+                  <div class="code-note"><code>… / 2 / 10000</code><span class="note-text">Sound goes out <em>and</em> back, so halve it; the <code>/ 10000</code> just lands the answer in centimetres. <button class="define" data-topic="divideTwo">Define</button></span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- MicroPython panel -->
+            <div class="tabpanel" id="panel-micropython" role="tabpanel" aria-labelledby="tab-micropython" hidden>
+              <p class="optional-tag">Optional side path · same circuit</p>
+              <div class="code-panel">
+                <div class="code-titlebar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="file">18.1_Ultrasonic_Ranging/Ultrasonic_Ranging.py</span></div>
+<pre><code>trigPin = <span class="tok-fn">Pin</span>(<span class="tok-num">13</span>, Pin.OUT, <span class="tok-num">0</span>)
+echoPin = <span class="tok-fn">Pin</span>(<span class="tok-num">14</span>, Pin.IN, <span class="tok-num">0</span>)</code></pre>
+                <div class="code-notes">
+                  <div class="code-note"><code>Pin(13, Pin.OUT, 0)</code><span class="note-text">Sets GPIO 13 as the trigger <strong>output</strong> — the board’s side of the ping.</span></div>
+                  <div class="code-note"><code>Pin(14, Pin.IN, 0)</code><span class="note-text">Sets GPIO 14 as the echo <strong>input</strong> — where the return pulse arrives.</span></div>
+                </div>
+              </div>
+              <p class="micropython-note">Same pins, same behaviour. Run it in Thonny and compare the printed distance with the Arduino version. If MicroPython isn’t set up yet, skip this — it should never block the Arduino-first day.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------------------- THEORY ---------------------- -->
+        <section id="theory" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">05</span> Understand, don’t memorise</p>
+              <h2>Physics of a ping</h2>
+              <p class="muted">The whole day is one loop, running many times a second. It’s the same idea as counting the seconds between lightning and thunder.</p>
+            </div>
+            <div class="theory-flow" aria-label="Ultrasonic measurement model">
+              <article class="flow-step"><span class="n">Send a ping</span><h3>Trig fires</h3><p>Trig tells the sensor to emit a short pulse above human hearing.</p></article>
+              <article class="flow-step"><span class="n">Wait for echo</span><h3>It bounces</h3><p>The pulse hits an object and some of it returns.</p></article>
+              <article class="flow-step"><span class="n">Measure time</span><h3>Echo holds HIGH</h3><p>Echo stays HIGH for exactly the round-trip time.</p></article>
+              <article class="flow-step"><span class="n">Convert</span><h3>Time → distance</h3><p>Time × speed of sound gives how far the pulse travelled.</p></article>
+            </div>
+            <div class="formula-card">
+              <span class="label">Useful model</span>
+              <code>distance = <b>speed of sound</b> × <b>echo time</b> ÷ 2</code>
+            </div>
+            <div class="two-col" style="margin-top:14px">
+              <article class="mini-card"><h3>Why readings wobble <button class="define" data-topic="wobble">Define</button></h3><p>Real sensors react to object shape, angle, movement, and air. A little wobble is normal — watch the trend, not one number.</p></article>
+              <article class="mini-card"><h3>Why flat targets help <button class="define" data-topic="flat">Define</button></h3><p>Flat objects bounce more sound straight back. Curved or soft ones scatter it, so the echo gets weaker.</p></article>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------------------- TEST + DEBUG ---------------------- -->
+        <section id="test" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">06</span> Know it worked</p>
+              <h2>Test &amp; debug</h2>
+              <p class="muted">Success and recovery sit side by side, so you never have to go hunting when something looks off.</p>
+            </div>
+            <div class="test-grid">
+              <div>
+                <span class="readout-title">What you should see</span>
+                <div class="serial" aria-label="Expected Serial Monitor output">
+                  <div class="bar"><span>Serial Monitor</span><span class="baud">115200 baud</span></div>
+                  <div class="lines"><span>Distance: 24.31cm</span><span>Distance: 23.92cm</span><span>Distance: 24.08cm</span></div>
+                </div>
+                <p class="micropython-note">A good reading changes when you move the object. Small wobble is fine.</p>
+              </div>
+              <div>
+                <span class="checks-title">If it doesn’t</span>
+                <ul class="checklist">
+                  <li><strong>0 cm or frozen?</strong> Check Trig, Echo, GND, and the target’s shape.</li>
+                  <li><strong>Blank monitor?</strong> Confirm 115200 baud, then the board and port.</li>
+                  <li><strong>Upload fails?</strong> Swap in a data-capable USB cable.</li>
+                  <li><strong>Readings jump?</strong> Aim straight at a flat object.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------------------- CHALLENGE ---------------------- -->
+        <section id="challenge" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">07</span> Make the idea yours</p>
+              <h2>Try this: a mini range log</h2>
+              <p class="muted">Same working setup, one new skill: turning a measurement into a judgement. It fits inside today’s 30 minutes.</p>
+            </div>
+            <div class="two-col">
+              <article class="mini-card"><h3>Measure three targets</h3><p>A book, a wall, and one object you pick. Note the expected distance, the reading, and anything odd.</p></article>
+              <article class="mini-card"><h3>Choose a threshold <button class="define" data-topic="threshold">Define</button></h3><p>Pick a “too close” distance — say 15 cm. Later that line can become a beep or a warning.</p></article>
+            </div>
+            <div class="logbook">
+              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
+              <label>What did you measure today?<textarea rows="2"></textarea></label>
+              <label>Which reading seemed most stable?<textarea rows="2"></textarea></label>
+              <label>What would you build if the sensor could warn you something’s too close?<textarea rows="2"></textarea></label>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------------------- AGENT ---------------------- -->
+        <section id="agent" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">08</span> Learn it with a hand on the tiller</p>
+              <h2>Coach me through it</h2>
+              <p class="muted">Every lesson ships with a code and a machine-readable packet, so an agent can guide you with full context.</p>
+            </div>
+            <div class="agent-grid">
+              <article class="mini-card"><h3>Lesson code</h3><p><code>TSK-DAY26-ULTRASONIC</code></p></article>
+              <article class="mini-card"><h3>Context packet</h3><p><a href="agent-lesson-packets/TSK-DAY26-ULTRASONIC.json">Open the JSON packet →</a></p></article>
+            </div>
+            <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
+              <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
+              <p><strong>How the agent should behave:</strong> guide one physical step at a time, wait for you to confirm, explain terms on request, and always check wiring, board, port, and USB before changing code.</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- ---------------------- COLOPHON ---------------------- -->
+    <footer class="colophon">
+      <p><strong>Prototype — Day 26 of the TinySkiff ESP32-S3 Lab.</strong> A cheap content/page prototype for <a href="https://github.com/skip-agent/freenove-esp32-s3-docs/issues/5">issue #5</a>, testing how one complete guided day feels: images, wiring, code, a challenge, debugging, and an optional MicroPython path together.</p>
+      <div class="rule"></div>
+      <p>Circuit diagram and code based on official Freenove Super Starter Kit for ESP32-S3 material — C Tutorial, Chapter 19, page 172; sketch <code>Sketch_19.1_Ultrasonic_Ranging.ino</code>; MicroPython <code>18.1_Ultrasonic_Ranging.py</code>. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+    </footer>
+  </div>
+
+  <!-- ---------------------- LIGHTBOXES ---------------------- -->
+  <dialog class="lightbox" id="explainer">
+    <div class="lb-head">
+      <div>
+        <span class="lb-kicker">Field note</span>
+        <h3 id="explainerTitle"></h3>
+      </div>
+      <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="lb-body"><p id="explainerBody"></p></div>
+    <div class="lb-shortcut"><span class="tag">Shortcut</span><span id="explainerShortcut"></span></div>
+  </dialog>
+
+  <dialog class="lightbox image" id="imageBox">
+    <button class="lb-close" type="button" data-close aria-label="Close">×</button>
+    <div class="lb-body"><img id="imageBoxImg" alt="" /></div>
+    <p class="lb-cap" id="imageBoxCap"></p>
+  </dialog>
+
+  <div class="toast" id="toast">Prompt copied</div>
+
+  <script src="prototype-preview.js"></script>
+</body>
+</html>
