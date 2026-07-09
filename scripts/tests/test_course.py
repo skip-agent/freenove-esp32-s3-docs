@@ -165,6 +165,24 @@ class ValidationTests(unittest.TestCase):
         errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
         self.assertTrue(any("hero.readout must be a mapping" in e for e in errors), errors)
 
+    def test_blank_step_string_fails(self):
+        lesson = load_day26()
+        lesson["steps"]["items"][0] = None  # blank YAML step
+        errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
+        self.assertTrue(any("steps.items[0] must be a non-empty string" in e for e in errors), errors)
+
+    def test_nested_mapping_required_field_fails(self):
+        lesson = load_day26()
+        lesson["test"]["checks"][0]["fix"] = ""  # blank fix
+        errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
+        self.assertTrue(any("test.checks[0].fix is required" in e for e in errors), errors)
+
+    def test_blank_logbook_prompt_fails(self):
+        lesson = load_day26()
+        lesson["challenge"]["logbook"][1] = None
+        errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
+        self.assertTrue(any("challenge.logbook[1]" in e for e in errors), errors)
+
     def test_collect_lessons_passes(self):
         lessons = lesson_schema.collect_lessons()
         self.assertGreaterEqual(len(lessons), 1)

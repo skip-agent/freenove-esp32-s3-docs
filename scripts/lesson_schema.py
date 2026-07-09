@@ -272,33 +272,57 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
     _require(errors, _nonempty(source.get("license")),
              f"{code}: source.license is required")
 
-    # Shape guard — every list/sub-block the renderer dereferences with .get must
-    # hold mappings, so a malformed authoring shape fails here with a clear error
-    # rather than crashing render (the build aborts on any error before rendering).
+    # Shape guard — everything the renderer emits is validated here so a malformed
+    # authoring shape fails with a clear error rather than crashing render or
+    # shipping blank content (the build aborts on any error before rendering).
     micro = _as_dict(_as_dict(lesson.get("code")).get("micropython"))
     for name, sub in (("hero", lesson.get("hero")),
                       ("hero.readout", _as_dict(lesson.get("hero")).get("readout")),
                       ("steps.done", _as_dict(lesson.get("steps")).get("done")),
-                      ("code.micropython", lesson.get("code", {}).get("micropython")
-                          if isinstance(lesson.get("code"), dict) else None)):
+                      ("code.micropython", code_block.get("micropython"))):
         if sub is not None and not isinstance(sub, dict):
             err(f"{name} must be a mapping")
-    mapping_lists = {
-        "wiring.safety": _as_list(wiring.get("safety")),
-        "code.arduino.notes": _as_list(arduino.get("notes")),
-        "code.micropython.notes": _as_list(micro.get("notes")),
-        "test.checks": _as_list(test.get("checks")),
-        "challenge.cards": _as_list(challenge.get("cards")),
-        "hero.pills": [p for p in _as_list(_as_dict(lesson.get("hero")).get("pills"))
-                       if not isinstance(p, str)],  # strings are allowed here
+
+    # Lists of mappings — each item must be a mapping with its required fields.
+    mapping_specs = {
+        "wiring.safety": (_as_list(wiring.get("safety")), ("label", "body")),
+        "code.arduino.notes": (_as_list(arduino.get("notes")), ("code", "text")),
+        "code.micropython.notes": (_as_list(micro.get("notes")), ("code", "text")),
+        "test.checks": (_as_list(test.get("checks")), ("symptom", "fix")),
+        "challenge.cards": (_as_list(challenge.get("cards")), ("title", "body")),
     }
     if theory is not None:
         theory_d = _as_dict(theory)
-        mapping_lists["theory.flow"] = _as_list(theory_d.get("flow"))
-        mapping_lists["theory.notes"] = _as_list(theory_d.get("notes"))
-    for name, items in mapping_lists.items():
+        mapping_specs["theory.flow"] = (_as_list(theory_d.get("flow")), ("n", "title", "body"))
+        mapping_specs["theory.notes"] = (_as_list(theory_d.get("notes")), ("title", "body"))
+    for name, (items, req_fields) in mapping_specs.items():
         for i, item in enumerate(items):
-            _require_mapping(item, f"{name}[{i}]")
+            if not _require_mapping(item, f"{name}[{i}]"):
+                continue
+            for field in req_fields:
+                _require(errors, _nonempty(item.get(field)),
+                         f"{code}: {name}[{i}].{field} is required")
+
+    # Lists of plain strings the renderer emits — each entry must be real text.
+    string_lists = {
+        "steps.items": _as_list(_as_dict(lesson.get("steps")).get("items")),
+        "test.expected": _as_list(test.get("expected")),
+        "challenge.logbook": _as_list(challenge.get("logbook")),
+        "agent.coachInstructions": _as_list(agent.get("coachInstructions")),
+    }
+    for name, items in string_lists.items():
+        for i, item in enumerate(items):
+            _require(errors, _nonempty(item),
+                     f"{code}: {name}[{i}] must be a non-empty string")
+
+    # hero.pills — a plain string or a mapping carrying non-empty `text`.
+    for i, pill in enumerate(_as_list(_as_dict(lesson.get("hero")).get("pills"))):
+        if isinstance(pill, dict):
+            _require(errors, _nonempty(pill.get("text")),
+                     f"{code}: hero.pills[{i}].text is required")
+        else:
+            _require(errors, _nonempty(pill),
+                     f"{code}: hero.pills[{i}] must be a non-empty string")
 
     # Every referenced glossary key must resolve
     for topic in sorted(referenced_topics(lesson)):
