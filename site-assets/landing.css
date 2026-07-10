@@ -211,6 +211,9 @@ section,
   font-size: .95rem;
   margin-bottom: .35rem;
 }
+/* app.js toggles the `hidden` attribute; don't let display override it, or a
+   fresh visitor with no saved progress sees a dead "Resume →" link. */
+.voyage-resume[hidden] { display: none; }
 .voyage-resume:hover { text-decoration: underline; }
 
 .voyage-note {
