@@ -134,7 +134,7 @@ def copy_assets() -> None:
 FONTS_HEAD = (
     '<link rel="preconnect" href="https://fonts.googleapis.com" />\n'
     '  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />\n'
-    '  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />'
+    '  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />'
 )
 
 
@@ -146,10 +146,11 @@ def render_html(data: dict, ctx: dict) -> str:
     """Render the course-forward landing (`/`).
 
     The course is the product: the hero leads with the 30-day voyage and a live
-    progress instrument (localStorage, shared with the course map), the six arcs
-    preview one click from the full map, and the searchable reference Library is
-    a clearly-signposted secondary band below. Styling is the course's own
-    "echo-sounder" system (course.css) so `/` and `/course/` read as one site.
+    progress tracker (localStorage, shared with the course map), the arcs preview
+    one click from the full map, and the searchable reference Library is a clearly
+    secondary band below. The landing carries its own light, minimal design
+    (landing.css) — approachable for a first-time ESP32 learner — and does not
+    inherit the course pages' heavier styling.
     """
     payload = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
     course_payload = json.dumps({
@@ -162,13 +163,16 @@ def render_html(data: dict, ctx: dict) -> str:
     day1_href = f"./course/{ctx['day1Slug']}/" if ctx["day1Slug"] else "./course/"
 
     legs = []
-    for leg in ctx["legs"]:
+    for i, leg in enumerate(ctx["legs"], start=1):
         rng = _day_range(leg["dayFrom"], leg["dayTo"])
         href = f"./course/{leg['startSlug']}/" if leg["startSlug"] else "./course/"
         legs.append(f"""        <a class=\"leg\" href=\"{href}\">
-          <span class=\"leg-range mono\">{rng}</span>
-          <span class=\"leg-name\">{html.escape(leg['name'])}</span>
-          <span class=\"leg-sub\">{html.escape(leg['subtitle'])}</span>
+          <span class=\"leg-no mono\">{i:02d}</span>
+          <span class=\"leg-body\">
+            <span class=\"leg-range mono\">{rng}</span>
+            <span class=\"leg-name\">{html.escape(leg['name'])}</span>
+            <span class=\"leg-sub\">{html.escape(leg['subtitle'])}</span>
+          </span>
         </a>""")
     legs_html = "\n".join(legs)
     leg_words = {
@@ -180,8 +184,8 @@ def render_html(data: dict, ctx: dict) -> str:
     counts = (
         (len(data["projectsC"]), "C / Arduino sketches"),
         (len(data["projectsPython"]), "MicroPython projects"),
-        (len(data["libraries"]), "Libraries"),
-        (len(data["pdfs"]), "Datasheets & PDFs"),
+        (len(data["libraries"]), "libraries"),
+        (len(data["pdfs"]), "datasheets & PDFs"),
     )
     stats_html = "\n".join(
         f'          <div class=\"lib-stat\"><b>{n}</b><span>{label}</span></div>'
@@ -196,52 +200,51 @@ def render_html(data: dict, ctx: dict) -> str:
   <meta name=\"description\" content=\"A guided, Arduino-first 30-day course for the Freenove Super Starter Kit for ESP32-S3 — plus a searchable library of every official sketch, example, and datasheet.\" />
   <title>{title}</title>
   {FONTS_HEAD}
-  <link rel=\"stylesheet\" href=\"./course/course.css\" />
   <link rel=\"stylesheet\" href=\"./landing.css\" />
 </head>
 <body>
-  <div class=\"lesson-shell\">
-    <header class=\"hero map-hero\" id=\"top\">
-      <div class=\"hero-copy\">
-        <p class=\"eyebrow\">TinySkiff · ESP32-S3 Lab</p>
-        <h1>Learn the ESP32-S3 in <em>30 guided days</em>.</h1>
-        <p class=\"lede\">An Arduino-first course built on the Freenove Super Starter Kit. Each day you wire one circuit, run it, and understand why it works — about 30 minutes, one real win.</p>
-        <div class=\"cta-row\">
-          <a class=\"btn-primary\" href=\"{day1_href}\">Start Day 1 →</a>
-          <a class=\"btn-ghost\" href=\"./course/\">See the 30-day map</a>
-        </div>
-        <p class=\"hero-foot mono\">Free · No account · Runs in your browser</p>
-      </div>
-      <div class=\"hero-side\">
-        <div class=\"map-progress\" id=\"mapProgress\">
-          <div class=\"map-progress-head\"><span>Your voyage</span><span class=\"dot\" aria-hidden=\"true\"></span></div>
-          <div class=\"map-progress-body\">
-            <span class=\"map-progress-count\"><b id=\"doneCount\">0</b> / {ctx['total']} days logged</span>
-            <div class=\"voyage\" id=\"mapVoyage\"><span></span></div>
-            <a class=\"map-resume\" id=\"mapResume\" href=\"#\" hidden>Resume →</a>
-            <p class=\"first-run mono\" id=\"firstRun\">Cast off with Day 1 — your place is saved as you go.</p>
+  <div class=\"page\">
+    <header class=\"hero\" id=\"top\">
+      <div class=\"hero-grid\">
+        <div class=\"hero-copy\">
+          <p class=\"eyebrow\">TinySkiff · ESP32-S3 Lab</p>
+          <h1>Learn the ESP32-S3 in <span class=\"hl\">30 guided days</span>.</h1>
+          <p class=\"lede\">A friendly, Arduino-first course built on the Freenove Super Starter Kit. Each day you wire one small circuit, run it, and understand why it works — about 30 minutes, one real win.</p>
+          <div class=\"cta-row\">
+            <a class=\"btn btn-primary\" href=\"{day1_href}\">Start Day 1 →</a>
+            <a class=\"btn btn-ghost\" href=\"./course/\">See the 30-day map</a>
           </div>
+          <p class=\"hero-foot\">Free · No account · Runs in your browser</p>
         </div>
+        <aside class=\"voyage-card\" id=\"mapProgress\" aria-label=\"Your course progress\">
+          <div class=\"voyage-head\">
+            <span class=\"voyage-title\">Your voyage</span>
+            <span class=\"voyage-count\"><b id=\"doneCount\">0</b> / {ctx['total']} days</span>
+          </div>
+          <div class=\"voyage\" id=\"mapVoyage\" role=\"img\" aria-label=\"Days completed\"></div>
+          <a class=\"voyage-resume\" id=\"mapResume\" href=\"#\" hidden>Resume →</a>
+          <p class=\"voyage-note\" id=\"firstRun\">Cast off with Day 1 — your place is saved as you go.</p>
+        </aside>
       </div>
     </header>
 
-    <main class=\"course-body\">
+    <main>
       <section class=\"legs-section\">
-        <p class=\"eyebrow\">The voyage</p>
-        <h2 class=\"section-h2\">{leg_count_word} legs, thirty days.</h2>
-        <p class=\"section-sub\">The course runs as one voyage — from first light to the open network. Jump into any leg, or follow it day by day.</p>
+        <div class=\"section-head\">
+          <p class=\"eyebrow\">The voyage</p>
+          <h2 class=\"section-h2\">{leg_count_word} legs, thirty days.</h2>
+          <p class=\"section-sub\">The course runs as one voyage — from first light to the open network. Start at the beginning, or jump into any leg.</p>
+        </div>
         <div class=\"legs\">
 {legs_html}
         </div>
       </section>
 
       <section class=\"lib\" id=\"library\">
-        <div class=\"lib-banner\">
-          <div class=\"lib-banner-copy\">
-            <p class=\"eyebrow\">The reference library</p>
-            <h2>Every official example, in one searchable place.</h2>
-            <p>Already comfortable with the board? Skip the course and browse every sketch, example, library, and datasheet from the official kit — no spelunking through a 200&nbsp;MB ZIP.</p>
-          </div>
+        <div class=\"section-head\">
+          <p class=\"eyebrow\">The reference library · optional</p>
+          <h2 class=\"section-h2\">Every official example, in one searchable place.</h2>
+          <p class=\"section-sub\">Already comfortable with the board? Skip the course and browse every sketch, example, library, and datasheet from the official kit — no spelunking through a 200&nbsp;MB ZIP.</p>
           <div class=\"lib-stats\">
 {stats_html}
           </div>
@@ -264,7 +267,7 @@ def render_html(data: dict, ctx: dict) -> str:
             <div id=\"libraries\" class=\"res-list\"></div>
           </article>
           <article class=\"res-card\">
-            <h3>Docs & datasheets</h3>
+            <h3>Docs &amp; datasheets</h3>
             <div id=\"pdfs\" class=\"res-list compact\"></div>
           </article>
         </div>
@@ -273,7 +276,6 @@ def render_html(data: dict, ctx: dict) -> str:
 
     <footer class=\"colophon\">
       <p><strong>TinySkiff ESP32-S3 Lab.</strong> A guided course and library built on the official Freenove Super Starter Kit for ESP32-S3 material, released under CC BY-NC-SA 3.0. Not affiliated with or endorsed by Freenove.</p>
-      <div class=\"rule\"></div>
       <div class=\"src-links\">
         <a href=\"{REPO_URL}\">Official GitHub repo</a>
         <a href=\"{GITHUB_ZIP}\">Official ZIP archive</a>

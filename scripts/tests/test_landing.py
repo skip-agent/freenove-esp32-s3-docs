@@ -84,10 +84,14 @@ class LandingRenderTests(unittest.TestCase):
         self.assertIn('"taughtInDay"', self.html)
         self.assertIn("day-03-blink", self.html)
 
-    def test_uses_course_design_system(self):
-        self.assertIn("./course/course.css", self.html)
+    def test_landing_has_own_minimal_design(self):
+        # The redesigned landing carries its own light stylesheet and no longer
+        # inherits the heavier course "echo-sounder" styling.
         self.assertIn("./landing.css", self.html)
+        self.assertNotIn("./course/course.css", self.html)
         self.assertNotIn("styles.css", self.html)
+        # the flagged "AI slop" tell (high-contrast display serif) is gone
+        self.assertNotIn("Fraunces", self.html)
 
 
 class BuildCourseCtxTests(unittest.TestCase):

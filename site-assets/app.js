@@ -109,12 +109,27 @@ const store = {
   if (!total) return;
   const days = course.publishedDays || [];
   const slugs = course.slugs || {};
-  const done = days.filter(d => store.isDone(d)).length;
+  const doneSet = new Set(days.filter(d => store.isDone(d)));
+  const done = doneSet.size;
 
   const doneCount = document.getElementById('doneCount');
   if (doneCount) doneCount.textContent = String(done);
-  const bar = document.querySelector('#mapVoyage span');
-  if (bar) bar.style.width = (done / total) * 100 + '%';
+
+  // One pip per day of the voyage — filled for days logged, outlined for the
+  // next unlogged day. A friendly, meaningful tracker rather than a gauge.
+  const voyage = document.getElementById('mapVoyage');
+  if (voyage) {
+    const resumeDay = store.getResume();
+    voyage.textContent = '';
+    for (let d = 1; d <= total; d++) {
+      const pip = document.createElement('span');
+      pip.className = 'pip';
+      if (doneSet.has(d)) pip.classList.add('is-done');
+      else if (d === resumeDay) pip.classList.add('is-next');
+      pip.title = `Day ${d}`;
+      voyage.appendChild(pip);
+    }
+  }
 
   const resume = store.getResume();
   const resumeLink = document.getElementById('mapResume');
