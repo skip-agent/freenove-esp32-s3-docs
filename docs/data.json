@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-09T09:00:56+00:00",
+  "generatedAt": "2026-07-10T07:04:41+00:00",
   "projectsC": [
     {
       "track": "C / Arduino",
@@ -11,7 +11,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n* Filename    : Blink\n* Description : Make an led blinking.\n* Auther      : www.freenove.com\n* Modification: 2022/10/19\n**********************************************************************/\n#define LED_BUILTIN  2\n// the setup function runs once when you press reset or power the board\nvoid setup() {\n  // initialize digital pin LED_BUILTIN as an output.\n  pinMode(LED_BUILTIN, OUTPUT);\n}\n\n// the loop function runs over and over again forever\nvoid loop() {\n  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)\n  delay(1000);                       // wait for a second\n  digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW\n  delay(1000);                       // wait for a second\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_01.1_Blink",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 3,
+        "slug": "day-03-blink",
+        "title": "Blink: prove the whole chain works"
+      }
     },
     {
       "track": "C / Arduino",
@@ -23,7 +28,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : ButtonAndLed\n  Description : Control led by button.\n  Auther      : www.freenove.com\n  Modification: 2022/10/19\n**********************************************************************/\n#define PIN_LED    2\n#define PIN_BUTTON 13\n// the setup function runs once when you press reset or power the board\nvoid setup() {\n  // initialize digital pin PIN_LED as an output.\n  pinMode(PIN_LED, OUTPUT);\n  pinMode(PIN_BUTTON, INPUT);\n}\n\n// the loop function runs over and over again forever\nvoid loop() {\n  if (digitalRead(PIN_BUTTON) == LOW) {\n    digitalWrite(PIN_LED,HIGH);\n  }else{\n    digitalWrite(PIN_LED,LOW);\n  }\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_02.1_ButtonAndLed",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 4,
+        "slug": "day-04-button",
+        "title": "Make a button light an LED"
+      }
     },
     {
       "track": "C / Arduino",
@@ -35,7 +45,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : TableLamp\n  Description : Control led by button.\n  Auther      : www.freenove.com\n  Modification: 2022/10/19\n**********************************************************************/\n#define PIN_LED    2\n#define PIN_BUTTON 13\n// the setup function runs once when you press reset or power the board\nvoid setup() {\n  // initialize digital pin PIN_LED as an output.\n  pinMode(PIN_LED, OUTPUT);\n  pinMode(PIN_BUTTON, INPUT);\n}\n\n// the loop function runs over and over again forever\nvoid loop() {\n  if (digitalRead(PIN_BUTTON) == LOW) {\n    delay(20);\n    if (digitalRead(PIN_BUTTON) == LOW) {\n      reverseGPIO(PIN_LED);\n    }\n    while (digitalRead(PIN_BUTTON) == LOW);\n    delay(20);\n    while (digitalRead(PIN_BUTTON) == LOW);\n  }\n}\n\nvoid reverseGPIO(int pin) {\n  digitalWrite(pin, !digitalRead(pin));\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_02.2_TableLamp",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 5,
+        "slug": "day-05-table-lamp",
+        "title": "Make a mini table lamp"
+      }
     },
     {
       "track": "C / Arduino",
@@ -47,7 +62,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : FlowingLight\n  Description : Using ledbar to demonstrate flowing lamp.\n  Auther      : www.freenove.com\n  Modification: 2022/10/20\n**********************************************************************/\nbyte ledPins[] = {21, 47, 48, 38, 39, 40, 41, 42, 2, 1};\nint ledCounts;\n\nvoid setup() {\n  ledCounts = sizeof(ledPins);\n  for (int i = 0; i < ledCounts; i++) {\n    pinMode(ledPins[i], OUTPUT);\n  }\n}\n\nvoid loop() {\n  for (int i = 0; i < ledCounts; i++) {\n    digitalWrite(ledPins[i], HIGH);\n    delay(100);\n    digitalWrite(ledPins[i], LOW);\n  }\n  for (int i = ledCounts - 1; i > -1; i--) {\n    digitalWrite(ledPins[i], HIGH);\n    delay(100);\n    digitalWrite(ledPins[i], LOW);\n  }\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_03.1_FlowingLight",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 6,
+        "slug": "day-06-led-bar",
+        "title": "Make ten lights flow like water"
+      }
     },
     {
       "track": "C / Arduino",
@@ -59,7 +79,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : BreathingLight\n  Description : Make led light fade in and out, just like breathing.\n  Auther      : www.freenove.com\n  Modification: 2024/07/01\n**********************************************************************/\n#define PIN_LED   2     //define the led pin\n#define CHN       0     //define the pwm channel\n#define FRQ       1000  //define the pwm frequency\n#define PWM_BIT   8     //define the pwm precision\nvoid setup() {\n  ledcAttachChannel(PIN_LED, FRQ, PWM_BIT, CHN);  //attach the led pin to pwm channel\n}\n\nvoid loop() {\n  for (int i = 0; i < 255; i++) { //make light fade in\n    ledcWrite(PIN_LED, i);\n    delay(10);\n  }\n  for (int i = 255; i > -1; i--) {  //make light fade out\n    ledcWrite(PIN_LED, i);\n    delay(10);\n  }\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_04.1_BreathingLight",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 7,
+        "slug": "day-07-breathing",
+        "title": "Make an LED breathe"
+      }
     },
     {
       "track": "C / Arduino",
@@ -71,7 +96,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : FlowingLight2\n  Description : More cool flowing light.\n  Auther      : www.freenove.com\n  Modification: 2024/07/01\n**********************************************************************/\nconst byte ledPins[] = {21, 47, 38, 39, 40, 41, 42, 2};  //define led pins\nconst byte chns[] = {0, 1, 2, 3, 4, 5, 6, 7};  //define the pwm channels\nconst int dutys[] = {0, 0, 0, 0, 0, 0, 0, 0,\n                     1023, 512, 256, 128, 64, 32, 16, 8,\n                     0, 0, 0, 0, 0, 0, 0, 0\n                    };  //define the pwm dutys\nint ledCounts;\nint delayTimes = 50;  //flowing speed ,the smaller, the faster\nvoid setup() {\n  ledCounts = sizeof(ledPins);  //get the led counts\n  for (int i = 0; i < ledCounts; i++) {  //setup the pwm channels\n    ledcAttachChannel(ledPins[i], 1000, 10, chns[i]);\n  }\n}\n\nvoid loop() {\n  for (int i = 0; i < 16; i++) {        //flowing one side to other side\n    for (int j = 0; j < ledCounts; j++) {\n      ledcWrite(ledPins[j], dutys[i + j]);\n    }\n    delay(delayTimes);\n  }\n  for (int i = 0; i < 16; i++) {      //flowing one side to other side\n    for (int j = ledCounts - 1; j > -1; j--) {\n      ledcWrite(ledPins[j], dutys[i + (ledCounts - 1 - j)]);\n    }\n    delay(delayTimes);\n  }\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_04.2_FlowingLight2",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 8,
+        "slug": "day-08-meteor",
+        "title": "Send a comet down the bar"
+      }
     },
     {
       "track": "C / Arduino",
@@ -83,7 +113,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : ColorfulLight\n  Description : Use RGBLED to show random color.\n  Auther      : www.freenove.com\n  Modification: 2024/07/01\n**********************************************************************/\nconst byte ledPins[] = {38, 39, 40};    //define red, green, blue led pins\nconst byte chns[] = {0, 1, 2};          //define the pwm channels\nint red, green, blue;\nvoid setup() {\n  for (int i = 0; i < 3; i++) {   //setup the pwm channels,1KHz,8bit\n    ledcAttachChannel(ledPins[i], 1000, 8, chns[i]);\n  }\n}\n\nvoid loop() {\n  red = random(0, 256);\n  green = random(0, 256);\n  blue = random(0, 256);\n  setColor(red, green, blue);\n  delay(200);\n}\n\nvoid setColor(byte r, byte g, byte b) {\n  ledcWrite(ledPins[0], 255 - r); //Common anode LED, low level to turn on the led.\n  ledcWrite(ledPins[1], 255 - g);\n  ledcWrite(ledPins[2], 255 - b);\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_05.1_RandomColorLight",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 9,
+        "slug": "day-09-rgb",
+        "title": "Mix any colour from three lights"
+      }
     },
     {
       "track": "C / Arduino",
@@ -107,7 +142,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : Doorbell\n  Description : Control active buzzer by button.\n  Auther      : www.freenove.com\n  Modification: 2022/10/20\n**********************************************************************/\n#define PIN_BUZZER 14\n#define PIN_BUTTON 21\n\nvoid setup() {\n  pinMode(PIN_BUZZER, OUTPUT);\n  pinMode(PIN_BUTTON, INPUT);\n}\n\nvoid loop() {\n  if (digitalRead(PIN_BUTTON) == LOW) {\n    digitalWrite(PIN_BUZZER,HIGH);\n  }else{\n    digitalWrite(PIN_BUZZER,LOW);\n  }\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_06.1_Doorbell",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 10,
+        "slug": "day-10-buzzer",
+        "title": "Give the board a voice"
+      }
     },
     {
       "track": "C / Arduino",
@@ -131,7 +171,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : SerialPrinter\n  Description : Use UART send some data to PC, and show them on serial monitor.\n  Auther      : www.freenove.com\n  Modification: 2022/10/20\n**********************************************************************/\n\nvoid setup() {\n  Serial.begin(115200);\n  Serial.println(\"ESP32S3 initialization completed!\");\n}\n\nvoid loop() {\n  Serial.printf(\"Running time : %.1f s\\r\\n\", millis() / 1000.0f);\n  delay(1000);\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_07.1_SerialPrinter",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 11,
+        "slug": "day-11-serial-print",
+        "title": "Make the board talk back"
+      }
     },
     {
       "track": "C / Arduino",
@@ -143,7 +188,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : SerialRW\n  Description : Use UART read and write data between ESP32 and PC.\n  Auther      : www.freenove.com\n  Modification: 2026/01/12\n**********************************************************************/\nString inputString = \"\";      // a String to hold incoming data\nbool stringComplete = false;  // whether the string is complete\n\nvoid setup() {\n  Serial.begin(115200);\n  Serial.println(\"\\nESP32S3 initialization completed!\");\n  Serial.println(\"Please input some characters,\");\n  Serial.println(\"select \\\"Newline\\\" below and Ctrl + Enter to send message to ESP32S3.\");\n  Serial.println(\"Ready to receive data...\\n\");\n}\n\nvoid loop() {\n  if (Serial.available()) {\n    inputString = Serial.readStringUntil('\\n');\n\n    // trim() removes leading and trailing whitespace characters, including \\r, \\n, tabs, etc.\n    inputString.trim();\n    \n    if (inputString.length() > 0) {\n      stringComplete = true;\n    }\n  }\n\n  if (stringComplete) {\n    Serial.printf(\"inputString: %s\\r\\n\", inputString.c_str());\n    inputString = \"\";\n    stringComplete = false;\n  }\n}",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_07.2_SerialRW",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 12,
+        "slug": "day-12-serial-rw",
+        "title": "Type to the board, hear it answer"
+      }
     },
     {
       "track": "C / Arduino",
@@ -155,7 +205,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : ADC_DAC\n  Description : Basic usage of ADC and DAC for esp32.\n  Auther      : www.freenove.com\n  Modification: 2022/10/20\n**********************************************************************/\n#define PIN_ANALOG_IN  1\nvoid setup() {\n  Serial.begin(115200);\n}\n\nvoid loop() {\n  int adcVal = analogRead(PIN_ANALOG_IN);\n  double voltage = adcVal / 4095.0 * 3.3;\n  Serial.printf(\"ADC Val: %d, \\t Voltage: %.2fV\\r\\n\", adcVal, voltage);\n  delay(200);\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_08.1_ADC",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 13,
+        "slug": "day-13-adc",
+        "title": "Read a knob as a number"
+      }
     },
     {
       "track": "C / Arduino",
@@ -179,7 +234,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : TouchLamp\n  Description : Control led by touch button.\n  Auther      : www.freenove.com\n  Modification: 2022/10/21\n**********************************************************************/\n#define PIN_LED     21\n#define PRESS_VAL   200000\t  //Set a threshold to judge touch\n#define RELEASE_VAL 60000\t    //Set a threshold to judge release\n\nbool isProcessed = false;\nvoid setup() {\n  Serial.begin(115200);\n  pinMode(PIN_LED, OUTPUT);\n}\nvoid loop() {\n  if (touchRead(T14) > PRESS_VAL) {\n    if (!isProcessed) {\n      isProcessed = true;\n      Serial.println(\"Touch detected! \");\n      reverseGPIO(PIN_LED);\n    }\n  }\n  if (touchRead(T14) < RELEASE_VAL) {\n    if (isProcessed) {\n      isProcessed = false;\n      Serial.println(\"Released! \");\n    }\n  }\n}\n\nvoid reverseGPIO(int pin) {\n  digitalWrite(pin, !digitalRead(pin));\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_09.2_TouchLamp",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 14,
+        "slug": "day-14-touch",
+        "title": "Touch sensor: use your body as input"
+      }
     },
     {
       "track": "C / Arduino",
@@ -191,7 +251,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : SoftLight\n  Description : Controlling the brightness of LED by potentiometer.\n  Auther      : www.freenove.com\n  Modification: 2024/07/01\n**********************************************************************/\n#define PIN_ANALOG_IN   1\n#define PIN_LED         14\n#define CHAN            0\nvoid setup() {\n  ledcAttachChannel(PIN_LED, 1000, 12, CHAN);\n}\n\nvoid loop() {\n  int adcVal = analogRead(PIN_ANALOG_IN); //read adc\n  int pwmVal = adcVal;        // adcVal re-map to pwmVal\n  ledcWrite(PIN_LED, pwmVal);    // set the pulse width.\n  delay(10);\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_10.1_SoftLight",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 15,
+        "slug": "day-15-soft-light",
+        "title": "Soft light: map input to brightness"
+      }
     },
     {
       "track": "C / Arduino",
@@ -203,7 +268,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : SoftColorfulLight\n  Description : Controlling the color of RGBLED by potentiometer.\n  Auther      : www.freenove.com\n  Modification: 2024/07/01\n**********************************************************************/\nconst byte adcChns[] = {12, 13, 14};    // define the adc channels\nconst byte ledPins[] = {38, 39, 40};    // define led pins\nconst byte pwmChns[] = { 0,  1,  2};    // define the pwm channels\nint colors[] = {0, 0, 0};               // red, green ,blue values of color.\nvoid setup() {\n  for (int i = 0; i < 3; i++) {         //setup the pwm channels\n    ledcAttachChannel(ledPins[i], 1000, 8, pwmChns[i]);//1KHz, 8bit(0-255).\n  }\n}\n\nvoid loop() {\n  for (int i = 0; i < 3; i++) {\n    colors[i] = map(analogRead(adcChns[i]), 0, 4096, 0, 255); //calculate color value.\n    ledcWrite(ledPins[i], 256 - colors[i]);                   //set color\n  }\n  delay(10);\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_10.2_SoftColorfulLight",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 16,
+        "slug": "day-16-soft-colour",
+        "title": "Soft colourful light: map input to colour"
+      }
     },
     {
       "track": "C / Arduino",
@@ -215,7 +285,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : NightLamp\n  Description : Controlling the brightness of LED by photoresistor.\n  Auther      : www.freenove.com\n  Modification: 2024/07/01\n**********************************************************************/\n#define PIN_ANALOG_IN   1\n#define PIN_LED         14\n#define CHAN            0\n#define LIGHT_MIN       372\n#define LIGHT_MAX       2048\nvoid setup() {\n  ledcAttachChannel(PIN_LED, 1000, 12, CHAN);\n}\n\nvoid loop() {\n  int adcVal = analogRead(PIN_ANALOG_IN); //read adc\n  int pwmVal = map(constrain(adcVal, LIGHT_MIN, LIGHT_MAX), LIGHT_MIN, LIGHT_MAX, 0, 4095);  // adcVal re-map to pwmVal\n  ledcWrite(PIN_LED, pwmVal);    // set the pulse width.\n  delay(10);\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_11.1_NightLamp",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 17,
+        "slug": "day-17-night-lamp",
+        "title": "Night lamp: respond to ambient light"
+      }
     },
     {
       "track": "C / Arduino",
@@ -227,7 +302,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : Thermomter\n  Description : Making a thermometer by thermistor.\n  Auther      : www.freenove.com\n  Modification: 2022/10/21\n**********************************************************************/\n#define PIN_ANALOG_IN   1\nvoid setup() {\n  Serial.begin(115200);\n}\n\nvoid loop() {\n  int adcValue = analogRead(PIN_ANALOG_IN);                       //read ADC pin\n  double voltage = (float)adcValue / 4095.0 * 3.3;                // calculate voltage\n  double Rt = 10 * voltage / (3.3 - voltage);                     //calculate resistance value of thermistor\n  double tempK = 1 / (1 / (273.15 + 25) + log(Rt / 10) / 3950.0); //calculate temperature (Kelvin)\n  double tempC = tempK - 273.15;                                  //calculate temperature (Celsius)\n  Serial.printf(\"ADC value : %d,\\tVoltage : %.2fV, \\tTemperature : %.2fC\\n\", adcValue, voltage, tempC);\n  delay(1000);\n}\n\n\n\n\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_12.1_Thermometer",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 18,
+        "slug": "day-18-thermometer",
+        "title": "Thermometer: sense temperature"
+      }
     },
     {
       "track": "C / Arduino",
@@ -239,7 +319,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : Joystick\n  Description : Read data from joystick.\n  Auther      : www.freenove.com\n  Modification: 2022/10/21\n**********************************************************************/\nint xyzPins[] = {14, 13, 12};   //x,y,z pins\nvoid setup() {\n  Serial.begin(115200);\n  pinMode(xyzPins[2], INPUT_PULLUP);  //z axis is a button.\n}\n\nvoid loop() {\n  int xVal = analogRead(xyzPins[0]);\n  int yVal = analogRead(xyzPins[1]);\n  int zVal = digitalRead(xyzPins[2]);\n  Serial.printf(\"X,Y,Z: %d,\\t%d,\\t%d\\n\", xVal, yVal, zVal);\n  delay(500);\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_13.1_Joystick",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 19,
+        "slug": "day-19-joystick",
+        "title": "Joystick: read two axes and a button"
+      }
     },
     {
       "track": "C / Arduino",
@@ -251,7 +336,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : FlowingLight02\n  Description : Use 74HC575 to drive the ledbar to display the flowing light.\n  Auther      : www.freenove.com\n  Modification: 2022/10/24\n**********************************************************************/\n\nint latchPin = 13;          // Pin connected to ST_CP of 74HC595(Pin12)\nint clockPin = 14;          // Pin connected to SH_CP of 74HC595(Pin11)\nint dataPin = 12;           // Pin connected to DS of 74HC595(Pin14)\n\nvoid setup() {\n  // set pins to output\n  pinMode(latchPin, OUTPUT);\n  pinMode(clockPin, OUTPUT);\n  pinMode(dataPin, OUTPUT);\n}\n\nvoid loop() {\n  // Define a one-byte variable to use the 8 bits to represent the state of 8 LEDs of LED bar graph.\n  // This variable is assigned to 0x01, that is binary 00000001, which indicates only one LED light on.\n  byte x = 0x01;    // 0b 0000 0001\n  for (int j = 0; j < 8; j++) { // Let led light up from right to left\n    writeTo595(LSBFIRST, x);\n    x <<= 1; // make the variable move one bit to left once, then the bright LED move one step to the left once.\n    delay(50);\n  }\n  delay(100);\n  x = 0x80;       //0b 1000 0000\n  for (int j = 0; j < 8; j++) { // Let led light up from left to right\n    writeTo595(LSBFIRST, x);\n    x >>= 1;    \n    delay(50);\n  }\n  delay(100);\n}\nvoid writeTo595(int order, byte _data ) {\n  // Output low level to latchPin\n  digitalWrite(latchPin, LOW);\n  // Send serial data to 74HC595\n  shiftOut(dataPin, clockPin, order, _data);\n  // Output high level to latchPin, and 74HC595 will update the data to the parallel output port.\n  digitalWrite(latchPin, HIGH);\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_14.1_FlowingLight02",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 20,
+        "slug": "day-20-shift-register",
+        "title": "Shift register: many outputs, fewer pins"
+      }
     },
     {
       "track": "C / Arduino",
@@ -263,7 +353,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : 1 Digital 7 Segment Display\n  Description : Use 74HC595 to drive the digital display\n  Auther      : www.freenove.com\n  Modification: 2022/10/24\n**********************************************************************/\nint dataPin  = 12;          // Pin connected to DS of 74HC595（Pin14）\nint latchPin = 13;          // Pin connected to ST_CP of 74HC595（Pin12）\nint clockPin = 14;          // Pin connected to SH_CP of 74HC595（Pin11）\n\n// Define the encoding of characters 0-F for the common-anode 7-Segment Display\nbyte num[] = {\n  0xc0, 0xf9, 0xa4, 0xb0, 0x99, 0x92, 0x82, 0xf8,\n  0x80, 0x90, 0x88, 0x83, 0xc6, 0xa1, 0x86, 0x8e\n};\n\nvoid setup() {\n  // set pins to output\n  pinMode(latchPin, OUTPUT);\n  pinMode(clockPin, OUTPUT);\n  pinMode(dataPin, OUTPUT);\n}\n\nvoid loop() {\n  // display 0-F on digital tube\n  for (int i = 0; i < 16; i++) {\n    writeData(num[i]);// Send data to 74HC595\n    delay(1000);      // delay 1 second\n    writeData(0xff);  // Clear the display content\n  }\n}\n\nvoid writeData(int value) {\n  // Make latchPin output low level\n  digitalWrite(latchPin, LOW);\n  // Send serial data to 74HC595\n  shiftOut(dataPin, clockPin, LSBFIRST, value);\n  // Make latchPin output high level, then 74HC595 will update the data to parallel output\n  digitalWrite(latchPin, HIGH);\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_15.1_1_Digit_7-Segment_Display",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 21,
+        "slug": "day-21-seven-segment",
+        "title": "Seven-segment display: show one clear digit"
+      }
     },
     {
       "track": "C / Arduino",
@@ -275,7 +370,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : Control_Motor_by_L293D\n  Description : Use PWM to control the direction and speed of the motor.\n  Auther      : www.freenove.com\n  Modification: 2024/07/01\n**********************************************************************/\nint in1Pin = 13;      // Define L293D channel 1 pin\nint in2Pin = 14;      // Define L293D channel 2 pin\nint enable1Pin = 12;  // Define L293D enable 1 pin\nint channel = 0;\n\nboolean rotationDir;  // Define a variable to save the motor's rotation direction\nint rotationSpeed;    // Define a variable to save the motor rotation speed\n\nvoid setup() {\n  Serial.begin(115200);\n  // Initialize the pin into an output mode:\n  pinMode(in1Pin, OUTPUT);\n  pinMode(in2Pin, OUTPUT);\n  pinMode(enable1Pin, OUTPUT);\n\n  ledcAttachChannel(enable1Pin, 1000, 11, channel);//Set PWM to 11 bits, range is 0-2047\n}\n\nvoid loop() {\n  int potenVal = analogRead(A0);      // Convert the voltage of rotary potentiometer into digital\n  //Compare the number with value 2048, \n  //if more than 2048, clockwise rotates, otherwise, counter clockwise rotates\n  rotationSpeed = potenVal - 2048;\n  if (potenVal > 2048)\n    rotationDir = true;\n  else\n    rotationDir = false;\n  // Calculate the motor speed\n  rotationSpeed = abs(potenVal - 2048);\n  //Control the steering and speed of the motor\n  Serial.println(rotationSpeed);\n  delay(100);\n  driveMotor(rotationDir, constrain(rotationSpeed,0,2048));\n}\n\nvoid driveMotor(boolean dir, int spd) {\n  // Control motor rotation direction\n  if (dir) {\n    digitalWrite(in1Pin, HIGH);\n    digitalWrite(in2Pin, LOW);\n  }\n  else {\n    digitalWrite(in1Pin, LOW);\n    digitalWrite(in2Pin, HIGH);\n  }\n  // Control motor rotation speed\n  ledcWrite(enable1Pin, spd);\n}\n\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_16.1_Control_Motor_by_L293D",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 22,
+        "slug": "day-22-motor",
+        "title": "Motor driver: control motion safely"
+      }
     },
     {
       "track": "C / Arduino",
@@ -287,7 +387,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : Servo Sweep\n  Description : Control the servo motor for sweeping\n  Auther      : www.freenove.com\n  Modification: 2022/10/25\n**********************************************************************/\n#define SERVO_PIN 21  //define the pwm pin\n#define SERVO_CHN 0   //define the pwm channel\n#define SERVO_FRQ 50  //define the pwm frequency\n#define SERVO_BIT 12  //define the pwm precision\n\nvoid servo_set_pin(int pin);\nvoid servo_set_angle(int angle);\n\nvoid setup() {\n  servo_set_pin(SERVO_PIN);\n}\n\nvoid loop() {\n  for (int i = 0; i < 180; i++) {  //make light fade in\n    servo_set_angle(i);\n    delay(10);\n  }\n  for (int i = 180; i > 0; i--) {  //make light fade out\n    servo_set_angle(i);\n    delay(10);\n  }\n}\n\nvoid servo_set_pin(int pin) {\n  ledcAttachChannel(pin, SERVO_FRQ, SERVO_BIT, SERVO_CHN);\n}\n\nvoid servo_set_angle(int angle) {\n  if (angle > 180 || angle < 0)\n    return;\n  long pwm_value = map(angle, 0, 180, 103, 512);\n  ledcWrite(SERVO_PIN, pwm_value);\n}",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_17.1_Servo_Sweep",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 23,
+        "slug": "day-23-servo-sweep",
+        "title": "Servo sweep: move to positions"
+      }
     },
     {
       "track": "C / Arduino",
@@ -299,7 +404,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : Control Servo by Potentiometer\n  Description : Use potentiometer to control the rotation of servo motor.\n  Auther      : www.freenove.com\n  Auther      : www.freenove.com\n  Modification: 2022/10/25\n**********************************************************************/\n#define SERVO_PIN 21  //define the pwm pin\n#define SERVO_CHN 0   //define the pwm channel\n#define SERVO_FRQ 50  //define the pwm frequency\n#define SERVO_BIT 12  //define the pwm precision\n#define ADC_PIN   14  //define the adc pin \n\nvoid servo_set_pin(int pin);\nvoid servo_set_angle(int angle);\n\nvoid setup() {\n  servo_set_pin(SERVO_PIN);\n  Serial.begin(115200);\n}\n\nvoid loop() {\n  // read the value of the potentiometer (value between 0 and 4095)\n  int potVal = analogRead(ADC_PIN);             \n  Serial.printf(\"potVal_1: %d\\t\",potVal);\n  // scale it to use it with the servo (value between 0 and 180)\n  potVal = map(potVal, 0, 4095, 0, 180); \n  // set the servo position according to the scaled value\n  servo_set_angle(potVal);                  \n  Serial.printf(\"potVal_2: %d\\r\\n\",potVal);\n  delay(15);// wait for the servo to get there\n}\n\nvoid servo_set_pin(int pin) {\n  ledcAttachChannel(pin, SERVO_FRQ, SERVO_BIT, SERVO_CHN);\n}\n\nvoid servo_set_angle(int angle) {\n  if (angle > 180 || angle < 0)\n    return;\n  long pwm_value = map(angle, 0, 180, 103, 512);\n  ledcWrite(SERVO_PIN, pwm_value);\n}\n\n\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_17.2_Control_Servo_by_Potentiometer",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 24,
+        "slug": "day-24-servo-knob",
+        "title": "Servo knob: control position with a knob"
+      }
     },
     {
       "track": "C / Arduino",
@@ -311,7 +421,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : Drive LiquidCrystal I2C to display characters\n  Description : I2C is used to control the display characters of LCD1602.\n  Auther      : www.freenove.com\n  Modification: 2022/10/25\n**********************************************************************/\n#include <LiquidCrystal_I2C.h>\n#include <Wire.h>\n\n#define SDA 14                    //Define SDA pins\n#define SCL 13                    //Define SCL pins\n\n/*\n * note:If lcd1602 uses PCF8574T, IIC's address is 0x27,\n *      or lcd1602 uses PCF8574AT, IIC's address is 0x3F.\n*/\nLiquidCrystal_I2C lcd(0x27,16,2); \nvoid setup() {\n  Wire.begin(SDA, SCL);           // attach the IIC pin\n  if (!i2CAddrTest(0x27)) {\n    lcd = LiquidCrystal_I2C(0x3F, 16, 2);\n  }\n  lcd.init();                     // LCD driver initialization\n  lcd.backlight();                // Open the backlight\n  lcd.setCursor(0,0);             // Move the cursor to row 0, column 0\n  lcd.print(\"hello, world!\");     // The print content is displayed on the LCD\n}\n\nvoid loop() {\n  lcd.setCursor(0,1);             // Move the cursor to row 1, column 0\n  lcd.print(\"Counter:\");          // The count is displayed every second\n  lcd.print(millis() / 1000);\n  delay(1000);\n}\n\nbool i2CAddrTest(uint8_t addr) {\n  Wire.beginTransmission(addr);\n  if (Wire.endTransmission() == 0) {\n    return true;\n  }\n  return false;\n}",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_18.1_Display_the_string_on_LCD1602",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 25,
+        "slug": "day-25-lcd",
+        "title": "LCD1602: give the project a display"
+      }
     },
     {
       "track": "C / Arduino",
@@ -352,7 +467,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : BLE_USART\n  Description : Esp32 communicates with the phone by BLE and sends incoming data via a serial port\n  Auther      : www.freenove.com\n  Modification: 2024/07/01\n**********************************************************************/\n#include \"BLEDevice.h\"\n#include \"BLEServer.h\"\n#include \"BLEUtils.h\"\n#include \"BLE2902.h\"\n \nBLECharacteristic *pCharacteristic;\nbool deviceConnected = false;\nuint8_t txValue = 0;\nlong lastMsg = 0;\nString rxload=\"Test\\n\";\n \n#define SERVICE_UUID           \"6E400001-B5A3-F393-E0A9-E50E24DCCA9E\" \n#define CHARACTERISTIC_UUID_RX \"6E400002-B5A3-F393-E0A9-E50E24DCCA9E\"\n#define CHARACTERISTIC_UUID_TX \"6E400003-B5A3-F393-E0A9-E50E24DCCA9E\"\n \nclass MyServerCallbacks: public BLEServerCallbacks {\n    void onConnect(BLEServer* pServer) {\n      deviceConnected = true;\n    };\n    void onDisconnect(BLEServer* pServer) {\n      deviceConnected = false;\n      //pServer->getAdvertising()->start(); //Reopen the pServer and wait for the connection.\n    }\n};\n \nclass MyCallbacks: public BLECharacteristicCallbacks {\n    void onWrite(BLECharacteristic *pCharacteristic) {\n      String rxValue = pCharacteristic->getValue();\n      if (rxValue.length() > 0) {\n        rxload=\"\";\n        for (int i = 0; i < rxValue.length(); i++){\n          rxload +=(char)rxValue[i];\n        }\n      }\n    }\n};\n \nvoid setupBLE(String BLEName){\n  const char *ble_name=BLEName.c_str();\n  BLEDevice::init(ble_name);\n  BLEServer *pServer = BLEDevice::createServer();\n  pServer->setCallbacks(new MyServerCallbacks());\n  BLEService *pService = pServer->createService(SERVICE_UUID); \n  pCharacteristic= pService->createCharacteristic(CHARACTERISTIC_UUID_TX,BLECharacteristic::PROPERTY_NOTIFY);\n  pCharacteristic->addDescriptor(new BLE2902());\n  BLECharacteristic *pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID_RX,BLECharacteristic::PROPERTY_WRITE);\n  pCharacteristic->setCallbacks(new MyCallbacks()); \n  pService->start();\n  pServer->getAdvertising()->start();\n  Serial.println(\"Waiting a client connection to notify...\");\n}\n\nvoid setup() {\n  Serial.begin(115200);\n  setupBLE(\"ESP32S3_Bluetooth\");\n}\n \nvoid loop() {\n  long now = millis();\n  if (now - lastMsg > 100) {\n    if (deviceConnected&&rxload.length()>0) {\n        Serial.println(rxload);\n        rxload=\"\";\n    }\n    if(Serial.avai",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_20.1_BLE_USART",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 27,
+        "slug": "day-27-ble",
+        "title": "BLE pass-through: talk at short range"
+      }
     },
     {
       "track": "C / Arduino",
@@ -364,7 +484,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : BLE_USART\n  Description : Esp32 communicates with the phone by BLE and sends incoming data via a serial port\n  Auther      : www.freenove.com\n  Modification: 2024/07/01\n**********************************************************************/\n#include \"BLEDevice.h\"\n#include \"BLEServer.h\"\n#include \"BLEUtils.h\"\n#include \"BLE2902.h\"\n#include \"String.h\"\n\nBLECharacteristic *pCharacteristic;\nbool deviceConnected = false;\nuint8_t txValue = 0;\nlong lastMsg = 0;\nchar rxload[20];\n\n#define SERVICE_UUID \"6E400001-B5A3-F393-E0A9-E50E24DCCA9E\"\n#define CHARACTERISTIC_UUID_RX \"6E400002-B5A3-F393-E0A9-E50E24DCCA9E\"\n#define CHARACTERISTIC_UUID_TX \"6E400003-B5A3-F393-E0A9-E50E24DCCA9E\"\n#define LED 2\n\nclass MyServerCallbacks : public BLEServerCallbacks {\n  void onConnect(BLEServer *pServer) {\n    deviceConnected = true;\n  };\n  void onDisconnect(BLEServer *pServer) {\n    deviceConnected = false;\n    //pServer->getAdvertising()->start(); //Reopen the pServer and wait for the connection.\n  }\n};\n\nclass MyCallbacks : public BLECharacteristicCallbacks {\n  void onWrite(BLECharacteristic *pCharacteristic) {\n    String rxValue = pCharacteristic->getValue();\n    if (rxValue.length() > 0) {\n      for (int i = 0; i < 20; i++) {\n        rxload[i] = 0;\n      }\n      for (int i = 0; i < rxValue.length(); i++) {\n        rxload[i] = (char)rxValue[i];\n      }\n    }\n  }\n};\n\nvoid setupBLE(String BLEName) {\n  const char *ble_name = BLEName.c_str();\n  BLEDevice::init(ble_name);\n  BLEServer *pServer = BLEDevice::createServer();\n  pServer->setCallbacks(new MyServerCallbacks());\n  BLEService *pService = pServer->createService(SERVICE_UUID);\n  pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID_TX, BLECharacteristic::PROPERTY_NOTIFY);\n  pCharacteristic->addDescriptor(new BLE2902());\n  BLECharacteristic *pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID_RX, BLECharacteristic::PROPERTY_WRITE);\n  pCharacteristic->setCallbacks(new MyCallbacks());\n  pService->start();\n  pServer->getAdvertising()->start();\n  Serial.println(\"Waiting a client connection to notify...\");\n}\n\nvoid setup() {\n  pinMode(LED, OUTPUT);\n  setupBLE(\"ESP32S3_Bluetooth\");\n  Serial.begin(115200);\n  Serial.println(\"\\nThe device started, now you can pair it with Bluetooth!\");\n}\n\nvoid loop() {\n  long now = millis();\n  if (no",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_20.2_BluetoothToLed",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 28,
+        "slug": "day-28-bluetooth-led",
+        "title": "Switch an LED from your phone"
+      }
     },
     {
       "track": "C / Arduino",
@@ -400,7 +525,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : WiFi Station\n  Description : Connect to your router using ESP32\n  Auther      : www.freenove.com\n  Modification: 2022/10/31\n**********************************************************************/\n#include <WiFi.h>\n  \nconst char *ssid_Router     = \"********\"; //Enter the router name\nconst char *password_Router = \"********\"; //Enter the router password\n\nvoid setup(){\n  Serial.begin(115200);\n  delay(2000);\n  Serial.println(\"Setup start\");\n  WiFi.begin(ssid_Router, password_Router);\n  Serial.println(String(\"Connecting to \")+ssid_Router);\n  while (WiFi.status() != WL_CONNECTED){\n    delay(500);\n    Serial.print(\".\");\n  }\n  Serial.println(\"\\nConnected, IP address: \");\n  Serial.println(WiFi.localIP());\n  Serial.println(\"Setup End\");\n}\n \nvoid loop() {\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_23.1_WiFi_Station",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 29,
+        "slug": "day-29-wifi",
+        "title": "Put the board on the network"
+      }
     },
     {
       "track": "C / Arduino",
@@ -448,7 +578,12 @@
       "language": "Arduino C++",
       "code": "/**********************************************************************\n  Filename    : WiFi Server\n  Description : Use ESP32's WiFi server feature to wait for other WiFi devices to connect.\n                And communicate with them once a connection has been established.\n  Auther      : www.freenove.com\n  Modification: 2024/07/01\n**********************************************************************/\n#include <WiFi.h>\n\n#define port 80\nconst char *ssid_Router      = \"********\";  //input your wifi name\nconst char *password_Router  = \"********\";  //input your wifi passwords\nWiFiServer  server(port);\n\nvoid setup()\n{\n    Serial.begin(115200);\n    Serial.printf(\"\\nConnecting to \");\n    Serial.println(ssid_Router);\n    WiFi.disconnect();\n    WiFi.begin(ssid_Router, password_Router);\n    delay(1000);\n    while (WiFi.status() != WL_CONNECTED) {\n        delay(500);\n        Serial.print(\".\");\n    }\n    Serial.println(\"\");\n    Serial.println(\"WiFi connected.\");\n    Serial.print(\"IP address: \");\n    Serial.println(WiFi.localIP());\t\t\t\n    Serial.printf(\"IP port: %d\\n\",port);\t\t\t\n    server.begin(port);\t\t\t\t\t\t\t\t\n    WiFi.setAutoReconnect(true);\n}\n\nvoid loop(){\n WiFiClient client = server.accept();               // listen for incoming clients\n  if (client) {                                     // if you get a client,\n    Serial.println(\"Client connected.\");\n    while (client.connected()) {                    // loop while the client's connected\n      if (client.available()) {                     // if there's bytes to read from the client,\n        Serial.println(client.readStringUntil('\\n')); // print it out the serial monitor\n        while(client.read()>0);                     // clear the wifi receive area cache\n      }\n      if(Serial.available()){                       // if there's bytes to read from the serial monitor,\n        client.print(Serial.readStringUntil('\\n')); // print it out the client.\n        while(Serial.read()>0);                     // clear the wifi receive area cache\n      }\n    }\n    client.stop();                                  // stop the client connecting.\n    Serial.println(\"Client Disconnected.\");\n  }\n}\n",
       "sourceUrl": "https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/C/Sketches/Sketch_24.2_WiFiServer",
-      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html"
+      "docsUrl": "https://docs.freenove.com/projects/fnk0083/en/latest/fnk0083/codes/C.html",
+      "taughtInDay": {
+        "day": 30,
+        "slug": "day-30-tcpip",
+        "title": "TCP/IP: a mini web-connected device"
+      }
     },
     {
       "track": "C / Arduino",

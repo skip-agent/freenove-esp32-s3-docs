@@ -131,142 +131,170 @@ def copy_assets() -> None:
                 shutil.copy2(p, OUT / p.name)
 
 
-def render_html(data: dict) -> str:
+FONTS_HEAD = (
+    '<link rel="preconnect" href="https://fonts.googleapis.com" />\n'
+    '  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />\n'
+    '  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />'
+)
+
+
+def _day_range(a: int, b: int) -> str:
+    return f"Day {a}" if a == b else f"Days {a}–{b}"
+
+
+def render_html(data: dict, ctx: dict) -> str:
+    """Render the course-forward landing (`/`).
+
+    The course is the product: the hero leads with the 30-day voyage and a live
+    progress tracker (localStorage, shared with the course map), the arcs preview
+    one click from the full map, and the searchable reference Library is a clearly
+    secondary band below. The landing carries its own light, minimal design
+    (landing.css) — approachable for a first-time ESP32 learner — and does not
+    inherit the course pages' heavier styling.
+    """
     payload = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
-    title = "TinySkiff ESP32-S3 Lab"
+    course_payload = json.dumps({
+        "total": ctx["total"],
+        "publishedDays": ctx["publishedDays"],
+        "slugs": ctx["slugs"],
+        "day1Slug": ctx["day1Slug"],
+    }, ensure_ascii=False).replace("</", "<\\/")
+    title = "TinySkiff ESP32-S3 Lab — learn the ESP32-S3 in 30 guided days"
+    day1_href = f"./course/{ctx['day1Slug']}/" if ctx["day1Slug"] else "./course/"
+
+    legs = []
+    for i, leg in enumerate(ctx["legs"], start=1):
+        rng = _day_range(leg["dayFrom"], leg["dayTo"])
+        href = f"./course/{leg['startSlug']}/" if leg["startSlug"] else "./course/"
+        legs.append(f"""        <a class=\"leg\" href=\"{href}\">
+          <span class=\"leg-no mono\">{i:02d}</span>
+          <span class=\"leg-body\">
+            <span class=\"leg-range mono\">{rng}</span>
+            <span class=\"leg-name\">{html.escape(leg['name'])}</span>
+            <span class=\"leg-sub\">{html.escape(leg['subtitle'])}</span>
+          </span>
+        </a>""")
+    legs_html = "\n".join(legs)
+    leg_words = {
+        1: "One", 2: "Two", 3: "Three", 4: "Four", 5: "Five",
+        6: "Six", 7: "Seven", 8: "Eight", 9: "Nine", 10: "Ten",
+    }
+    leg_count_word = leg_words.get(len(ctx["legs"]), str(len(ctx["legs"])))
+
+    counts = (
+        (len(data["projectsC"]), "C / Arduino sketches"),
+        (len(data["projectsPython"]), "MicroPython projects"),
+        (len(data["libraries"]), "libraries"),
+        (len(data["pdfs"]), "datasheets & PDFs"),
+    )
+    stats_html = "\n".join(
+        f'          <div class=\"lib-stat\"><b>{n}</b><span>{label}</span></div>'
+        for n, label in counts
+    )
+
     return f"""<!doctype html>
 <html lang=\"en\">
 <head>
   <meta charset=\"utf-8\" />
   <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
-  <meta name=\"description\" content=\"A cleaner launchpad for Freenove Super Starter Kit for ESP32-S3 docs, code, libraries, and datasheets.\" />
+  <meta name=\"description\" content=\"A guided, Arduino-first 30-day course for the Freenove Super Starter Kit for ESP32-S3 — plus a searchable library of every official sketch, example, and datasheet.\" />
   <title>{title}</title>
-  <link rel=\"stylesheet\" href=\"./styles.css\" />
+  {FONTS_HEAD}
+  <link rel=\"stylesheet\" href=\"./landing.css\" />
 </head>
 <body>
-  <header class=\"hero\">
-    <nav class=\"topbar\">
-      <a class=\"brand\" href=\"#top\">TinySkiff ESP32-S3 Lab</a>
-      <div class=\"navlinks\">
-        <a href=\"./course/\">The 30-day course</a>
-        <a href=\"#start\">Start</a>
-        <a href=\"#projects\">Projects</a>
-        <a href=\"#resources\">Resources</a>
-        <a href=\"#source\">Source</a>
-      </div>
-    </nav>
-    <section class=\"heroGrid\" id=\"top\">
-      <div>
-        <p class=\"eyebrow\">Freenove Super Starter Kit for ESP32-S3</p>
-        <h1>One clean place to start tinkering without spelunking through a 200 MB ZIP.</h1>
-        <p class=\"lede\">C/Arduino sketches, MicroPython examples, libraries, setup links, datasheets, and the official docs — organized as a fast searchable launchpad.</p>
-        <div class=\"ctaRow\">
-          <a class=\"button primary\" href=\"#projects\">Browse projects</a>
-          <a class=\"button\" href=\"./course/\">Start the 30-day course</a>
-          <a class=\"button\" href=\"{GITHUB_ZIP}\">Download official ZIP</a>
+  <div class=\"page\">
+    <header class=\"hero\" id=\"top\">
+      <div class=\"hero-grid\">
+        <div class=\"hero-copy\">
+          <p class=\"eyebrow\">TinySkiff · ESP32-S3 Lab</p>
+          <h1>Learn the ESP32-S3 in <span class=\"hl\">30 guided days</span>.</h1>
+          <p class=\"lede\">A friendly, Arduino-first course built on the Freenove Super Starter Kit. Each day you wire one small circuit, run it, and understand why it works — about 30 minutes, one real win.</p>
+          <div class=\"cta-row\">
+            <a class=\"btn btn-primary\" href=\"{day1_href}\">Start Day 1 →</a>
+            <a class=\"btn btn-ghost\" href=\"./course/\">See the 30-day map</a>
+          </div>
+          <p class=\"hero-foot\">Free · No account · Runs in your browser</p>
         </div>
+        <aside class=\"voyage-card\" id=\"mapProgress\" aria-label=\"Your course progress\">
+          <div class=\"voyage-head\">
+            <span class=\"voyage-title\">Your voyage</span>
+            <span class=\"voyage-count\"><b id=\"doneCount\">0</b> / {ctx['total']} days</span>
+          </div>
+          <div class=\"voyage\" id=\"mapVoyage\" role=\"img\" aria-label=\"Days completed\"></div>
+          <a class=\"voyage-resume\" id=\"mapResume\" href=\"#\" hidden>Resume →</a>
+          <p class=\"voyage-note\" id=\"firstRun\">Cast off with Day 1 — your place is saved as you go.</p>
+        </aside>
       </div>
-      <div class=\"heroCard\">
-        <img src=\"./assets/Super.jpg\" alt=\"Freenove Super Starter Kit for ESP32-S3\" />
-        <dl>
-          <div><dt>C sketches</dt><dd>{len(data['projectsC'])}</dd></div>
-          <div><dt>Python projects</dt><dd>{len(data['projectsPython'])}</dd></div>
-          <div><dt>Libraries</dt><dd>{len(data['libraries'])}</dd></div>
-          <div><dt>PDFs/datasheets</dt><dd>{len(data['pdfs'])}</dd></div>
-        </dl>
-      </div>
-    </section>
-  </header>
+    </header>
 
-  <main>
-    <section id=\"start\" class=\"section\">
-      <p class=\"eyebrow\">Start here</p>
-      <h2>Pick the track that matches what you want to learn.</h2>
-      <div class=\"cards two\">
-        <article class=\"card\">
-          <h3>C / Arduino IDE</h3>
-          <p>Use this if you want the broadest project coverage: audio, Bluetooth, Wi‑Fi, camera, USB HID, and the classic electronics lessons.</p>
-          <ol>
-            <li>Install Arduino IDE.</li>
-            <li>Install/select the ESP32 board package for the ESP32-S3.</li>
-            <li>Open a sketch from <code>C/Sketches</code>.</li>
-            <li>Use the USB mode/configuration shown in the official tutorial.</li>
-          </ol>
-          <a href=\"{ONLINE_BASE}fnk0083/codes/C.html\">Open official C docs →</a>
-        </article>
-        <article class=\"card\">
-          <h3>Python / MicroPython</h3>
-          <p>Use this if you want a faster beginner loop in Thonny. It covers most core sensor/LED/motor lessons, but not every advanced C project.</p>
-          <ol>
-            <li>Install Thonny.</li>
-            <li>Flash the kit’s MicroPython firmware.</li>
-            <li>Upload needed helper libraries from <code>Python_Libraries</code>.</li>
-            <li>Run projects from <code>Python_Codes</code>.</li>
-          </ol>
-          <a href=\"{ONLINE_BASE}fnk0083/codes/Python.html\">Open official Python docs →</a>
-        </article>
-      </div>
-      <div class=\"pinout\">
-        <div>
-          <h3>Board pinout</h3>
-          <p>Keep this open while wiring. ESP32-S3 pins are powerful and a little booby-trapped; the source docs call out strapping, PSRAM, SD card, USB, and camera pins.</p>
+    <main>
+      <section class=\"legs-section\">
+        <div class=\"section-head\">
+          <p class=\"eyebrow\">The voyage</p>
+          <h2 class=\"section-h2\">{leg_count_word} legs, thirty days.</h2>
+          <p class=\"section-sub\">The course runs as one voyage — from first light to the open network. Start at the beginning, or jump into any leg.</p>
         </div>
-        <img src=\"./assets/ESP32S3_Pinout.png\" alt=\"ESP32-S3 pinout\" />
-      </div>
-    </section>
+        <div class=\"legs\">
+{legs_html}
+        </div>
+      </section>
 
-    <section id=\"projects\" class=\"section\">
-      <p class=\"eyebrow\">Project browser</p>
-      <h2>Search the examples</h2>
-      <div class=\"toolbar\">
-        <input id=\"search\" type=\"search\" placeholder=\"Search blink, camera, servo, BLE, LCD…\" />
-        <select id=\"trackFilter\">
-          <option value=\"all\">All tracks</option>
-          <option value=\"C / Arduino\">C / Arduino</option>
-          <option value=\"Python / MicroPython\">Python / MicroPython</option>
-        </select>
-      </div>
-      <div id=\"projectCount\" class=\"muted\"></div>
-      <div id=\"projectGrid\" class=\"projectGrid\"></div>
-    </section>
+      <section class=\"lib\" id=\"library\">
+        <div class=\"section-head\">
+          <p class=\"eyebrow\">The reference library · optional</p>
+          <h2 class=\"section-h2\">Every official example, in one searchable place.</h2>
+          <p class=\"section-sub\">Already comfortable with the board? Skip the course and browse every sketch, example, library, and datasheet from the official kit — no spelunking through a 200&nbsp;MB ZIP.</p>
+          <div class=\"lib-stats\">
+{stats_html}
+          </div>
+        </div>
 
-    <section id=\"resources\" class=\"section\">
-      <p class=\"eyebrow\">Resources</p>
-      <h2>Libraries and PDFs</h2>
-      <div class=\"resourceGrid\">
-        <article class=\"card\">
-          <h3>Libraries</h3>
-          <div id=\"libraries\" class=\"list\"></div>
-        </article>
-        <article class=\"card\">
-          <h3>Docs and datasheets</h3>
-          <div id=\"pdfs\" class=\"list compact\"></div>
-        </article>
-      </div>
-    </section>
+        <div class=\"toolbar\">
+          <input id=\"search\" type=\"search\" placeholder=\"Search blink, camera, servo, BLE, LCD…\" aria-label=\"Search examples\" />
+          <select id=\"trackFilter\" aria-label=\"Filter by track\">
+            <option value=\"all\">All tracks</option>
+            <option value=\"C / Arduino\">C / Arduino</option>
+            <option value=\"Python / MicroPython\">Python / MicroPython</option>
+          </select>
+        </div>
+        <div id=\"projectCount\" class=\"proj-count mono\"></div>
+        <div id=\"projectGrid\" class=\"proj-grid\"></div>
 
-    <section id=\"source\" class=\"section source\">
-      <p class=\"eyebrow\">Source + license</p>
-      <h2>Built from Freenove’s official materials</h2>
-      <p>This launchpad indexes the official Freenove repository and documentation. Freenove’s files are published under Creative Commons Attribution‑NonCommercial‑ShareAlike 3.0 Unported; this site links back to the official source for downloads and full files.</p>
-      <div class=\"sourceLinks\">
+        <div class=\"res-grid\">
+          <article class=\"res-card\">
+            <h3>Libraries</h3>
+            <div id=\"libraries\" class=\"res-list\"></div>
+          </article>
+          <article class=\"res-card\">
+            <h3>Docs &amp; datasheets</h3>
+            <div id=\"pdfs\" class=\"res-list compact\"></div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class=\"colophon\">
+      <p><strong>TinySkiff ESP32-S3 Lab.</strong> A guided course and library built on the official Freenove Super Starter Kit for ESP32-S3 material, released under CC BY-NC-SA 3.0. Not affiliated with or endorsed by Freenove.</p>
+      <div class=\"src-links\">
         <a href=\"{REPO_URL}\">Official GitHub repo</a>
         <a href=\"{GITHUB_ZIP}\">Official ZIP archive</a>
         <a href=\"{ONLINE_BASE}\">Official online docs</a>
         <a href=\"mailto:support@freenove.com\">Freenove support</a>
       </div>
-      <p class=\"muted\">Generated {html.escape(data['generatedAt'])}. Not affiliated with Freenove; just a less annoying front door.</p>
-    </section>
-  </main>
+      <p class=\"gen mono\">Generated {html.escape(data['generatedAt'])}.</p>
+    </footer>
+  </div>
 
-  <dialog id=\"codeDialog\">
-    <button id=\"closeDialog\" class=\"close\">×</button>
+  <dialog id=\"codeDialog\" class=\"code-dialog\">
+    <button id=\"closeDialog\" class=\"close\" aria-label=\"Close\">×</button>
     <h3 id=\"dialogTitle\"></h3>
-    <p id=\"dialogMeta\" class=\"muted\"></p>
+    <p id=\"dialogMeta\" class=\"mono\"></p>
     <pre><code id=\"dialogCode\"></code></pre>
   </dialog>
 
   <script id=\"site-data\" type=\"application/json\">{payload}</script>
+  <script id=\"landing-course\" type=\"application/json\">{course_payload}</script>
   <script src=\"./app.js\"></script>
 </body>
 </html>
@@ -276,7 +304,7 @@ def render_html(data: dict) -> str:
 # Generated outputs this build owns. Everything else under docs/ (the committed
 # docs/wayfinder/ planning docs) is preserved — the build no longer wipes the
 # whole tree.
-GENERATED_FILES = ["index.html", "data.json", "styles.css", "app.js"]
+GENERATED_FILES = ["index.html", "data.json", "landing.css", "app.js"]
 GENERATED_DIRS = ["assets", "course"]
 
 
@@ -290,11 +318,14 @@ def clean_generated() -> None:
             shutil.rmtree(target)
 
 
-def build_course(data: dict) -> dict:
-    """Build /course/ from lessons and return a small summary for the build log.
+def build_course(data: dict) -> tuple[dict, dict]:
+    """Build /course/ from lessons; return (build-log summary, landing context).
 
-    Also enriches Library sketch entries with the day that teaches them, so the
-    derivation exists in the data (the Library UI cross-link is Phase D).
+    Also enriches Library sketch entries with the day that teaches them so the
+    Library cards can render a "Taught in Day N" cross-link, and returns the
+    context the course-forward landing needs: the voyage total, the published
+    days and their slugs (for the shared progress instrument), the first day to
+    start on, and the six arcs as preview "legs".
     """
     lessons = lesson_schema.collect_lessons()  # validates; raises on any problem
     glossary = lesson_schema.load_glossary()
@@ -333,12 +364,40 @@ def build_course(data: dict) -> dict:
         if link:
             sketch["taughtInDay"] = link
 
-    return {
+    published_days = sorted(published_map)
+    slugs = {str(n): published_map[n]["slug"] for n in published_days}
+    # First day to start on: the first day of the voyage order that is published.
+    first_day = next((d["day"] for d in order if d["day"] in published_map), None)
+    day1_slug = published_map[first_day]["slug"] if first_day is not None else None
+
+    legs = []
+    for arc in course.get("arcs") or []:
+        days = [d["day"] for d in (arc.get("days") or [])]
+        if not days:
+            continue
+        published_in_arc = [n for n in days if n in published_map]
+        legs.append({
+            "name": arc.get("name", ""),
+            "subtitle": arc.get("subtitle", ""),
+            "dayFrom": min(days),
+            "dayTo": max(days),
+            "startSlug": published_map[published_in_arc[0]]["slug"] if published_in_arc else None,
+        })
+
+    summary = {
         "lessons": len(lessons),
-        "published": sum(1 for ls in lessons if ls.data.get("status") == "published"),
+        "published": len(published_map),
         "days_in_spine": len(order),
         "backlinks": len(backlinks),
     }
+    ctx = {
+        "total": course.get("totalDays", len(order)),
+        "publishedDays": published_days,
+        "slugs": slugs,
+        "day1Slug": day1_slug,
+        "legs": legs,
+    }
+    return summary, ctx
 
 
 def main() -> None:
@@ -353,8 +412,8 @@ def main() -> None:
         "libraries": collect_libraries(),
         "pdfs": collect_pdfs(),
     }
-    course_summary = build_course(data)
-    (OUT / "index.html").write_text(render_html(data), encoding="utf-8")
+    course_summary, course_ctx = build_course(data)
+    (OUT / "index.html").write_text(render_html(data, course_ctx), encoding="utf-8")
     (OUT / "data.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps({
         "out": str(OUT),
