@@ -1,30 +1,28 @@
 name: Deploy to Cloudflare Pages
 
-# Auto-deploy: every push to main rebuilds the static site from source and
-# ships it to the tinyskiff-esp32 Cloudflare Pages project. No manual
-# `wrangler pages deploy` step, and no CF git-integration OAuth needed.
+# Auto-deploy the built site to the Cloudflare Pages project `tinyskiff-esp32`
+# (live at esp32.tinyskiff.xyz) on every push to main that touches the output.
+# The site is pre-built and committed under docs/ — the Freenove source/ folder
+# is gitignored, so CI does NOT build; it just uploads the committed docs/.
+# This is the auto-deploy the CF dashboard git-integration can't do here.
+
 on:
   push:
     branches: [main]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-
-concurrency:
-  group: cf-pages-deploy
-  cancel-in-progress: true
+    paths:
+      - 'docs/**'
+      - '.github/workflows/deploy-cloudflare.yml'
+  workflow_dispatch: {}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      # The build needs the ~200 MB official kit under source/, which is not
-      # committed. docs/ is the committed, pre-built output (rebuild locally with
-      # `.venv/bin/python scripts/build_site.py` and commit it), so CI just ships
-      # what's in the repo.
       - name: Deploy docs/ to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:

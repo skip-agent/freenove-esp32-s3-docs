@@ -1,11 +1,11 @@
 /* ===========================================================================
-   TinySkiff ESP32-S3 Lab · course design system ("echo sounder")
+   TinySkiff ESP32-S3 Lab · course design system (light / minimal)
    Shared, tokenised styling for every guided day and the course map.
-   Productised from the approved Day 26 prototype (issue #5). The page is
-   dressed as a ship's instrument + logbook: deep-sea ink instrument frames,
-   warm nautical chart-paper reading surfaces, an amber sounder-signal accent,
-   teal depth markers, phosphor-green readouts. Per-day values (voyage fill,
-   hero instrument, glossary) are injected by the build, never hard-coded here.
+   Reskinned to the landing's language (issue #21): cool-neutral paper, one calm
+   blue accent, all-Inter type. Genuine terminals (code panel, serial monitor)
+   stay dark; the old skeuomorphic sonar instrument is retired. Legacy token
+   names (--sounder, --depth, --abyss…) are kept but remapped. Per-day values
+   (voyage fill, glossary) are injected by the build, never hard-coded here.
    =========================================================================== */
 
 :root {
