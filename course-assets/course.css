@@ -20,7 +20,7 @@
   --paper: #ffffff;          /* reading card surface */
   --ink: #171a20;            /* primary text */
   --ink-soft: #4c525d;       /* secondary text */
-  --ink-faint: #7b828e;      /* captions, meta */
+  --ink-faint: #6b7280;      /* captions, meta — AA on white at small sizes */
   --line: #e5e7ee;           /* hairlines */
   --line-strong: #d7dbe4;
   --sounder: #3557f0;        /* primary accent (blue) */
@@ -137,7 +137,7 @@ h1, h2, h3, h4 {
 }
 .hero > * { position: relative; z-index: 1; }
 
-.hero .eyebrow { color: var(--ink-faint); }
+.hero .eyebrow { color: var(--ink-soft); }
 .hero .eyebrow::before { background: var(--sounder); }
 
 .hero h1 {
@@ -798,7 +798,7 @@ h1, h2, h3, h4 {
   color: var(--ink-faint);
 }
 .tab[aria-selected="true"] { background: var(--sounder); color: #fff; }
-.tab[aria-selected="true"] .badge { color: rgba(255, 255, 255, 0.75); }
+.tab[aria-selected="true"] .badge { color: #fff; }
 
 .code-panel {
   border-radius: var(--r-lg);
@@ -950,7 +950,8 @@ h1, h2, h3, h4 {
   background: none;
   padding: 0;
 }
-.formula-card code b { color: var(--sounder); font-weight: 600; }
+/* light accent for emphasis on the dark formula card (blue accent fails AA here) */
+.formula-card code b { color: var(--phosphor); font-weight: 600; }
 
 .two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .mini-card {
