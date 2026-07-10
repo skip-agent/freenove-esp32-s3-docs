@@ -1,0 +1,40 @@
+name: Deploy to Cloudflare Pages
+
+# Auto-deploy: every push to main rebuilds the static site from source and
+# ships it to the tinyskiff-esp32 Cloudflare Pages project. No manual
+# `wrangler pages deploy` step, and no CF git-integration OAuth needed.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cf-pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build the site from source
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python scripts/build_site.py
+
+      - name: Deploy docs/ to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy docs --project-name=tinyskiff-esp32 --branch=main
