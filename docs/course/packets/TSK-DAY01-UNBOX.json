@@ -22,11 +22,6 @@
       "name": "GPIO extension board",
       "imageAsset": "docs/course/assets/shared/item-gpio-extension-board.png",
       "explanation": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself."
-    },
-    {
-      "name": "Pinout map",
-      "imageAsset": "docs/course/assets/shared/item-pinout.png",
-      "explanation": "A pinout is a labelled drawing of the board that names every pin — power, ground, USB, and the numbered GPIO pins your code uses. You will reach for it constantly once you start wiring, so it is worth knowing where it lives."
     }
   ],
   "wiring": [],
@@ -43,7 +38,7 @@
     "Find the two small buttons near the port. One is RESET, one is BOOT — together they control whether the board runs your program or listens for a new one.",
     "Find the small onboard LED near the chip. It's wired to one pin and needs no external parts, which is why you'll blink it on Day 3 before touching a single wire.",
     "Look along both long edges and find the two rows of numbered pins. Each one is a GPIO — a wire your program can switch on, or read a signal from.",
-    "Open the pinout map and match a few printed numbers to the physical pins. That map is how \"GPIO 13\" in code becomes a specific pin you can touch."
+    "Take the pinout map provided above and match a few of its printed numbers to the physical pins on the board. That map is how \"GPIO 13\" in code becomes a specific pin you can touch."
   ],
   "codeFocus": {},
   "theoryModel": {

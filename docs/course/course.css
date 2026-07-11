@@ -573,6 +573,9 @@ h1, h2, h3, h4 {
    =========================================================================== */
 .wire-layout { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; align-items: start; }
 
+/* Provided reference material (pinout, tables) — one or more zoomable figures. */
+.reference-stack { display: grid; gap: 16px; }
+
 .image-frame {
   position: relative;
   margin: 0;

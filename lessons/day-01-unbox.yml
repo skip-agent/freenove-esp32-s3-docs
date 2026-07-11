@@ -43,7 +43,7 @@ hero:
 
 parts:
   intro: >
-    Tip the kit out and find these three — they're the ones today is about. Tap
+    Tip the kit out and find these two — they're what today is about. Tap
     *Define* on anything unfamiliar; the answer opens as a field note you can read
     and dismiss.
   items:
@@ -59,12 +59,18 @@ parts:
       alt: Official manual image of the ESP32-S3 GPIO extension board.
       blurb: Fans the chip's pins out into labelled rows you can actually reach and wire.
       explain: gpio
-    - name: Pinout map
-      image: shared/item-pinout.png
-      imageKind: Manual reference
-      alt: Official ESP32-S3 pinout diagram labelling every GPIO, power, and USB pin on the board.
-      blurb: The map from a physical pin to the number your code uses. You'll live in it.
-      explain: pinout
+
+reference:
+  intro: >
+    The pinout map does not come in the box — so here it is, yours to keep. It
+    names every pin on the board- the power rails, ground, USB, and the numbered
+    GPIO pins your code uses. This is the one reference you'll come back to on
+    every wiring day, so take a moment with it now. Tap to enlarge.
+  items:
+    - image: shared/item-pinout.png
+      alt: Official ESP32-S3 pinout diagram labelling every GPIO, power, ground, and USB pin on the board, with a colour key for pin functions.
+      caption: Freenove ESP32-S3-WROOM pinout — the map from a physical pin to the number your code uses.
+      zoomCaption: The full ESP32-S3-WROOM pinout. Each numbered GPIO, the 3.3V and 5V power pins, the GND pins, and the USB pins are labelled, with a colour key for what each pin can do.
 
 steps:
   intro: >
@@ -76,7 +82,7 @@ steps:
     - Find the two small buttons near the port. One is RESET, one is BOOT — together they control whether the board runs your program or listens for a new one. {bootReset}
     - Find the small onboard LED near the chip. It's wired to one pin and needs no external parts, which is why you'll blink it on Day 3 before touching a single wire. {ledBuiltin}
     - Look along both long edges and find the two rows of numbered pins. Each one is a GPIO — a wire your program can switch on, or read a signal from. {gpio}
-    - Open the pinout map and match a few printed numbers to the physical pins. That map is how "GPIO 13" in code becomes a specific pin you can touch. {pinout}
+    - Take the pinout map provided above and match a few of its printed numbers to the physical pins on the board. That map is how "GPIO 13" in code becomes a specific pin you can touch. {pinout}
   done:
     icon: "🧭"
     title: You can read the board now.

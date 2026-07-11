@@ -184,8 +184,9 @@ pinout:
   title: Pinout map
   body: >
     A pinout is a labelled drawing of the board that names every pin — power,
-    ground, USB, and the numbered GPIO pins your code uses. You will reach for it
-    constantly once you start wiring, so it is worth knowing where it lives.
+    ground, USB, and the numbered GPIO pins your code uses. It does not come in
+    the kit, so Day 1 provides it for you to keep; you'll reach for it whenever a
+    lesson names a pin.
   shortcut: When a lesson says GPIO 13, the pinout shows you which physical pin that is.
 
 usbData:

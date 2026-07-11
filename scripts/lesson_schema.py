@@ -202,6 +202,21 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
             _require(errors, _nonempty(part.get(field)),
                      f"{code}: {where}.{field} is required")
 
+    # Reference — optional. Material the kit does NOT ship (pinout map, code
+    # tables, charts) that the lesson provides inline so the learner never has to
+    # hunt for it. Complete when present: each item carries image + alt + caption.
+    if lesson.get("reference") is not None:
+        ref_items = _as_dict(lesson.get("reference")).get("items")
+        _require(errors, isinstance(ref_items, list) and len(ref_items) > 0,
+                 f"{code}: reference.items must be a non-empty list when a reference block is present")
+        for i, item in enumerate(_as_list(ref_items)):
+            where = f"reference.items[{i}]"
+            if not _require_mapping(item, where):
+                continue
+            for field in ("image", "alt", "caption"):
+                _require(errors, _nonempty(item.get(field)),
+                         f"{code}: {where}.{field} is required")
+
     # Wiring — optional (setup/onboard-LED days have no circuit), but complete
     # when present: diagram carries alt + source; pins have from/to/why. The
     # renderer already skips an absent wiring block and its rail entry.
@@ -385,6 +400,9 @@ def _image_paths(lesson: dict) -> list[str]:
     for part in _as_list(_as_dict(lesson.get("parts")).get("items")):
         if isinstance(part, dict) and part.get("image"):
             paths.append(str(part["image"]))
+    for item in _as_list(_as_dict(lesson.get("reference")).get("items")):
+        if isinstance(item, dict) and item.get("image"):
+            paths.append(str(item["image"]))
     diagram = _as_dict(_as_dict(lesson.get("wiring")).get("diagram"))
     if diagram.get("image"):
         paths.append(str(diagram["image"]))
