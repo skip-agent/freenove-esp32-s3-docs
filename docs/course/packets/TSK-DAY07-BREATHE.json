@@ -148,10 +148,5 @@
       ]
     }
   ],
-  "challenge": "Change the delay in the fade loops to find a resting-breath rhythm, then make the light pause at full before it fades back.",
-  "logbookPrompts": [
-    "What fade speed felt most like a calm, resting breath?",
-    "How did a pause at full brightness change the feel of the breath?",
-    "Where in daily life have you seen a light breathe like this?"
-  ]
+  "challenge": "Change the delay in the fade loops to find a resting-breath rhythm, then make the light pause at full before it fades back."
 }

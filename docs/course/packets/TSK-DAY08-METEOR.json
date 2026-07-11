@@ -150,10 +150,5 @@
       ]
     }
   ],
-  "challenge": "Change the trail by editing the dutys values, then change the sweep speed with the delay, and note what each edit does to the comet.",
-  "logbookPrompts": [
-    "What did a longer or shorter tail change about how the comet looked?",
-    "Which sweep speed felt best, and why?",
-    "What real-world moving light works like this comet and tail?"
-  ]
+  "challenge": "Change the trail by editing the dutys values, then change the sweep speed with the delay, and note what each edit does to the comet."
 }

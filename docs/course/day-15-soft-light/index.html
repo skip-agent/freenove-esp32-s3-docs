@@ -296,12 +296,6 @@ pwm.<span class="tok-fn">duty</span>(pwmValue)</code></pre>
               <article class="mini-card"><h3>Reverse the direction</h3><p>Change the middle line to <code>int pwmVal = 4095 - adcVal;</code> and upload. The light now fades the opposite way as you turn — the same chain, flipped in one subtraction.</p></article>
               <article class="mini-card"><h3>Make a three-step lamp <button class="define" data-topic="threshold">Define</button></h3><p>Replace the pass-through with if-bands — below 1000 write 0, up to 3000 write 2048, above that write 4095 — and feel the knob become an off / half / full switch.</p></article>
             </div>
-            <div class="logbook">
-              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
-              <label>Which way round did your knob end up — clockwise for brighter or for dimmer?<textarea rows="2"></textarea></label>
-              <label>Where did you put the band edges for the three-step lamp, and how did it feel to use?<textarea rows="2"></textarea></label>
-              <label>What in your home would you rather control with a knob like this?<textarea rows="2"></textarea></label>
-            </div>
           </div>
         </section>
         <section id="agent" class="card">

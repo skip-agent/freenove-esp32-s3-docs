@@ -102,10 +102,5 @@
       ]
     }
   ],
-  "challenge": "Change the delay values and find a rhythm that feels like a calm heartbeat, then note the two numbers you chose.",
-  "logbookPrompts": [
-    "What delay felt most like a heartbeat?",
-    "What was the fastest blink you could still see as separate flashes?",
-    "What would you want this LED to tell you in a real project?"
-  ]
+  "challenge": "Change the delay values and find a rhythm that feels like a calm heartbeat, then note the two numbers you chose."
 }

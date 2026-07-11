@@ -256,10 +256,6 @@ challenge:
       body: Add `delay(1000)` after each `for` loop so the horn pauses a second at each end before turning back.
     - title: Find the smallest step
       body: Make the loops step by 2, then 5, then 10. Watch for the smallest angle step your servo turns into a visible move.
-  logbook:
-    - Where did the horn stop on your half-arc, and did it match your prediction?
-    - How did the one-second rest change the feel of the sweep?
-    - What was the smallest angle step your servo visibly moved?
 
 agent:
   intro: >

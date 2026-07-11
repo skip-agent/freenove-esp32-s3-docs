@@ -128,10 +128,5 @@
       ]
     }
   ],
-  "challenge": "Change the reply so the board wraps your message in words of its own, then make it react to one specific word.",
-  "logbookPrompts": [
-    "What reply did you have the board send back?",
-    "What word did you teach it to react to, and what did it answer?",
-    "What could you control if a typed word could trigger an action later?"
-  ]
+  "challenge": "Change the reply so the board wraps your message in words of its own, then make it react to one specific word."
 }

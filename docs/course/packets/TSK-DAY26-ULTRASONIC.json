@@ -165,10 +165,5 @@
       ]
     }
   ],
-  "challenge": "Measure three targets, record expected and actual distances, then choose a keep-out-zone threshold and explain why.",
-  "logbookPrompts": [
-    "What did you measure today?",
-    "Which reading seemed most stable?",
-    "What would you build if the sensor could warn you something's too close?"
-  ]
+  "challenge": "Measure three targets, record expected and actual distances, then choose a keep-out-zone threshold and explain why."
 }

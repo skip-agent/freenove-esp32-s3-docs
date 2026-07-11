@@ -236,10 +236,6 @@ challenge:
       body: >
         Back in station mode, open your router's device list and find your
         board there — the same IP address the monitor printed.
-  logbook:
-    - What IP address did your router assign the board?
-    - What did you name the board's own network?
-    - What would you want the board to serve up once your phone can reach it?
 
 agent:
   intro: >

@@ -131,10 +131,5 @@
       ]
     }
   ],
-  "challenge": "Run the client sketch with sketchWiFi as the server, teach the board to answer \"aye\" to \"ahoy\", and note what you'd build next — the whole kit is yours now.",
-  "logbookPrompts": [
-    "What was the first line your board and your computer exchanged?",
-    "Which role did you leave the board in — listening or dialling — and why?",
-    "Thirty days on, the whole kit is yours. What will you build next?"
-  ]
+  "challenge": "Run the client sketch with sketchWiFi as the server, teach the board to answer \"aye\" to \"ahoy\", and note what you'd build next — the whole kit is yours now."
 }

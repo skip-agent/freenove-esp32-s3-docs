@@ -239,10 +239,6 @@ challenge:
     - title: Change the speed
       explain: delayMs
       body: Set every `delay(100)` to a larger or smaller number and upload. Find the speed where the flow still reads as a single moving light.
-  logbook:
-    - Which delay made the flow feel best, and why?
-    - What changed when you ran the reverse loop first?
-    - What real-world display works like this moving bar?
 
 agent:
   intro: >

@@ -174,10 +174,5 @@
       ]
     }
   ],
-  "challenge": "Change one aspect of the lamp's feel — the debounce timing, or a double-press behaviour — and describe the result.",
-  "logbookPrompts": [
-    "What debounce value felt best, and how did too-short and too-long each fail?",
-    "How is a toggle different from the hold-to-light button of Day 4?",
-    "What household thing could you now rebuild as a tiny product?"
-  ]
+  "challenge": "Change one aspect of the lamp's feel — the debounce timing, or a double-press behaviour — and describe the result."
 }

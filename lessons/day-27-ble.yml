@@ -225,10 +225,6 @@ challenge:
       body: Change `setupBLE("ESP32S3_Bluetooth")` to `setupBLE("YourBoatName")`, re-upload, and rescan in LightBlue — your board now broadcasts under its own flag.
     - title: Find the range edge
       body: Stay subscribed on the phone and walk to the far end of your home while a helper (or a repeated send) keeps messages coming from Serial Monitor. Note where they stop arriving.
-  logbook:
-    - What name did you broadcast, and how quickly did it show up in a rescan?
-    - Where in your home did the link drop out?
-    - What would you want your board to report to your phone in a real project?
 
 agent:
   intro: >

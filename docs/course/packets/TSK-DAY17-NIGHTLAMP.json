@@ -177,10 +177,5 @@
       ]
     }
   ],
-  "challenge": "Discover your room's own LIGHT_MIN and LIGHT_MAX by watching real readings, then flip the mapping so darkness makes the lamp glow.",
-  "logbookPrompts": [
-    "What LIGHT_MIN and LIGHT_MAX did your room actually call for?",
-    "Which way did covering the sensor move the lamp before you flipped it?",
-    "Where in your home would a lamp that senses darkness earn its keep?"
-  ]
+  "challenge": "Discover your room's own LIGHT_MIN and LIGHT_MAX by watching real readings, then flip the mapping so darkness makes the lamp glow."
 }

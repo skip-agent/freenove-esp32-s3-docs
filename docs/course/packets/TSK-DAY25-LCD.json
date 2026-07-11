@@ -166,10 +166,5 @@
       ]
     }
   ],
-  "challenge": "Put your boat's name on row 0, turn the counter into minutes and seconds, then overflow a row on purpose and fix it.",
-  "logbookPrompts": [
-    "What did the screen do with the characters past column sixteen?",
-    "How would you show a sensor reading from an earlier day on this screen?",
-    "Where on a real boat would a two-line display earn its keep?"
-  ]
+  "challenge": "Put your boat's name on row 0, turn the counter into minutes and seconds, then overflow a row on purpose and fix it."
 }

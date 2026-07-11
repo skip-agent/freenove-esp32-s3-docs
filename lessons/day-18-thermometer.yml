@@ -240,10 +240,6 @@ challenge:
     - title: Add Fahrenheit
       explain: serialPrint
       body: Add `double tempF = tempC * 1.8 + 32;` after the Celsius line and print it too — one more field in the printf.
-  logbook:
-    - What did your room read this morning and this evening?
-    - How long did the bead take to reach body-warm while you held it?
-    - Where on a boat — or in your home — would a temperature sensor earn its keep?
 
 agent:
   intro: >

@@ -320,10 +320,6 @@ challenge:
         Change the sketch so Serial prints `potenVal - 2048` in place of the
         abs() value. Now one direction reads positive and the other negative —
         a single number that tells the whole story of the shaft.
-  logbook:
-    - What speed number first got the shaft moving — and was it the same in both directions?
-    - Why does the motor need current before it moves at all?
-    - What would you drive with this chip if the motor were a wheel, a pump, or a winch?
 
 agent:
   intro: >

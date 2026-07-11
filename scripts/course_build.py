@@ -458,18 +458,11 @@ def _challenge_section(index: int, block: dict) -> str:
     for card in block.get("cards") or []:
         chip = _chip(card)
         cards.append(f"""              <article class="mini-card"><h3>{esc(card.get("title"))}{chip}</h3><p>{inline(card.get("body"))}</p></article>""")
-    prompts = []
-    for prompt in block.get("logbook") or []:
-        prompts.append(f"""              <label>{esc(prompt)}<textarea rows="2"></textarea></label>""")
     return f"""        <section id="challenge" class="card">
           <div class="card-inner">
 {_section_head(index, meta, block.get("intro", ""))}
             <div class="two-col">
 {chr(10).join(cards)}
-            </div>
-            <div class="logbook">
-              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
-{chr(10).join(prompts)}
             </div>
           </div>
         </section>"""
@@ -859,7 +852,6 @@ def emit_packet(lesson: dict, glossary: dict) -> dict:
         for c in test.get("checks") or []
     ]
     packet["challenge"] = plain_text((lesson.get("challenge") or {}).get("summary"))
-    packet["logbookPrompts"] = list((lesson.get("challenge") or {}).get("logbook") or [])
     return packet
 
 

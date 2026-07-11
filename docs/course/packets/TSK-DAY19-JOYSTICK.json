@@ -176,10 +176,5 @@
       ]
     }
   ],
-  "challenge": "Find your joystick's true centre and corner numbers, sketch the four compass directions as value pairs, and count how far the resting centre drifts.",
-  "logbookPrompts": [
-    "What are your resting centre numbers, and how much do they drift?",
-    "What value pairs mark north, south, east, and west?",
-    "Where have you held a control like this before?"
-  ]
+  "challenge": "Find your joystick's true centre and corner numbers, sketch the four compass directions as value pairs, and count how far the resting centre drifts."
 }

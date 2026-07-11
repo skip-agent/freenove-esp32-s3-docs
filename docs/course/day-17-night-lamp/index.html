@@ -304,12 +304,6 @@ pwm.<span class="tok-fn">duty</span>(pwmValue)
               <article class="mini-card"><h3>Find your room&#x27;s numbers <button class="define" data-topic="adc">Define</button></h3><p>Add <code>Serial.begin(115200);</code> to setup and <code>Serial.println(adcVal);</code> to the loop, re-upload, and open Serial Monitor. Note the values at your room&#x27;s darkest and brightest, then write those into LIGHT_MIN and LIGHT_MAX.</p></article>
               <article class="mini-card"><h3>Flip the lamp&#x27;s direction <button class="define" data-topic="mapValue">Define</button></h3><p>Swap the last two arguments of map so 0 and 4095 trade places, then re-upload. Whatever your lamp did before, it now does in reverse — set it so darkness makes it glow, and you have a true night lamp.</p></article>
             </div>
-            <div class="logbook">
-              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
-              <label>What LIGHT_MIN and LIGHT_MAX did your room actually call for?<textarea rows="2"></textarea></label>
-              <label>Which way did covering the sensor move the lamp before you flipped it?<textarea rows="2"></textarea></label>
-              <label>Where in your home would a lamp that senses darkness earn its keep?<textarea rows="2"></textarea></label>
-            </div>
           </div>
         </section>
         <section id="agent" class="card">

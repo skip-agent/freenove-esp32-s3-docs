@@ -181,10 +181,5 @@
       ]
     }
   ],
-  "challenge": "Limit the horn to a 45° window like a tiller stop, reverse the steering direction, and mark three knob positions that point the horn at known angles.",
-  "logbookPrompts": [
-    "What did your 45° window feel like compared with the full sweep?",
-    "Which map() arguments did you change to reverse the direction, and why did that work?",
-    "Where did your three marks land on the knob — evenly spaced or bunched?"
-  ]
+  "challenge": "Limit the horn to a 45° window like a tiller stop, reverse the steering direction, and mark three knob positions that point the horn at known angles."
 }

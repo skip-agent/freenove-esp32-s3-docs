@@ -255,10 +255,6 @@ challenge:
       body: Add a third strncmp branch for `led_blink` that flashes the LED twice — HIGH, a short delay, LOW, and again. Upload and send your new word.
     - title: Rename the commands
       body: Change `led_on` and `led_off` to words of your own — keep the character counts in each strncmp honest — and drive the light with your own vocabulary.
-  logbook:
-    - What did your third command do, and what did you name it?
-    - What happened when a command was off by a single character?
-    - What device in your life is obeying exact spellings like this right now?
 
 agent:
   intro: >

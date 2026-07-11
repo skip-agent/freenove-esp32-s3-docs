@@ -245,10 +245,6 @@ challenge:
         Raise PRESS_VAL step by step until a light brush does nothing and only a
         firm, deliberate grip flips the lamp. You've just designed how the switch
         should feel.
-  logbook:
-    - What did your untouched and touched readings turn out to be?
-    - Where did you finally set PRESS_VAL and RELEASE_VAL, and why?
-    - What everyday device would feel better with a touch control like this?
 
 agent:
   intro: >

@@ -153,10 +153,5 @@
       ]
     }
   ],
-  "challenge": "Read your own touch numbers with Sketch_09.1_TouchRead, re-tune PRESS_VAL and RELEASE_VAL, then set the lamp to answer only a firm grip.",
-  "logbookPrompts": [
-    "What did your untouched and touched readings turn out to be?",
-    "Where did you finally set PRESS_VAL and RELEASE_VAL, and why?",
-    "What everyday device would feel better with a touch control like this?"
-  ]
+  "challenge": "Read your own touch numbers with Sketch_09.1_TouchRead, re-tune PRESS_VAL and RELEASE_VAL, then set the lamp to answer only a firm grip."
 }

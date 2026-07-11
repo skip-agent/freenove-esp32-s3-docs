@@ -270,10 +270,6 @@ challenge:
       body: Change `delay(1000)` to 2000 and upload — each character now holds for two seconds. Find a pace you could actually read across the room.
     - title: Draw an H
       body: Segments F E G B C make an H, and in bit order DP G F E D C B A that pattern is the byte `0x89`. Call `writeData(0x89)` and check the shape that appears.
-  logbook:
-    - Which character surprised you when it appeared, and why?
-    - What byte would draw the first letter of your name — and can this display manage it?
-    - Where in daily life did you last read a seven-segment digit?
 
 agent:
   intro: >

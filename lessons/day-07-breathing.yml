@@ -237,10 +237,6 @@ challenge:
       body: Change both `delay(10)` lines together — try 5 for a quick breath, 20 for a slow one — and upload until the fade feels like a resting breath.
     - title: Hold at the top
       body: Add a short `delay(300)` between the fade-in and fade-out loops so the light pauses at full brightness before it sinks again.
-  logbook:
-    - What fade speed felt most like a calm, resting breath?
-    - How did a pause at full brightness change the feel of the breath?
-    - Where in daily life have you seen a light breathe like this?
 
 agent:
   intro: >

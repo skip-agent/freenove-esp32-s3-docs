@@ -177,10 +177,5 @@
       ]
     }
   ],
-  "challenge": "Change the flow speed, send two lit LEDs travelling together, then fill the bar step by step — all by reshaping the byte x.",
-  "logbookPrompts": [
-    "Which speed made the flow easiest to follow, and why?",
-    "What starting value made the pair bounce cleanly at both ends?",
-    "After eight steps of the fill pattern, what byte is the chip holding?"
-  ]
+  "challenge": "Change the flow speed, send two lit LEDs travelling together, then fill the bar step by step — all by reshaping the byte x."
 }

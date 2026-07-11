@@ -82,10 +82,5 @@
       ]
     }
   ],
-  "challenge": "List your computer's serial devices with the board unplugged, plug it in, list again to see the new device appear, then unplug to watch it vanish.",
-  "logbookPrompts": [
-    "What name did your board's serial device show up as?",
-    "Did your system need the CH343 driver, or did the port appear on its own?",
-    "In your own words, what are the four stages an upload goes through?"
-  ]
+  "challenge": "List your computer's serial devices with the board unplugged, plug it in, list again to see the new device appear, then unplug to watch it vanish."
 }

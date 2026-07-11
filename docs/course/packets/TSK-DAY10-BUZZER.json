@@ -182,10 +182,5 @@
       ]
     }
   ],
-  "challenge": "Design a two-beep pattern that means something, then try the passive buzzer to hear a pitch you control.",
-  "logbookPrompts": [
-    "What did your two-beep signal mean, and could someone else read it?",
-    "What was the transistor doing every time the buzzer sounded?",
-    "Where in daily life does one fixed tone do a whole job?"
-  ]
+  "challenge": "Design a two-beep pattern that means something, then try the passive buzzer to hear a pitch you control."
 }

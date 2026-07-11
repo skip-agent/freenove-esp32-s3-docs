@@ -265,10 +265,6 @@ challenge:
     - title: Overflow the row
       explain: lcd1602
       body: Print a message longer than sixteen characters and watch where the extra letters go. Then trim the message until the whole line fits the glass again.
-  logbook:
-    - What did the screen do with the characters past column sixteen?
-    - How would you show a sensor reading from an earlier day on this screen?
-    - Where on a real boat would a two-line display earn its keep?
 
 agent:
   intro: >

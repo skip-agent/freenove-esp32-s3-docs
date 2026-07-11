@@ -242,10 +242,6 @@ challenge:
     - title: Map the corners
       explain: joystick
       body: Push the stick to north, south, east, and west, and record the X and Y pair at each full deflection. Sketch them as a compass with your centre numbers in the middle.
-  logbook:
-    - What are your resting centre numbers, and how much do they drift?
-    - What value pairs mark north, south, east, and west?
-    - Where have you held a control like this before?
 
 agent:
   intro: >

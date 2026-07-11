@@ -257,10 +257,6 @@ challenge:
     - title: Hear a siren
       explain: tone
       body: Swap in the passive buzzer and upload `Sketch_06.2_Alertor.ino` to hear a siren instead of a single note. Notice how choosing the pitch changes everything.
-  logbook:
-    - What did your two-beep signal mean, and could someone else read it?
-    - What was the transistor doing every time the buzzer sounded?
-    - Where in daily life does one fixed tone do a whole job?
 
 agent:
   intro: >

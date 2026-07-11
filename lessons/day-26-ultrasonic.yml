@@ -221,10 +221,6 @@ challenge:
     - title: Choose a threshold
       explain: threshold
       body: Pick a "too close" distance — say 15 cm. Later that line can become a beep or a warning.
-  logbook:
-    - What did you measure today?
-    - Which reading seemed most stable?
-    - What would you build if the sensor could warn you something's too close?
 
 agent:
   intro: >

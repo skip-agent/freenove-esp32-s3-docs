@@ -151,10 +151,5 @@
       ]
     }
   ],
-  "challenge": "Reverse the direction the light flows, then change how fast it moves by editing the delay, and note what each edit does.",
-  "logbookPrompts": [
-    "Which delay made the flow feel best, and why?",
-    "What changed when you ran the reverse loop first?",
-    "What real-world display works like this moving bar?"
-  ]
+  "challenge": "Reverse the direction the light flows, then change how fast it moves by editing the delay, and note what each edit does."
 }

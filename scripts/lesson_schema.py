@@ -271,8 +271,6 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
              f"{code}: challenge.title is required")
     _require(errors, _nonempty(challenge.get("summary")),
              f"{code}: challenge.summary is required (feeds the agent packet)")
-    _require(errors, len(_as_list(challenge.get("logbook"))) > 0,
-             f"{code}: challenge.logbook must be non-empty")
 
     # Agent packet
     agent = _as_dict(lesson.get("agent"))
@@ -308,7 +306,6 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
         ("test.expected", test.get("expected")),
         ("test.checks", test.get("checks")),
         ("challenge.cards", challenge.get("cards")),
-        ("challenge.logbook", challenge.get("logbook")),
         ("agent.coachInstructions", agent.get("coachInstructions")),
         ("hero.pills", _as_dict(lesson.get("hero")).get("pills")),
     ]
@@ -344,7 +341,6 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
     string_lists = {
         "steps.items": _as_list(_as_dict(lesson.get("steps")).get("items")),
         "test.expected": _as_list(test.get("expected")),
-        "challenge.logbook": _as_list(challenge.get("logbook")),
         "agent.coachInstructions": _as_list(agent.get("coachInstructions")),
     }
     for name, items in string_lists.items():

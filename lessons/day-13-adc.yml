@@ -227,10 +227,6 @@ challenge:
     - title: Map the sweep
       explain: potentiometer
       body: Pick three positions — a quarter turn, halfway, three quarters — and write down the reading at each. Then hold one position still and watch how steady the number stays.
-  logbook:
-    - What reading did your knob's midpoint give?
-    - How steady did a held position stay, and by how many counts did it drift?
-    - What would you control with a knob that reports its own position?
 
 agent:
   intro: >

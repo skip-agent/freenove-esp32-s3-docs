@@ -218,11 +218,13 @@ class ValidationTests(unittest.TestCase):
         errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
         self.assertTrue(any("test.checks[0].fix is required" in e for e in errors), errors)
 
-    def test_blank_logbook_prompt_fails(self):
+    def test_logbook_is_not_required(self):
+        # The logbook (reflection prompts) was removed from the course; a lesson
+        # with no logbook key must still validate.
         lesson = load_day26()
-        lesson["challenge"]["logbook"][1] = None
+        lesson.get("challenge", {}).pop("logbook", None)
         errors = lesson_schema.validate_lesson(lesson, GLOSSARY_KEYS)
-        self.assertTrue(any("challenge.logbook[1]" in e for e in errors), errors)
+        self.assertFalse(any("logbook" in e for e in errors), errors)
 
     def test_optional_list_wrong_type_fails(self):
         # an optional list written as a mapping/string must be caught, not coerced

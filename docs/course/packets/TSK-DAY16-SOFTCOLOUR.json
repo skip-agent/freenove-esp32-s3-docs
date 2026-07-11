@@ -192,10 +192,5 @@
       ]
     }
   ],
-  "challenge": "Dial the dome to sunset orange and record the three knob levels, then rewrite one line so two knobs mix the whole colour.",
-  "logbookPrompts": [
-    "What three numbers made your sunset orange?",
-    "Which colour surprised you most when you mixed it?",
-    "With blue riding the green knob, which colours could you no longer reach?"
-  ]
+  "challenge": "Dial the dome to sunset orange and record the three knob levels, then rewrite one line so two knobs mix the whole colour."
 }

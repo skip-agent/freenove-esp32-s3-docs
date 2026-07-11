@@ -172,10 +172,5 @@
       ]
     }
   ],
-  "challenge": "Reverse the knob so turning up dims the light, then turn the smooth fade into a three-step lamp with if-bands.",
-  "logbookPrompts": [
-    "Which way round did your knob end up — clockwise for brighter or for dimmer?",
-    "Where did you put the band edges for the three-step lamp, and how did it feel to use?",
-    "What in your home would you rather control with a knob like this?"
-  ]
+  "challenge": "Reverse the knob so turning up dims the light, then turn the smooth fade into a three-step lamp with if-bands."
 }

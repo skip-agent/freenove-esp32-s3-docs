@@ -129,10 +129,6 @@ challenge:
     - title: Plug in and look again
       explain: usbSerial
       body: Connect the board and run the same command. A new entry appears — that's your board arriving through the USB-to-serial bridge. Unplug it and it disappears. That entry is exactly what Tools → Port lists.
-  logbook:
-    - What name did your board's serial device show up as?
-    - Did your system need the CH343 driver, or did the port appear on its own?
-    - In your own words, what are the four stages an upload goes through?
 
 agent:
   intro: >

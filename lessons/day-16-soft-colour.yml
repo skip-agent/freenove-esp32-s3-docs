@@ -263,10 +263,6 @@ challenge:
     - title: Two-knob mixer
       explain: pinArray
       body: In the loop, make the blue channel reuse the green knob's value — set `colors[2] = colors[1]` after the map line — and the mix now lives on two knobs.
-  logbook:
-    - What three numbers made your sunset orange?
-    - Which colour surprised you most when you mixed it?
-    - With blue riding the green knob, which colours could you no longer reach?
 
 agent:
   intro: >

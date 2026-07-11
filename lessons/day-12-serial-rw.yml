@@ -192,10 +192,6 @@ challenge:
     - title: React to a word
       explain: serialRead
       body: Add an `if (inputString == "ping")` check that answers `pong` — the first hint of a board that follows commands.
-  logbook:
-    - What reply did you have the board send back?
-    - What word did you teach it to react to, and what did it answer?
-    - What could you control if a typed word could trigger an action later?
 
 agent:
   intro: >

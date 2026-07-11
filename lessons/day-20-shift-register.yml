@@ -277,10 +277,6 @@ challenge:
       body: Start the first loop with `x = 0x03` so two neighbouring LEDs travel together. Predict what the second loop's starting value needs to be before you change it.
     - title: Fill the bar
       body: In the first loop, replace `x <<= 1` with `x = (x << 1) | 1` so each step keeps every light already lit and the bar fills from one end.
-  logbook:
-    - Which speed made the flow easiest to follow, and why?
-    - What starting value made the pair bounce cleanly at both ends?
-    - After eight steps of the fill pattern, what byte is the chip holding?
 
 agent:
   intro: >

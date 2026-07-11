@@ -136,10 +136,5 @@
       ]
     }
   ],
-  "challenge": "Rename the broadcast to your boat's name and rescan, then send messages from the far end of your home to find the edge of BLE's range.",
-  "logbookPrompts": [
-    "What name did you broadcast, and how quickly did it show up in a rescan?",
-    "Where in your home did the link drop out?",
-    "What would you want your board to report to your phone in a real project?"
-  ]
+  "challenge": "Rename the broadcast to your boat's name and rescan, then send messages from the far end of your home to find the edge of BLE's range."
 }

@@ -156,10 +156,5 @@
       ]
     }
   ],
-  "challenge": "Sweep a half-arc, rest at each end like a lighthouse, then hunt for the smallest angle step your servo visibly answers.",
-  "logbookPrompts": [
-    "Where did the horn stop on your half-arc, and did it match your prediction?",
-    "How did the one-second rest change the feel of the sweep?",
-    "What was the smallest angle step your servo visibly moved?"
-  ]
+  "challenge": "Sweep a half-arc, rest at each end like a lighthouse, then hunt for the smallest angle step your servo visibly answers."
 }

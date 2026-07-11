@@ -231,10 +231,6 @@ challenge:
     - title: Change the speed
       explain: delayMs
       body: Set `delay(100)` to a larger or smaller number and upload. Find the speed where the comet still reads as one moving light.
-  logbook:
-    - What did a longer or shorter tail change about how the comet looked?
-    - Which sweep speed felt best, and why?
-    - What real-world moving light works like this comet and tail?
 
 agent:
   intro: >

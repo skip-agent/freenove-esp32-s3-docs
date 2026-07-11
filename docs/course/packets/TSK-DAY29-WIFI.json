@@ -127,10 +127,5 @@
       ]
     }
   ],
-  "challenge": "Flip the board into access-point mode with Sketch_23.2, join WiFi_Name from your phone, then rename the network after your boat and find the board on your router's device list.",
-  "logbookPrompts": [
-    "What IP address did your router assign the board?",
-    "What did you name the board's own network?",
-    "What would you want the board to serve up once your phone can reach it?"
-  ]
+  "challenge": "Flip the board into access-point mode with Sketch_23.2, join WiFi_Name from your phone, then rename the network after your boat and find the board on your router's device list."
 }

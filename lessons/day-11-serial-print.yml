@@ -185,10 +185,6 @@ challenge:
     - title: Report faster
       explain: millis
       body: Lower the `delay(1000)` to `delay(250)` so the running time updates four times a second, then add a second `Serial.println` of your own.
-  logbook:
-    - What message did you have the board greet you with?
-    - How fast could the running time update before it was hard to read?
-    - What would you want the board to report back to you in a real project?
 
 agent:
   intro: >

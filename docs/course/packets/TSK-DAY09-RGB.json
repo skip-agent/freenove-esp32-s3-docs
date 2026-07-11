@@ -164,10 +164,5 @@
       ]
     }
   ],
-  "challenge": "Choose a colour that would mean ready or warning, record its red, green, and blue numbers, then try the gradient variant.",
-  "logbookPrompts": [
-    "What red, green, and blue numbers did you pick for your status colour?",
-    "How did the gradient sketch feel different from the random one?",
-    "What in a real gadget would you want an RGB light to tell you?"
-  ]
+  "challenge": "Choose a colour that would mean ready or warning, record its red, green, and blue numbers, then try the gradient variant."
 }

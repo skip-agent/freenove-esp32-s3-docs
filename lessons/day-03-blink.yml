@@ -159,10 +159,6 @@ challenge:
     - title: Find a heartbeat
       explain: delayMs
       body: Adjust the two numbers until the blink feels like a resting pulse. Write down what you landed on.
-  logbook:
-    - What delay felt most like a heartbeat?
-    - What was the fastest blink you could still see as separate flashes?
-    - What would you want this LED to tell you in a real project?
 
 agent:
   intro: >

@@ -238,10 +238,6 @@ challenge:
       body: Decide on a colour that would read as ready or as a warning, then write down the red, green, and blue numbers from 0 to 255 that would make it.
     - title: Let it drift
       body: Upload the gradient variant `Sketch_05.2_GradientColorLight.ino` and watch the colour slide smoothly instead of jumping.
-  logbook:
-    - What red, green, and blue numbers did you pick for your status colour?
-    - How did the gradient sketch feel different from the random one?
-    - What in a real gadget would you want an RGB light to tell you?
 
 agent:
   intro: >

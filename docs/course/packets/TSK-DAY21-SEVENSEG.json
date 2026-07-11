@@ -176,10 +176,5 @@
       ]
     }
   ],
-  "challenge": "Show your favourite digit from power-on, slow the count, then work out the byte for the letter H and put it on the display.",
-  "logbookPrompts": [
-    "Which character surprised you when it appeared, and why?",
-    "What byte would draw the first letter of your name — and can this display manage it?",
-    "Where in daily life did you last read a seven-segment digit?"
-  ]
+  "challenge": "Show your favourite digit from power-on, slow the count, then work out the byte for the letter H and put it on the display."
 }

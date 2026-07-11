@@ -156,10 +156,5 @@
       ]
     }
   ],
-  "challenge": "Find the knob's midpoint by numbers alone, map a few positions to their readings, and note how steadily a held value sits.",
-  "logbookPrompts": [
-    "What reading did your knob's midpoint give?",
-    "How steady did a held position stay, and by how many counts did it drift?",
-    "What would you control with a knob that reports its own position?"
-  ]
+  "challenge": "Find the knob's midpoint by numbers alone, map a few positions to their readings, and note how steadily a held value sits."
 }

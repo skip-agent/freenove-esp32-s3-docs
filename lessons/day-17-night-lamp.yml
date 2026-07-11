@@ -255,10 +255,6 @@ challenge:
     - title: Flip the lamp's direction
       explain: mapValue
       body: Swap the last two arguments of map so 0 and 4095 trade places, then re-upload. Whatever your lamp did before, it now does in reverse — set it so darkness makes it glow, and you have a true night lamp.
-  logbook:
-    - What LIGHT_MIN and LIGHT_MAX did your room actually call for?
-    - Which way did covering the sensor move the lamp before you flipped it?
-    - Where in your home would a lamp that senses darkness earn its keep?
 
 agent:
   intro: >

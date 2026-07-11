@@ -120,10 +120,6 @@ challenge:
     - title: Find the special pins
       explain: bootReset
       body: Locate GPIO0 on the map — that's the BOOT pin the button pulls at power-up. Then find the pin the onboard LED sits on. Not every pin is interchangeable, and the map is how you tell.
-  logbook:
-    - Which pins carry 3.3V, 5V, and GND on your board?
-    - In your own words, what is a GPIO pin, and what two things can it do?
-    - Why would wiring a 5V sensor output straight into a GPIO be a bad idea?
 
 agent:
   intro: >

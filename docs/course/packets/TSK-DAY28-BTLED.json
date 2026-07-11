@@ -161,10 +161,5 @@
       ]
     }
   ],
-  "challenge": "Add a third command that blinks the LED twice, rename the commands to your own words, and note the exact spelling discipline a protocol demands.",
-  "logbookPrompts": [
-    "What did your third command do, and what did you name it?",
-    "What happened when a command was off by a single character?",
-    "What device in your life is obeying exact spellings like this right now?"
-  ]
+  "challenge": "Add a third command that blinks the LED twice, rename the commands to your own words, and note the exact spelling discipline a protocol demands."
 }

@@ -124,10 +124,5 @@
       ]
     }
   ],
-  "challenge": "Change the start-up message and the reporting speed, then add a line of your own to the loop.",
-  "logbookPrompts": [
-    "What message did you have the board greet you with?",
-    "How fast could the running time update before it was hard to read?",
-    "What would you want the board to report back to you in a real project?"
-  ]
+  "challenge": "Change the start-up message and the reporting speed, then add a line of your own to the loop."
 }

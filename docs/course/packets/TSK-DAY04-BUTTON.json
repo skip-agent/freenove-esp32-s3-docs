@@ -176,10 +176,5 @@
       ]
     }
   ],
-  "challenge": "Predict the LED's state before each press, then reason about what the 10 kΩ resistor is quietly doing.",
-  "logbookPrompts": [
-    "Which prediction did you get wrong, and why?",
-    "What did the 10 kΩ resistor turn out to be doing?",
-    "What everyday object works like this button and light?"
-  ]
+  "challenge": "Predict the LED's state before each press, then reason about what the 10 kΩ resistor is quietly doing."
 }

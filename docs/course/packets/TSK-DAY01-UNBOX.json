@@ -65,10 +65,5 @@
     "successCriteria": ""
   },
   "troubleshooting": [],
-  "challenge": "Use the pinout to locate the power rails, the BOOT pin, and the onboard LED's pin, then reason about why 5V from a sensor can't go straight into a GPIO.",
-  "logbookPrompts": [
-    "Which pins carry 3.3V, 5V, and GND on your board?",
-    "In your own words, what is a GPIO pin, and what two things can it do?",
-    "Why would wiring a 5V sensor output straight into a GPIO be a bad idea?"
-  ]
+  "challenge": "Use the pinout to locate the power rails, the BOOT pin, and the onboard LED's pin, then reason about why 5V from a sensor can't go straight into a GPIO."
 }

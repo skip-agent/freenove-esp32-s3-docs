@@ -273,10 +273,6 @@ challenge:
       body: Swap the output ends — map to 180 down to 0 — and the horn runs against the knob. One line reverses the helm.
     - title: Mark the helm
       body: With the original sketch restored, find the knob positions that print 0, 90, and 180, and mark each on the knob with a sliver of tape. You've calibrated a control.
-  logbook:
-    - What did your 45° window feel like compared with the full sweep?
-    - Which map() arguments did you change to reverse the direction, and why did that work?
-    - Where did your three marks land on the knob — evenly spaced or bunched?
 
 agent:
   intro: >

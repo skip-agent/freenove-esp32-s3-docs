@@ -204,10 +204,6 @@ challenge:
       body: Open `Sketch_24.1_WiFiClient.ino`, put your computer's address in `REMOTE_IP`, and run sketchWiFi in **TCP SERVER** mode on port 8888. The board dials in and introduces itself — "Hello", then "This is my IP."
     - title: Teach it a word
       body: Back in the server sketch, check each incoming line and have the board `client.print("aye\n")` whenever the line contains "ahoy". A two-word protocol, and it's yours.
-  logbook:
-    - What was the first line your board and your computer exchanged?
-    - Which role did you leave the board in — listening or dialling — and why?
-    - Thirty days on, the whole kit is yours. What will you build next?
 
 agent:
   intro: >

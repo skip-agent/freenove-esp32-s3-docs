@@ -163,10 +163,5 @@
       ]
     }
   ],
-  "challenge": "Log your room's reading morning and evening, add a Fahrenheit line to the printout, then hold the bead and time how long it takes to read body-warm.",
-  "logbookPrompts": [
-    "What did your room read this morning and this evening?",
-    "How long did the bead take to reach body-warm while you held it?",
-    "Where on a boat — or in your home — would a temperature sensor earn its keep?"
-  ]
+  "challenge": "Log your room's reading morning and evening, add a Fahrenheit line to the printout, then hold the bead and time how long it takes to read body-warm."
 }
