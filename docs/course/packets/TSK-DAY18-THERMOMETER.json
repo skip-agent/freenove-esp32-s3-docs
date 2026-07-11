@@ -7,7 +7,7 @@
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
   "estimatedTimeMinutes": 25,
-  "mission": "Build a working thermometer from a thermistor and a 10 kΩ resistor, upload the Arduino sketch, and watch live temperature readings print in Serial Monitor — then pinch the bead and see the number climb.",
+  "mission": "Build a thermometer from a thermistor and a 10 kΩ resistor, upload the Arduino sketch, and read live temperature in Serial Monitor — then pinch the bead and watch the number climb. This is the first sensor whose signal follows a curve, so today you learn how four lines of maths walk one raw reading through resistance and into honest degrees.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -72,9 +72,11 @@
   "coachInstructions": [
     "Guide one physical connection at a time and wait for learner confirmation before proceeding.",
     "The divider's layout is the day's main trap — 10 kΩ to 3.3V, thermistor to GND, and the row where they meet to GPIO 1.",
+    "Teach the core idea- this sensor's resistance follows a curve, so the sketch uses the B-equation's logarithm to reach degrees, where earlier analog days rescaled a straight line with map().",
+    "Walk the chain out loud using the printed fields — ADC count to voltage, voltage to resistance, resistance to degrees.",
     "A reading near -273 or nan means the divider is open or shorted; check the GPIO 1 midpoint wire and the 10 kΩ resistor before changing code.",
     "If values freeze or ignore a pinch, have the learner reseat the thermistor's legs in their breadboard rows.",
-    "Coach the pinch itself — fingers on the bead so body heat transfers; a climb of a few degrees is success.",
+    "Coach the pinch itself — fingers on the bead so body heat transfers; the ADC count and voltage fall as the temperature climbs a few degrees, which is success.",
     "Keep the Arduino path primary; MicroPython is optional only if already set up."
   ],
   "steps": [
@@ -116,16 +118,20 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "The thermistor's resistance moves with temperature; the divider turns resistance into voltage; the B-equation turns it back into degrees.",
-    "formula": "ADC count → volts → ohms → degrees",
+    "plainLanguage": "A thermistor's resistance follows a curve as it heats; the divider turns that resistance into a voltage, and the B-equation's logarithm turns the curve back into straight degrees.",
+    "formula": "ADC count → volts → ohms → degrees — and the last arrow follows a curve, so it takes a logarithm",
     "notes": [
       {
-        "title": "Why resistance moves",
-        "body": "A thermistor is made of a material whose electrons flow more freely as it warms, so its resistance drops as temperature rises. At 25 °C this bead sits near 10 kΩ."
+        "title": "Why this one needs a formula",
+        "body": "map() draws a straight line between two points, ideal when a sensor rises evenly across its range. A thermistor's resistance follows a curve as it heats, so a straight rescale would match the real temperature at a single point and wander off on either side. The B-equation carries a logarithm that follows the curve, keeping the reading honest from cold to warm."
+      },
+      {
+        "title": "Why resistance moves with heat",
+        "body": "A thermistor is made of a material whose electrons flow more freely as it warms, so its resistance drops as temperature rises. At 25 °C this bead sits near 10 kΩ, which is why the sketch's reference values are built around 10 and 25."
       },
       {
         "title": "What the 10 kΩ partner does",
-        "body": "The ADC measures voltage. Stacking the fixed resistor above the thermistor makes a divider whose midpoint voltage tracks the changing resistance — the translation the pin can actually read."
+        "body": "The ADC measures voltage, and the thermistor only offers a changing resistance. Stacking the fixed 10 kΩ resistor above it makes a divider whose midpoint voltage tracks that resistance — the one form the pin can actually read."
       }
     ]
   },
@@ -163,5 +169,5 @@
       ]
     }
   ],
-  "challenge": "Log your room's reading morning and evening, add a Fahrenheit line to the printout, then hold the bead and time how long it takes to read body-warm."
+  "challenge": "Pinch the thermistor and watch the ADC count and voltage fall while the temperature climbs, then reason back through resistance to explain why all three move the way they do."
 }

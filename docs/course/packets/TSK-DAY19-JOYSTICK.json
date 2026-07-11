@@ -7,7 +7,7 @@
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
   "estimatedTimeMinutes": 20,
-  "mission": "Wire the joystick module's five pins, upload the Arduino sketch, and watch three numbers stream in Serial Monitor — X and Y follow the stick's tilt, and Z drops from 1 to 0 when you press straight down.",
+  "mission": "Wire the joystick's five pins, upload the sketch, and watch three numbers stream in Serial Monitor. Today is about seeing the module for what it is — two of the potentiometers you have already read, set at right angles, plus one push button underneath. Two analog reads become an (X, Y) position on a plane, one digital read catches the press, and every piece is one you have met before.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -75,9 +75,12 @@
     }
   ],
   "coachInstructions": [
+    "Frame the module as a composite of things already learned — two potentiometers read with analogRead (the X and Y axes) and one push button read with digitalRead and an internal pull-up.",
+    "Land the 2D-position idea — X and Y alone are two dials, but together they name a point on a plane, which is how a stick steers.",
+    "Explain that each axis rests near 2048 but never exactly, so healthy resting values fall roughly between 1800 and 2200 and differ from board to board.",
     "Guide one physical connection at a time and wait for learner confirmation before proceeding.",
     "If one axis is stuck at 0 or 4095, check that axis's wire first — VRX belongs on GPIO 14 and VRY on GPIO 13.",
-    "If X and Y move for the wrong direction of tilt, the VRX and VRY wires have traded places.",
+    "If X and Y respond to the wrong direction of tilt, the VRX and VRY wires have traded places.",
     "If Z never leaves 1, check the SW wire on GPIO 12 and coach a firm straight-down press.",
     "If both axes read the same dead value, check the module's +5V and GND connections before touching code.",
     "Keep the Arduino path primary; MicroPython is optional only if already set up."
@@ -123,16 +126,20 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "The stick tilts two potentiometers at right angles while a push button waits underneath — three sensors sharing one thumb.",
-    "formula": "one joystick = two potentiometers at right angles + one push button",
+    "plainLanguage": "Two potentiometers at right angles turn the stick into an (X, Y) point on a plane, and a push button underneath reads the press — every part you have already met.",
+    "formula": "one joystick = two ADC axes naming a point (X, Y) on a plane + one button (Z)",
     "notes": [
       {
-        "title": "Two of the same dial",
-        "body": "Each axis is the dial you've already read — one turned by side-to-side motion, one by forward-and-back. At rest both sit near the middle of their travel."
+        "title": "Why the centre is near 2048, never exactly",
+        "body": "At rest each pot sits near the middle of its travel, so each axis reads near the middle of the 0-to-4095 range — about 2048. Real pots and the ADC never land dead centre, so expect resting numbers anywhere from about 1800 to 2200, each board its own. The centre is a neighbourhood, not a single value."
+      },
+      {
+        "title": "Why the axes move independently",
+        "body": "The two pots share nothing but the stick. Tilt purely left-to-right and X swings while Y barely moves; tilt forward and Y swings while X holds. Because each axis is its own dial, the pair can point anywhere inside the square between the corners — that independence is what makes a plane rather than a line."
       },
       {
         "title": "Why Z rests at 1",
-        "body": "The internal pull-up holds the button pin HIGH with nothing connected in the module. Pressing the stick closes the switch to ground, so the reading drops to 0."
+        "body": "The internal pull-up holds the button pin HIGH with nothing else connected in the module. Pressing the stick closes the switch to ground, so the reading drops to 0 — a plain digital button carried alongside the two analog axes."
       }
     ]
   },
@@ -142,7 +149,7 @@
       "X,Y,Z: 4095,  1852,  1",
       "X,Y,Z: 1921,  1839,  0"
     ],
-    "successCriteria": "A new line lands twice a second. At rest both axes sit near mid-scale — anywhere around 1800–2200 is healthy, and your exact numbers will differ. A full push drives one axis toward 0 or 4095, and a straight-down press flips Z from 1 to 0."
+    "successCriteria": "A new line lands twice a second. At rest both axes sit near mid-scale — around 2048, though real pots land anywhere from about 1800 to 2200, and your exact numbers will differ. A full push drives one axis toward 0 or 4095, and a straight-down press flips Z from 1 to 0."
   },
   "troubleshooting": [
     {
@@ -176,5 +183,5 @@
       ]
     }
   ],
-  "challenge": "Find your joystick's true centre and corner numbers, sketch the four compass directions as value pairs, and count how far the resting centre drifts."
+  "challenge": "Record the resting centre and notice it never lands on a clean 2048, push each axis to both extremes to find its real span, then read a few tilts as (X, Y) points to feel the plane the stick lives on."
 }

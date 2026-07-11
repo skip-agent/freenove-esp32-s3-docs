@@ -6,8 +6,8 @@
   "title": "Servo sweep: move to positions",
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
-  "estimatedTimeMinutes": 20,
-  "mission": "Wire a servo's three leads to the board, upload the Arduino sketch, and watch the horn sweep smoothly from 0° to 180° and back — your first part that moves to an exact position on command.",
+  "estimatedTimeMinutes": 25,
+  "mission": "Wire a servo's three leads to the board, upload the Arduino sketch, and watch the horn move from 0° to 180° and back — your first part that goes to an exact position on command. Underneath the sweep is the day's real idea: a servo is a small geared motor that reads a repeating pulse and turns its shaft to the angle that pulse's width names, so you command a position and the servo's own electronics get there and hold it.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -67,6 +67,9 @@
   "coachInstructions": [
     "Guide one physical connection at a time and wait for learner confirmation before proceeding.",
     "Colour is the map — orange signal to GPIO 21, red to 5V, brown to GND; check that order before anything else.",
+    "Land the core idea- a servo is a small geared motor with a control circuit that reads a pulse repeated every 20 ms and turns its shaft to the angle the pulse's width names, then holds there.",
+    "Make the Day 22 contrast concrete- with the DC motor the learner set speed and direction and it spun freely; here they hand the servo an angle and its own electronics drive to it and hold.",
+    "Point out that this sketch drives the LEDC PWM hardware directly at 50 Hz and 12-bit so the pulse timing is visible; the Arduino Servo library would fold the same maths into write(angle).",
     "If the horn twitches or judders, confirm the red wire sits on the 5V pin with its own jumper — a GPIO cannot supply a servo's current.",
     "If it sweeps once then jams at an end, the horn is hitting something — have the learner refit it on the shaft.",
     "If the board resets mid-sweep, the USB supply is weak — unplug other loads before changing any code.",
@@ -109,16 +112,20 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "A servo reads the width of a repeating pulse and turns its shaft to the matching angle; the sketch only counts degrees and lets map() translate.",
+    "plainLanguage": "A servo is a small geared motor with a control circuit inside; it reads the width of a pulse repeated every 20 ms and drives its shaft to the matching angle and holds there. The sketch only counts degrees and lets map() set the width.",
     "formula": "angle = pulse width — 0.5 ms is 0° · 1.5 ms is 90° · 2.5 ms is 180°",
     "notes": [
       {
-        "title": "Where 103 and 512 come from",
-        "body": "At 50 Hz and 12 bits, each 20 ms frame is 4096 counts — so 103 counts lasts about 0.5 ms and 512 counts about 2.5 ms, the two ends of the servo's travel."
+        "title": "You name the destination",
+        "body": "On Day 22 you set a DC motor's speed and direction and it spun freely for as long as it had power. A servo takes an angle instead — you hand it a position and its own electronics decide how far and how fast to turn, then hold."
       },
       {
-        "title": "A straight line of angles",
-        "body": "The mapping is linear — 0.5 ms sits at 0°, 1.5 ms at 90°, 2.5 ms at 180°, and every angle between gets its own width."
+        "title": "Why the timing is visible here",
+        "body": "The Arduino Servo library packages all of this into servo.write(90) and keeps the timing out of sight. This sketch drives the LEDC PWM hardware directly — 50 Hz, 12-bit — so the frame rate and the map() line that becomes the pulse width are yours to read."
+      },
+      {
+        "title": "Where 103 and 512 come from",
+        "body": "At 50 Hz and 12 bits, each 20 ms frame is 4096 counts — so 103 counts lasts about 0.5 ms and 512 counts about 2.5 ms, the two ends of the servo's travel."
       }
     ]
   },
@@ -156,5 +163,5 @@
       ]
     }
   ],
-  "challenge": "Sweep a half-arc, rest at each end like a lighthouse, then hunt for the smallest angle step your servo visibly answers."
+  "challenge": "Replace the sweep with three explicit commands — 0°, 90°, 180°, holding each for a second — work out each pulse width from the map() line before uploading, then check the horn lands where the maths said."
 }

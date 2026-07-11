@@ -7,7 +7,7 @@
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
   "estimatedTimeMinutes": 30,
-  "mission": "Wire Day 20's 74HC595 to a 7-segment display, upload the Arduino sketch, and watch the display count 0 through F, one character per second — the same three wires from the board now draw a shape you can read at a glance.",
+  "mission": "Wire Day 20's 74HC595 to a 7-segment display and upload the Arduino sketch, then watch it count 0 through F, one character per second. The real lesson sits underneath: how a numeral turns into a pattern of lit bars, how that pattern packs into one byte, and why the sketch keeps a small table of those bytes to look up rather than working each character out on the fly.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -80,6 +80,9 @@
     }
   ],
   "coachInstructions": [
+    "Teach the core idea that a numeral is a pattern of lit bars and one byte with one bit per segment encodes that pattern — num[3] is 0xb0, whose 0 bits light the segments that draw a 3.",
+    "Make sure they see why it is a lookup table — there is no formula from a digit to its segments, so ten patterns for 0-9 (sixteen here, adding A-F for hex) are stored once and indexed.",
+    "Reinforce that the display is common anode, so a 0 bit lights its segment and 0xff blanks everything; this inverted sense is what trips people up.",
     "Confirm the three Day 20 control wires first (GPIO 12 to DS, GPIO 13 to ST_CP, GPIO 14 to SH_CP) before touching the eight segment wires.",
     "The eight resistor paths from Q0-Q7 to the segments are today's main failure surface — have the learner verify them against the diagram one row at a time.",
     "If every segment is always lit, check the latch wire on GPIO 13 — the patterns are likely never reaching the outputs.",
@@ -102,7 +105,7 @@
     "arduino": [
       {
         "line": "byte num[]",
-        "explanation": "Sixteen ready-made segment patterns — one byte per character, 0 through F."
+        "explanation": "The lookup table of segment patterns — sixteen bytes, one per character 0 through F, so num[i] is the ready-made encoding for character i."
       },
       {
         "line": "shiftOut(dataPin, clockPin, LSBFIRST, value)",
@@ -129,16 +132,20 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "Eight segments line up with eight bits, so one byte holds a whole character — and on this display a 0 bit is what lights a segment.",
-    "formula": "character → one byte → eight segments → a shape you can read",
+    "plainLanguage": "Number the seven bars a to g, give each one its own bit, and the whole on-off pattern for a character fits in a single byte — so showing a digit is just looking its byte up.",
+    "formula": "digit → index the table → one byte → eight segments → a shape you can read",
     "notes": [
       {
-        "title": "How the byte maps to segments",
-        "body": "From the top bit down the order is DP G F E D C B A. So 0xc0 is 1100 0000 — DP and G stay dark while the other six light up and draw a 0."
+        "title": "How a byte becomes a shape",
+        "body": "Read 0xb0 as bits, 1011 0000, in segment order DP G F E D C B A. The 0 bits — G, D, C, B, A — are the lit bars, and A B C D G drawn together is a 3. Every entry in the table is one of these patterns worked out in advance."
+      },
+      {
+        "title": "Why a table, not arithmetic",
+        "body": "Which bars a numeral lights follows no equation — a 2 and a 5 share almost nothing. Ten patterns cover 0 to 9 (this sketch keeps sixteen, adding A to F for hex counting), each stored once so the loop only has to index them."
       },
       {
         "title": "Why 0 means on",
-        "body": "This display is common anode — every segment's positive side is tied to the rail, so an output has to sit LOW to let current flow and light its segment. 0xff is all HIGH, which is a blank display."
+        "body": "Common anode ties every segment's positive side to the rail, so an output must sit LOW to let current flow and light its bar. That inverts the intuition: 0 is on, 1 is off, and all ones (0xff) shows nothing."
       }
     ]
   },
@@ -176,5 +183,5 @@
       ]
     }
   ],
-  "challenge": "Show your favourite digit from power-on, slow the count, then work out the byte for the letter H and put it on the display."
+  "challenge": "Decode num[3] into the segments it lights and confirm it draws a 3, shorten the loop to count only 0 through 9, then work out the byte for the letter H and put it on the display."
 }

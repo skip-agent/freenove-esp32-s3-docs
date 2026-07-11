@@ -15,9 +15,13 @@ learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
   Wire a 74HC595 shift register between three GPIOs and the LED bar, upload the
-  Arduino sketch, and watch a single lit LED flow along the bar and back — eight
-  lights driven through one chip from just three pins.
-unlocks: A shift register takes a byte over three wires and fans it out to eight outputs, so a handful of pins can drive a whole bank of lights.
+  Arduino sketch, and watch a single lit LED flow along the bar and back. The
+  real lesson is the trade underneath it: Day 6 spent one pin per light, and
+  today you spend a little time instead — feeding eight bits down a single wire
+  — so three pins drive all eight lights. Learn how the data, clock, and latch
+  wires split that job, and the same three pins will drive far bigger banks of
+  outputs later.
+unlocks: You understand how a shift register trades time for pins — eight bits clocked in one at a time over three wires, then a single latch edge lights all eight outputs at once — and why a flowing light is simply a bit being shifted along.
 seoDescription: >
   Drive an LED bar graph through a 74HC595 shift register on the ESP32-S3. Three
   GPIOs carry a byte to eight outputs, and a lit LED flows along the bar and back.
@@ -26,10 +30,12 @@ hero:
   instrument: none
   headline: Eight lights|from three {wires}
   lede: >
-    Today a chip joins the crew. You feed a 74HC595 one byte over three wires —
-    data, clock, latch — and it fans those eight bits out to the LED bar all at
-    once. The flowing light you built on Day 6 took ten GPIOs; today's takes
-    three.
+    Today a chip joins the crew, and it changes the deal you've been working
+    with. On Day 6 every light cost a pin — ten lights, ten wires. The 74HC595
+    lets you pay in time instead: you send it the eight bits one after another
+    down a single data wire, tick them in with a clock, then flip them all on
+    together with a latch. Three pins, eight lights — and the flowing pattern
+    turns out to be one bit sliding along a row.
   pills:
     - { text: About 30 minutes, key: true }
     - Arduino first
@@ -177,10 +183,10 @@ code:
       }
     notes:
       - code: shiftOut(dataPin, clockPin, order, _data)
-        text: Sends the byte to the chip one bit at a time — data on GPIO 12, a clock tick on GPIO 14 for each bit.
+        text: Sends the byte to the chip one bit at a time — a level on GPIO 12 for each bit, and a clock tick on GPIO 14 to take it in. One call does all eight.
         explain: shiftOut
       - code: digitalWrite(latchPin, HIGH)
-        text: The rising edge on GPIO 13 moves all eight stored bits to the outputs in one step.
+        text: The rising edge on GPIO 13 copies all eight stored bits to the outputs in one step, so the whole pattern appears together.
         explain: shiftRegister
       - code: x <<= 1
         text: Slides the single 1 bit one place left, so the lit LED takes one step along the bar; delay(50) sets the pace.
@@ -218,33 +224,43 @@ code:
       it — it should never block the Arduino-first path.
 
 theory:
-  title: Three wires carry a byte
-  summary: The board clocks eight bits into the chip one at a time, and a single latch edge lights all eight outputs together.
+  title: How three wires carry eight lights
+  summary: A shift register trades time for pins — it takes eight bits one at a time down a single wire, clocked in one per tick, then a single latch edge lights all eight outputs together.
   intro: >
-    The chip is a small memory with eight outputs. Watch what the three wires
-    each do, and the moving light explains itself.
+    On Day 6 the bar cost you ten pins because each LED had its own wire, all
+    driven in parallel at the same instant. The 74HC595 makes a different bargain.
+    It accepts the eight bits one after another down one wire, holds them inside,
+    and reveals them together on a signal — so you spend a few microseconds of
+    clocking and get seven pins back. Read what each of the three wires does and
+    the moving light explains itself.
   flow:
-    - n: "Load"
-      title: "Bit by bit"
-      body: "Each clock tick pushes the next bit of the byte into the chip."
+    - n: "The trade"
+      title: "Time for pins"
+      body: "Ten parallel wires became three because the chip accepts the bits in sequence instead of all at once. You pay in time, and it costs you almost nothing the eye can see."
+    - n: "Data"
+      title: "One bit on the wire"
+      body: "The data pin (DS, GPIO 12) carries a single bit at a time — HIGH for a 1, LOW for a 0. It only ever presents one bit; the value on it changes eight times to send a whole byte."
+    - n: "Clock"
+      title: "Each tick shifts and stores"
+      body: "The chip is a row of eight slots. Every rising tick on the clock pin (SH_CP, GPIO 14) shoves the row one place along and drops the current data-pin level into the empty end. Eight ticks and the whole byte is inside."
     - n: "Latch"
-      title: "One edge"
-      body: "A rising edge on the latch pin presents all eight bits at once."
-    - n: "Light"
-      title: "Eight outputs"
-      body: "Q0 through Q7 each drive one segment of the bar."
-    - n: "Shift"
-      title: "The byte moves"
-      body: "x <<= 1 slides the lit bit along and the light follows it."
-  formulaLabel: The model
-  formula: eight outputs = **one byte** carried over three wires
+      title: "All eight at once"
+      body: "While those eight ticks happen the outputs keep showing the old pattern. A rising edge on the latch pin (ST_CP, GPIO 13) copies the eight inner slots to the eight output pins in one step — which is why you never see the bits crawl in."
+    - n: "shiftOut"
+      title: "One call sends a byte"
+      body: "shiftOut(dataPin, clockPin, LSBFIRST, x) does all eight data-and-clock pairs for you. The sketch wraps it: latch LOW, shiftOut the byte, latch HIGH — send, then reveal."
+    - n: "The light"
+      title: "A bit sliding along"
+      body: "x starts as 0x01, one lit slot among seven dark. x <<= 1 moves that 1 up one place, the next byte goes out, and the lit segment jumps one over. Repeat and the light walks the bar."
+  formulaLabel: The trade
+  formula: "**8 bits down 1 data wire, one per clock tick** → **one latch edge** → 8 outputs lit together"
   notes:
-    - title: Where Day 6's ten pins went
-      explain: pinArray
-      body: Day 6 gave every segment its own GPIO in a pin array. Today the chip holds all eight states, and the board keeps just three wires — data, clock, and latch.
-    - title: What the latch is for
+    - title: What the latch buys you
+      explain: shiftOut
+      body: Without it, every LED would flicker as the bits shifted through on their way to their final slot. The latch holds the outputs steady until the whole byte has arrived, then updates them together — you only ever see finished patterns.
+    - title: Where Day 6's ten pins went, and beyond
       explain: shiftRegister
-      body: While bits are still arriving, the outputs hold their previous pattern. The latch edge updates them all in one clean step, so you never see half a byte on the bar.
+      body: Day 6 gave every segment its own GPIO. Here the chip holds all eight states and the board keeps just three wires. The same three can drive far more — chips chain end to end, each passing bits to the next, so three pins can run sixteen, twenty-four, or more outputs.
 
 test:
   mode: visual
@@ -270,33 +286,40 @@ test:
       fix: "Swap in a data-capable USB cable."
 
 challenge:
-  title: "Try this: reshape the byte"
+  title: "Try this: choose the byte, predict the lights"
   railLabel: Try this
   intro: >
-    Same working circuit, one variable to play with: the byte x. Everything the
-    bar does comes from how you shape and shift it. It fits inside today's 30
-    minutes.
-  summary: Change the flow speed, send two lit LEDs travelling together, then fill the bar step by step — all by reshaping the byte x.
+    Same working circuit, and the one thing that decides what the bar shows is
+    the byte you send. Instead of watching the sketch shift a bit for you, hand
+    the chip a byte you picked and predict the result before you upload. It fits
+    inside today's 30 minutes.
+  summary: Send a fixed byte of your own choosing and predict which segments light, then send two lit LEDs travelling together, then fill the bar step by step — every result comes from the eight bits in the byte.
   cards:
-    - title: Change the pace
-      explain: delayMs
-      body: Change both `delay(50)` lines together — try 20 for a sprint, 150 for a stroll — and upload until the flow feels right.
+    - title: Predict a pattern
+      explain: shiftOut
+      body: In the first loop, replace the body with a single `writeTo595(LSBFIRST, 0b10100101)` and a `delay(500)`. Before uploading, count the 1 bits — that's how many segments light — and predict which end holds bit 0. Upload to confirm, and note that LSBFIRST plus the bar's direction decide which segment is which.
     - title: Run a pair
       body: Start the first loop with `x = 0x03` so two neighbouring LEDs travel together. Predict what the second loop's starting value needs to be before you change it.
     - title: Fill the bar
-      body: In the first loop, replace `x <<= 1` with `x = (x << 1) | 1` so each step keeps every light already lit and the bar fills from one end.
+      explain: shiftRegister
+      body: In the first loop, replace `x <<= 1` with `x = (x << 1) | 1` so each step keeps every light already lit and the bar fills from one end — the chip is holding a growing pattern for you.
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent can
     guide you with full context.
   behaviour: >
-    guide one physical connection at a time, wait for you to confirm, explain
-    terms on request, and always check wiring, board, port, and USB before
+    guide one physical connection at a time and wait for confirmation, then teach
+    the real idea — a shift register trades time for pins by clocking eight bits
+    in one at a time and latching them out together. Explain the data, clock, and
+    latch roles concretely, and always check wiring, board, port, and USB before
     changing code.
   coachInstructions:
     - Guide one physical connection at a time — about fifteen jumpers is the most wiring so far — and wait for learner confirmation before proceeding.
     - The chip's half-moon notch sets its orientation; verify it matches the chart before checking anything else.
+    - Teach the core trade — Day 6 spent one pin per LED in parallel; the 74HC595 spends time instead, taking eight bits one at a time so three pins drive eight outputs.
+    - Give each wire a concrete job — data (GPIO 12) carries one bit at a time, each clock tick (GPIO 14) shifts the row and stores that bit, and the latch edge (GPIO 13) copies all eight to the outputs at once.
+    - Connect it to the code — shiftOut sends the whole byte bit by bit, the latch reveals it, and x <<= 1 shifting the single 1 bit is exactly why the light walks the bar.
     - If nothing lights, check the chip's power first — VCC and MR (pin 10) to 5V, GND and OE (pin 13) to ground — before touching code.
     - If the pattern is scrambled, verify the three control wires against the sketch — data on GPIO 12, latch on GPIO 13, clock on GPIO 14.
     - If a single LED stays dark, check that segment's 220 Ω resistor and the bar's direction, which the learner met on Day 6.

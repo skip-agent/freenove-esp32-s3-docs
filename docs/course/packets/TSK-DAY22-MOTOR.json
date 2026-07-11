@@ -7,7 +7,7 @@
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
   "estimatedTimeMinutes": 30,
-  "mission": "Wire a DC motor through the L293D driver chip, power it from its own 9V battery, and turn a potentiometer to command the motor's speed and direction — the board sends the plan, the chip switches the current.",
+  "mission": "Wire a DC motor through the L293D driver chip, power it from its own 9V battery, and turn a potentiometer to command speed and direction. This is the first day the board commands real power rather than lighting an LED — its pins send the plan, and the chip carries the current that plan describes.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -90,6 +90,8 @@
     }
   ],
   "coachInstructions": [
+    "Teach why the chip exists first- a GPIO pin offers a few milliamps at 3.3V while the motor draws 0.2-0.3A and kicks back a voltage spike when its current is switched, so the L293D carries that current from its own 9V battery.",
+    "Explain direction as the H-bridge routing battery current either way- In1 and In2 pick which way it flows, and PWM on Enable1 sets how hard the motor drives.",
     "Before anything powers up, confirm the 9V battery is connected to the extension board — Freenove warns that powering the motor from the ESP32-S3 directly may cause permanent damage to the board.",
     "Confirm the battery and the board share a common ground through the extension board before debugging any behaviour.",
     "If the motor never spins, check the battery and the extension board's power switch first, then the L293D's orientation by its notch.",
@@ -140,16 +142,16 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "The board sends three small signals — two for direction, one PWM for speed — and the L293D switches the battery's current through the motor.",
-    "formula": "speed = distance from 2048 · direction = side of 2048",
+    "plainLanguage": "A GPIO pin sends three small signals — two for direction, one PWM for speed — and the L293D switches its own battery's current through the motor.",
+    "formula": "small signal + the chip's own battery = real motion · direction from which way current runs · speed from PWM duty",
     "notes": [
       {
-        "title": "Why the chip is here",
-        "body": "A GPIO pin can offer a few milliamps, and this motor draws around 0.2–0.3 A before it even does any work. The L293D takes the pin's small signal and switches the battery's heavy current — the board decides, the chip delivers."
+        "title": "Two power worlds, one ground",
+        "body": "The 9V battery moves the motor; USB feeds the board. The two supplies only agree on what HIGH and LOW mean because they share a ground on the extension board — that shared wire is what lets the chip read the board's signals."
       },
       {
-        "title": "Two power worlds, one ground",
-        "body": "The 9V battery moves the motor; USB feeds the board. The two supplies only agree on what HIGH and LOW mean because they share a ground on the extension board — that shared wire is what makes the chip's inputs readable."
+        "title": "Why reversing costs nothing",
+        "body": "A DC motor spins the other way the moment its current reverses. The H-bridge does exactly that on command, so direction is a matter of which two switches close — never a second motor or a gearbox."
       }
     ]
   },
@@ -188,5 +190,5 @@
       ]
     }
   ],
-  "challenge": "Find the smallest speed number that actually starts the motor turning, then make the serial output signed so reverse reads as negative."
+  "challenge": "Print the direction flag next to the speed and sweep the knob through both directions to watch In1/In2 flip and the PWM number climb, then find the smallest number that actually starts the shaft turning."
 }

@@ -16,7 +16,7 @@
       <div class="hero-copy">
         <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 19 of 30</p>
         <h1>Read two axes<br />and one <em>button</em></h1>
-        <p class="lede">Today you wire the control that steers every gamepad. Under the stick sit two potentiometers at right angles and a push button hiding beneath them. The sketch reads all three and prints their values twice a second, so you can watch your hand become numbers.
+        <p class="lede">Today you wire the control that steers every gamepad, and take it apart in your head first. Under the stick sit two potentiometers at right angles and a push button beneath them, so the same analogRead from the potentiometer day runs twice, once per axis, and the same digitalRead catches the press. Two numbers together name a point on a plane; the third is a plain button. Watch your hand become a coordinate on screen.
 </p>
         <div class="meta-row" aria-label="Lesson facts">
           <span class="pill is-key">About 20 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">No electronics assumed</span>
@@ -46,7 +46,7 @@
           <a href="#wiring"><span class="tick"></span>Chart the circuit</a>
           <a href="#steps"><span class="tick"></span>Build it</a>
           <a href="#code"><span class="tick"></span>Read the code</a>
-          <a href="#theory"><span class="tick"></span>Two dials and a button in one grip</a>
+          <a href="#theory"><span class="tick"></span>A point on a plane, plus a press</a>
           <a href="#test"><span class="tick"></span>Test &amp; debug</a>
           <a href="#challenge"><span class="tick"></span>Try this</a>
           <a href="#agent"><span class="tick"></span>Coach me</a>
@@ -174,7 +174,7 @@
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">04</span> Read just enough code</p>
               <h2>Read the code</h2>
-              <p class="muted">The loop is three reads and one print. Two pins are measured with analogRead, one with digitalRead, and printf lines all three up. Switch to MicroPython if you&#x27;d rather see the same idea in Python — the wiring never changes.
+              <p class="muted">The loop is three reads and one print — two axes with analogRead, the button with digitalRead, the two skills from earlier days sitting side by side. A printf line sends all three up at once. Switch to MicroPython if you&#x27;d rather see the same idea in Python; the wiring never changes.
 </p>
             </div>
             <div class="tabs" role="tablist" aria-label="Code language">
@@ -230,23 +230,24 @@ xVal.<span class="tok-fn">width</span>(ADC.WIDTH_12BIT)
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">05</span> Understand, don&#x27;t memorise</p>
-              <h2>Two dials and a button in one grip</h2>
-              <p class="muted">You already know every part inside this module. The joystick simply packs them under a single stick — the same arrangement lives inside every gamepad you&#x27;ve ever held.
+              <h2>A point on a plane, plus a press</h2>
+              <p class="muted">Nothing here is new. Reading a potentiometer with analogRead was the potentiometer day; reading a button that rests HIGH and drops on a press was the button day. A joystick stacks two of those pots at right angles and hides a button beneath them, so one grip hands the board a position and a press. Seeing it as a composite, three familiar things in one part, is the whole lesson.
 </p>
             </div>
             <div class="theory-flow" aria-label="Measurement model">
-              <article class="flow-step"><span class="n">Tilt</span><h3>Pots turn</h3><p>Pushing the stick rotates two potentiometers set at right angles.</p></article>
-              <article class="flow-step"><span class="n">Measure</span><h3>ADC reads</h3><p>analogRead turns each pot&#x27;s voltage into a number from 0 to 4095.</p></article>
-              <article class="flow-step"><span class="n">Press</span><h3>Button drops</h3><p>INPUT_PULLUP holds GPIO 12 at 1 until a press pulls it to 0.</p></article>
-              <article class="flow-step"><span class="n">Report</span><h3>Serial prints</h3><p>Twice a second the sketch prints all three values on one line.</p></article>
+              <article class="flow-step"><span class="n">Two dials</span><h3>Right angles</h3><p>Under the stick sit two potentiometers mounted at right angles — one follows left-and-right, the other forward-and-back. Each is the same dial from the potentiometer day.</p></article>
+              <article class="flow-step"><span class="n">Two numbers</span><h3>analogRead, twice</h3><p>analogRead measures each pot&#x27;s voltage as a number from 0 to 4095. Two axes means two of the reads you already know, one for X and one for Y.</p></article>
+              <article class="flow-step"><span class="n">One point</span><h3>X and Y together</h3><p>On their own, X and Y are two loose dials. Together they name a point on a plane — X across, Y up and down — which is how a stick&#x27;s position becomes a coordinate the code can steer with.</p></article>
+              <article class="flow-step"><span class="n">One press</span><h3>digitalRead, once</h3><p>Push straight down and a hidden button closes to ground. INPUT_PULLUP holds GPIO 12 at 1 until the press pulls it to 0 — the same button-and-pull-up from earlier, riding on a third pin.</p></article>
             </div>
             <div class="formula-card">
               <span class="label">The model</span>
-              <code>one joystick = <b>two potentiometers</b> at right angles + <b>one push button</b></code>
+              <code>one joystick = <b>two ADC axes</b> naming a point (X, Y) on a plane + <b>one button</b> (Z)</code>
             </div>
             <div class="two-col" style="margin-top:14px">
-              <article class="mini-card"><h3>Two of the same dial <button class="define" data-topic="potentiometer">Define</button></h3><p>Each axis is the dial you&#x27;ve already read — one turned by side-to-side motion, one by forward-and-back. At rest both sit near the middle of their travel.</p></article>
-              <article class="mini-card"><h3>Why Z rests at 1 <button class="define" data-topic="inputPullup">Define</button></h3><p>The internal pull-up holds the button pin HIGH with nothing connected in the module. Pressing the stick closes the switch to ground, so the reading drops to 0.</p></article>
+              <article class="mini-card"><h3>Why the centre is near 2048, never exactly <button class="define" data-topic="adc">Define</button></h3><p>At rest each pot sits near the middle of its travel, so each axis reads near the middle of the 0-to-4095 range — about 2048. Real pots and the ADC never land dead centre, so expect resting numbers anywhere from about 1800 to 2200, each board its own. The centre is a neighbourhood, not a single value.</p></article>
+              <article class="mini-card"><h3>Why the axes move independently <button class="define" data-topic="potentiometer">Define</button></h3><p>The two pots share nothing but the stick. Tilt purely left-to-right and X swings while Y barely moves; tilt forward and Y swings while X holds. Because each axis is its own dial, the pair can point anywhere inside the square between the corners — that independence is what makes a plane rather than a line.</p></article>
+              <article class="mini-card"><h3>Why Z rests at 1 <button class="define" data-topic="inputPullup">Define</button></h3><p>The internal pull-up holds the button pin HIGH with nothing else connected in the module. Pressing the stick closes the switch to ground, so the reading drops to 0 — a plain digital button carried alongside the two analog axes.</p></article>
             </div>
           </div>
         </section>
@@ -265,7 +266,7 @@ xVal.<span class="tok-fn">width</span>(ADC.WIDTH_12BIT)
                   <div class="bar"><span>Serial Monitor</span><span class="baud">115200 baud</span></div>
                   <div class="lines"><span>X,Y,Z: 1917,  1846,  1</span><span>X,Y,Z: 4095,  1852,  1</span><span>X,Y,Z: 1921,  1839,  0</span></div>
                 </div>
-                <p class="micropython-note">A new line lands twice a second. At rest both axes sit near mid-scale — anywhere around 1800–2200 is healthy, and your exact numbers will differ. A full push drives one axis toward 0 or 4095, and a straight-down press flips Z from 1 to 0.
+                <p class="micropython-note">A new line lands twice a second. At rest both axes sit near mid-scale — around 2048, though real pots land anywhere from about 1800 to 2200, and your exact numbers will differ. A full push drives one axis toward 0 or 4095, and a straight-down press flips Z from 1 to 0.
 </p>
               </div>
               <div>
@@ -285,13 +286,14 @@ xVal.<span class="tok-fn">width</span>(ADC.WIDTH_12BIT)
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">07</span> Make the idea yours</p>
-              <h2>Try this: chart your stick</h2>
-              <p class="muted">Same working circuit, one new habit: learning your instrument&#x27;s true numbers. It fits inside today&#x27;s 20 minutes.
+              <h2>Try this: read your stick as coordinates</h2>
+              <p class="muted">Same working circuit, one new habit — reading the stick as a point rather than two loose numbers. It fits inside today&#x27;s 20 minutes.
 </p>
             </div>
             <div class="two-col">
-              <article class="mini-card"><h3>Find true centre</h3><p>Let the stick rest and write down the X and Y values. Watch a few more lines land and count how far the numbers drift while nothing touches the stick.</p></article>
-              <article class="mini-card"><h3>Map the corners <button class="define" data-topic="joystick">Define</button></h3><p>Push the stick to north, south, east, and west, and record the X and Y pair at each full deflection. Sketch them as a compass with your centre numbers in the middle.</p></article>
+              <article class="mini-card"><h3>Find your true centre <button class="define" data-topic="adc">Define</button></h3><p>Let the stick rest and write down the X and Y numbers. Neither will be exactly 2048 — note how far each sits from it, then watch a few more lines to see the resting values drift by a handful even while nothing touches the stick. That is the centre-is-a-neighbourhood idea in your own numbers.</p></article>
+              <article class="mini-card"><h3>Reach both extremes</h3><p>Push X fully one way, then fully the other, and record its lowest and highest — near 0 and near 4095. Do the same for Y. Those four numbers are your two axis spans: the edges of the square the stick can point inside.</p></article>
+              <article class="mini-card"><h3>Read a tilt as a point <button class="define" data-topic="joystick">Define</button></h3><p>Now hold the stick partway toward a corner and read the pair as one coordinate — X across, Y up. Nudge it and watch both numbers change together. That moving (X, Y) pair is exactly the position a game would steer with, and why two dials beat one.</p></article>
             </div>
           </div>
         </section>
@@ -309,7 +311,7 @@ xVal.<span class="tok-fn">width</span>(ADC.WIDTH_12BIT)
             </div>
             <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
               <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
-              <p><strong>How the agent should behave:</strong> guide one physical connection at a time, wait for you to confirm, explain terms on request, and always check wiring, board, port, and USB before changing code.
+              <p><strong>How the agent should behave:</strong> guide one physical connection at a time and wait for confirmation, but teach the joystick as a composite — two analog axes that together name a point on a plane, plus one digital button, all skills the learner already has. Explain terms on request, and always check wiring, board, port, and USB before changing code.
 </p>
             </div>
           </div>
