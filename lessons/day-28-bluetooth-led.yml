@@ -117,7 +117,7 @@ steps:
     - Compare every wire to the chart, then plug in USB.
     - Open `Sketch_20.2_BluetoothToLed.ino` in Arduino IDE and upload it.
     - Open Serial Monitor at `115200` and look for the "device started" line. {serial}
-    - On your phone, open LightBlue and connect to `ESP32S3_Bluetooth`, exactly as you did on Day 27. {ble}
+    - On your phone, open [LightBlue](https://apps.apple.com/us/app/lightblue/id557428110) ([Android](https://play.google.com/store/apps/details?id=com.punchthrough.lightblueexplorer)) and connect to `ESP32S3_Bluetooth`, exactly as you did on Day 27. {ble}
     - Find the write characteristic, set the format to utf-string, and write `led_on` — underscore, exact spelling. {bleCharacteristic}
     - Watch the LED light, then write `led_off` to put it out.
   done:
@@ -195,7 +195,7 @@ code:
     note: >
       Same pin, same wiring. Copy `ble_advertising.py` onto the board alongside
       this file. The Python version broadcasts as `ESP32S3`, so look for that
-      name in LightBlue. Run it in Thonny if MicroPython is set up; otherwise
+      name in LightBlue. Run it in [Thonny](https://thonny.org) if MicroPython is set up; otherwise
       skip it — it should never block the Arduino-first path.
 
 theory:

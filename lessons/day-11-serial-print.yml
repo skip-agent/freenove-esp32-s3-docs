@@ -122,7 +122,7 @@ code:
           time.sleep(1)
     notes:
       - code: print("ESP32S3 initialization completed!")
-        text: In MicroPython, print() sends text up the same USB serial link Thonny reads.
+        text: In MicroPython, print() sends text up the same USB serial link [Thonny](https://thonny.org) reads.
       - code: time.ticks_ms()/1000
         text: Milliseconds since the board started, divided into seconds — the same running clock as the Arduino sketch.
     note: >

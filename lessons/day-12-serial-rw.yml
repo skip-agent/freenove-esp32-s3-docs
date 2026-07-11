@@ -131,7 +131,7 @@ code:
           print("inputString: ", input())
     notes:
       - code: input()
-        text: In MicroPython, input() waits for a line you type in Thonny's shell — the same pause-and-read as Serial.available plus readStringUntil.
+        text: In MicroPython, input() waits for a line you type in [Thonny](https://thonny.org)'s shell — the same pause-and-read as Serial.available plus readStringUntil.
       - code: 'print("inputString: ", input())'
         text: Echoes your typed line straight back, just like the Arduino sketch.
     note: >

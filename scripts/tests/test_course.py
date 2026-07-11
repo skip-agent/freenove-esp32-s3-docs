@@ -325,6 +325,54 @@ class InlineRenderTests(unittest.TestCase):
         out = course_build.plain_text("Install the [CH343 driver](https://example.com/driver).")
         self.assertEqual(out, "Install the CH343 driver (https://example.com/driver).")
 
+    def test_link_renders_external_anchor(self):
+        out = course_build.inline("Get the [Arduino IDE](https://www.arduino.cc/en/software/).")
+        self.assertIn('href="https://www.arduino.cc/en/software/"', out)
+        self.assertIn('target="_blank"', out)
+        self.assertIn('rel="noopener noreferrer"', out)
+        self.assertIn(">Arduino IDE</a>", out)
+        self.assertNotIn("](", out)  # no leftover raw Markdown
+
+    def test_link_label_still_formats(self):
+        # A URL's own characters survive; the label keeps its inline formatting.
+        out = course_build.inline("[the `boards` URL](https://espressif.github.io/x_y.json)")
+        self.assertIn('href="https://espressif.github.io/x_y.json"', out)
+        self.assertIn("<code>boards</code>", out)
+
+    def test_plain_text_keeps_url(self):
+        out = course_build.plain_text("Install [Processing](https://processing.org/download).")
+        self.assertEqual(out, "Install Processing (https://processing.org/download).")
+
+    def test_link_url_with_parens_not_truncated(self):
+        # A destination with balanced parens must stay whole in href and packet.
+        url = "https://example.com/OV2640_DS(1.6).pdf"
+        out = course_build.inline(f"See [datasheet]({url}).")
+        self.assertIn(f'href="{url}"', out)
+        self.assertIn(">datasheet</a>", out)
+        self.assertNotIn(".pdf)", out.split("</a>")[1])  # remainder not spilled outside
+        self.assertEqual(course_build.plain_text(f"See [datasheet]({url})."),
+                         f"See datasheet ({url}).")
+
+    def test_plain_text_url_with_markup_chars_not_mangled(self):
+        # The packet path must preserve a URL's * ` {} just like the HTML path.
+        for url in ("https://example.com/a*b*c",
+                    "https://example.com/x`y`z",
+                    "https://example.com/{foo}"):
+            self.assertEqual(course_build.plain_text(f"[x]({url})"), f"x ({url})")
+
+    def test_link_url_with_markup_chars_not_mangled(self):
+        # A URL containing *, `, or {} must survive the formatting passes intact.
+        for url in ("https://example.com/a*b*c",
+                    "https://example.com/a**b**c",
+                    "https://example.com/{foo}",
+                    "https://example.com/x`y`z"):
+            out = course_build.inline(f"[x]({url})")
+            self.assertIn(f'href="{url}"', out)
+            self.assertNotIn("<em>", out)
+            self.assertNotIn("<strong>", out)
+            self.assertNotIn("<code>", out)
+            self.assertNotIn("define", out)
+
     def test_plain_text_strips_markup(self):
         out = course_build.plain_text("Set baud to `115200`. {serial}")
         self.assertNotIn("`", out)

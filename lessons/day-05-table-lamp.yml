@@ -189,7 +189,7 @@ code:
       - code: while not button.value()
         text: Holds until you release, so the press's edge registers exactly once.
     note: >
-      Same pins, same wiring, same behaviour. Run it in Thonny if MicroPython is
+      Same pins, same wiring, same behaviour. Run it in [Thonny](https://thonny.org) if MicroPython is
       set up; otherwise skip it — it should never block the Arduino-first path.
 
 theory:

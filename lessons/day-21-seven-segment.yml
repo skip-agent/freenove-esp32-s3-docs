@@ -211,7 +211,7 @@ code:
     note: >
       Same chip, same table of bytes. This version paces at 500 ms per character
       and skips the blanking write between them, so it counts twice as fast. Run
-      it in Thonny if MicroPython is set up; otherwise skip it — it should never
+      it in [Thonny](https://thonny.org) if MicroPython is set up; otherwise skip it — it should never
       block the Arduino-first path.
 
 theory:

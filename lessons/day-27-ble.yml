@@ -73,7 +73,7 @@ steps:
     LightBlue. Tap each step as you go to keep your place; you can finish
     without opening a single field note.
   items:
-    - On your phone, install the free **LightBlue** app from the iOS App Store or Google Play, and turn Bluetooth on. (On Android, Serial Bluetooth Terminal also works if you already have it.)
+    - On your phone, install the free **LightBlue** app ([iOS App Store](https://apps.apple.com/us/app/lightblue/id557428110) or [Google Play](https://play.google.com/store/apps/details?id=com.punchthrough.lightblueexplorer)), and turn Bluetooth on. (On Android, Serial Bluetooth Terminal also works if you already have it.)
     - Plug the ESP32-S3 into your computer with a data-capable USB cable. {usbData}
     - Open `Sketch_20.1_BLE_USART.ino` in Arduino IDE — the BLE libraries ship with the ESP32 board package, so there is nothing extra to install.
     - Press **Upload**, then open Serial Monitor and set the baud rate to `115200`. {serial}

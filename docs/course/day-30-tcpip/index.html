@@ -94,8 +94,8 @@
             <ol class="step-list">
               <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 1 done"></button><p class="text">Open <code>Sketch_24.2_WiFiServer.ino</code> in Arduino IDE.</p></li>
               <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 2 done"></button><p class="text">Replace the two <code>********</code> placeholders with your own Wi-Fi name and password — the same network your computer is on. <button class="define" data-topic="wifi">Define</button></p></li>
-              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">On your computer, install Processing from processing.org/download.</p></li>
-              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">In Processing, add the ControlP5 library — Sketch → Import Library → Add Library, then search ControlP5.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">On your computer, install Processing from <a class="resource-link" href="https://processing.org/download" target="_blank" rel="noopener noreferrer">processing.org/download</a>.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">In Processing, add the <a class="resource-link" href="https://github.com/sojamo/controlp5" target="_blank" rel="noopener noreferrer">ControlP5</a> library — Sketch → Import Library → Add Library, then search ControlP5.</p></li>
               <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Back in the sketch folder, open the bundled <code>sketchWiFi/sketchWiFi.pde</code> in Processing and click Run.</p></li>
               <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 6 done"></button><p class="text">Upload the Arduino sketch, then open Serial Monitor at <code>115200</code> and watch the board join your network and print its IP address and port 80. <button class="define" data-topic="ipAddress">Define</button></p></li>
               <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 7 done"></button><p class="text">In sketchWiFi, choose <strong>TCP CLIENT</strong> mode, enter the board&#x27;s printed IP and port <code>80</code>, and connect. <button class="define" data-topic="tcp">Define</button></p></li>
@@ -155,7 +155,7 @@ conn.<span class="tok-fn">send</span>(&#x27;I am Server&#x27;)</code></pre>
                   <div class="code-note"><code>conn.send(&#x27;I am Server&#x27;)</code><span class="note-text">The first line down the wire the moment a client connects.</span></div>
                 </div>
               </div>
-              <p class="micropython-note">Raw sockets this time, and port 8000 where the C sketch uses 80 — dial whichever port the running code printed. Run it in Thonny if MicroPython is set up; otherwise skip it — it should never block the Arduino-first day.
+              <p class="micropython-note">Raw sockets this time, and port 8000 where the C sketch uses 80 — dial whichever port the running code printed. Run it in <a class="resource-link" href="https://thonny.org" target="_blank" rel="noopener noreferrer">Thonny</a> if MicroPython is set up; otherwise skip it — it should never block the Arduino-first day.
 </p>
             </div>
           </div>

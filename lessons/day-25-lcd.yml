@@ -114,7 +114,7 @@ steps:
     - Slide female jumper ends onto GND and VCC, then land them on the board's GND and 5V pins.
     - Wire SDA to GPIO 14 and SCL to GPIO 13. {i2c}
     - Compare every wire to the chart before you plug in USB.
-    - In Arduino IDE choose Sketch → Include Library → Add .ZIP Library… and pick `LiquidCrystal_I2C-1.1.2.zip` from the kit download's `C/Libraries` folder — you install it once and it stays. {arduino}
+    - In Arduino IDE choose Sketch → Include Library → Add .ZIP Library… and pick [`LiquidCrystal_I2C-1.1.2.zip`](https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/blob/main/C/Libraries/LiquidCrystal_I2C-1.1.2.zip) from the kit download's `C/Libraries` folder — you install it once and it stays. {arduino}
     - Open `Sketch_18.1_Display_the_string_on_LCD1602.ino` and upload it. (`Wire.h`, the I2C library, ships with the board package.)
     - Watch row 0 greet you and row 1 start counting seconds.
   done:
@@ -205,7 +205,7 @@ code:
     note: >
       Same pins, same wiring. This path needs two helper modules — `I2C_LCD.py`
       and `LCD_API.py` from the same kit folder — copied onto the board before it
-      runs. Run it in Thonny if MicroPython is set up; otherwise skip it — it
+      runs. Run it in [Thonny](https://thonny.org) if MicroPython is set up; otherwise skip it — it
       should never block the Arduino-first path.
 
 theory:

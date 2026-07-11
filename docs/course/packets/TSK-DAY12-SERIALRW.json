@@ -72,7 +72,7 @@
     "micropython": [
       {
         "line": "input()",
-        "explanation": "In MicroPython, input() waits for a line you type in Thonny's shell — the same pause-and-read as Serial.available plus readStringUntil."
+        "explanation": "In MicroPython, input() waits for a line you type in Thonny (https://thonny.org)'s shell — the same pause-and-read as Serial.available plus readStringUntil."
       },
       {
         "line": "print(\"inputString: \", input())",

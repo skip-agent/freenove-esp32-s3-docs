@@ -67,7 +67,7 @@
     "micropython": [
       {
         "line": "print(\"ESP32S3 initialization completed!\")",
-        "explanation": "In MicroPython, print() sends text up the same USB serial link Thonny reads."
+        "explanation": "In MicroPython, print() sends text up the same USB serial link Thonny (https://thonny.org) reads."
       },
       {
         "line": "time.ticks_ms()/1000",

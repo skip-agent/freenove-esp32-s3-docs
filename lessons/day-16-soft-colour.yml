@@ -205,7 +205,7 @@ code:
     note: >
       Same wiring, one difference to expect: Freenove's Python version pairs the
       knobs to the colours in the reverse order — the knob on GPIO 12 drives the
-      leg on GPIO 40 — and both pairings work fine. Run it in Thonny if
+      leg on GPIO 40 — and both pairings work fine. Run it in [Thonny](https://thonny.org) if
       MicroPython is set up; otherwise skip it — it should never block the
       Arduino-first path.
 

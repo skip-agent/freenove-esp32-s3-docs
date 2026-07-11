@@ -73,8 +73,8 @@ steps:
   items:
     - Open `Sketch_24.2_WiFiServer.ino` in Arduino IDE.
     - Replace the two `********` placeholders with your own Wi-Fi name and password — the same network your computer is on. {wifi}
-    - On your computer, install Processing from processing.org/download.
-    - In Processing, add the ControlP5 library — Sketch → Import Library → Add Library, then search ControlP5.
+    - On your computer, install Processing from [processing.org/download](https://processing.org/download).
+    - In Processing, add the [ControlP5](https://github.com/sojamo/controlp5) library — Sketch → Import Library → Add Library, then search ControlP5.
     - Back in the sketch folder, open the bundled `sketchWiFi/sketchWiFi.pde` in Processing and click Run.
     - Upload the Arduino sketch, then open Serial Monitor at `115200` and watch the board join your network and print its IP address and port 80. {ipAddress}
     - In sketchWiFi, choose **TCP CLIENT** mode, enter the board's printed IP and port `80`, and connect. {tcp}
@@ -137,7 +137,7 @@ code:
         text: The first line down the wire the moment a client connects.
     note: >
       Raw sockets this time, and port 8000 where the C sketch uses 80 — dial
-      whichever port the running code printed. Run it in Thonny if MicroPython
+      whichever port the running code printed. Run it in [Thonny](https://thonny.org) if MicroPython
       is set up; otherwise skip it — it should never block the Arduino-first
       day.
 

@@ -180,7 +180,7 @@ code:
       - code: dutys = [...1023,512,256,128,64,32,16,8...]
         text: The same falling gradient as the Arduino sketch — the head is brightest and the tail fades.
     note: >
-      A helper `pwm.py` wraps each pin as a PWM object. Run it in Thonny if
+      A helper `pwm.py` wraps each pin as a PWM object. Run it in [Thonny](https://thonny.org) if
       MicroPython is set up; otherwise skip it — it should never block the
       Arduino-first path.
 

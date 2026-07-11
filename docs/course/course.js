@@ -211,7 +211,11 @@ if (steps.length) {
   }
   steps.forEach((step) => {
     step.querySelector(".box").addEventListener("click", () => toggleStep(step));
-    step.querySelector(".text").addEventListener("click", () => toggleStep(step));
+    step.querySelector(".text").addEventListener("click", (e) => {
+      // A resource link inside the step text should open, not tick the step.
+      if (e.target.closest("a")) return;
+      toggleStep(step);
+    });
   });
   refreshSteps();
 }

@@ -31,7 +31,7 @@ def fail(msg):
 html_path=DOCS/'index.html'
 if not html_path.exists(): fail('docs/index.html missing')
 text=html_path.read_text(encoding='utf-8')
-for needle in ['TinySkiff ESP32-S3 Lab','Project browser','Official ZIP archive','site-data']:
+for needle in ['TinySkiff ESP32-S3 Lab','Every official example','Official ZIP archive','site-data']:
     if needle not in text: fail(f'missing marker {needle!r}')
 match=re.search(r'<script id="site-data" type="application/json">(.*?)</script>', text, re.S)
 if not match:

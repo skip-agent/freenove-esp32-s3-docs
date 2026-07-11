@@ -170,7 +170,7 @@ code:
     note: >
       Same pins, same wiring. MicroPython asks you to set the range and the
       resolution yourself — the two `adc.` lines above — where the Arduino core
-      picks those defaults for you. Run it in Thonny if MicroPython is set up;
+      picks those defaults for you. Run it in [Thonny](https://thonny.org) if MicroPython is set up;
       otherwise skip it — it should never block the Arduino-first path.
 
 theory:

@@ -196,7 +196,7 @@ code:
       - code: led = Pin(pins[i], Pin.OUT)
         text: Picks one pin from the list and drives it, then the loop moves to the next.
     note: >
-      Same pins, same wiring. Run it in Thonny if MicroPython is set up; otherwise
+      Same pins, same wiring. Run it in [Thonny](https://thonny.org) if MicroPython is set up; otherwise
       skip it — it should never block the Arduino-first path.
 
 theory:
