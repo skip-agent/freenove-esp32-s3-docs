@@ -14,10 +14,12 @@ tracks: { main: arduino, optional: micropython }
 learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
-  Wire an RGB LED — three tiny lights in one dome — to three PWM pins, upload the
-  Arduino sketch, and watch the board mix red, green, and blue into a stream of
-  random colours you never wired by hand.
-unlocks: A colour is just three brightnesses set at once, so three PWM channels can paint any shade you ask for.
+  Wire an RGB LED — three tiny lights in one dome — to three PWM pins and upload
+  the Arduino sketch. The real payoff is a model you'll use for every screen you
+  own: any colour is three brightnesses — red, green, and blue — each set by its
+  own PWM channel from 0 to 255. The board proves it by mixing colours you never
+  wired by hand.
+unlocks: A colour is three brightnesses set at once, so three PWM channels — one per primary, 0 to 255 each — can paint any shade you name.
 seoDescription: >
   Wire a common-anode RGB LED to the ESP32-S3, upload the sketch, and mix any
   colour from three PWM channels — red, green, and blue set to brightnesses that
@@ -28,8 +30,9 @@ hero:
   headline: Mix any colour|from three {lights}
   lede: >
     Today the board becomes a painter. You wire one small dome that holds three
-    lights — red, green, and blue — to three PWM pins, then upload a sketch that
-    sets each brightness and lets your eye blend them into a single colour.
+    lights — red, green, and blue — to three PWM pins, then set a brightness on
+    each. Your eye adds the three glows into a single colour, which is how every
+    screen you own builds its picture from just three numbers.
   pills:
     - { text: About 25 minutes, key: true }
     - Arduino first
@@ -183,25 +186,65 @@ code:
       skip it — it should never block the Arduino-first path.
 
 theory:
-  title: One colour from three primaries
-  summary: Set a brightness for red, green, and blue at once, and your eye blends them into a single colour.
+  title: Any colour is three brightnesses
+  summary: >
+    Give red, green, and blue each a level from 0 to 255 and your eye adds the
+    three glows into one colour — the same PWM dimming from Day 7, run on three
+    channels at once.
   intro: >
-    There's no trick here — three small lights sit close together and PWM sets how
-    bright each one glows.
+    Day 7 turned one pin into a dimmer with PWM. Today you run that same dimmer on
+    three pins — one for red, one for green, one for blue — and the colours add up
+    in your eye. That single idea is the whole of colour on every screen you own,
+    built from three numbers.
   flow:
-    - { n: Three lights, title: One dome, body: Red green and blue sit side by side under one lens. }
-    - { n: Set levels, title: PWM each, body: A PWM channel dials each colour from off to full. }
-    - { n: Blend, title: Your eye, body: The three glows overlap and read as one colour. }
-    - { n: All full, title: White, body: Red green and blue at full together look white. }
+    - n: "1"
+      title: Three PWM dials
+      body: >
+        Each colour leg gets its own PWM channel — the Day 7 dimmer, running three
+        times over instead of once.
+    - n: "2"
+      title: 0 to 255 each
+      body: >
+        Each channel is set to 8-bit, so a colour has 256 brightness steps from 0
+        to 255; three of them together reach millions of shades.
+    - n: "3"
+      title: Your eye adds them
+      body: >
+        The red, green, and blue glows overlap under one lens and arrive at your
+        eye as a single blended colour.
+    - n: "4"
+      title: Equal makes white
+      body: >
+        With no colour winning — red, green, and blue at the same level — the mix
+        stays neutral, dim grey low down and white at full.
+    - n: "5"
+      title: Anode or cathode
+      body: >
+        The one shared pin sets the polarity, deciding whether a colour lights when
+        its pin goes LOW or when it goes HIGH.
   formulaLabel: The model
-  formula: colour = **red** + **green** + **blue** at chosen brightnesses
+  formula: colour = **red** + **green** + **blue**, each a PWM level from **0 to 255**
   notes:
-    - title: Why the code inverts each value
+    - title: Common anode vs common cathode
       explain: commonAnode
-      body: The common pin sits at 3.3V, so a colour is brightest when its own pin is pulled LOW. Writing 255 minus the brightness flips the scale so bigger still means brighter.
-    - title: Three lights in one part
+      body: >
+        Three LEDs share one pin. Run that shared pin to 3.3V and you have a common
+        anode, where each colour lights when its own pin goes LOW. Run it to ground
+        and you have a common cathode, lit on HIGH. This kit is a common anode, so
+        the sketch writes 255 minus your value and a bigger number still means
+        brighter.
+    - title: Why the numbers stop at 255
+      explain: ledc
+      body: >
+        The channels are 8-bit, which gives 256 levels per colour, 0 through 255.
+        That is the same ledc hardware from Day 7 doing the fast switching, while
+        your loop just names one level for each of the three colours.
+    - title: Why equal numbers look grey
       explain: rgb
-      body: An RGB LED is three coloured LEDs packaged together, each with its own leg and a shared common pin.
+      body: >
+        When red, green, and blue are equal, none of them leads, so your eye finds
+        no hue to settle on and reads neutral — grey at a low level, white at a
+        high one.
 
 test:
   mode: visual
@@ -226,33 +269,38 @@ test:
       fix: "Swap in a data-capable USB cable."
 
 challenge:
-  title: "Try this: choose a status colour"
+  title: "Try this: predict a colour, then mix it"
   railLabel: Try this
   intro: >
-    Same working circuit, one design choice: picking a colour that carries meaning.
-    It fits inside today's 25 minutes.
-  summary: Choose a colour that would mean ready or warning, record its red, green, and blue numbers, then try the gradient variant.
+    The random sketch proves the board can mix. This proves you know the recipe.
+    You'll predict three colours from their red, green, and blue numbers, then set
+    those numbers by hand and check your eye against your maths. It fits inside
+    today's 25 minutes.
+  summary: Predict the red, green, and blue numbers for orange, purple, and white, then replace the three random() calls with your fixed numbers, upload, and see whether the dome matches your prediction.
   cards:
-    - title: Name a colour
+    - title: Predict three colours
       explain: rgb
-      body: Decide on a colour that would read as ready or as a warning, then write down the red, green, and blue numbers from 0 to 255 that would make it.
-    - title: Let it drift
-      body: Upload the gradient variant `Sketch_05.2_GradientColorLight.ino` and watch the colour slide smoothly instead of jumping.
+      body: On paper, write the three numbers from 0 to 255 for orange, then purple, then white. Orange is a lot of red with some green and no blue; purple is red and blue together with green held low; white is all three at full. Notice that equal numbers should read as neutral grey or white.
+    - title: Mix it by hand
+      explain: commonAnode
+      body: In the sketch, swap each `random(0, 256)` for your fixed red, green, and blue number, upload, and compare the dome with your prediction. The code still writes 255 minus each value for the common anode, so your bigger number is still the brighter one. If a colour looks off, nudge the number and re-upload.
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent can
     guide you with full context.
   behaviour: >
-    guide one physical connection at a time, wait for you to confirm, explain the
-    common-anode inversion on request, and always check the common pin, wiring,
-    board, and USB before changing code.
+    guide one physical connection at a time and wait for confirmation, teach that
+    any colour is three PWM brightnesses from 0 to 255, explain the common-anode
+    inversion on request, and help the learner predict then mix a named colour.
+    Always check the common pin, wiring, board, and USB before changing code.
   coachInstructions:
     - Guide one physical connection at a time and wait for learner confirmation before proceeding.
-    - Stress that this is a common-anode LED — the long common pin goes to 3.3V, not to ground.
-    - Explain the 255 minus value inversion only when asked; it is why a colour lights when its pin goes LOW.
-    - If only one colour appears, check that colour's 220 Ω resistor and GPIO wire before changing code.
-    - If nothing lights, check the common pin reaches 3.3V; if a colour is stuck on, suspect common-anode wiring or the wrong leg.
+    - Land the core model- any colour is three brightnesses (red, green, blue), each set by its own PWM channel from 0 to 255, and equal amounts read as grey or white.
+    - Stress that this is a common-anode LED- its shared pin goes to 3.3V, so a colour lights when its pin goes LOW; a common-cathode part shares ground instead and lights on HIGH.
+    - Explain the 255 minus value inversion when asked- it hides the common-anode polarity so a bigger number still means brighter.
+    - For the challenge, have the learner predict the red, green, and blue numbers for orange, purple, and white before setting them, then check the dome against the prediction.
+    - If only one colour appears, check that colour's 220 Ω resistor and GPIO wire before changing code; if nothing lights, check the common pin reaches 3.3V; if a colour is stuck on, suspect common-anode wiring or the wrong leg.
     - Keep the Arduino path primary; MicroPython is optional only if already set up.
 
 source:

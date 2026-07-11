@@ -9,15 +9,18 @@ day: 8
 slug: day-08-meteor
 title: Send a comet down the bar
 status: published
-estimatedTimeMinutes: 20
+estimatedTimeMinutes: 25
 tracks: { main: arduino, optional: micropython }
 learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
   Rebuild the Day 6 LED bar, upload the Arduino sketch, and watch a bright head
-  with a fading tail glide along the bar and back — the first time each segment
-  holds its own brightness instead of full on or full off.
-unlocks: Each pin can hold its own brightness with PWM, so a row of LEDs can carry a gradient and a light can appear to move with a tail.
+  with a fading tail glide along the bar and back. The real lesson sits
+  underneath the light: the board draws one still frame, pauses, then draws the
+  next — motion built from stills on a timer, the same idea behind every film and
+  video game. A moving comet turns out to be a list of brightnesses, shifted one
+  step each frame.
+unlocks: You understand animation as frames on a timer — each pass of the loop draws one still frame, and shifting a brightness array a step at a time turns those stills into a moving light with a fading tail.
 seoDescription: >
   Reuse the ESP32-S3 LED bar from Day 6, upload the sketch, and give each
   segment its own PWM brightness to make a bright comet head with a fading tail
@@ -27,12 +30,14 @@ hero:
   instrument: none
   headline: A bright head|and a fading {tail}
   lede: >
-    Today the light gains a tail. You reuse the same LED bar from Day 6, then
-    upload a sketch that gives each segment its own brightness with PWM — a
-    bright head at the front, dimmer segments trailing behind, all sliding along
-    the bar and back.
+    Today the light gains a tail — and you'll see exactly why it moves. You reuse
+    the same LED bar from Day 6, then upload a sketch that draws one still frame
+    at a time — eight brightnesses set at once, a short pause, then the whole
+    pattern nudged one step along the bar. Run those frames fast enough and they
+    blend into a single gliding comet with a trailing tail. It's the same trick
+    your eye plays at the cinema.
   pills:
-    - { text: About 20 minutes, key: true }
+    - { text: About 25 minutes, key: true }
     - Arduino first
     - MicroPython optional
     - Same LED bar as Day 6
@@ -124,9 +129,11 @@ steps:
 
 code:
   intro: >
-    The sketch keeps the pins in one list, like Day 6, but adds a second list of
-    brightness values that forms the tail. Switch to MicroPython if you'd rather
-    see the same idea in Python — the wiring never changes.
+    The sketch keeps the pins in one list, like Day 6, and adds a second list of
+    brightness values. That second list is the whole animation — a bright head
+    with values that fall off behind it — and each frame the loop shows a moving
+    slice of it. Switch to MicroPython if you'd rather see the same idea in
+    Python — the wiring never changes.
   arduino:
     file: Sketch_04.2_FlowingLight2.ino
     sketch: C/Sketches/Sketch_04.2_FlowingLight2/Sketch_04.2_FlowingLight2.ino
@@ -151,13 +158,13 @@ code:
       }
     notes:
       - code: ledcAttachChannel(ledPins[i], 1000, 10, chns[i])
-        text: Gives each of the eight pins its own PWM channel, so every segment can hold a brightness of its own.
+        text: Gives each of the eight pins its own PWM channel, so every segment can hold a brightness of its own — the per-LED control each frame needs.
         explain: ledc
       - code: const int dutys[] = {0,..., 1023,512,256,128,64,32,16,8, ...,0}
-        text: A brightness gradient — bright to dim — with dark padding on each side; those falling numbers are the fading tail.
+        text: A brightness for every position — bright head down to a faint glow, with dark padding on each side. Those falling numbers are the tail, baked into the data rather than redrawn each frame.
         explain: pwm
       - code: ledcWrite(ledPins[j], dutys[i + j])
-        text: Reads an eight-wide window of the gradient and slides it one step each pass, which is what makes the comet move.
+        text: Shows one eight-wide slice of the list — a single frame; the i offset moves that slice one step further each pass, so successive frames make the comet travel.
         explain: pinArray
   micropython:
     file: 04.2_FlowingLight/FlowingLight.py
@@ -178,22 +185,29 @@ code:
       Arduino-first path.
 
 theory:
-  title: A gradient that moves
-  summary: Give each LED its own brightness, shape a bright-to-dim gradient, then slide that gradient one step at a time so the head leads and the tail fades.
+  title: Motion is frames on a timer
+  summary: Each pass of the loop draws one still frame — eight brightnesses on the bar — then shifts the pattern one step; frames arriving faster than the eye can separate them read as a single moving comet.
   intro: >
-    There's no trick here — the board sets eight brightnesses at once, then nudges
-    the whole pattern along the bar, faster than the eye separates the steps.
+    There's no special "animation" feature on the chip. Everything that moves —
+    film, a game, this bar — is still frames shown one after another, fast. The
+    `loop` is your projector — each pass sets a fresh picture and pauses, and a
+    small change between frames becomes motion.
   flow:
-    - { n: Brightness, title: PWM per LED, body: Each segment gets its own channel so it can be bright or dim. }
-    - { n: Gradient, title: bright to dim, body: The dutys list falls from full on down to a faint glow. }
-    - { n: Slide, title: one step, body: An eight-wide window of that list moves one place each pass. }
-    - { n: Comet, title: head and tail, body: The bright end leads and the dim end trails it down the bar. }
-  formulaLabel: The model
-  formula: eight brightnesses → a falling gradient → slide it one step → head leads, tail fades
+    - { n: Frame, title: one pass, one still, body: Each time through the loop the board sets all eight brightnesses at once and pauses. That fixed picture is one frame. }
+    - { n: Array, title: brightness per LED, body: A list holds a brightness for every position — a bright head with values that fall off behind it. That falling shape is the tail. }
+    - { n: Advance, title: move a step, body: Before the next frame the pattern shifts one LED along the bar. A small move plus a short pause reads as the head creeping forward. }
+    - { n: Fuse, title: faster than the eye, body: At about ten frames a second the pauses disappear and the separate steps blend into one comet gliding down the bar. }
+  formulaLabel: The loop
+  formula: "set eight brightnesses → pause → shift one step → repeat = a moving picture"
   notes:
-    - title: What PWM is doing
+    - title: How each LED holds a brightness
       explain: pwm
-      body: PWM flicks each pin on and off very fast; the fraction of time it stays on sets how bright that segment looks, so a whole row can carry a smooth gradient.
+      body: PWM flicks each pin on and off very fast; the fraction of time it stays on sets how bright that segment looks, so one row can carry a smooth gradient of its own.
+    - title: Why the steps look smooth
+      body: Each frame lingers on your eye for an instant, and the next arrives before it fades. Around ten frames a second, they merge into continuous motion — the same trick a film reel uses.
+    - title: One long list, a moving window
+      explain: pinArray
+      body: The brightness list is longer than the bar and padded with dark at both ends. Each frame shows a different eight-LED slice of it, so the comet can slide in from a dark bar and back out again.
 
 test:
   mode: visual
@@ -221,31 +235,39 @@ challenge:
   title: "Try this: reshape the comet"
   railLabel: Try this
   intro: >
-    Same working circuit, small edits to the sketch. Both fit inside today's time
-    and leave the wiring untouched.
-  summary: Change the trail by editing the dutys values, then change the sweep speed with the delay, and note what each edit does to the comet.
+    Same working circuit, small edits to the one sketch — each one changes the
+    animation and shows you a different part of how it works. All three fit inside
+    today's time and leave the wiring untouched.
+  summary: Slow the frames down until you can see them land one at a time, then reshape the tail and swap which end leads — and predict each result before you upload.
   cards:
+    - title: See the frames land
+      explain: delayMs
+      body: Change `delay(100)` to `delay(500)` and upload. The comet now steps forward once every half-second, so you can watch each individual frame arrive — the motion you saw was these same stills, shown too fast to separate.
     - title: Reshape the tail
       explain: pwm
-      body: Edit the falling numbers in `dutys` — add more dim values for a longer tail, or fewer for a shorter one. Predict the shape before you upload.
-    - title: Change the speed
-      explain: delayMs
-      body: Set `delay(100)` to a larger or smaller number and upload. Find the speed where the comet still reads as one moving light.
+      body: Edit the falling numbers in `dutys` — add more dim values for a longer tail, fewer for a stubbier one. That list is the animation, so predict the new shape before you upload, then check it.
+    - title: Swap which end leads
+      explain: pinArray
+      body: Reverse the order of the bright block in `dutys` so it climbs from dim up to bright. The head and tail trade ends, and the comet appears to run the other way — proof that head and tail are only the shape of the list.
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent can
     guide you with full context.
   behaviour: >
-    confirm the Day 6 circuit first, guide one segment at a time, wait for you to
-    confirm, explain terms on request, and always check wiring, board, port, and
-    USB before changing code.
+    confirm the Day 6 circuit first, then teach the animation idea plainly — one
+    loop pass draws a still frame, the dutys list is the whole animation, and
+    shifting it one step each frame is what moves the comet. Guide edits one at a
+    time, wait for the learner to confirm, explain terms on request, and always
+    check wiring, board, port, and USB before changing code.
   coachInstructions:
     - Start by confirming the Day 6 LED bar is still wired; only eight segments are driven today, and two staying dark is expected.
+    - Land the core idea — motion here is still frames on a timer, where each loop pass sets eight brightnesses and pauses, and shifting the brightness list one step per frame is what moves the comet.
+    - Point out that the tail lives in the dutys list as values that fall off behind the head; the loop only ever shows a moving slice of that list.
     - Remind the learner that each driven segment needs its own 220 Ω series resistor — a shared or missing resistor is the common mistake here.
     - If only one segment lights with no tail, suspect Day 6's on/off sketch is still loaded; have the learner upload 04.2 before changing anything else.
     - If a segment in the path stays dark, check that segment's resistor and its jumper to its GPIO pin, not the whole circuit.
-    - Explain PWM, the dutys gradient, and the sliding window on request; do not dump theory before the learner has a working comet.
+    - For the challenge, have them slow delay right down first to watch single frames land, before reshaping the tail or reversing the gradient; do not dump theory before the learner has a working comet.
     - Keep the Arduino path primary; MicroPython is optional only if already set up.
 
 source:

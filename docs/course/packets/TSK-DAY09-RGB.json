@@ -7,7 +7,7 @@
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
   "estimatedTimeMinutes": 25,
-  "mission": "Wire an RGB LED — three tiny lights in one dome — to three PWM pins, upload the Arduino sketch, and watch the board mix red, green, and blue into a stream of random colours you never wired by hand.",
+  "mission": "Wire an RGB LED — three tiny lights in one dome — to three PWM pins and upload the Arduino sketch. The real payoff is a model you'll use for every screen you own: any colour is three brightnesses — red, green, and blue — each set by its own PWM channel from 0 to 255. The board proves it by mixing colours you never wired by hand.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -77,10 +77,11 @@
   ],
   "coachInstructions": [
     "Guide one physical connection at a time and wait for learner confirmation before proceeding.",
-    "Stress that this is a common-anode LED — the long common pin goes to 3.3V, not to ground.",
-    "Explain the 255 minus value inversion only when asked; it is why a colour lights when its pin goes LOW.",
-    "If only one colour appears, check that colour's 220 Ω resistor and GPIO wire before changing code.",
-    "If nothing lights, check the common pin reaches 3.3V; if a colour is stuck on, suspect common-anode wiring or the wrong leg.",
+    "Land the core model- any colour is three brightnesses (red, green, blue), each set by its own PWM channel from 0 to 255, and equal amounts read as grey or white.",
+    "Stress that this is a common-anode LED- its shared pin goes to 3.3V, so a colour lights when its pin goes LOW; a common-cathode part shares ground instead and lights on HIGH.",
+    "Explain the 255 minus value inversion when asked- it hides the common-anode polarity so a bigger number still means brighter.",
+    "For the challenge, have the learner predict the red, green, and blue numbers for orange, purple, and white before setting them, then check the dome against the prediction.",
+    "If only one colour appears, check that colour's 220 Ω resistor and GPIO wire before changing code; if nothing lights, check the common pin reaches 3.3V; if a colour is stuck on, suspect common-anode wiring or the wrong leg.",
     "Keep the Arduino path primary; MicroPython is optional only if already set up."
   ],
   "steps": [
@@ -117,16 +118,20 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "Set a brightness for red, green, and blue at once, and your eye blends them into a single colour.",
-    "formula": "colour = red + green + blue at chosen brightnesses",
+    "plainLanguage": "Give red, green, and blue each a level from 0 to 255 and your eye adds the three glows into one colour — the same PWM dimming from Day 7, run on three channels at once.",
+    "formula": "colour = red + green + blue, each a PWM level from 0 to 255",
     "notes": [
       {
-        "title": "Why the code inverts each value",
-        "body": "The common pin sits at 3.3V, so a colour is brightest when its own pin is pulled LOW. Writing 255 minus the brightness flips the scale so bigger still means brighter."
+        "title": "Common anode vs common cathode",
+        "body": "Three LEDs share one pin. Run that shared pin to 3.3V and you have a common anode, where each colour lights when its own pin goes LOW. Run it to ground and you have a common cathode, lit on HIGH. This kit is a common anode, so the sketch writes 255 minus your value and a bigger number still means brighter."
       },
       {
-        "title": "Three lights in one part",
-        "body": "An RGB LED is three coloured LEDs packaged together, each with its own leg and a shared common pin."
+        "title": "Why the numbers stop at 255",
+        "body": "The channels are 8-bit, which gives 256 levels per colour, 0 through 255. That is the same ledc hardware from Day 7 doing the fast switching, while your loop just names one level for each of the three colours."
+      },
+      {
+        "title": "Why equal numbers look grey",
+        "body": "When red, green, and blue are equal, none of them leads, so your eye finds no hue to settle on and reads neutral — grey at a low level, white at a high one."
       }
     ]
   },
@@ -164,5 +169,5 @@
       ]
     }
   ],
-  "challenge": "Choose a colour that would mean ready or warning, record its red, green, and blue numbers, then try the gradient variant."
+  "challenge": "Predict the red, green, and blue numbers for orange, purple, and white, then replace the three random() calls with your fixed numbers, upload, and see whether the dome matches your prediction."
 }

@@ -16,7 +16,7 @@
       <div class="hero-copy">
         <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 9 of 30</p>
         <h1>Mix any colour<br />from three <em>lights</em></h1>
-        <p class="lede">Today the board becomes a painter. You wire one small dome that holds three lights — red, green, and blue — to three PWM pins, then upload a sketch that sets each brightness and lets your eye blend them into a single colour.
+        <p class="lede">Today the board becomes a painter. You wire one small dome that holds three lights — red, green, and blue — to three PWM pins, then set a brightness on each. Your eye adds the three glows into a single colour, which is how every screen you own builds its picture from just three numbers.
 </p>
         <div class="meta-row" aria-label="Lesson facts">
           <span class="pill is-key">About 25 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">No electronics assumed</span>
@@ -46,7 +46,7 @@
           <a href="#wiring"><span class="tick"></span>Chart the circuit</a>
           <a href="#steps"><span class="tick"></span>Build it</a>
           <a href="#code"><span class="tick"></span>Read the code</a>
-          <a href="#theory"><span class="tick"></span>One colour from three primaries</a>
+          <a href="#theory"><span class="tick"></span>Any colour is three brightnesses</a>
           <a href="#test"><span class="tick"></span>Test &amp; debug</a>
           <a href="#challenge"><span class="tick"></span>Try this</a>
           <a href="#agent"><span class="tick"></span>Coach me</a>
@@ -232,23 +232,33 @@ pwm0.<span class="tok-fn">duty</span>(<span class="tok-num">1023</span> - r)    
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">05</span> Understand, don&#x27;t memorise</p>
-              <h2>One colour from three primaries</h2>
-              <p class="muted">There&#x27;s no trick here — three small lights sit close together and PWM sets how bright each one glows.
+              <h2>Any colour is three brightnesses</h2>
+              <p class="muted">Day 7 turned one pin into a dimmer with PWM. Today you run that same dimmer on three pins — one for red, one for green, one for blue — and the colours add up in your eye. That single idea is the whole of colour on every screen you own, built from three numbers.
 </p>
             </div>
             <div class="theory-flow" aria-label="Measurement model">
-              <article class="flow-step"><span class="n">Three lights</span><h3>One dome</h3><p>Red green and blue sit side by side under one lens.</p></article>
-              <article class="flow-step"><span class="n">Set levels</span><h3>PWM each</h3><p>A PWM channel dials each colour from off to full.</p></article>
-              <article class="flow-step"><span class="n">Blend</span><h3>Your eye</h3><p>The three glows overlap and read as one colour.</p></article>
-              <article class="flow-step"><span class="n">All full</span><h3>White</h3><p>Red green and blue at full together look white.</p></article>
+              <article class="flow-step"><span class="n">1</span><h3>Three PWM dials</h3><p>Each colour leg gets its own PWM channel — the Day 7 dimmer, running three times over instead of once.
+</p></article>
+              <article class="flow-step"><span class="n">2</span><h3>0 to 255 each</h3><p>Each channel is set to 8-bit, so a colour has 256 brightness steps from 0 to 255; three of them together reach millions of shades.
+</p></article>
+              <article class="flow-step"><span class="n">3</span><h3>Your eye adds them</h3><p>The red, green, and blue glows overlap under one lens and arrive at your eye as a single blended colour.
+</p></article>
+              <article class="flow-step"><span class="n">4</span><h3>Equal makes white</h3><p>With no colour winning — red, green, and blue at the same level — the mix stays neutral, dim grey low down and white at full.
+</p></article>
+              <article class="flow-step"><span class="n">5</span><h3>Anode or cathode</h3><p>The one shared pin sets the polarity, deciding whether a colour lights when its pin goes LOW or when it goes HIGH.
+</p></article>
             </div>
             <div class="formula-card">
               <span class="label">The model</span>
-              <code>colour = <b>red</b> + <b>green</b> + <b>blue</b> at chosen brightnesses</code>
+              <code>colour = <b>red</b> + <b>green</b> + <b>blue</b>, each a PWM level from <b>0 to 255</b></code>
             </div>
             <div class="two-col" style="margin-top:14px">
-              <article class="mini-card"><h3>Why the code inverts each value <button class="define" data-topic="commonAnode">Define</button></h3><p>The common pin sits at 3.3V, so a colour is brightest when its own pin is pulled LOW. Writing 255 minus the brightness flips the scale so bigger still means brighter.</p></article>
-              <article class="mini-card"><h3>Three lights in one part <button class="define" data-topic="rgb">Define</button></h3><p>An RGB LED is three coloured LEDs packaged together, each with its own leg and a shared common pin.</p></article>
+              <article class="mini-card"><h3>Common anode vs common cathode <button class="define" data-topic="commonAnode">Define</button></h3><p>Three LEDs share one pin. Run that shared pin to 3.3V and you have a common anode, where each colour lights when its own pin goes LOW. Run it to ground and you have a common cathode, lit on HIGH. This kit is a common anode, so the sketch writes 255 minus your value and a bigger number still means brighter.
+</p></article>
+              <article class="mini-card"><h3>Why the numbers stop at 255 <button class="define" data-topic="ledc">Define</button></h3><p>The channels are 8-bit, which gives 256 levels per colour, 0 through 255. That is the same ledc hardware from Day 7 doing the fast switching, while your loop just names one level for each of the three colours.
+</p></article>
+              <article class="mini-card"><h3>Why equal numbers look grey <button class="define" data-topic="rgb">Define</button></h3><p>When red, green, and blue are equal, none of them leads, so your eye finds no hue to settle on and reads neutral — grey at a low level, white at a high one.
+</p></article>
             </div>
           </div>
         </section>
@@ -285,13 +295,13 @@ pwm0.<span class="tok-fn">duty</span>(<span class="tok-num">1023</span> - r)    
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">07</span> Make the idea yours</p>
-              <h2>Try this: choose a status colour</h2>
-              <p class="muted">Same working circuit, one design choice: picking a colour that carries meaning. It fits inside today&#x27;s 25 minutes.
+              <h2>Try this: predict a colour, then mix it</h2>
+              <p class="muted">The random sketch proves the board can mix. This proves you know the recipe. You&#x27;ll predict three colours from their red, green, and blue numbers, then set those numbers by hand and check your eye against your maths. It fits inside today&#x27;s 25 minutes.
 </p>
             </div>
             <div class="two-col">
-              <article class="mini-card"><h3>Name a colour <button class="define" data-topic="rgb">Define</button></h3><p>Decide on a colour that would read as ready or as a warning, then write down the red, green, and blue numbers from 0 to 255 that would make it.</p></article>
-              <article class="mini-card"><h3>Let it drift</h3><p>Upload the gradient variant <code>Sketch_05.2_GradientColorLight.ino</code> and watch the colour slide smoothly instead of jumping.</p></article>
+              <article class="mini-card"><h3>Predict three colours <button class="define" data-topic="rgb">Define</button></h3><p>On paper, write the three numbers from 0 to 255 for orange, then purple, then white. Orange is a lot of red with some green and no blue; purple is red and blue together with green held low; white is all three at full. Notice that equal numbers should read as neutral grey or white.</p></article>
+              <article class="mini-card"><h3>Mix it by hand <button class="define" data-topic="commonAnode">Define</button></h3><p>In the sketch, swap each <code>random(0, 256)</code> for your fixed red, green, and blue number, upload, and compare the dome with your prediction. The code still writes 255 minus each value for the common anode, so your bigger number is still the brighter one. If a colour looks off, nudge the number and re-upload.</p></article>
             </div>
           </div>
         </section>
@@ -309,7 +319,7 @@ pwm0.<span class="tok-fn">duty</span>(<span class="tok-num">1023</span> - r)    
             </div>
             <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
               <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
-              <p><strong>How the agent should behave:</strong> guide one physical connection at a time, wait for you to confirm, explain the common-anode inversion on request, and always check the common pin, wiring, board, and USB before changing code.
+              <p><strong>How the agent should behave:</strong> guide one physical connection at a time and wait for confirmation, teach that any colour is three PWM brightnesses from 0 to 255, explain the common-anode inversion on request, and help the learner predict then mix a named colour. Always check the common pin, wiring, board, and USB before changing code.
 </p>
             </div>
           </div>
@@ -353,7 +363,7 @@ pwm0.<span class="tok-fn">duty</span>(<span class="tok-num">1023</span> - r)    
 
   <div class="toast" id="toast">Prompt copied</div>
 
-  <script id="lesson-data" type="application/json">{"day": 9, "totalDays": 30, "slug": "day-09-rgb", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "commonAnode": {"title": "Common anode — why brightness looks inverted", "body": "In this RGB LED all three colours share one positive pin, so a colour lights when its own pin is pulled LOW, not HIGH. The sketch writes 255 minus your value, so 255 still means \"brightest\" to you even though the hardware works upside down.\n", "shortcut": "A bigger number still means brighter — the 255 − value in code hides the inversion."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "gpio": {"title": "GPIO extension board", "body": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself.\n", "shortcut": "When a lesson says GPIO 13, look for the pin labelled 13 on the extension board."}, "jumpers": {"title": "Jumper wires", "body": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles.\n", "shortcut": "If a reading seems impossible, gently reseat the jumper wires before changing code."}, "pwm": {"title": "PWM — dimming by blinking", "body": "A pin is only ever fully on or fully off. But if it flicks on and off thousands of times a second, your eye blends it into a steady in-between brightness. The share of time it stays on is the duty cycle — more on-time looks brighter.\n", "shortcut": "PWM fakes \"half on\" by switching fast. Duty 0 = off, maximum = brightest."}, "resistor": {"title": "Resistor", "body": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction.\n", "shortcut": "The 220 Ω resistor protects the LED; either way round is fine."}, "rgb": {"title": "RGB colour mixing", "body": "An RGB LED is three tiny LEDs — red, green, and blue — in one dome. Set each one's brightness with PWM and your eye blends them into a single colour. All off is dark; all full is white; everything else is a mix — the same trick a screen uses.\n", "shortcut": "Red + green + blue at different brightnesses makes any colour."}}, "prev": {"day": 8, "slug": "day-08-meteor", "title": "Send a comet down the bar"}, "next": {"day": 10, "slug": "day-10-buzzer", "title": "Give the board a voice"}}</script>
+  <script id="lesson-data" type="application/json">{"day": 9, "totalDays": 30, "slug": "day-09-rgb", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "commonAnode": {"title": "Common anode — why brightness looks inverted", "body": "In this RGB LED all three colours share one positive pin, so a colour lights when its own pin is pulled LOW, not HIGH. The sketch writes 255 minus your value, so 255 still means \"brightest\" to you even though the hardware works upside down.\n", "shortcut": "A bigger number still means brighter — the 255 − value in code hides the inversion."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "gpio": {"title": "GPIO extension board", "body": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself.\n", "shortcut": "When a lesson says GPIO 13, look for the pin labelled 13 on the extension board."}, "jumpers": {"title": "Jumper wires", "body": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles.\n", "shortcut": "If a reading seems impossible, gently reseat the jumper wires before changing code."}, "ledc": {"title": "ledcWrite() and PWM channels", "body": "The ESP32-S3 has hardware PWM \"channels\" (its LEDC controller). You attach a pin to a channel once, then ledcWrite() sets its level. The board does the fast switching for you, so your loop just names a brightness number.\n", "shortcut": "Attach the pin to a channel once; then ledcWrite(pin, level) sets brightness."}, "pwm": {"title": "PWM — dimming by blinking", "body": "A pin is only ever fully on or fully off. But if it flicks on and off thousands of times a second, your eye blends it into a steady in-between brightness. The share of time it stays on is the duty cycle — more on-time looks brighter.\n", "shortcut": "PWM fakes \"half on\" by switching fast. Duty 0 = off, maximum = brightest."}, "resistor": {"title": "Resistor", "body": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction.\n", "shortcut": "The 220 Ω resistor protects the LED; either way round is fine."}, "rgb": {"title": "RGB colour mixing", "body": "An RGB LED is three tiny LEDs — red, green, and blue — in one dome. Set each one's brightness with PWM and your eye blends them into a single colour. All off is dark; all full is white; everything else is a mix — the same trick a screen uses.\n", "shortcut": "Red + green + blue at different brightnesses makes any colour."}}, "prev": {"day": 8, "slug": "day-08-meteor", "title": "Send a comet down the bar"}, "next": {"day": 10, "slug": "day-10-buzzer", "title": "Give the board a voice"}}</script>
   <script src="../course.js"></script>
 </body>
 </html>

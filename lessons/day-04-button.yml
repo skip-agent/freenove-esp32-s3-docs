@@ -15,8 +15,9 @@ learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
   Wire a push button to one pin and a LED to another, upload the Arduino sketch,
-  and watch the LED light the instant you press — your first circuit where
-  something you do changes what the board does.
+  and watch the LED light the instant you press. Along the way, learn why an input
+  pin needs a resistor to read reliably at all — the idea behind every button,
+  switch, and sensor you'll wire from here on.
 unlocks: A pin can read the world as well as drive it, so the board can react to you instead of only running on a timer.
 seoDescription: >
   Wire a push button and a LED to the ESP32-S3, upload the sketch, and make the
@@ -29,6 +30,8 @@ hero:
     Today the board starts listening. You wire a push button to one pin and a LED
     to another, then upload a sketch that watches the button and lights the LED
     whenever it's pressed — the smallest complete loop of sense, decide, and act.
+    The wiring hides the real lesson: a resistor whose only job is to give the
+    input pin a steady reading to start from.
   pills:
     - { text: About 25 minutes, key: true }
     - Arduino first
@@ -190,25 +193,27 @@ code:
       skip it — it should never block the Arduino-first path.
 
 theory:
-  title: Sense, decide, act
-  summary: The board reads the button, decides with an if, and drives the LED — the loop under every gadget.
+  title: How the board reads a button
+  summary: An input pin reads its voltage as HIGH or LOW; a pull resistor gives it a resting level so a press has something to flip.
   intro: >
-    There's no trick here — just three moves the board makes over and over, faster
-    than you can see.
+    Driving the LED is the easy half — the board pushes voltage out of a pin.
+    Reading the button is the subtle half, because an input pin is a listener, and
+    a listener with nothing wired to it invents noise. One resistor fixes that, and
+    understanding why is the real lesson of your first wiring day.
   flow:
-    - { n: Sense, title: Button in, body: digitalRead checks GPIO 13 many times a second. }
-    - { n: Decide, title: if / else, body: LOW means pressed so the board chooses to light up. }
-    - { n: Act, title: LED out, body: digitalWrite pushes the pin HIGH and the LED turns on. }
-    - { n: Repeat, title: loop(), body: The whole check runs again at once and forever. }
-  formulaLabel: The model
-  formula: input (button) → **decision** (code) → output (LED)
+    - { n: 1 · Listen, title: An input pin, body: "pinMode INPUT turns GPIO 13 into a high-impedance listener. It senses the pin's voltage — near 3.3V reads HIGH, near 0V reads LOW — while drawing almost no current itself, which is exactly what makes it easy to sway." }
+    - { n: 2 · The catch, title: A floating pin, body: With nothing holding it, that sensitive input picks up ambient electrical noise from the wiring and even your body, and its reading drifts between HIGH and LOW at random. A pin left floating cannot be trusted. }
+    - { n: 3 · The anchor, title: A pull resistor, body: The 10 kΩ resistor ties GPIO 13 up to 3.3V, giving it a steady resting HIGH. The resistor is weak enough that a solid connection elsewhere can still overrule it, which is the whole trick. }
+    - { n: 4 · The press, title: Override to LOW, body: "Pressing connects the pin straight to ground through a near-zero-resistance path. That solid path wins over the gentle pull-up, so the pin snaps to LOW — and the sketch reads the change on its very next pass." }
+  formulaLabel: The loop
+  formula: sense (digitalRead) → **decide** (if) → act (digitalWrite) → repeat
   notes:
     - title: Why a press reads LOW
       explain: activeLow
-      body: In this wiring a press pulls GPIO 13 toward ground, so the sketch checks for LOW on purpose.
-    - title: What the 10 kΩ resistor is for
-      explain: pullResistor
-      body: Without it the input pin would float and read at random. The resistor gives it a steady resting value.
+      body: The pull-up holds GPIO 13 at 3.3V, so at rest it reads HIGH. A press connects the pin to ground and it reads LOW, which is why the sketch checks for LOW. This backwards-feeling wiring is common in real circuits, so it's worth meeting early.
+    - title: The pull-up the chip already has
+      explain: inputPullup
+      body: This circuit wires its own 10 kΩ pull-up and reads the pin with plain INPUT. Every ESP32-S3 input pin also carries a pull-up resistor built into the chip; INPUT_PULLUP switches that one on so you can skip the external part. The MicroPython version does precisely this with Pin.PULL_UP.
 
 test:
   mode: visual
@@ -233,18 +238,20 @@ test:
       fix: "Swap in a data-capable USB cable."
 
 challenge:
-  title: "Try this: predict before you press"
+  title: "Try this: make the pin float"
   railLabel: Try this
   intro: >
-    Same working circuit, one new habit: predicting a result before you test it.
-    It fits inside today's 30 minutes.
-  summary: Predict the LED's state before each press, then reason about what the 10 kΩ resistor is quietly doing.
+    The pull resistor is invisible while it works. The way to see what it does is
+    to take it out for a minute and watch the input pin lose its footing, then put
+    it back and watch the reading settle. It fits inside today's session.
+  summary: With power off, remove the 10 kΩ resistor so GPIO 13 floats, run the sketch and watch the LED drift and react to your hand, then restore the resistor and watch the reading go rock steady.
   cards:
-    - title: Predict first
-      body: Before each press, say out loud whether the LED is on or off. Then press and check whether you were right.
-    - title: Reason about the resistor
+    - title: Take the anchor away
       explain: pullResistor
-      body: Picture removing the 10 kΩ resistor. Predict what GPIO 13 would read with nothing holding it, and why that would be a problem.
+      body: With USB unplugged, remove the 10 kΩ resistor that ties GPIO 13 to 3.3V, so nothing holds the pin. Reconnect USB and run the same sketch. The LED loses its footing — it flickers, drifts, or reacts when your hand comes near the wire — because the floating pin is reading ambient noise with no resting level to hold.
+    - title: Put it back
+      explain: inputPullup
+      body: Unplug USB, wire the 10 kΩ resistor back to 3.3V, then reconnect. The LED goes rock steady — dark at rest, lit only while you press. That steadiness is the resistor's whole job, and INPUT_PULLUP would earn the same result from inside the chip.
 
 agent:
   intro: >
@@ -253,12 +260,17 @@ agent:
   behaviour: >
     guide one physical connection at a time, wait for you to confirm, explain
     terms on request, and always check wiring, board, port, and USB before
-    changing code.
+    changing code. Once the circuit works, use the floating-pin experiment to make
+    the pull resistor's job real.
   coachInstructions:
     - Guide one physical connection at a time and wait for learner confirmation before proceeding.
     - Watch for LED polarity and the 220 Ω series resistor — the two most common first-circuit mistakes.
+    - Teach the core idea once the circuit works- an input pin is high-impedance, so a floating pin reads random noise and the 10 kΩ pull-up gives it a steady resting level a press can override.
+    - Explain the active-low reading- the pull-up holds GPIO 13 HIGH at rest, and a press to ground reads LOW, which is why the sketch checks for LOW.
+    - Connect the two code paths- the Arduino sketch uses an external pull-up with plain INPUT, while the MicroPython version uses the chip's built-in pull-up via INPUT_PULLUP (Pin.PULL_UP).
     - If the LED never lights, check its direction, the resistor, the GPIO 2 wire, and the shared ground before changing code.
     - If the LED is always on, suspect the button wiring or its 10 kΩ resistor on GPIO 13.
+    - For the challenge, have them remove the pull-up with power off to watch the pin float, then restore it — supervise so USB is unplugged during any rewiring.
     - Offer short explanations on request; do not dump theory before the learner has a working circuit.
     - Keep the Arduino path primary; MicroPython is optional only if already set up.
 

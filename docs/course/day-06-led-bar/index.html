@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Day 6 · Make ten lights flow like water — TinySkiff ESP32-S3 Lab</title>
-  <meta name="description" content="Wire a ten-segment LED bar to the ESP32-S3, upload the sketch, and watch a lit segment flow along the bar and back — your first many-output circuit driven by a pin array and a loop." />
+  <meta name="description" content="Drive a ten-segment LED bar from the ESP32-S3 with a single array of pins and one loop instead of ten copied lines, watch a lit segment sweep along the bar and back, and learn why every LED needs its own current-limiting resistor." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -16,7 +16,7 @@
       <div class="hero-copy">
         <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 6 of 30</p>
         <h1>Ten lights<br />that <em>flow</em></h1>
-        <p class="lede">Today one light moves. You wire ten LED segments, each on its own pin, then upload a sketch that lights them one at a time down the bar and back — the first circuit where a list of pins and a single loop do the work of ten.
+        <p class="lede">Ten outputs is where copy-paste stops scaling. So today you meet the fix you will use for every many-part circuit after this — put the pins in an array and let one loop walk it. Wire ten segments, upload, and watch a single lit segment sweep down the bar and back. The motion is nothing but the loop&#x27;s counter stepping through the list.
 </p>
         <div class="meta-row" aria-label="Lesson facts">
           <span class="pill is-key">About 25 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">No electronics assumed</span>
@@ -46,7 +46,7 @@
           <a href="#wiring"><span class="tick"></span>Chart the circuit</a>
           <a href="#steps"><span class="tick"></span>Build it</a>
           <a href="#code"><span class="tick"></span>Read the code</a>
-          <a href="#theory"><span class="tick"></span>One list, one loop</a>
+          <a href="#theory"><span class="tick"></span>An array of pins, walked by a loop</a>
           <a href="#test"><span class="tick"></span>Test &amp; debug</a>
           <a href="#challenge"><span class="tick"></span>Try this</a>
           <a href="#agent"><span class="tick"></span>Coach me</a>
@@ -80,7 +80,7 @@
               <article class="part-card">
                 <figure class="part-photo"><img src="../assets/shared/item-resistor.png" alt="Official manual photo of a resistor with coloured value bands." /><figcaption>Manual photo</figcaption></figure>
                 <h3>10 × 220 Ω resistors <button class="define" data-topic="resistor">Define</button></h3>
-                <p>One in series with each segment to keep every current gentle.</p>
+                <p>One per segment, in series, to set the current so each LED lights instead of burning out. Ten LEDs means ten resistors.</p>
               </article>
               <article class="part-card">
                 <figure class="part-photo"><img src="../assets/shared/item-jumper-wire.png" alt="Official manual image of a jumper wire." /><figcaption>Manual photo</figcaption></figure>
@@ -115,12 +115,12 @@
                 <div class="pin-row">
                   <span class="pin-name"><span class="pin-dot"></span>10 bar segments (via 220 Ω each) <button class="define" data-topic="pinArray">Define</button></span>
                   <span class="pin-arrow">→</span><span class="pin-dest">GPIO 21 47 48 38 39 40 41 42 2 1</span>
-                  <span class="pin-why">Each pin lights one segment of the bar.</span>
+                  <span class="pin-why">Each segment gets its own pin so code can address them one at a time. This exact order is the order the array uses. Its 220 Ω resistor sets the current that keeps that segment alive.</span>
                 </div>
                 <div class="pin-row">
                   <span class="pin-name"><span class="pin-dot"></span>Bar common row <button class="define" data-topic="gnd">Define</button></span>
                   <span class="pin-arrow">→</span><span class="pin-dest">GND</span>
-                  <span class="pin-why">Returns every segment to zero volts.</span>
+                  <span class="pin-why">Every segment returns through one shared row to zero volts</span>
                 </div>
               </div>
             </div>
@@ -163,7 +163,7 @@
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">04</span> Read just enough code</p>
               <h2>Read the code</h2>
-              <p class="muted">The sketch stays short even with ten LEDs, because the pins live in one list and a loop walks it. Switch to MicroPython if you&#x27;d rather see the same idea in Python — the wiring never changes.
+              <p class="muted">The code for ten LEDs is the same length as the code for two. The pins live in one array and a loop does each job once per pass — one pinMode line prepares all ten, one digitalWrite line drives whichever the loop points at. Switch to MicroPython if you&#x27;d rather see the same idea in Python — the wiring never changes.
 </p>
             </div>
             <div class="tabs" role="tablist" aria-label="Code language">
@@ -195,9 +195,11 @@
   }
 }</code></pre>
                 <div class="code-notes">
-                  <div class="code-note"><code>byte ledPins[] = {21, 47, 48, 38, 39, 40, 41, 42, 2, 1}</code><span class="note-text">One list holds all ten pins in bar order, so the loop can reach each by number. <button class="define" data-topic="pinArray">Define</button></span></div>
-                  <div class="code-note"><code>digitalWrite(ledPins[i], HIGH)</code><span class="note-text">Lights whichever segment the loop is pointing at right now; the next line turns it off. <button class="define" data-topic="digitalWrite">Define</button></span></div>
-                  <div class="code-note"><code>for (int i = ledCounts - 1; i &gt; -1; i--)</code><span class="note-text">Walks the same list backwards, which is what sends the light flowing back the other way. <button class="define" data-topic="pinArray">Define</button></span></div>
+                  <div class="code-note"><code>byte ledPins[] = {21, 47, 48, 38, 39, 40, 41, 42, 2, 1}</code><span class="note-text">All ten pins in one array, in bar order. The array holds the pattern; position 0 is the first segment, position 9 the last. <button class="define" data-topic="pinArray">Define</button></span></div>
+                  <div class="code-note"><code>ledCounts = sizeof(ledPins)</code><span class="note-text">Counts the array so the loop knows where to stop. Add or remove a pin and the loops adjust on their own, with no other edit.</span></div>
+                  <div class="code-note"><code>pinMode(ledPins[i], OUTPUT)</code><span class="note-text">Runs once per pin in setup(), so a single line prepares all ten instead of ten copied lines. <button class="define" data-topic="pinMode">Define</button></span></div>
+                  <div class="code-note"><code>digitalWrite(ledPins[i], HIGH)</code><span class="note-text">ledPins[i] reads the pin at position i, and the loop drives just that one HIGH; the next line sets it LOW before i moves on. <button class="define" data-topic="digitalWrite">Define</button></span></div>
+                  <div class="code-note"><code>for (int i = ledCounts - 1; i &gt; -1; i--)</code><span class="note-text">Same array, index counting down from 9 to 0, so the light steps back the other way. <button class="define" data-topic="pinArray">Define</button></span></div>
                 </div>
               </div>
             </div>
@@ -227,22 +229,23 @@ while True:
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">05</span> Understand, don&#x27;t memorise</p>
-              <h2>One list, one loop</h2>
-              <p class="muted">There&#x27;s no trick here — the loop just points at one pin after another and lights whatever it&#x27;s pointing at, faster than the eye separates.
+              <h2>An array of pins, walked by a loop</h2>
+              <p class="muted">The instinct with ten LEDs is to write the blink code ten times over. That works, and it is a trap — it does not scale, and every change means editing ten places. The move that does scale is the whole lesson. Name the pins once, as a numbered list, and write the work once, as a loop that reads the list by position. The count of outputs stops mattering to the code.
 </p>
             </div>
             <div class="theory-flow" aria-label="Measurement model">
-              <article class="flow-step"><span class="n">List</span><h3>the pin array</h3><p>All ten pins sit in one array in bar order.</p></article>
-              <article class="flow-step"><span class="n">Light</span><h3>HIGH</h3><p>The loop lights the pin it&#x27;s pointing at right now.</p></article>
-              <article class="flow-step"><span class="n">Step</span><h3>i++</h3><p>It turns that one off and moves to the next pin.</p></article>
-              <article class="flow-step"><span class="n">Sweep</span><h3>back again</h3><p>A second loop walks the list in reverse so the light flows back.</p></article>
+              <article class="flow-step"><span class="n">1</span><h3>Pins in an array</h3><p>ledPins holds all ten pin numbers in bar order. An array is a numbered shelf- position 0 is the first segment, position 9 the last. The array is the pattern; the wiring just follows it.</p></article>
+              <article class="flow-step"><span class="n">2</span><h3>An index selects one</h3><p>The loop keeps a counter, i. ledPins[i] means read the pin number sitting at position i — so a single line can address any segment by changing one number.</p></article>
+              <article class="flow-step"><span class="n">3</span><h3>Light</h3><p>The loop drives that one pin HIGH</p></article>
+              <article class="flow-step"><span class="n">4</span><h3>Motion is the index over time</h3><p>As i climbs 0 to 9, the lit pin marches down the bar. One counter, changing over time, is the whole of the motion. Reverse the count, 9 down to 0, and the light flows back.</p></article>
             </div>
             <div class="formula-card">
               <span class="label">The model</span>
-              <code>one array of pins → walk it forward → walk it back → repeat</code>
+              <code><b>pins in an array</b> + <b>a loop over the index</b> = ten outputs from code you wrote once</code>
             </div>
             <div class="two-col" style="margin-top:14px">
-              <article class="mini-card"><h3>Why a pin array <button class="define" data-topic="pinArray">Define</button></h3><p>Ten separate variables would mean ten copies of every line. One array lets a single loop stand in for all of them.</p></article>
+              <article class="mini-card"><h3>Why an array beats ten variables <button class="define" data-topic="pinArray">Define</button></h3><p>Ten named variables would mean ten copies of pinMode and two more of every blink line. The array collapses all of that into one loop, and it takes the count of pins from the list itself — so growing the bar is one more number, not another block of code.</p></article>
+              <article class="mini-card"><h3>Why each segment still needs its own resistor <button class="define" data-topic="resistor">Define</button></h3><p>A LED left to itself pulls far more current than it can survive and burns out in an instant. It has no way to limit itself. The 220 Ω resistor in series does the limiting — the voltage across it sets how much current flows, and that current is what a LED actually runs on. Ten LEDs on ten pins means ten resistors; one shared resistor would starve or overload them together.</p></article>
             </div>
           </div>
         </section>
@@ -261,14 +264,15 @@ while True:
                   <div class="bar"><span>LED bar</span></div>
                   <ul class="observe-lines"><li>One lit segment starts at one end of the bar.</li><li>It travels along the bar a segment at a time to the far end.</li><li>Then it flows back the other way, and repeats for as long as the board has power.</li></ul>
                 </div>
-                <p class="micropython-note">Only one segment is lit at any instant — the flow is that single light moving, not a growing row.</p>
+                <p class="micropython-note">Only one segment is lit at any instant, so the flow you see is that single light stepping from one row to the next.</p>
               </div>
               <div>
                 <span class="checks-title">If it doesn&#x27;t</span>
                 <ul class="checklist">
-                  <li><strong>Whole bar stays dark?</strong> Rotate the LED bar 180° — its direction is easy to reverse — then re-check the common row to ground.</li>
-                  <li><strong>One segment never lights?</strong> Check that segment&#x27;s own 220 Ω resistor and its jumper to its GPIO pin.</li>
-                  <li><strong>Nothing happens at all?</strong> Re-check the common row to ground, then that the sketch uploaded.</li>
+                  <li><strong>Whole bar stays dark?</strong> The bar is likely in backwards — its direction is easy to reverse. Rotate it 180°, then re-check the common row to ground.</li>
+                  <li><strong>One segment never lights?</strong> That one segment is a broken circuit of its own — check its 220 Ω resistor and its jumper to the right GPIO pin. Its neighbours working tells you the code and ground are fine.</li>
+                  <li><strong>Segments light in a scrambled order, not a clean sweep?</strong> A jumper is on the wrong GPIO, so a pin sits out of sequence versus the array. Re-check each wire against the pin order 21 47 48 38 39 40 41 42 2 1.</li>
+                  <li><strong>Nothing happens at all?</strong> Re-check the common row to ground, then that the sketch actually uploaded.</li>
                   <li><strong>Upload fails?</strong> Swap in a data-capable USB cable.</li>
                 </ul>
               </div>
@@ -279,13 +283,13 @@ while True:
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">07</span> Make the idea yours</p>
-              <h2>Try this: bend the flow</h2>
-              <p class="muted">Same working circuit, two small edits to the sketch. Both fit inside today&#x27;s time and leave the wiring untouched.
+              <h2>Try this: prove the array is the pattern</h2>
+              <p class="muted">Two edits that touch only the array — no rewiring, and you never open the loops. If the motion follows what you type in the list, you have proven the pattern lives in the array and the loop just reads it.
 </p>
             </div>
             <div class="two-col">
-              <article class="mini-card"><h3>Reverse the flow</h3><p>Swap which loop runs first so the light starts its sweep from the other end. Predict which end it begins from before you upload.</p></article>
-              <article class="mini-card"><h3>Change the speed <button class="define" data-topic="delayMs">Define</button></h3><p>Set every <code>delay(100)</code> to a larger or smaller number and upload. Find the speed where the flow still reads as a single moving light.</p></article>
+              <article class="mini-card"><h3>Scramble the list <button class="define" data-topic="pinArray">Define</button></h3><p>In <code>byte ledPins[]</code>, swap two of the pin numbers — put 48 where 47 was, and 47 where 48 was — and upload. Nothing on the breadboard changed, yet the light now jumps between those two segments out of order. The sequence you see is the array&#x27;s order, and the wiring only decides which physical LED each number reaches.</p></article>
+              <article class="mini-card"><h3>Make the bar shorter</h3><p>Delete two numbers from the end of the array so it holds eight instead of ten, and upload. The sweep now covers eight segments and turns back early — even though you never edited a loop. The loops read their length from the array itself, so shortening the list shortens the pattern for free.</p></article>
             </div>
           </div>
         </section>
@@ -303,7 +307,7 @@ while True:
             </div>
             <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
               <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
-              <p><strong>How the agent should behave:</strong> guide one segment at a time, wait for you to confirm, explain terms on request, and always check wiring, board, port, and USB before changing code.
+              <p><strong>How the agent should behave:</strong> guide one segment at a time, wait for you to confirm, and always check wiring, board, port, and USB before changing code. Once the bar is sweeping, make the array-and-loop idea land- the pins are one list, the loop walks it by index, and the moving light is that index over time.
 </p>
             </div>
           </div>
@@ -347,7 +351,7 @@ while True:
 
   <div class="toast" id="toast">Prompt copied</div>
 
-  <script id="lesson-data" type="application/json">{"day": 6, "totalDays": 30, "slug": "day-06-led-bar", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "delayMs": {"title": "delay()", "body": "delay() pauses the whole program for a number of milliseconds — 1000 is one second. The blink you see is the LED held on for a moment, then off for a moment, on a loop.\n", "shortcut": "The number is milliseconds — 1000 = 1 second, 200 = a fifth of a second."}, "digitalWrite": {"title": "digitalWrite()", "body": "digitalWrite() sets a pin fully on or fully off. HIGH puts voltage on the pin (LED on); LOW removes it (LED off). It is the simplest way for code to change something in the physical world.\n", "shortcut": "HIGH = on, LOW = off. No in-between — that is what PWM is for later."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "gnd": {"title": "Ground / GND", "body": "Ground is the shared zero-voltage reference. The board and sensor need a common ground so a signal like HIGH or LOW means the same thing to both parts.\n", "shortcut": "A missing ground can make everything look haunted. Check it early."}, "gpio": {"title": "GPIO extension board", "body": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself.\n", "shortcut": "When a lesson says GPIO 13, look for the pin labelled 13 on the extension board."}, "jumpers": {"title": "Jumper wires", "body": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles.\n", "shortcut": "If a reading seems impossible, gently reseat the jumper wires before changing code."}, "ledBar": {"title": "LED bar graph", "body": "A LED bar packs ten separate LEDs into one strip, with a row of pins along each edge. Each LED is wired and driven on its own — exactly like the single LED from earlier days, just ten of them in a tidy line.\n", "shortcut": "Ten LEDs in one part. If it stays dark, rotate it 180° — the label direction is easy to get backwards."}, "pinArray": {"title": "An array of pins", "body": "Instead of naming ten pins one by one, the sketch keeps them in a list (an array) and walks the list with a loop. Change the order or length of the list and the pattern changes with it — no rewiring needed.\n", "shortcut": "One loop over a list of pins does the work of ten copied-and-pasted lines."}, "resistor": {"title": "Resistor", "body": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction.\n", "shortcut": "The 220 Ω resistor protects the LED; either way round is fine."}}, "prev": {"day": 5, "slug": "day-05-table-lamp", "title": "Make a mini table lamp"}, "next": {"day": 7, "slug": "day-07-breathing", "title": "Make an LED breathe"}}</script>
+  <script id="lesson-data" type="application/json">{"day": 6, "totalDays": 30, "slug": "day-06-led-bar", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "digitalWrite": {"title": "digitalWrite()", "body": "digitalWrite() sets a pin fully on or fully off. HIGH puts voltage on the pin (LED on); LOW removes it (LED off). It is the simplest way for code to change something in the physical world.\n", "shortcut": "HIGH = on, LOW = off. No in-between — that is what PWM is for later."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "gnd": {"title": "Ground / GND", "body": "Ground is the shared zero-voltage reference. The board and sensor need a common ground so a signal like HIGH or LOW means the same thing to both parts.\n", "shortcut": "A missing ground can make everything look haunted. Check it early."}, "gpio": {"title": "GPIO extension board", "body": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself.\n", "shortcut": "When a lesson says GPIO 13, look for the pin labelled 13 on the extension board."}, "jumpers": {"title": "Jumper wires", "body": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles.\n", "shortcut": "If a reading seems impossible, gently reseat the jumper wires before changing code."}, "ledBar": {"title": "LED bar graph", "body": "A LED bar packs ten separate LEDs into one strip, with a row of pins along each edge. Each LED is wired and driven on its own — exactly like the single LED from earlier days, just ten of them in a tidy line.\n", "shortcut": "Ten LEDs in one part. If it stays dark, rotate it 180° — the label direction is easy to get backwards."}, "pinArray": {"title": "An array of pins", "body": "Instead of naming ten pins one by one, the sketch keeps them in a list (an array) and walks the list with a loop. Change the order or length of the list and the pattern changes with it — no rewiring needed.\n", "shortcut": "One loop over a list of pins does the work of ten copied-and-pasted lines."}, "pinMode": {"title": "pinMode()", "body": "pinMode() tells the board how you will use a pin before you use it. OUTPUT means the board will push a signal out of the pin — here, enough to light the LED. The other common mode, INPUT, is for reading a signal in.\n", "shortcut": "Set a pin's direction once in setup(), before the loop uses it."}, "resistor": {"title": "Resistor", "body": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction.\n", "shortcut": "The 220 Ω resistor protects the LED; either way round is fine."}}, "prev": {"day": 5, "slug": "day-05-table-lamp", "title": "Make a mini table lamp"}, "next": {"day": 7, "slug": "day-07-breathing", "title": "Make an LED breathe"}}</script>
   <script src="../course.js"></script>
 </body>
 </html>

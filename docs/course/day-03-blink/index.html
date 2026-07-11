@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Day 3 · Blink: prove the whole chain works — TinySkiff ESP32-S3 Lab</title>
-  <meta name="description" content="Upload your first sketch and blink the ESP32-S3&#x27;s onboard LED. No wiring — just proof that your computer, cable, board, and Arduino IDE all work together." />
+  <meta name="description" content="Upload your first sketch and blink the ESP32-S3&#x27;s onboard LED. No wiring — plus the two-function program model (setup once, loop forever), what digitalWrite does to a pin, and why delay() blocks the whole program." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -16,10 +16,10 @@
       <div class="hero-copy">
         <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 3 of 30</p>
         <h1>Prove the whole chain<br />with one <em>blink</em></h1>
-        <p class="lede">No wiring today. You upload five short lines and the board&#x27;s own tiny LED starts blinking — the smallest possible proof that everything from your keyboard to the chip is connected and listening.
+        <p class="lede">No wiring today. You upload five short lines and the board&#x27;s own tiny LED starts blinking — the smallest possible proof that everything from your keyboard to the chip is connected and listening. Then we read those five lines, because they carry the two ideas behind almost every program on this board — run once, then repeat forever, driving a pin between 3.3V and 0V.
 </p>
         <div class="meta-row" aria-label="Lesson facts">
-          <span class="pill is-key">About 15 minutes</span><span class="pill">Arduino first</span><span class="pill">No wiring today</span><span class="pill">No electronics assumed</span>
+          <span class="pill is-key">About 20 minutes</span><span class="pill">Upload and watch</span><span class="pill">No wiring today</span><span class="pill">Read the five lines</span>
         </div>
       </div>
       <div class="hero-side no-instrument">
@@ -45,7 +45,7 @@
           <a href="#parts"><span class="tick"></span>What you need</a>
           <a href="#steps"><span class="tick"></span>Build it</a>
           <a href="#code"><span class="tick"></span>Read the code</a>
-          <a href="#theory"><span class="tick"></span>Why it blinks</a>
+          <a href="#theory"><span class="tick"></span>The two-function loop, and what a pin actually does</a>
           <a href="#test"><span class="tick"></span>Test &amp; debug</a>
           <a href="#challenge"><span class="tick"></span>Try this</a>
           <a href="#agent"><span class="tick"></span>Coach me</a>
@@ -133,8 +133,8 @@
                 <div class="code-notes">
                   <div class="code-note"><code>#define LED_BUILTIN 2</code><span class="note-text">Names the onboard LED&#x27;s pin so the rest of the sketch reads plainly. <button class="define" data-topic="define">Define</button></span></div>
                   <div class="code-note"><code>pinMode(LED_BUILTIN, OUTPUT)</code><span class="note-text">Runs once in <code>setup()</code> to say this pin will push signal out. <button class="define" data-topic="pinMode">Define</button></span></div>
-                  <div class="code-note"><code>digitalWrite(LED_BUILTIN, HIGH)</code><span class="note-text">Turns the LED on; <code>LOW</code> turns it off. <button class="define" data-topic="digitalWrite">Define</button></span></div>
-                  <div class="code-note"><code>delay(1000)</code><span class="note-text">Holds that state for one second before the next line. <button class="define" data-topic="delayMs">Define</button></span></div>
+                  <div class="code-note"><code>digitalWrite(LED_BUILTIN, HIGH)</code><span class="note-text">Puts 3.3V on the pin so the LED lights; <code>LOW</code> puts 0V and it goes dark. <button class="define" data-topic="digitalWrite">Define</button></span></div>
+                  <div class="code-note"><code>delay(1000)</code><span class="note-text">Freezes the whole program for one second so the pin holds its state before the next line. <button class="define" data-topic="delayMs">Define</button></span></div>
                 </div>
               </div>
             </div>
@@ -145,22 +145,24 @@
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">04</span> Understand, don&#x27;t memorise</p>
-              <h2>Why it blinks</h2>
-              <p class="muted">There&#x27;s no magic here — just two functions the board runs in a fixed order, over and over.
+              <h2>The two-function loop, and what a pin actually does</h2>
+              <p class="muted">Five lines, but they carry the shape of almost every program you&#x27;ll write on this board. Two ideas do the real work- a sketch has one part that runs once and one part that repeats forever, and driving a pin HIGH or LOW is literally switching 3.3 volts onto a physical wire and off again.
 </p>
             </div>
             <div class="theory-flow" aria-label="Measurement model">
-              <article class="flow-step"><span class="n">Run once</span><h3>setup()</h3><p>The board prepares the pin as an output.</p></article>
-              <article class="flow-step"><span class="n">Then loop</span><h3>loop()</h3><p>Everything inside runs again and again without stopping.</p></article>
-              <article class="flow-step"><span class="n">Light on</span><h3>HIGH + delay</h3><p>Voltage on the pin lights the LED; delay holds it there.</p></article>
-              <article class="flow-step"><span class="n">Light off</span><h3>LOW + delay</h3><p>Voltage off; delay holds the dark before it repeats.</p></article>
+              <article class="flow-step"><span class="n">1</span><h3>setup() runs once</h3><p>The instant the board gets power or is reset, setup() runs a single time. Here it prepares the pin as an output — then it never runs again.</p></article>
+              <article class="flow-step"><span class="n">2</span><h3>loop() runs forever</h3><p>When loop() reaches its last line, the board jumps straight back to the top and runs it again. With no operating system waiting underneath, repeating loop() is the only thing the chip does.</p></article>
+              <article class="flow-step"><span class="n">3</span><h3>HIGH is 3.3 volts</h3><p>digitalWrite(pin, HIGH) puts 3.3V onto that physical pin; LOW puts 0V. The LED lights because real voltage now sits on its wire — the same 3.3V logic you met on Day 1.</p></article>
+              <article class="flow-step"><span class="n">4</span><h3>delay() freezes everything</h3><p>delay(1000) stops the whole program for one second. The board holds the pin where it is because every other line is frozen too — the count has to finish before anything else can run.</p></article>
             </div>
             <div class="formula-card">
-              <span class="label">The rhythm</span>
-              <code>one blink = <b>1 s on</b> + <b>1 s off</b> = a 2-second cycle</code>
+              <span class="label">The shape</span>
+              <code><b>setup() once</b> → <b>loop() forever</b> → each pass drives the pin to <b>3.3V or 0V</b></code>
             </div>
             <div class="two-col" style="margin-top:14px">
-              <article class="mini-card"><h3>setup() vs loop() <button class="define" data-topic="setupLoop">Define</button></h3><p>setup() gets things ready a single time; loop() is the part that keeps running.</p></article>
+              <article class="mini-card"><h3>HIGH is literally 3.3 volts <button class="define" data-topic="logic33">Define</button></h3><p>digitalWrite(pin, HIGH) connects the pin to the board&#x27;s 3.3V rail; LOW connects it to 0V. The LED responds to that real voltage — the same 3.3V logic that decides what a pin can safely take in later on.</p></article>
+              <article class="mini-card"><h3>setup() once, loop() forever <button class="define" data-topic="setupLoop">Define</button></h3><p>Anything that only needs doing at the start — preparing a pin, opening the serial port — belongs in setup(). Anything that should keep happening lives in loop(), which the board runs end to end and then restarts, with no pause between passes unless you add one.</p></article>
+              <article class="mini-card"><h3>Why delay() is a real limitation <button class="define" data-topic="delayMs">Define</button></h3><p>While delay() counts, the processor can do nothing else — it can&#x27;t read a button or drive a second LED on its own rhythm. A plain blink doesn&#x27;t mind. Later days swap delay() for a running clock the program checks, so it can keep several things going at once.</p></article>
             </div>
           </div>
         </section>
@@ -196,13 +198,13 @@
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">06</span> Make the idea yours</p>
-              <h2>Try this: find a heartbeat</h2>
-              <p class="muted">Same sketch, one small change: the two delay numbers. Timing is what gives a blink its character.
+              <h2>Try this: blink faster than your eye</h2>
+              <p class="muted">The same five lines, driven fast, reveal as much about your own eyes as about the board. Speed the blink up far enough and on-off-on-off stops looking like blinking and fuses into a single steady light — the effect every screen and dimmable bulb leans on.
 </p>
             </div>
             <div class="two-col">
-              <article class="mini-card"><h3>Speed it up</h3><p>Set both <code>delay(1000)</code> lines to <code>delay(200)</code> and upload. Notice how different 200 feels.</p></article>
-              <article class="mini-card"><h3>Find a heartbeat <button class="define" data-topic="delayMs">Define</button></h3><p>Adjust the two numbers until the blink feels like a resting pulse. Write down what you landed on.</p></article>
+              <article class="mini-card"><h3>Halve it, then halve again</h3><p>Change both <code>delay(1000)</code> lines to <code>delay(500)</code>, upload, and watch. Then <code>250</code>, then <code>120</code>, then <code>60</code>, re-uploading each time. The blink gets visibly faster at every step.</p></article>
+              <article class="mini-card"><h3>Watch it fuse to steady <button class="define" data-topic="delayMs">Define</button></h3><p>At about <code>delay(5)</code> or below, your eye stops resolving separate blinks and reads one continuous, slightly dim light. The LED is still going fully on then fully off — you&#x27;re watching persistence of vision, the trick that makes a fast flicker look solid.</p></article>
             </div>
           </div>
         </section>
@@ -220,7 +222,7 @@
             </div>
             <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
               <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
-              <p><strong>How the agent should behave:</strong> keep it to upload-and-watch, check board and port and cable before touching code, and explain setup()/loop() and the delay numbers on request.
+              <p><strong>How the agent should behave:</strong> keep it to upload-and-watch and check board, port, and cable before touching code. Once it blinks, teach the two-function shape — setup() once, loop() forever — and that digitalWrite puts 3.3V or 0V on the pin while delay() blocks the whole program as it counts.
 </p>
             </div>
           </div>
@@ -264,7 +266,7 @@
 
   <div class="toast" id="toast">Prompt copied</div>
 
-  <script id="lesson-data" type="application/json">{"day": 3, "totalDays": 30, "slug": "day-03-blink", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "define": {"title": "#define", "body": "#define creates a nickname before the code is compiled. #define trigPin 13 means: whenever the sketch says trigPin, use the number 13. It makes the code easier to read.\n", "shortcut": "Nicknames matter because physical pin numbers are easy to forget."}, "delayMs": {"title": "delay()", "body": "delay() pauses the whole program for a number of milliseconds — 1000 is one second. The blink you see is the LED held on for a moment, then off for a moment, on a loop.\n", "shortcut": "The number is milliseconds — 1000 = 1 second, 200 = a fifth of a second."}, "digitalWrite": {"title": "digitalWrite()", "body": "digitalWrite() sets a pin fully on or fully off. HIGH puts voltage on the pin (LED on); LOW removes it (LED off). It is the simplest way for code to change something in the physical world.\n", "shortcut": "HIGH = on, LOW = off. No in-between — that is what PWM is for later."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "ledBuiltin": {"title": "The onboard LED", "body": "Most ESP32-S3 boards have a small LED wired to a GPIO pin at the factory, so you can prove code runs without wiring anything. In this sketch it is named LED_BUILTIN, which stands for GPIO 2 on this board.\n", "shortcut": "Look for the small LED near the chip — not the steady power LED."}, "pinMode": {"title": "pinMode()", "body": "pinMode() tells the board how you will use a pin before you use it. OUTPUT means the board will push a signal out of the pin — here, enough to light the LED. The other common mode, INPUT, is for reading a signal in.\n", "shortcut": "Set a pin's direction once in setup(), before the loop uses it."}, "setupLoop": {"title": "setup() and loop()", "body": "Every Arduino sketch has two parts. setup() runs once when the board powers on or resets — a good place to prepare pins. loop() runs again and again, forever, as fast as the board can, which is what makes the LED keep blinking.\n", "shortcut": "setup() = get ready once; loop() = do this over and over."}, "sketch": {"title": "Official sketch", "body": "A sketch is the Arduino name for a program. This lesson uses Freenove's Sketch_19.1_Ultrasonic_Ranging.ino so you can focus first on wiring, observation, and the measurement model.\n", "shortcut": "Treat the sketch as a working example to read and modify, not a spell to copy blindly."}}, "prev": {"day": 2, "slug": "day-02-setup", "title": "Install the toolchain and learn what uploading really does"}, "next": {"day": 4, "slug": "day-04-button", "title": "Make a button light an LED"}}</script>
+  <script id="lesson-data" type="application/json">{"day": 3, "totalDays": 30, "slug": "day-03-blink", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "define": {"title": "#define", "body": "#define creates a nickname before the code is compiled. #define trigPin 13 means: whenever the sketch says trigPin, use the number 13. It makes the code easier to read.\n", "shortcut": "Nicknames matter because physical pin numbers are easy to forget."}, "delayMs": {"title": "delay()", "body": "delay() pauses the whole program for a number of milliseconds — 1000 is one second. The blink you see is the LED held on for a moment, then off for a moment, on a loop.\n", "shortcut": "The number is milliseconds — 1000 = 1 second, 200 = a fifth of a second."}, "digitalWrite": {"title": "digitalWrite()", "body": "digitalWrite() sets a pin fully on or fully off. HIGH puts voltage on the pin (LED on); LOW removes it (LED off). It is the simplest way for code to change something in the physical world.\n", "shortcut": "HIGH = on, LOW = off. No in-between — that is what PWM is for later."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "ledBuiltin": {"title": "The onboard LED", "body": "Most ESP32-S3 boards have a small LED wired to a GPIO pin at the factory, so you can prove code runs without wiring anything. In this sketch it is named LED_BUILTIN, which stands for GPIO 2 on this board.\n", "shortcut": "Look for the small LED near the chip — not the steady power LED."}, "logic33": {"title": "3.3V logic (the safety rule)", "body": "Every input and output pin on the ESP32-S3 speaks in 3.3 volts: roughly 3.3V means \"high\", near 0V means \"low\". The pins are not built to survive 5V. A sensor that outputs 5V, or 5V wired straight to a pin by mistake, can damage the input. When a part runs on 5V, its signal into the board needs care — later lessons show how.\n", "shortcut": "Pins are 3.3V devices. Powering a part from 5V is fine; feeding 5V into a pin is not."}, "pinMode": {"title": "pinMode()", "body": "pinMode() tells the board how you will use a pin before you use it. OUTPUT means the board will push a signal out of the pin — here, enough to light the LED. The other common mode, INPUT, is for reading a signal in.\n", "shortcut": "Set a pin's direction once in setup(), before the loop uses it."}, "setupLoop": {"title": "setup() and loop()", "body": "Every Arduino sketch has two parts. setup() runs once when the board powers on or resets — a good place to prepare pins. loop() runs again and again, forever, as fast as the board can, which is what makes the LED keep blinking.\n", "shortcut": "setup() = get ready once; loop() = do this over and over."}, "sketch": {"title": "Official sketch", "body": "A sketch is the Arduino name for a program. This lesson uses Freenove's Sketch_19.1_Ultrasonic_Ranging.ino so you can focus first on wiring, observation, and the measurement model.\n", "shortcut": "Treat the sketch as a working example to read and modify, not a spell to copy blindly."}}, "prev": {"day": 2, "slug": "day-02-setup", "title": "Install the toolchain and learn what uploading really does"}, "next": {"day": 4, "slug": "day-04-button", "title": "Make a button light an LED"}}</script>
   <script src="../course.js"></script>
 </body>
 </html>

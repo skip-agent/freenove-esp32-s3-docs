@@ -7,7 +7,7 @@
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
   "estimatedTimeMinutes": 25,
-  "mission": "Wire a ten-segment LED bar — each segment on its own pin through its own 220 Ω resistor — upload the Arduino sketch, and watch a single lit segment sweep along the bar and back, over and over.",
+  "mission": "Wire a ten-segment LED bar — each segment on its own pin through its own 220 Ω resistor — and drive all ten from a sketch that never names a pin more than once. Ten pins live in one array; one loop walks that array and lights whichever pin it points at. The sweep you see is the loop's counter climbing through the list and back. Learn that, and adding an eleventh output later is one more number, not another block of copied code.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -56,20 +56,21 @@
     {
       "partPin": "10 bar segments (via 220 Ω each)",
       "connectTo": "GPIO 21 47 48 38 39 40 41 42 2 1",
-      "reason": "Each pin lights one segment of the bar."
+      "reason": "Each segment gets its own pin so code can address them one at a time. This exact order is the order the array uses. Its 220 Ω resistor sets the current that keeps that segment alive."
     },
     {
       "partPin": "Bar common row",
       "connectTo": "GND",
-      "reason": "Returns every segment to zero volts."
+      "reason": "Every segment returns through one shared row to zero volts"
     }
   ],
   "coachInstructions": [
     "Guide one segment at a time and wait for learner confirmation before moving to the next; ten connections are easy to lose track of.",
-    "Remind the learner that each segment needs its own 220 Ω series resistor — a shared or missing resistor is the common mistake here.",
+    "Teach the core idea once the circuit works- ten pins in one array, one loop stepping through it by index, so code written once drives all ten. Frame the moving light as one counter climbing through the list over time.",
+    "Explain the resistor as current-limiting, not decoration- a LED alone pulls too much current and burns out, and the 220 Ω resistor in series sets the current it runs on. Each segment needs its own; a shared or missing resistor is the common mistake here.",
     "If the whole bar stays dark, have the learner rotate the LED bar 180° and re-check the common row to ground before changing code.",
-    "If one segment never lights, check that segment's resistor and its jumper to its GPIO pin, not the whole circuit.",
-    "Explain the pin array and the forward and reverse loops on request; do not dump theory before the learner has a working circuit.",
+    "If one segment never lights, check that segment's resistor and its jumper to its GPIO pin, not the whole circuit — its neighbours working proves the code and ground are fine.",
+    "For the challenge, have them edit only the array (reorder, then shorten) and predict the result first; the point is that the pattern lives in the list, not the loop or the wiring.",
     "Keep the Arduino path primary; MicroPython is optional only if already set up."
   ],
   "steps": [
@@ -85,15 +86,23 @@
     "arduino": [
       {
         "line": "byte ledPins[] = {21, 47, 48, 38, 39, 40, 41, 42, 2, 1}",
-        "explanation": "One list holds all ten pins in bar order, so the loop can reach each by number."
+        "explanation": "All ten pins in one array, in bar order. The array holds the pattern; position 0 is the first segment, position 9 the last."
+      },
+      {
+        "line": "ledCounts = sizeof(ledPins)",
+        "explanation": "Counts the array so the loop knows where to stop. Add or remove a pin and the loops adjust on their own, with no other edit."
+      },
+      {
+        "line": "pinMode(ledPins[i], OUTPUT)",
+        "explanation": "Runs once per pin in setup(), so a single line prepares all ten instead of ten copied lines."
       },
       {
         "line": "digitalWrite(ledPins[i], HIGH)",
-        "explanation": "Lights whichever segment the loop is pointing at right now; the next line turns it off."
+        "explanation": "ledPins[i] reads the pin at position i, and the loop drives just that one HIGH; the next line sets it LOW before i moves on."
       },
       {
         "line": "for (int i = ledCounts - 1; i > -1; i--)",
-        "explanation": "Walks the same list backwards, which is what sends the light flowing back the other way."
+        "explanation": "Same array, index counting down from 9 to 0, so the light steps back the other way."
       }
     ],
     "micropython": [
@@ -108,12 +117,16 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "Keep the pins in an array, then walk the list to light them in turn — forward, then back.",
-    "formula": "one array of pins → walk it forward → walk it back → repeat",
+    "plainLanguage": "Ten pins live in one array; a loop's counter steps through it, lighting whichever pin its index points at. The moving light is that index over time.",
+    "formula": "pins in an array + a loop over the index = ten outputs from code you wrote once",
     "notes": [
       {
-        "title": "Why a pin array",
-        "body": "Ten separate variables would mean ten copies of every line. One array lets a single loop stand in for all of them."
+        "title": "Why an array beats ten variables",
+        "body": "Ten named variables would mean ten copies of pinMode and two more of every blink line. The array collapses all of that into one loop, and it takes the count of pins from the list itself — so growing the bar is one more number, not another block of code."
+      },
+      {
+        "title": "Why each segment still needs its own resistor",
+        "body": "A LED left to itself pulls far more current than it can survive and burns out in an instant. It has no way to limit itself. The 220 Ω resistor in series does the limiting — the voltage across it sets how much current flows, and that current is what a LED actually runs on. Ten LEDs on ten pins means ten resistors; one shared resistor would starve or overload them together."
       }
     ]
   },
@@ -123,25 +136,31 @@
       "It travels along the bar a segment at a time to the far end.",
       "Then it flows back the other way, and repeats for as long as the board has power."
     ],
-    "successCriteria": "Only one segment is lit at any instant — the flow is that single light moving, not a growing row."
+    "successCriteria": "Only one segment is lit at any instant, so the flow you see is that single light stepping from one row to the next."
   },
   "troubleshooting": [
     {
       "symptom": "Whole bar stays dark",
       "firstChecks": [
-        "Rotate the LED bar 180° — its direction is easy to reverse — then re-check the common row to ground."
+        "The bar is likely in backwards — its direction is easy to reverse. Rotate it 180°, then re-check the common row to ground."
       ]
     },
     {
       "symptom": "One segment never lights",
       "firstChecks": [
-        "Check that segment's own 220 Ω resistor and its jumper to its GPIO pin."
+        "That one segment is a broken circuit of its own — check its 220 Ω resistor and its jumper to the right GPIO pin. Its neighbours working tells you the code and ground are fine."
+      ]
+    },
+    {
+      "symptom": "Segments light in a scrambled order, not a clean sweep",
+      "firstChecks": [
+        "A jumper is on the wrong GPIO, so a pin sits out of sequence versus the array. Re-check each wire against the pin order 21 47 48 38 39 40 41 42 2 1."
       ]
     },
     {
       "symptom": "Nothing happens at all",
       "firstChecks": [
-        "Re-check the common row to ground, then that the sketch uploaded."
+        "Re-check the common row to ground, then that the sketch actually uploaded."
       ]
     },
     {
@@ -151,5 +170,5 @@
       ]
     }
   ],
-  "challenge": "Reverse the direction the light flows, then change how fast it moves by editing the delay, and note what each edit does."
+  "challenge": "Reorder the numbers in the pin array and watch the sweep reorder to match, then delete two numbers and watch the sweep shorten on its own — the loop follows the list without being touched."
 }

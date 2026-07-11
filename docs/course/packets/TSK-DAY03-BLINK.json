@@ -6,8 +6,8 @@
   "title": "Blink: prove the whole chain works",
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
-  "estimatedTimeMinutes": 15,
-  "mission": "Make the ESP32-S3's own onboard LED blink from code you upload — proof that your computer, the USB cable, the board, and the Arduino toolchain all talk to each other.",
+  "estimatedTimeMinutes": 20,
+  "mission": "Upload five lines and make the board's own onboard LED blink — proof that your computer, the USB cable, the board, and the Arduino toolchain all talk to each other. Then read those five lines closely, because they hold the shape of nearly every sketch you'll write- one part that runs once, one part that repeats forever, and a single command that switches real voltage onto a pin.",
   "mainPath": "Arduino/C++",
   "sourceMetadata": {
     "arduinoSketch": "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main/C/Sketches/Sketch_01.1_Blink/Sketch_01.1_Blink.ino",
@@ -34,8 +34,10 @@
   "coachInstructions": [
     "Keep the day to upload-and-watch; there is nothing to wire.",
     "If nothing blinks, check board, port, and a data-capable cable before changing code.",
-    "Explain setup() vs loop() and the delay numbers on request; do not front-load theory.",
-    "For the challenge, have the learner change only the delay values and re-upload, preserving the working sketch."
+    "Once it works, teach the core model- setup() runs once to get ready, loop() runs forever, and the chip just repeats loop() with no OS to hand back to.",
+    "Explain that digitalWrite(pin, HIGH) puts 3.3V on the physical pin and LOW puts 0V, and tie it back to Day 1's 3.3V logic.",
+    "Make the delay() limitation land- while delay counts, nothing else in the program can run, which is why later days use a running clock instead of blocking.",
+    "For the challenge, have them halve the delay values step by step and watch the blink fuse into steady light (persistence of vision), keeping the working sketch intact."
   ],
   "steps": [
     "Plug the ESP32-S3 into your computer with a data-capable USB-C cable.",
@@ -56,21 +58,29 @@
       },
       {
         "line": "digitalWrite(LED_BUILTIN, HIGH)",
-        "explanation": "Turns the LED on; LOW turns it off."
+        "explanation": "Puts 3.3V on the pin so the LED lights; LOW puts 0V and it goes dark."
       },
       {
         "line": "delay(1000)",
-        "explanation": "Holds that state for one second before the next line."
+        "explanation": "Freezes the whole program for one second so the pin holds its state before the next line."
       }
     ]
   },
   "theoryModel": {
-    "plainLanguage": "Get ready once, then repeat on-wait-off-wait forever.",
-    "formula": "one blink = 1 s on + 1 s off = a 2-second cycle",
+    "plainLanguage": "setup() runs once to get ready, loop() runs forever, and digitalWrite puts real volts on a pin — 3.3V for HIGH, 0V for LOW.",
+    "formula": "setup() once → loop() forever → each pass drives the pin to 3.3V or 0V",
     "notes": [
       {
-        "title": "setup() vs loop()",
-        "body": "setup() gets things ready a single time; loop() is the part that keeps running."
+        "title": "HIGH is literally 3.3 volts",
+        "body": "digitalWrite(pin, HIGH) connects the pin to the board's 3.3V rail; LOW connects it to 0V. The LED responds to that real voltage — the same 3.3V logic that decides what a pin can safely take in later on."
+      },
+      {
+        "title": "setup() once, loop() forever",
+        "body": "Anything that only needs doing at the start — preparing a pin, opening the serial port — belongs in setup(). Anything that should keep happening lives in loop(), which the board runs end to end and then restarts, with no pause between passes unless you add one."
+      },
+      {
+        "title": "Why delay() is a real limitation",
+        "body": "While delay() counts, the processor can do nothing else — it can't read a button or drive a second LED on its own rhythm. A plain blink doesn't mind. Later days swap delay() for a running clock the program checks, so it can keep several things going at once."
       }
     ]
   },
@@ -102,5 +112,5 @@
       ]
     }
   ],
-  "challenge": "Change the delay values and find a rhythm that feels like a calm heartbeat, then note the two numbers you chose."
+  "challenge": "Halve the two delay numbers step by step, watch the blink speed up, and keep going until it fuses into what looks like a steady, slightly dim glow once it flickers faster than your eye can resolve."
 }
