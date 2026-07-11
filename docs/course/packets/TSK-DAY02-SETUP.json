@@ -3,11 +3,11 @@
   "lessonCode": "TSK-DAY02-SETUP",
   "course": "TinySkiff ESP32-S3 Lab",
   "day": 2,
-  "title": "Install the Arduino IDE and see the board",
+  "title": "Install the toolchain and learn what uploading really does",
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
-  "estimatedTimeMinutes": 25,
-  "mission": "Install the Arduino IDE, add support for the ESP32-S3, and confirm your computer can see the board. Get this right once and every later day is just open-upload-watch.",
+  "estimatedTimeMinutes": 30,
+  "mission": "Install the Arduino IDE, add ESP32-S3 support, and get your computer to see the board. While it installs, learn what actually happens when you press Upload — compile, download mode, flash, run — so that when something goes wrong on a later day you can reason about where in that chain it broke instead of guessing.",
   "mainPath": "Arduino/C++",
   "sourceMetadata": {
     "licenseNote": "Based on Freenove official material released under CC BY-NC-SA 3.0; preserve attribution and non-affiliation language.\n"
@@ -27,25 +27,30 @@
   "wiring": [],
   "coachInstructions": [
     "Walk the install one step at a time; this is the fiddliest day of the course.",
-    "If no port appears, check the CH343 driver, then a data-capable cable, then board and port selection.",
-    "There is no code to upload today — confirming the board appears as a port is the success condition.",
-    "Reassure the learner that this setup is a one-time cost."
+    "Use the install wait to teach the upload chain- compile, enter download mode, write to flash, reset and run.",
+    "Frame every problem by its stage- no port means the serial bridge (driver or cable); board missing from the list means the compile target (board package) isn't installed.",
+    "If no port appears, check the CH343 driver, then a data-capable cable, then board and port selection, in that order.",
+    "There's no code to upload today — the board appearing as a port is the success condition, and it's a one-time cost."
   ],
   "steps": [
     "Download and install the Arduino IDE from arduino.cc for your operating system.",
-    "In Preferences, add the ESP32 boards URL, then install the ESP32 package from Boards Manager.",
-    "If your system needs it, install the CH343 USB driver.",
-    "Plug the board in with a data-capable USB-C cable.",
-    "Choose your ESP32-S3 under Tools → Board, then pick its Port."
+    "In Preferences, add the ESP32 boards URL, then install the ESP32 package from Boards Manager. This is what teaches the IDE to compile for your chip.",
+    "If your board doesn't appear later, install the CH343 USB driver — the software for the translator chip that lets USB reach the board.",
+    "Plug the board in with a data-capable USB-C cable. A charge-only cable powers it but carries no data.",
+    "Choose your ESP32-S3 under Tools → Board (which chip to compile for), then pick its Port (which connection to talk over)."
   ],
   "codeFocus": {},
   "theoryModel": {
-    "plainLanguage": "One setting says what the chip is; the other says where to find it.",
-    "formula": "right board + right port = uploads work",
+    "plainLanguage": "Compile your code for this chip, drop the board into download mode, write it to flash, then run it.",
+    "formula": "compile → download mode → flash → run",
     "notes": [
       {
-        "title": "Why a port might not appear",
-        "body": "A missing driver or a charge-only cable are the two usual reasons the board never shows up."
+        "title": "Why there's a driver and a \"port\"",
+        "body": "The board's bootloader speaks old-fashioned serial; your computer speaks USB. A translator chip bridges them, which is why the board shows up as a port and why some systems need its driver first."
+      },
+      {
+        "title": "Board vs port, made concrete",
+        "body": "Board is a compile-time choice — which chip's instructions to build. Port is a delivery choice — which connected device to send them to. Both must be right, for different reasons."
       }
     ]
   },
@@ -53,34 +58,34 @@
     "expectedOutputExample": [
       "Your ESP32-S3 appears as a selectable port in Tools → Port.",
       "The board name is selectable under Tools → Board.",
-      "No error appears when you select them."
+      "Selecting both produces no error."
     ],
-    "successCriteria": "You don't need to upload anything today — seeing the port is the whole win."
+    "successCriteria": "Seeing the port is the whole win today — that port is the serial bridge your code will travel across on Day 3."
   },
   "troubleshooting": [
     {
-      "symptom": "No port appears",
+      "symptom": "No port appears at all",
       "firstChecks": [
-        "Install the CH343 driver, then unplug and replug the board."
+        "The bridge isn't reaching your computer- install the CH343 driver, then unplug and replug."
       ]
     },
     {
       "symptom": "Only a charging sound, no port",
       "firstChecks": [
-        "Swap in a data-capable USB-C cable — some only carry power."
+        "The cable carries power but no data — swap in a data-capable USB-C cable."
       ]
     },
     {
-      "symptom": "Board not in the list",
+      "symptom": "Board name missing from the list",
       "firstChecks": [
-        "Re-open Boards Manager and confirm the ESP32 package finished installing."
+        "The compile step has no target yet — re-open Boards Manager and confirm the ESP32 package finished installing."
       ]
     }
   ],
-  "challenge": "Deliberately select the wrong port, notice what changes, then restore the correct board and port.",
+  "challenge": "List your computer's serial devices with the board unplugged, plug it in, list again to see the new device appear, then unplug to watch it vanish.",
   "logbookPrompts": [
-    "What board and port did you end up selecting?",
-    "Did you need the CH343 driver on your system?",
-    "What was the trickiest part of setup, so you remember it next time?"
+    "What name did your board's serial device show up as?",
+    "Did your system need the CH343 driver, or did the port appear on its own?",
+    "In your own words, what are the four stages an upload goes through?"
   ]
 }

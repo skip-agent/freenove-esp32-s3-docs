@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Day 1 · Unbox safely and meet the ESP32-S3 — TinySkiff ESP32-S3 Lab</title>
-  <meta name="description" content="Day 1 of the TinySkiff ESP32-S3 course: unbox the kit, meet the board, learn to handle it safely, and find the pinout you&#x27;ll use all course." />
+  <title>Day 1 · Meet the ESP32-S3 — what this chip actually is — TinySkiff ESP32-S3 Lab</title>
+  <meta name="description" content="Day 1 of the TinySkiff ESP32-S3 course: what a microcontroller actually is, a guided tour of the board&#x27;s parts, what GPIO pins are, and the 3.3V logic rule that keeps beginners out of trouble." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -15,11 +15,11 @@
     <header class="hero">
       <div class="hero-copy">
         <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 1 of 30</p>
-        <h1>Meet the board<br />before you <em>build</em></h1>
-        <p class="lede">Every day after this one starts with the same small computer in your hand. Fifteen minutes now to know what it is, how to hold it, and where its labels live will save you a dozen puzzled moments later.
+        <h1>A whole computer<br />on one <em>chip</em></h1>
+        <p class="lede">The board in your hand is not a gadget with a chip in it — it is a complete computer the size of a stamp, and by the end of the course you will have written the only program it runs. Twenty minutes today to understand what it is and how it&#x27;s laid out turns the next 29 days from copying steps into knowing why they work.
 </p>
         <div class="meta-row" aria-label="Lesson facts">
-          <span class="pill is-key">About 15 minutes</span><span class="pill">No tools needed</span><span class="pill">Nothing to wire</span><span class="pill">No electronics assumed</span>
+          <span class="pill is-key">About 20 minutes</span><span class="pill">No tools needed</span><span class="pill">Nothing to wire</span><span class="pill">Builds the mental model</span>
         </div>
       </div>
       <div class="hero-side no-instrument">
@@ -44,6 +44,7 @@
         <div class="rail-nav">
           <a href="#parts"><span class="tick"></span>What you need</a>
           <a href="#steps"><span class="tick"></span>Build it</a>
+          <a href="#theory"><span class="tick"></span>What you&#x27;re actually holding</a>
           <a href="#challenge"><span class="tick"></span>Try this</a>
           <a href="#agent"><span class="tick"></span>Coach me</a>
         </div>
@@ -54,24 +55,24 @@
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">01</span> First, know the pieces</p>
               <h2>What you need</h2>
-              <p class="muted">Tip the kit out and find these three. Tap <em>Define</em> on anything unfamiliar — the answer opens as a field note you can read and dismiss.
+              <p class="muted">Tip the kit out and find these three — they&#x27;re the ones today is about. Tap <em>Define</em> on anything unfamiliar; the answer opens as a field note you can read and dismiss.
 </p>
             </div>
             <div class="part-grid">
               <article class="part-card">
                 <figure class="part-photo"><img src="../assets/shared/item-esp32-s3-board.jpg" alt="Official manual photo of the ESP32-S3 development board." /><figcaption>Manual photo</figcaption></figure>
-                <h3>ESP32-S3 board <button class="define" data-topic="esp32">Define</button></h3>
-                <p>The small computer at the centre of every project this course.</p>
+                <h3>ESP32-S3 board <button class="define" data-topic="module">Define</button></h3>
+                <p>The metal can holds an entire computer; the rest of the board feeds it.</p>
               </article>
               <article class="part-card">
                 <figure class="part-photo"><img src="../assets/shared/item-gpio-extension-board.png" alt="Official manual image of the ESP32-S3 GPIO extension board." /><figcaption>Manual photo</figcaption></figure>
                 <h3>GPIO extension board <button class="define" data-topic="gpio">Define</button></h3>
-                <p>Spreads the board&#x27;s pins into labelled rows you can reach.</p>
+                <p>Fans the chip&#x27;s pins out into labelled rows you can actually reach and wire.</p>
               </article>
               <article class="part-card">
                 <figure class="part-photo"><img src="../assets/shared/item-pinout.png" alt="Official ESP32-S3 pinout diagram labelling every GPIO, power, and USB pin on the board." /><figcaption>Manual reference</figcaption></figure>
                 <h3>Pinout map <button class="define" data-topic="pinout">Define</button></h3>
-                <p>The labelled map of every pin. Keep it close once wiring starts.</p>
+                <p>The map from a physical pin to the number your code uses. You&#x27;ll live in it.</p>
               </article>
             </div>
           </div>
@@ -81,50 +82,75 @@
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">02</span> One action at a time</p>
               <h2>Build it</h2>
-              <p class="muted">No rush and no risk today — just find things and look closely.
+              <p class="muted">A guided tour, not a checklist. Hold the board by the edges and find each thing in turn — you&#x27;re learning the geography you&#x27;ll navigate for a month.
 </p>
             </div>
             <div class="steps-progress">
               <div class="bar" aria-hidden="true"><span id="stepBar"></span></div>
-              <span class="count" id="stepCount">0 / 5 done</span>
+              <span class="count" id="stepCount">0 / 6 done</span>
             </div>
             <ol class="step-list">
-              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 1 done"></button><p class="text">Open the kit and lay the parts out where you can see them.</p></li>
-              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 2 done"></button><p class="text">Find the ESP32-S3 board and hold it by the edges. <button class="define" data-topic="esd">Define</button></p></li>
-              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">Locate the USB port on the board — that&#x27;s how code and power arrive. <button class="define" data-topic="usbData">Define</button></p></li>
-              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">Find the tiny onboard LED near the chip; you&#x27;ll blink it on Day 3.</p></li>
-              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Open the pinout map and notice the numbered GPIO pins along the sides. <button class="define" data-topic="pinout">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 1 done"></button><p class="text">Find the metal can in the middle. That shield covers the whole computer — processor, memory, and the flash chip that will hold your program. <button class="define" data-topic="module">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 2 done"></button><p class="text">Find the USB-C port along one edge. Power and code both arrive here, and the board will talk back to your screen through it. <button class="define" data-topic="usbData">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">Find the two small buttons near the port. One is RESET, one is BOOT — together they control whether the board runs your program or listens for a new one. <button class="define" data-topic="bootReset">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">Find the small onboard LED near the chip. It&#x27;s wired to one pin and needs no external parts, which is why you&#x27;ll blink it on Day 3 before touching a single wire. <button class="define" data-topic="ledBuiltin">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Look along both long edges and find the two rows of numbered pins. Each one is a GPIO — a wire your program can switch on, or read a signal from. <button class="define" data-topic="gpio">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 6 done"></button><p class="text">Open the pinout map and match a few printed numbers to the physical pins. That map is how &quot;GPIO 13&quot; in code becomes a specific pin you can touch. <button class="define" data-topic="pinout">Define</button></p></li>
             </ol>
             <div class="done-banner" id="doneBanner" role="status">
               <span class="icon" aria-hidden="true">🧭</span>
-              <div><strong>You&#x27;ve got your bearings.</strong><p>You can recognise the board, its port, and its pin labels. Day 2 gets the software talking to it.</p></div>
+              <div><strong>You can read the board now.</strong><p>You know what the chip is, where power and code arrive, how it&#x27;s told to run or reprogram, and what its pins are for. Day 2 gets your computer talking to it.</p></div>
+            </div>
+          </div>
+        </section>
+        <section id="theory" class="card">
+          <div class="card-inner">
+            <div class="section-head">
+              <p class="section-kicker"><span class="section-index">03</span> Understand, don&#x27;t memorise</p>
+              <h2>What you&#x27;re actually holding</h2>
+              <p class="muted">Before any code, the single idea that makes the ESP32-S3 click. Your laptop runs an operating system that starts and stops many apps. This chip is a different kind of machine, and understanding how is worth more than any step-by-step you&#x27;ll follow later.
+</p>
+            </div>
+            <div class="theory-flow" aria-label="Measurement model">
+              <article class="flow-step"><span class="n">One chip</span><h3>A whole computer</h3><p>Processor</p></article>
+              <article class="flow-step"><span class="n">One program</span><h3>No apps</h3><p>It runs a single program from the instant it gets power. The sketch you upload IS its software.</p></article>
+              <article class="flow-step"><span class="n">The pins</span><h3>GPIO</h3><p>Each numbered pin is a wire your code can drive high or low</p></article>
+              <article class="flow-step"><span class="n">The catch</span><h3>3.3 volts</h3><p>Every pin speaks in 3.3V. Powering a part from 5V is fine; pushing 5V into a pin can damage it.</p></article>
+            </div>
+            <div class="formula-card">
+              <span class="label">The model</span>
+              <code><b>one chip</b> + <b>one program</b> + <b>pins at 3.3V</b> = everything you&#x27;ll build</code>
+            </div>
+            <div class="two-col" style="margin-top:14px">
+              <article class="mini-card"><h3>Why the metal shield <button class="define" data-topic="module">Define</button></h3><p>It keeps the Wi-Fi and Bluetooth radio inside clean and stops it leaking interference into the rest of the board.</p></article>
+              <article class="mini-card"><h3>The power path <button class="define" data-topic="regulator">Define</button></h3><p>USB gives 5V; the chip needs 3.3V. A regulator on the board steps it down — which is exactly why the pins are 3.3V devices.</p></article>
             </div>
           </div>
         </section>
         <section id="challenge" class="card">
           <div class="card-inner">
             <div class="section-head">
-              <p class="section-kicker"><span class="section-index">03</span> Make the idea yours</p>
-              <h2>Try this: name three parts</h2>
-              <p class="muted">A tiny memory exercise — no pressure, just a way to make the board feel familiar before you start using it.
+              <p class="section-kicker"><span class="section-index">04</span> Make the idea yours</p>
+              <h2>Try this: read the pinout like a chart</h2>
+              <p class="muted">The pinout is the one reference you&#x27;ll reopen every wiring day. Spending five minutes finding your way around it now makes every later circuit faster to follow — and shows you why the 3.3V rule matters before you can break it.
 </p>
             </div>
             <div class="two-col">
-              <article class="mini-card"><h3>Name three parts</h3><p>Pick any three pieces and name them out loud. Check the kit&#x27;s parts list if you&#x27;re unsure.</p></article>
-              <article class="mini-card"><h3>Trace the USB path</h3><p>Follow where the USB port leads on the board. That&#x27;s the road your code travels in on.</p></article>
+              <article class="mini-card"><h3>Find the rails <button class="define" data-topic="regulator">Define</button></h3><p>On the pinout, find the 3.3V pin, the 5V pin, and a GND (ground) pin. Those three feed power to everything you&#x27;ll wire. Notice 3.3V and 5V are separate — that difference is the whole safety story.</p></article>
+              <article class="mini-card"><h3>Find the special pins <button class="define" data-topic="bootReset">Define</button></h3><p>Locate GPIO0 on the map — that&#x27;s the BOOT pin the button pulls at power-up. Then find the pin the onboard LED sits on. Not every pin is interchangeable, and the map is how you tell.</p></article>
             </div>
             <div class="logbook">
               <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
-              <label>Which three parts did you name?<textarea rows="2"></textarea></label>
-              <label>Where is the board&#x27;s USB port, and where is the onboard LED?<textarea rows="2"></textarea></label>
-              <label>What&#x27;s one thing about the board that surprised you?<textarea rows="2"></textarea></label>
+              <label>Which pins carry 3.3V, 5V, and GND on your board?<textarea rows="2"></textarea></label>
+              <label>In your own words, what is a GPIO pin, and what two things can it do?<textarea rows="2"></textarea></label>
+              <label>Why would wiring a 5V sensor output straight into a GPIO be a bad idea?<textarea rows="2"></textarea></label>
             </div>
           </div>
         </section>
         <section id="agent" class="card">
           <div class="card-inner">
             <div class="section-head">
-              <p class="section-kicker"><span class="section-index">04</span> Learn it with a hand on the tiller</p>
+              <p class="section-kicker"><span class="section-index">05</span> Learn it with a hand on the tiller</p>
               <h2>Coach me through it</h2>
               <p class="muted">Every lesson ships with a code and a machine-readable packet, so an agent can guide you with full context.
 </p>
@@ -135,7 +161,7 @@
             </div>
             <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
               <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
-              <p><strong>How the agent should behave:</strong> keep it calm and orientation-only, name parts on request, and reinforce safe handling (edges, static) without turning it into a lecture.
+              <p><strong>How the agent should behave:</strong> teach the microcontroller mental model plainly, run the board tour part by part on request, and make sure the learner leaves understanding GPIO and the 3.3V rule — without turning safe handling into a lecture.
 </p>
             </div>
           </div>
@@ -144,7 +170,7 @@
         <span class="day-nav-link is-empty" aria-hidden="true"></span>
         <a class="day-nav-link next" href="../day-02-setup/">
           <span class="day-nav-dir">Day 2 →</span>
-          <span class="day-nav-title">Install the Arduino IDE and see the board</span>
+          <span class="day-nav-title">Install the toolchain and learn what uploading really does</span>
         </a>
         </nav>
       </main>
@@ -176,7 +202,7 @@
 
   <div class="toast" id="toast">Prompt copied</div>
 
-  <script id="lesson-data" type="application/json">{"day": 1, "totalDays": 30, "slug": "day-01-unbox", "explainers": {"esd": {"title": "Static electricity (ESD)", "body": "A bare circuit board can be harmed by a static shock you cannot feel. Touch something metal and grounded before handling the board, hold it by the edges, and keep it off wool or fluffy surfaces.\n", "shortcut": "Touch metal first, hold by the edges."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "gpio": {"title": "GPIO extension board", "body": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself.\n", "shortcut": "When a lesson says GPIO 13, look for the pin labelled 13 on the extension board."}, "pinout": {"title": "Pinout map", "body": "A pinout is a labelled drawing of the board that names every pin — power, ground, USB, and the numbered GPIO pins your code uses. You will reach for it constantly once you start wiring, so it is worth knowing where it lives.\n", "shortcut": "When a lesson says GPIO 13, the pinout shows you which physical pin that is."}, "usbData": {"title": "Data-capable USB cable", "body": "Some USB cables only carry power (for charging), with no data wires inside. Uploading code needs a cable that carries data. A charge-only cable will power the board but never let the IDE talk to it.\n", "shortcut": "If uploads fail on a cable that charges phones fine, suspect the cable first."}}, "prev": null, "next": {"day": 2, "slug": "day-02-setup", "title": "Install the Arduino IDE and see the board"}}</script>
+  <script id="lesson-data" type="application/json">{"day": 1, "totalDays": 30, "slug": "day-01-unbox", "explainers": {"bootReset": {"title": "BOOT and RESET buttons", "body": "Two small buttons sit near the USB port. RESET restarts the program from the beginning, the same as cutting and restoring power. BOOT chooses what runs at startup: held down as the board powers up, it enters the download mode that lets new code be written to flash. The upload tool normally presses this pair for you electronically; when it can't, you do it by hand.\n", "shortcut": "RESET restarts your program. BOOT held at power-up means \"listen for new code\"."}, "gpio": {"title": "GPIO extension board", "body": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself.\n", "shortcut": "When a lesson says GPIO 13, look for the pin labelled 13 on the extension board."}, "ledBuiltin": {"title": "The onboard LED", "body": "Most ESP32-S3 boards have a small LED wired to a GPIO pin at the factory, so you can prove code runs without wiring anything. In this sketch it is named LED_BUILTIN, which stands for GPIO 2 on this board.\n", "shortcut": "Look for the small LED near the chip — not the steady power LED."}, "module": {"title": "The metal can (the module)", "body": "The small metal box soldered to the board is the ESP32-S3 module. Under the shield sit the processor, its memory, the flash chip that holds your program, and the radio for Wi-Fi and Bluetooth. The rest of the board exists to serve it — power, the USB port, buttons, and the pins that fan its signals out to the world. The shield keeps the radio clean and stops it interfering.\n", "shortcut": "The whole computer is inside that metal can; everything else on the board feeds it."}, "pinout": {"title": "Pinout map", "body": "A pinout is a labelled drawing of the board that names every pin — power, ground, USB, and the numbered GPIO pins your code uses. You will reach for it constantly once you start wiring, so it is worth knowing where it lives.\n", "shortcut": "When a lesson says GPIO 13, the pinout shows you which physical pin that is."}, "regulator": {"title": "The power path (5V to 3.3V)", "body": "USB delivers 5 volts, but the ESP32-S3 runs at 3.3 volts. A small component called a voltage regulator sits between them and steps 5V down to a steady 3.3V for the chip. This is why the board's logic runs at 3.3V, and why the 3.3V and 5V pins on the header are different rails you must not mix up.\n", "shortcut": "USB is 5V, the chip is 3.3V; the regulator on the board bridges them."}, "usbData": {"title": "Data-capable USB cable", "body": "Some USB cables only carry power (for charging), with no data wires inside. Uploading code needs a cable that carries data. A charge-only cable will power the board but never let the IDE talk to it.\n", "shortcut": "If uploads fail on a cable that charges phones fine, suspect the cable first."}}, "prev": null, "next": {"day": 2, "slug": "day-02-setup", "title": "Install the toolchain and learn what uploading really does"}}</script>
   <script src="../course.js"></script>
 </body>
 </html>
