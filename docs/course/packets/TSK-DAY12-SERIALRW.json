@@ -6,8 +6,8 @@
   "title": "Type to the board, hear it answer",
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
-  "estimatedTimeMinutes": 15,
-  "mission": "Upload a sketch with no wiring, open Serial Monitor, type a message, and watch the ESP32-S3 read what you sent and echo it straight back — the USB line working both ways for the first time.",
+  "estimatedTimeMinutes": 20,
+  "mission": "Upload a sketch with no wiring, open Serial Monitor, and type. Each character you send crosses the USB cable into a small holding area on the board; the sketch checks how much is waiting, reads a whole line, and answers. Learn how input actually arrives — one byte at a time, waiting to be read — because that is what lets a board stop running a fixed script and start taking commands from you while it runs.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -34,11 +34,12 @@
   ],
   "wiring": [],
   "coachInstructions": [
-    "Keep the day to upload, type, and read the reply; there is nothing to wire.",
-    "If nothing echoes back, the Newline line ending is the first thing to check — the board waits for it to end a message.",
-    "If text is garbled, confirm the baud rate is 115200; if the monitor is blank at start, check board and port and press reset.",
-    "Explain that the same USB cable now carries words both ways; do not front-load theory.",
-    "For the challenge, change only the reply text or add a single word check, preserving the working loop.",
+    "Keep the working day to upload, type, and read the reply; there is nothing to wire.",
+    "Teach the mechanism when asked - typed characters land in the board's receive buffer one byte at a time, available() reports how many are waiting, and read() takes one out.",
+    "Explain why the check comes first - read() on an empty buffer returns -1, so available() lets the board wait for real input instead of acting on that -1.",
+    "Point out that bytes arrive as character codes (A is 65), which is why readStringUntil gathers a whole line and why toInt() or a comparison is what turns input into a command.",
+    "If nothing echoes back, the Newline line ending is the first thing to check — the board waits for it to end a message; if text is garbled, confirm 115200 baud; if the monitor is blank at start, check board and port and press reset.",
+    "For the challenge, keep the working read loop and add to it - a word check that switches the onboard LED, then toInt() to act on a typed number; the onboard LED needs no wiring.",
     "Keep the Arduino path primary; MicroPython's input() reads from Thonny's shell and is optional only if already set up."
   ],
   "steps": [
@@ -53,19 +54,19 @@
     "arduino": [
       {
         "line": "Serial.available()",
-        "explanation": "Checks whether you've sent any characters yet, so the board reads only when there's something waiting."
+        "explanation": "Reports how many of your characters are sitting in the receive buffer, so the board reads only when something has actually arrived rather than acting on an empty read."
       },
       {
         "line": "Serial.readStringUntil('\\n')",
-        "explanation": "Gathers what you typed up to the Enter key into one complete message."
+        "explanation": "Pulls characters out of the buffer one after another and stops at the Enter key, handing you one whole message instead of loose bytes."
       },
       {
         "line": "inputString.trim()",
-        "explanation": "Trims the stray newline and spaces off the ends so the echo is clean."
+        "explanation": "Trims the stray newline and spaces off the ends so the message you act on is exactly what you typed."
       },
       {
         "line": "Serial.printf(\"inputString: %s\\r\\n\", inputString.c_str())",
-        "explanation": "Sends your message straight back, then the sketch clears it and waits for the next one."
+        "explanation": "Sends your message straight back as proof it was read, then the sketch clears its variable and waits for the next line."
       }
     ],
     "micropython": [
@@ -80,16 +81,16 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "The board checks whether anything arrived, reads a whole line, and answers — the USB link working both directions.",
-    "formula": "check → read a line → answer → wait",
+    "plainLanguage": "Each character you type crosses the same USB wires into a receive buffer; available() counts what's waiting, read() takes it out one byte at a time, and your code decides what it means.",
+    "formula": "characters land in a buffer → available() counts → read() takes one → your code acts on it",
     "notes": [
       {
-        "title": "Why check before reading",
-        "body": "Reading when nothing has arrived would just return empty. available() lets the board wait for real input instead."
+        "title": "Why check available() before you read",
+        "body": "Calling read() on an empty buffer returns -1, its stand-in for nothing here. Checking available() first means the board waits for real input instead of mistaking that -1 for something you sent."
       },
       {
-        "title": "What readStringUntil does",
-        "body": "It gathers characters until the newline you send with Enter, so the board gets one whole message rather than single letters."
+        "title": "Bytes arrive, not words",
+        "body": "The board receives raw character codes one at a time, so a five-letter word is five separate bytes. readStringUntil gathers them up to your Enter key into one whole message; a comparison or toInt() then turns that message into something to act on."
       }
     ]
   },
@@ -128,5 +129,5 @@
       ]
     }
   ],
-  "challenge": "Change the reply so the board wraps your message in words of its own, then make it react to one specific word."
+  "challenge": "Add the onboard LED to the sketch, then make the board switch it with the word you type — first as an on/off command, then by acting on a typed number."
 }

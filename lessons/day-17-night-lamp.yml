@@ -204,10 +204,18 @@ theory:
     The whole day is one chain of four conversions, each small enough to hold in
     your head, running many times a second.
   flow:
-    - { n: Light, title: Resistance shifts, body: The photoresistor's resistance follows the light falling on it. }
-    - { n: Divide, title: Volts at the midpoint, body: The 10 kΩ divider turns that resistance into a voltage on GPIO 1. }
-    - { n: Read, title: ADC to a number, body: analogRead measures the voltage as a value from 0 to 4095. }
-    - { n: Drive, title: Map to brightness, body: constrain and map squeeze the reading into a PWM level for the LED. }
+    - n: "Light"
+      title: "Resistance shifts"
+      body: "The photoresistor's resistance follows the light falling on it."
+    - n: "Divide"
+      title: "Volts at the midpoint"
+      body: "The 10 kΩ divider turns that resistance into a voltage on GPIO 1."
+    - n: "Read"
+      title: "ADC to a number"
+      body: "analogRead measures the voltage as a value from 0 to 4095."
+    - n: "Drive"
+      title: "Map to brightness"
+      body: "constrain and map squeeze the reading into a PWM level for the LED."
   formulaLabel: The chain
   formula: light → **resistance** → voltage → number → brightness
   notes:

@@ -204,10 +204,18 @@ theory:
     The clever part of today fits in one line — the `map()` call. Everything
     around it is a counter going up and coming back down.
   flow:
-    - { n: Beat, title: 50 frames a second, body: The pin starts a fresh pulse every 20 ms. }
-    - { n: Width, title: The pulse is the order, body: A 0.5 ms pulse means 0° and a 2.5 ms pulse means 180°. }
-    - { n: Convert, title: map() translates, body: Degrees become pulse counts — 103 at one end and 512 at the other. }
-    - { n: Hold, title: The servo obeys, body: A circuit inside turns the shaft until it matches the width. }
+    - n: "Beat"
+      title: "50 frames a second"
+      body: "The pin starts a fresh pulse every 20 ms."
+    - n: "Width"
+      title: "The pulse is the order"
+      body: "A 0.5 ms pulse means 0° and a 2.5 ms pulse means 180°."
+    - n: "Convert"
+      title: "map() translates"
+      body: "Degrees become pulse counts — 103 at one end and 512 at the other."
+    - n: "Hold"
+      title: "The servo obeys"
+      body: "A circuit inside turns the shaft until it matches the width."
   formulaLabel: The model
   formula: angle = **pulse width** — 0.5 ms is 0° · 1.5 ms is 90° · 2.5 ms is 180°
   notes:

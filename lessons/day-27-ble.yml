@@ -171,10 +171,18 @@ theory:
     into characteristics — small named mailboxes the phone can read, write, or
     subscribe to. Today's service holds exactly two, one for each direction.
   flow:
-    - { n: Advertise, title: The board calls out, body: The sketch broadcasts the name ESP32S3_Bluetooth so nearby phones can find it. }
-    - { n: Connect, title: The phone answers, body: LightBlue opens a connection and finds the service by its UUID. }
-    - { n: Write in, title: Phone → board, body: Text written to the characteristic ending 0002 lands in the sketch and prints to Serial Monitor. }
-    - { n: Notify out, title: Board → phone, body: Text typed in Serial Monitor is pushed through the characteristic ending 0003 to every subscriber. }
+    - n: "Advertise"
+      title: "The board calls out"
+      body: "The sketch broadcasts the name ESP32S3_Bluetooth so nearby phones can find it."
+    - n: "Connect"
+      title: "The phone answers"
+      body: "LightBlue opens a connection and finds the service by its UUID."
+    - n: "Write in"
+      title: "Phone → board"
+      body: "Text written to the characteristic ending 0002 lands in the sketch and prints to Serial Monitor."
+    - n: "Notify out"
+      title: "Board → phone"
+      body: "Text typed in Serial Monitor is pushed through the characteristic ending 0003 to every subscriber."
   formulaLabel: Useful model
   formula: "one **write** lane in + one **notify** lane out = a two-way text pipe"
   notes:

@@ -203,10 +203,18 @@ theory:
     Put them together and you have remote control — and the pattern in today's
     loop is the skeleton of every protocol you'll ever meet.
   flow:
-    - { n: Send, title: Phone writes, body: LightBlue writes your text into the board's write characteristic. }
-    - { n: Receive, title: Buffer fills, body: The sketch copies the incoming bytes into rxload. }
-    - { n: Compare, title: Two known words, body: strncmp checks the buffer against led_on and led_off. }
-    - { n: Act, title: Pin moves, body: digitalWrite drives GPIO 2 HIGH or LOW and the LED follows. }
+    - n: "Send"
+      title: "Phone writes"
+      body: "LightBlue writes your text into the board's write characteristic."
+    - n: "Receive"
+      title: "Buffer fills"
+      body: "The sketch copies the incoming bytes into rxload."
+    - n: "Compare"
+      title: "Two known words"
+      body: "strncmp checks the buffer against led_on and led_off."
+    - n: "Act"
+      title: "Pin moves"
+      body: "digitalWrite drives GPIO 2 HIGH or LOW and the LED follows."
   formulaLabel: The model
   formula: phone text → **match a known command** → digitalWrite
   notes:

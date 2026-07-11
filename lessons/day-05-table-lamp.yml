@@ -202,11 +202,21 @@ theory:
     holding the light's on/off state between loop passes, and getting past the
     switch's mechanical bounce. Those three ideas are the whole lesson.
   flow:
-    - { n: Level, title: What the loop sees, body: "loop() reads GPIO 13 thousands of times a second. At rest it reads HIGH; through the entire press it reads LOW. That reading is the level — the pin's state right now." }
-    - { n: The trap, title: A level flips forever, body: Flip the lamp whenever the pin reads LOW and it flips on every pass while you hold — hundreds of times before you let go. The level alone can't tell a tap from a long hold. }
-    - { n: Edge, title: The moment of change, body: "What you mean by a press is the edge: the single HIGH-to-LOW fall when the contact closes. One press has exactly one falling edge, so acting on the edge acts once." }
-    - { n: Bounce, title: The edge arrives messy, body: The switch's metal contacts spring apart and back as they meet, so that one clean edge lands as a burst of edges over a few milliseconds. Left alone, one press reads as several. }
-    - { n: Memory, title: Where on/off lives, body: The LED's own driven level is the remembered state. It stays put between loop passes, and each clean edge inverts it — so the lamp holds long after your finger is gone. }
+    - n: "Level"
+      title: "What the loop sees"
+      body: "loop() reads GPIO 13 thousands of times a second. At rest it reads HIGH; through the entire press it reads LOW. That reading is the level — the pin's state right now."
+    - n: "The trap"
+      title: "A level flips forever"
+      body: "Flip the lamp whenever the pin reads LOW and it flips on every pass while you hold — hundreds of times before you let go. The level alone can't tell a tap from a long hold."
+    - n: "Edge"
+      title: "The moment of change"
+      body: "What you mean by a press is the edge: the single HIGH-to-LOW fall when the contact closes. One press has exactly one falling edge, so acting on the edge acts once."
+    - n: "Bounce"
+      title: "The edge arrives messy"
+      body: "The switch's metal contacts spring apart and back as they meet, so that one clean edge lands as a burst of edges over a few milliseconds. Left alone, one press reads as several."
+    - n: "Memory"
+      title: "Where on/off lives"
+      body: "The LED's own driven level is the remembered state. It stays put between loop passes, and each clean edge inverts it — so the lamp holds long after your finger is gone."
   formulaLabel: The model
   formula: one clean **falling edge** → invert the remembered state → the lamp holds
   notes:

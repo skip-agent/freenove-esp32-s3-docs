@@ -209,10 +209,18 @@ theory:
     as a numbered list, and write the work once, as a loop that reads the list by
     position. The count of outputs stops mattering to the code.
   flow:
-    - { n: "1", title: Pins in an array, body: "ledPins holds all ten pin numbers in bar order. An array is a numbered shelf- position 0 is the first segment, position 9 the last. The array is the pattern; the wiring just follows it." }
-    - { n: "2", title: An index selects one, body: "The loop keeps a counter, i. ledPins[i] means read the pin number sitting at position i — so a single line can address any segment by changing one number." }
-    - { n: "3", title: Light, then step, body: The loop drives that one pin HIGH, waits, sets it LOW, then i++ moves the index one place along the array to the next pin. }
-    - { n: "4", title: Motion is the index over time, body: "As i climbs 0 to 9, the lit pin marches down the bar. One counter, changing over time, is the whole of the motion. Reverse the count, 9 down to 0, and the light flows back." }
+    - n: "1"
+      title: "Pins in an array"
+      body: "ledPins holds all ten pin numbers in bar order. An array is a numbered shelf- position 0 is the first segment, position 9 the last. The array is the pattern; the wiring just follows it."
+    - n: "2"
+      title: "An index selects one"
+      body: "The loop keeps a counter, i. ledPins[i] means read the pin number sitting at position i — so a single line can address any segment by changing one number."
+    - n: "3"
+      title: "Light, then step"
+      body: "The loop drives that one pin HIGH, waits, sets it LOW, then i++ moves the index one place along the array to the next pin."
+    - n: "4"
+      title: "Motion is the index over time"
+      body: "As i climbs 0 to 9, the lit pin marches down the bar. One counter, changing over time, is the whole of the motion. Reverse the count, 9 down to 0, and the light flows back."
   formulaLabel: The model
   formula: "**pins in an array** + **a loop over the index** = ten outputs from code you wrote once"
   notes:

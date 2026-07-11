@@ -80,10 +80,18 @@ theory:
     Knowing them is the difference between "it didn't work" and "it got past
     compile, so the problem is the connection, not my code."
   flow:
-    - { n: 1 · Compile, title: Text to machine code, body: Your readable C++ is translated into raw instructions built for the ESP32-S3. This is what the board package enabled. }
-    - { n: 2 · Enter, title: Download mode, body: The IDE pulses the board into the bootloader — the small program that listens for new code instead of running the old one. }
-    - { n: 3 · Flash, title: Write to storage, body: The compiled bytes travel down USB and are written into flash, the board's permanent storage. }
-    - { n: 4 · Run, title: Reset and go, body: The board restarts, the bootloader hands over, and your fresh program runs — and keeps running with the power off and on. }
+    - n: "1 · Compile"
+      title: "Text to machine code"
+      body: "Your readable C++ is translated into raw instructions built for the ESP32-S3. This is what the board package enabled."
+    - n: "2 · Enter"
+      title: "Download mode"
+      body: "The IDE pulses the board into the bootloader — the small program that listens for new code instead of running the old one."
+    - n: "3 · Flash"
+      title: "Write to storage"
+      body: "The compiled bytes travel down USB and are written into flash, the board's permanent storage."
+    - n: "4 · Run"
+      title: "Reset and go"
+      body: "The board restarts, the bootloader hands over, and your fresh program runs — and keeps running with the power off and on."
   formulaLabel: The chain
   formula: "compile → **download mode** → flash → run"
   notes:

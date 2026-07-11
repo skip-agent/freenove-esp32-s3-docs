@@ -236,7 +236,7 @@ while True:
             <div class="theory-flow" aria-label="Measurement model">
               <article class="flow-step"><span class="n">1</span><h3>Pins in an array</h3><p>ledPins holds all ten pin numbers in bar order. An array is a numbered shelf- position 0 is the first segment, position 9 the last. The array is the pattern; the wiring just follows it.</p></article>
               <article class="flow-step"><span class="n">2</span><h3>An index selects one</h3><p>The loop keeps a counter, i. ledPins[i] means read the pin number sitting at position i — so a single line can address any segment by changing one number.</p></article>
-              <article class="flow-step"><span class="n">3</span><h3>Light</h3><p>The loop drives that one pin HIGH</p></article>
+              <article class="flow-step"><span class="n">3</span><h3>Light, then step</h3><p>The loop drives that one pin HIGH, waits, sets it LOW, then i++ moves the index one place along the array to the next pin.</p></article>
               <article class="flow-step"><span class="n">4</span><h3>Motion is the index over time</h3><p>As i climbs 0 to 9, the lit pin marches down the bar. One counter, changing over time, is the whole of the motion. Reverse the count, 9 down to 0, and the light flows back.</p></article>
             </div>
             <div class="formula-card">

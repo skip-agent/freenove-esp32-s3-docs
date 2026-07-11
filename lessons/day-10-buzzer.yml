@@ -1,7 +1,8 @@
 # Day 10 — Buzzer · tinyskiff.lesson.v1
 # One source of truth: this file renders to the guided page
 # (/course/day-10-buzzer/), the agent packet, and the course-map entry.
-# The board gets a voice — and a transistor lets a pin drive a load it can't power directly.
+# The board gets a voice: an active buzzer beeps on command, and pitch turns out
+# to be frequency — the counterpart to Day 7, where on-time set brightness.
 
 schema: tinyskiff.lesson.v1
 lessonCode: TSK-DAY10-BUZZER
@@ -16,21 +17,27 @@ learnerProfile: adult beginner; curious and capable; no electronics assumed
 mission: >
   Wire an active buzzer through an NPN transistor, add a push button, upload the
   Arduino sketch, and turn your board into a doorbell — press for a beep, let go
-  for silence.
-unlocks: A pin can make sound, and a transistor lets that pin switch a load it could never power on its own.
+  for silence. While you build it, learn what that beep actually is: sound is air
+  being pushed back and forth, and its pitch is a frequency you can set. That is
+  the idea the passive-buzzer siren pays off, and the counterpart to Day 7, where
+  the pin's on-time set brightness.
+unlocks: You learn that sound is vibrating air and pitch is frequency — the count of on/off cycles a second, in hertz — why an active buzzer plays one fixed note while a passive buzzer lets you choose the pitch, and how a transistor lets a gentle pin drive the 5V buzzer.
 seoDescription: >
   Wire an active buzzer and an NPN transistor to the ESP32-S3, add a push button,
-  and build a doorbell — press to beep. Your first circuit that makes sound and
-  switches a bigger load through a transistor.
+  and build a doorbell — press to beep. Learn what sound is, why pitch is
+  frequency, and how an active buzzer with its own oscillator differs from a
+  passive buzzer you tune with tone().
 
 hero:
   instrument: none
   headline: Give the board|a {voice}
   lede: >
     Today the board makes sound. You wire an active buzzer through a small
-    transistor, add a push button, and upload a sketch that beeps the moment you
-    press — a doorbell you built yourself. The transistor is the new trick: it
-    lets a gentle pin switch a load the pin could never drive alone.
+    transistor, add a push button, and upload a sketch that beeps the instant you
+    press — a doorbell you built yourself. The beep is worth understanding: sound
+    is air pushed rapidly back and forth, and how many pushes a second is the
+    pitch you hear. An active buzzer fixes that number itself; a passive buzzer
+    hands it to you to set.
   pills:
     - { text: About 25 minutes, key: true }
     - Arduino first
@@ -202,25 +209,65 @@ code:
       up; otherwise skip it — it should never block the Arduino-first path.
 
 theory:
-  title: Active buzzers, passive buzzers, and the transistor
-  summary: The pin reads the button and switches a transistor, and the transistor drives the 5V buzzer the pin couldn't power alone.
+  title: What sound is, and why pitch is frequency
+  summary: Sound is air vibrating, and pitch is how many on/off cycles a second reach the buzzer — the counterpart to Day 7, where the pin's on-time set brightness.
   intro: >
-    There's no trick here — the pin does the deciding, and a small transistor does
-    the heavy lifting the pin can't.
+    Today's doorbell uses an active buzzer, which plays one fixed note. The idea
+    worth carrying is what that note actually is, because the passive buzzer later
+    lets you choose it. Sound is moving air, and the pitch you hear is a number.
   flow:
-    - { n: Sense, title: Button in, body: digitalRead checks GPIO 21 many times a second. }
-    - { n: Trickle, title: Weak pin, body: The pin can only supply a trickle of current on its own. }
-    - { n: Switch, title: Transistor, body: The transistor uses that trickle to switch the 5V buzzer. }
-    - { n: Silence, title: Release, body: Let go and the transistor opens so the buzzer goes silent. }
+    - n: "Air"
+      title: Sound is vibration
+      body: >-
+        A buzzer holds a thin disc that snaps back and forth, shoving the air in
+        front of it. Each full back-and-forth is one cycle, and your ear reads a
+        stream of those pushes as a sound rather than separate clicks.
+    - n: "Rate"
+      title: Pitch is frequency
+      body: >-
+        How many cycles happen each second is the frequency, measured in hertz.
+        More cycles a second arrives as a higher note, fewer as a lower one, so
+        the pitch is simply a count you can name and set.
+    - n: "Active"
+      title: Its own oscillator
+      body: >-
+        An active buzzer carries a tiny oscillator inside that vibrates the disc
+        at one built-in rate, so bare power plays one set note. That is the beep
+        in today's doorbell, and why the pin only has to switch it on or off.
+    - n: "Passive"
+      title: You set the rate
+      body: >-
+        A passive buzzer has no oscillator and stays silent on steady power. The
+        pin has to switch it on and off itself, and how fast it does that becomes
+        the pitch. The frequency you drive it at is the frequency you hear.
+    - n: "Notes"
+      title: Music is frequencies
+      body: >-
+        A musical note is a named frequency: 262 Hz is a middle C, 392 Hz is the
+        G above it, 440 Hz is the A an orchestra tunes to. Feed those numbers to
+        a passive buzzer and it plays them; tone() generates exactly that.
   formulaLabel: The model
-  formula: press → **transistor** switches 5V → buzzer sounds
+  formula: "**on/off cycles per second** = frequency = **pitch** (Day 7 varied on-time for brightness; here the rate sets the note)"
   notes:
-    - title: Active vs passive buzzers
+    - title: The tie back to Day 7
+      explain: pwm
+      body: >-
+        Day 7's pin also flicked far too fast to watch, and its duty cycle, the
+        share of each cycle held on, set the brightness. Here the duty stays near
+        half and the frequency is the knob, so the same fast-switching pin makes
+        pitch instead of light.
+    - title: Why the active buzzer ignores all this
       explain: buzzer
-      body: An active buzzer has its own oscillator and plays one fixed tone. A passive buzzer is silent until you feed it a changing signal, so you choose the pitch.
-    - title: What the transistor is for
+      body: >-
+        Its built-in oscillator fixes its own pitch, so switching it faster from
+        the pin just chops the same note on and off. Only a passive buzzer hands
+        you the frequency, which is why melodies and sirens need the passive kind.
+    - title: Where the transistor fits
       explain: transistor
-      body: The pin can't supply the buzzer's current. The transistor lets the small pin signal switch the larger 5V current on and off.
+      body: >-
+        The pin still can't supply the buzzer's current, so it switches a
+        transistor and the transistor drives the 5V buzzer. The pin decides on or
+        off; the transistor does the lifting.
 
 test:
   mode: visual
@@ -245,34 +292,50 @@ test:
       fix: "Swap in a data-capable USB cable."
 
 challenge:
-  title: "Try this: invent a signal"
+  title: "Try this: play a pitch, then a phrase"
   railLabel: Try this
   intro: >
-    Same working circuit, one new idea: giving a sound a meaning. It fits inside
-    today's 30 minutes.
-  summary: Design a two-beep pattern that means something, then try the passive buzzer to hear a pitch you control.
+    The doorbell proved a pin can make sound. This proves the pitch is a number
+    you choose. Swap in the passive buzzer, drive it with tone() the way
+    `Sketch_06.2_Alertor.ino` does, and hear frequency become pitch in your own
+    ear. It fits inside today's session.
+  summary: Play three named frequencies on the passive buzzer, hear each land as a higher note, then string them into a short rising phrase — and confirm the active buzzer can't do it.
   cards:
-    - title: Invent a signal
-      body: Design a two-beep pattern — short-short, or short-long — and write down what it means. Press it out by hand and see if a listener can read it.
-    - title: Hear a siren
+    - title: Play three notes
       explain: tone
-      body: Swap in the passive buzzer and upload `Sketch_06.2_Alertor.ino` to hear a siren instead of a single note. Notice how choosing the pitch changes everything.
+      body: >-
+        Swap in the passive buzzer and, using tone() on GPIO 14, sound 262 Hz,
+        then 392 Hz, then 523 Hz for about half a second each. Those are a middle
+        C, the G above it, and the C above that — each higher frequency is an
+        unmistakably higher note. That mapping from frequency to pitch is the
+        whole idea of the day.
+    - title: Build a tiny phrase
+      explain: buzzer
+      body: >-
+        Now play 330 Hz, 392 Hz, then 523 Hz in a row with short gaps between
+        them — a three-note rising figure you can hum back. You have turned bare
+        numbers into music. Try the same on the active buzzer and it can't
+        follow: its oscillator only ever knows its one note.
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent can
     guide you with full context.
   behaviour: >
-    guide one physical connection at a time, wait for you to confirm, explain
-    terms on request, and always check the transistor orientation, wiring, board,
-    port, and USB before changing code.
+    guide one physical connection at a time and wait for confirmation, but make
+    sure the learner leaves understanding that pitch is frequency and why an
+    active buzzer plays one fixed note while a passive buzzer can be tuned. Always
+    check transistor orientation, wiring, board, port, and USB before code.
   coachInstructions:
     - Guide one physical connection at a time and wait for learner confirmation before proceeding.
+    - Land the core idea- sound is vibrating air, and pitch is frequency, the number of on/off cycles a second that reach the buzzer.
+    - Tie it to Day 7- there the duty cycle set brightness; here the frequency sets pitch while the duty stays roughly fixed, the same fast-switching pin doing a new job.
+    - Explain active versus passive plainly- an active buzzer has its own oscillator and plays one fixed note, while a passive buzzer is silent until the pin feeds it a frequency, which tone() generates.
+    - Point out that musical notes are just specific frequencies, so 262 Hz is a middle C and 392 Hz the G above it.
     - Check the transistor's orientation first — emitter, base, and collector each have a job, and a reversed transistor is the most common cause of no sound.
     - Confirm the buzzer's + pin goes to the 5V rail, not 3.3V, or the sound will be faint or absent.
-    - If there is no sound, check the transistor legs and the 5V buzzer connection before changing code.
     - If the buzzer always sounds, suspect the button wiring or its 10 kΩ pull-up on GPIO 21.
-    - Keep the Arduino path primary; MicroPython and the passive-buzzer siren are optional only if already set up.
+    - Keep the Arduino path primary; the passive-buzzer pitch experiment and MicroPython are optional only if already set up.
 
 source:
   license: CC BY-NC-SA 3.0

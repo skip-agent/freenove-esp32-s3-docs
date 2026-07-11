@@ -7,7 +7,7 @@
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
   "estimatedTimeMinutes": 25,
-  "mission": "Wire three knobs to three input pins and the RGB LED to three PWM pins, upload the Arduino sketch, and turn the knobs to mix any colour by hand — a small mixing desk where each knob owns one channel of light.",
+  "mission": "Wire three knobs to three input pins and the RGB LED to three PWM pins, upload the Arduino sketch, and turn the knobs to mix any colour by hand. Under the colours sits the real lesson — map(), the single line that rescales one range onto another, so a knob reading of 0 to 4095 can drive a colour channel of 0 to 255.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -100,11 +100,13 @@
     }
   ],
   "coachInstructions": [
+    "Land the core idea early — map(value, inLow, inHigh, outLow, outHigh) drops a reading at the same fraction of the output range as it sits in the input range, and here it rescales a 0 to 4095 knob onto a 0 to 255 colour channel.",
+    "Show the composition — Day 13's analogRead gives the number, Day 9's RGB channel takes the brightness, and map() is the adapter between them.",
     "Anchor the pairing early — knob on GPIO 12 drives red on 38, 13 drives green on 39, 14 drives blue on 40 — and have the learner say it back before debugging.",
     "If one colour never changes, check that knob's middle wire on 12/13/14 and its outer legs on 3.3V and GND before touching code.",
-    "If turning a knob moves the wrong colour, the RGB legs are swapped on 38/39/40 — fix the order rather than the sketch.",
-    "If the dome is always dark, check the common pin reaches 3.3V; also confirm all three knobs turned down is correct dark behaviour before treating it as a fault.",
-    "The 256-minus inversion is Day 9's common-anode trick — explain it on request and keep the sketch's map upper bound of 4096 exactly as written.",
+    "If turning a knob moves the wrong colour, the RGB legs are swapped on 38/39/40 — fix the wiring order rather than the sketch.",
+    "The 256-minus write is Day 9's common-anode inversion and stands apart from the mapping — explain it on request and keep the sketch's map input top of 4096 exactly as written.",
+    "For the challenge, swapping map's output ends reverses a channel and narrowing its input top clips the top of the knob's travel — both are one-line edits that show what the four map() numbers do.",
     "Keep the Arduino path primary; MicroPython pairs the knobs to colours in reverse order (12 drives 40) and that difference is expected, so never \"fix\" it."
   ],
   "steps": [
@@ -126,7 +128,7 @@
       },
       {
         "line": "colors[i] = map(analogRead(adcChns[i]), 0, 4096, 0, 255)",
-        "explanation": "Reads one knob (0–4095) and rescales it onto the 0–255 brightness range in a single line."
+        "explanation": "Reads one knob and rescales it proportionally — where the reading sits between 0 and 4096 is where the colour value lands between 0 and 255."
       },
       {
         "line": "ledcWrite(ledPins[i], 256 - colors[i])",
@@ -145,16 +147,20 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "The same read-map-write chain runs three times per pass — arrays hold the pin numbers and the loop walks them.",
-    "formula": "colour = three knob readings → three mapped brightnesses",
+    "plainLanguage": "map() finds where a number sits in its input range and drops it at the same spot in the output range — plain proportional arithmetic.",
+    "formula": "out = outLow + (value − inLow) × (outHigh − outLow) ÷ (inHigh − inLow)",
     "notes": [
       {
-        "title": "Why arrays and a loop",
-        "body": "Writing the pins as three matched arrays lets one loop serve every channel. Adding a fourth channel would mean one more entry in each array and nothing else."
+        "title": "Match the input ends to the real reading",
+        "body": "The input ends should be the smallest and largest numbers the sensor truly reaches. Claim a top of 4096 when the knob only reaches 3600 and the colour never quite hits full. Claim a top of 2048 when the knob reaches 4095 and everything past halfway pins at full and stops changing. The output uses its whole range only when the input ends are honest about the reading."
       },
       {
-        "title": "The same inversion as Day 9",
-        "body": "The common pin sits at 3.3V, so a colour is brightest when its own pin is pulled LOW. Subtracting the value from 256 flips the scale so a bigger knob reading still means a brighter colour."
+        "title": "map() rescales, it does not clamp",
+        "body": "map() is straight proportional arithmetic, so a reading outside the stated input range lands outside the output range too. When a value might stray past its ends, fence it with constrain() first — the pairing you met in Day 15's glossary."
+      },
+      {
+        "title": "Where 4096 and 255 come from",
+        "body": "4096 is the top of the ADC's 12-bit scale and 255 is the top of an 8-bit PWM channel, so this map squeezes a 4096-step reading down onto a 256-step brightness. Change the chip or the settings and those numbers move, and map() still only needs the four ends."
       }
     ]
   },
@@ -192,5 +198,5 @@
       ]
     }
   ],
-  "challenge": "Dial the dome to sunset orange and record the three knob levels, then rewrite one line so two knobs mix the whole colour."
+  "challenge": "Swap red's output ends to run the colour backwards, then narrow red's input top and watch the top of the knob's travel clip at full."
 }

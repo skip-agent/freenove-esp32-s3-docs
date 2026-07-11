@@ -9,28 +9,34 @@ day: 12
 slug: day-12-serial-rw
 title: Type to the board, hear it answer
 status: published
-estimatedTimeMinutes: 15
+estimatedTimeMinutes: 20
 tracks: { main: arduino, optional: micropython }
 learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
-  Upload a sketch with no wiring, open Serial Monitor, type a message, and watch
-  the ESP32-S3 read what you sent and echo it straight back — the USB line
-  working both ways for the first time.
-unlocks: The USB link runs both ways, so your code can react to what you type — the start of a real conversation between you and the board.
+  Upload a sketch with no wiring, open Serial Monitor, and type. Each character
+  you send crosses the USB cable into a small holding area on the board; the
+  sketch checks how much is waiting, reads a whole line, and answers. Learn how
+  input actually arrives — one byte at a time, waiting to be read — because that
+  is what lets a board stop running a fixed script and start taking commands from
+  you while it runs.
+unlocks: You understand how typed input reaches the board — landing byte by byte in a receive buffer that available() counts and read() empties — so your code can act on what you type. That turns the board from a fixed program into something you can steer live.
 seoDescription: >
   Type into Serial Monitor and watch the ESP32-S3 read your message and echo it
-  back. No wiring — just Serial.available and readStringUntil turning USB two-way.
+  back. Learn how input arrives byte by byte in a receive buffer, why you check
+  Serial.available before reading, and how typed characters become commands.
 
 hero:
   instrument: none
   headline: Type to the board|hear it {answer}
   lede: >
-    Yesterday the board only talked. Today it listens. You upload a short sketch,
-    type a message into Serial Monitor, and the ESP32-S3 reads what you sent and
-    sends it right back — the same USB cable now carrying words in both directions.
+    Yesterday the board only talked. Today it listens. The same two USB wires that
+    carried its readings out now carry your keystrokes back in — each character
+    landing in a small buffer on the board, waiting there until the sketch reads
+    it. Once your code can read what you type, it can act on it, and the board
+    becomes something you steer while it runs.
   pills:
-    - { text: About 15 minutes, key: true }
+    - { text: About 20 minutes, key: true }
     - Arduino first
     - MicroPython optional
     - No wiring today
@@ -102,15 +108,15 @@ code:
       }
     notes:
       - code: Serial.available()
-        text: Checks whether you've sent any characters yet, so the board reads only when there's something waiting.
+        text: Reports how many of your characters are sitting in the receive buffer, so the board reads only when something has actually arrived rather than acting on an empty read.
         explain: serialAvailable
       - code: Serial.readStringUntil('\n')
-        text: Gathers what you typed up to the Enter key into one complete message.
+        text: Pulls characters out of the buffer one after another and stops at the Enter key, handing you one whole message instead of loose bytes.
         explain: serialRead
       - code: inputString.trim()
-        text: Trims the stray newline and spaces off the ends so the echo is clean.
+        text: Trims the stray newline and spaces off the ends so the message you act on is exactly what you typed.
       - code: "Serial.printf(\"inputString: %s\\r\\n\", inputString.c_str())"
-        text: Sends your message straight back, then the sketch clears it and waits for the next one.
+        text: Sends your message straight back as proof it was read, then the sketch clears its variable and waits for the next line.
         explain: serialPrint
   micropython:
     file: 07.2_Serial_Read_and_Write/Serial_Read_and_Write.py
@@ -134,25 +140,40 @@ code:
       isn't set up yet, skip this — it should never block the Arduino-first path.
 
 theory:
-  title: Listening as well as talking
-  summary: The board checks whether anything arrived, reads a whole line, and answers — the USB link working both directions.
+  title: How your keystrokes reach the board
+  summary: Each character you type crosses the same USB wires into a receive buffer; available() counts what's waiting, read() takes it out one byte at a time, and your code decides what it means.
   intro: >
-    Yesterday's cable only carried the board's voice out. The same wires carry
-    your words back in; the sketch just has to check for them and read a full line.
+    Yesterday the cable carried the board's voice out. The reverse trip is the
+    whole idea today, and it does not happen the way you might picture. The board
+    is not watching your keyboard. Your characters arrive on their own schedule
+    and pile up in a small holding area until the sketch gets around to reading
+    them. Understanding that gap between arriving and being read is what makes
+    input reliable.
   flow:
-    - { n: Anything there, title: available(), body: The board asks whether you've sent characters before it tries to read. }
-    - { n: Read a line, title: readStringUntil, body: It collects your characters up to the Enter key into one message. }
-    - { n: Tidy it, title: trim(), body: Stray newline and spaces come off the ends so the message is clean. }
-    - { n: Answer, title: print it back, body: The board sends your message straight back and waits for the next. }
-  formulaLabel: The loop
-  formula: "**check** → **read a line** → **answer** → wait"
+    - n: "1 · Same wires"
+      title: The direction reverses
+      body: Nothing new is wired. The two data wires that sent readings out yesterday now carry each key you press back to the board.
+    - n: "2 · Into a buffer"
+      title: Characters wait to be read
+      body: A typed character crosses the cable and lands in the board's receive buffer — a small queue — one byte at a time, whether or not the loop is ready for it.
+    - n: "3 · How many waiting"
+      title: available() counts
+      body: Serial.available() reports how many bytes are sitting in that buffer right now. Zero means nothing has arrived yet.
+    - n: "4 · Take one out"
+      title: read() empties it
+      body: Serial.read() removes the next byte and hands it to your code. readStringUntil is that same read run in a loop until it reaches your Enter key.
+    - n: "5 · From byte to command"
+      title: Decide what it means
+      body: Each byte is a character code — the letter A arrives as the number 65. Compare it or convert it to a number, and the board can act on what you typed.
+  formulaLabel: The path in
+  formula: "**characters land in a buffer** → **available() counts** → **read() takes one** → **your code acts on it**"
   notes:
-    - title: Why check before reading
+    - title: Why check available() before you read
       explain: serialAvailable
-      body: Reading when nothing has arrived would just return empty. available() lets the board wait for real input instead.
-    - title: What readStringUntil does
+      body: Calling read() on an empty buffer returns -1, its stand-in for nothing here. Checking available() first means the board waits for real input instead of mistaking that -1 for something you sent.
+    - title: Bytes arrive, not words
       explain: serialRead
-      body: It gathers characters until the newline you send with Enter, so the board gets one whole message rather than single letters.
+      body: The board receives raw character codes one at a time, so a five-letter word is five separate bytes. readStringUntil gathers them up to your Enter key into one whole message; a comparison or toInt() then turns that message into something to act on.
 
 test:
   mode: serial
@@ -179,34 +200,38 @@ test:
       fix: "Swap in a data-capable USB cable."
 
 challenge:
-  title: "Try this: make it a real reply"
+  title: "Try this: make it obey a command"
   railLabel: Try this
   intro: >
-    Same working sketch, no wiring — change what the board says back. It fits
-    inside today's 15 minutes.
-  summary: Change the reply so the board wraps your message in words of its own, then make it react to one specific word.
+    Echoing text proves the board read you. Making it do something proves it can
+    take orders. The onboard LED needs no wiring, so you can turn your typed words
+    into a physical action without touching a single wire.
+  summary: Add the onboard LED to the sketch, then make the board switch it with the word you type — first as an on/off command, then by acting on a typed number.
   cards:
-    - title: Wrap the echo
-      explain: serialPrint
-      body: 'Change the reply text so the board answers with something like `You said: hello` instead of the plain `inputString:` label.'
-    - title: React to a word
-      explain: serialRead
-      body: Add an `if (inputString == "ping")` check that answers `pong` — the first hint of a board that follows commands.
+    - title: Turn a word into an action
+      explain: digitalWrite
+      body: 'In setup() add `pinMode(LED_BUILTIN, OUTPUT)`. In the loop, where the message is ready, add `if (inputString == "on") digitalWrite(LED_BUILTIN, HIGH);` and an `off` line that writes LOW. Type on or off and the onboard LED follows your command — the board acting on words, no wiring.'
+    - title: Act on a typed value
+      explain: ledBuiltin
+      body: Replace the word check with `int n = inputString.toInt();` and blink the onboard LED n times. Now a number you type drives real behaviour, and you have watched raw characters become a value the board acts on — exactly the byte-to-command step from the theory.
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent can
     guide you with full context.
   behaviour: >
-    keep it to upload-type-read, check board, port, cable, baud rate, and the
-    Newline line ending before touching code, and explain available, readStringUntil,
-    and trim on request.
+    keep the core loop to upload-type-read, and check board, port, cable, baud
+    rate, and the Newline line ending before touching code. On request, explain
+    how input arrives — characters landing in a receive buffer, available()
+    counting them, read() taking one at a time, and read() returning -1 on an
+    empty buffer — so the learner sees why the sketch checks before it reads.
   coachInstructions:
-    - Keep the day to upload, type, and read the reply; there is nothing to wire.
-    - If nothing echoes back, the Newline line ending is the first thing to check — the board waits for it to end a message.
-    - If text is garbled, confirm the baud rate is 115200; if the monitor is blank at start, check board and port and press reset.
-    - Explain that the same USB cable now carries words both ways; do not front-load theory.
-    - For the challenge, change only the reply text or add a single word check, preserving the working loop.
+    - Keep the working day to upload, type, and read the reply; there is nothing to wire.
+    - Teach the mechanism when asked - typed characters land in the board's receive buffer one byte at a time, available() reports how many are waiting, and read() takes one out.
+    - Explain why the check comes first - read() on an empty buffer returns -1, so available() lets the board wait for real input instead of acting on that -1.
+    - Point out that bytes arrive as character codes (A is 65), which is why readStringUntil gathers a whole line and why toInt() or a comparison is what turns input into a command.
+    - If nothing echoes back, the Newline line ending is the first thing to check — the board waits for it to end a message; if text is garbled, confirm 115200 baud; if the monitor is blank at start, check board and port and press reset.
+    - For the challenge, keep the working read loop and add to it - a word check that switches the onboard LED, then toInt() to act on a typed number; the onboard LED needs no wiring.
     - Keep the Arduino path primary; MicroPython's input() reads from Thonny's shell and is optional only if already set up.
 
 source:

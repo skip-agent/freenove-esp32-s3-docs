@@ -212,10 +212,18 @@ theory:
     shrinks that to two signals, because I2C sends everything as addressed
     messages down a shared pair.
   flow:
-    - { n: One bus, title: Two shared wires, body: SDA carries the data while SCL keeps the beat for both ends. }
-    - { n: Address, title: 0x27 or 0x3F, body: Every device on the bus has a number so the board can call this one by name. }
-    - { n: Translate, title: The backpack chip, body: It turns bus messages into the many parallel signals the bare LCD needs. }
-    - { n: Print, title: Cursor then text, body: The sketch parks the cursor at a row and column and writes characters there. }
+    - n: "One bus"
+      title: "Two shared wires"
+      body: "SDA carries the data while SCL keeps the beat for both ends."
+    - n: "Address"
+      title: "0x27 or 0x3F"
+      body: "Every device on the bus has a number so the board can call this one by name."
+    - n: "Translate"
+      title: "The backpack chip"
+      body: "It turns bus messages into the many parallel signals the bare LCD needs."
+    - n: "Print"
+      title: "Cursor then text"
+      body: "The sketch parks the cursor at a row and column and writes characters there."
   formulaLabel: The model
   formula: two wires → **address** → cursor position → characters
   notes:

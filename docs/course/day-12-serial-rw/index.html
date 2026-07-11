@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Day 12 · Type to the board, hear it answer — TinySkiff ESP32-S3 Lab</title>
-  <meta name="description" content="Type into Serial Monitor and watch the ESP32-S3 read your message and echo it back. No wiring — just Serial.available and readStringUntil turning USB two-way." />
+  <meta name="description" content="Type into Serial Monitor and watch the ESP32-S3 read your message and echo it back. Learn how input arrives byte by byte in a receive buffer, why you check Serial.available before reading, and how typed characters become commands." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -16,10 +16,10 @@
       <div class="hero-copy">
         <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 12 of 30</p>
         <h1>Type to the board<br />hear it <em>answer</em></h1>
-        <p class="lede">Yesterday the board only talked. Today it listens. You upload a short sketch, type a message into Serial Monitor, and the ESP32-S3 reads what you sent and sends it right back — the same USB cable now carrying words in both directions.
+        <p class="lede">Yesterday the board only talked. Today it listens. The same two USB wires that carried its readings out now carry your keystrokes back in — each character landing in a small buffer on the board, waiting there until the sketch reads it. Once your code can read what you type, it can act on it, and the board becomes something you steer while it runs.
 </p>
         <div class="meta-row" aria-label="Lesson facts">
-          <span class="pill is-key">About 15 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">No wiring today</span>
+          <span class="pill is-key">About 20 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">No wiring today</span>
         </div>
       </div>
       <div class="hero-side no-instrument">
@@ -45,7 +45,7 @@
           <a href="#parts"><span class="tick"></span>What you need</a>
           <a href="#steps"><span class="tick"></span>Build it</a>
           <a href="#code"><span class="tick"></span>Read the code</a>
-          <a href="#theory"><span class="tick"></span>Listening as well as talking</a>
+          <a href="#theory"><span class="tick"></span>How your keystrokes reach the board</a>
           <a href="#test"><span class="tick"></span>Test &amp; debug</a>
           <a href="#challenge"><span class="tick"></span>Try this</a>
           <a href="#agent"><span class="tick"></span>Coach me</a>
@@ -135,10 +135,10 @@
   }
 }</code></pre>
                 <div class="code-notes">
-                  <div class="code-note"><code>Serial.available()</code><span class="note-text">Checks whether you&#x27;ve sent any characters yet, so the board reads only when there&#x27;s something waiting. <button class="define" data-topic="serialAvailable">Define</button></span></div>
-                  <div class="code-note"><code>Serial.readStringUntil(&#x27;\n&#x27;)</code><span class="note-text">Gathers what you typed up to the Enter key into one complete message. <button class="define" data-topic="serialRead">Define</button></span></div>
-                  <div class="code-note"><code>inputString.trim()</code><span class="note-text">Trims the stray newline and spaces off the ends so the echo is clean.</span></div>
-                  <div class="code-note"><code>Serial.printf(&quot;inputString: %s\r\n&quot;, inputString.c_str())</code><span class="note-text">Sends your message straight back, then the sketch clears it and waits for the next one. <button class="define" data-topic="serialPrint">Define</button></span></div>
+                  <div class="code-note"><code>Serial.available()</code><span class="note-text">Reports how many of your characters are sitting in the receive buffer, so the board reads only when something has actually arrived rather than acting on an empty read. <button class="define" data-topic="serialAvailable">Define</button></span></div>
+                  <div class="code-note"><code>Serial.readStringUntil(&#x27;\n&#x27;)</code><span class="note-text">Pulls characters out of the buffer one after another and stops at the Enter key, handing you one whole message instead of loose bytes. <button class="define" data-topic="serialRead">Define</button></span></div>
+                  <div class="code-note"><code>inputString.trim()</code><span class="note-text">Trims the stray newline and spaces off the ends so the message you act on is exactly what you typed.</span></div>
+                  <div class="code-note"><code>Serial.printf(&quot;inputString: %s\r\n&quot;, inputString.c_str())</code><span class="note-text">Sends your message straight back as proof it was read, then the sketch clears its variable and waits for the next line. <button class="define" data-topic="serialPrint">Define</button></span></div>
                 </div>
               </div>
             </div>
@@ -166,23 +166,24 @@ while True:
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">04</span> Understand, don&#x27;t memorise</p>
-              <h2>Listening as well as talking</h2>
-              <p class="muted">Yesterday&#x27;s cable only carried the board&#x27;s voice out. The same wires carry your words back in; the sketch just has to check for them and read a full line.
+              <h2>How your keystrokes reach the board</h2>
+              <p class="muted">Yesterday the cable carried the board&#x27;s voice out. The reverse trip is the whole idea today, and it does not happen the way you might picture. The board is not watching your keyboard. Your characters arrive on their own schedule and pile up in a small holding area until the sketch gets around to reading them. Understanding that gap between arriving and being read is what makes input reliable.
 </p>
             </div>
             <div class="theory-flow" aria-label="Measurement model">
-              <article class="flow-step"><span class="n">Anything there</span><h3>available()</h3><p>The board asks whether you&#x27;ve sent characters before it tries to read.</p></article>
-              <article class="flow-step"><span class="n">Read a line</span><h3>readStringUntil</h3><p>It collects your characters up to the Enter key into one message.</p></article>
-              <article class="flow-step"><span class="n">Tidy it</span><h3>trim()</h3><p>Stray newline and spaces come off the ends so the message is clean.</p></article>
-              <article class="flow-step"><span class="n">Answer</span><h3>print it back</h3><p>The board sends your message straight back and waits for the next.</p></article>
+              <article class="flow-step"><span class="n">1 · Same wires</span><h3>The direction reverses</h3><p>Nothing new is wired. The two data wires that sent readings out yesterday now carry each key you press back to the board.</p></article>
+              <article class="flow-step"><span class="n">2 · Into a buffer</span><h3>Characters wait to be read</h3><p>A typed character crosses the cable and lands in the board&#x27;s receive buffer — a small queue — one byte at a time, whether or not the loop is ready for it.</p></article>
+              <article class="flow-step"><span class="n">3 · How many waiting</span><h3>available() counts</h3><p>Serial.available() reports how many bytes are sitting in that buffer right now. Zero means nothing has arrived yet.</p></article>
+              <article class="flow-step"><span class="n">4 · Take one out</span><h3>read() empties it</h3><p>Serial.read() removes the next byte and hands it to your code. readStringUntil is that same read run in a loop until it reaches your Enter key.</p></article>
+              <article class="flow-step"><span class="n">5 · From byte to command</span><h3>Decide what it means</h3><p>Each byte is a character code — the letter A arrives as the number 65. Compare it or convert it to a number, and the board can act on what you typed.</p></article>
             </div>
             <div class="formula-card">
-              <span class="label">The loop</span>
-              <code><b>check</b> → <b>read a line</b> → <b>answer</b> → wait</code>
+              <span class="label">The path in</span>
+              <code><b>characters land in a buffer</b> → <b>available() counts</b> → <b>read() takes one</b> → <b>your code acts on it</b></code>
             </div>
             <div class="two-col" style="margin-top:14px">
-              <article class="mini-card"><h3>Why check before reading <button class="define" data-topic="serialAvailable">Define</button></h3><p>Reading when nothing has arrived would just return empty. available() lets the board wait for real input instead.</p></article>
-              <article class="mini-card"><h3>What readStringUntil does <button class="define" data-topic="serialRead">Define</button></h3><p>It gathers characters until the newline you send with Enter, so the board gets one whole message rather than single letters.</p></article>
+              <article class="mini-card"><h3>Why check available() before you read <button class="define" data-topic="serialAvailable">Define</button></h3><p>Calling read() on an empty buffer returns -1, its stand-in for nothing here. Checking available() first means the board waits for real input instead of mistaking that -1 for something you sent.</p></article>
+              <article class="mini-card"><h3>Bytes arrive, not words <button class="define" data-topic="serialRead">Define</button></h3><p>The board receives raw character codes one at a time, so a five-letter word is five separate bytes. readStringUntil gathers them up to your Enter key into one whole message; a comparison or toInt() then turns that message into something to act on.</p></article>
             </div>
           </div>
         </section>
@@ -219,13 +220,13 @@ while True:
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">06</span> Make the idea yours</p>
-              <h2>Try this: make it a real reply</h2>
-              <p class="muted">Same working sketch, no wiring — change what the board says back. It fits inside today&#x27;s 15 minutes.
+              <h2>Try this: make it obey a command</h2>
+              <p class="muted">Echoing text proves the board read you. Making it do something proves it can take orders. The onboard LED needs no wiring, so you can turn your typed words into a physical action without touching a single wire.
 </p>
             </div>
             <div class="two-col">
-              <article class="mini-card"><h3>Wrap the echo <button class="define" data-topic="serialPrint">Define</button></h3><p>Change the reply text so the board answers with something like <code>You said: hello</code> instead of the plain <code>inputString:</code> label.</p></article>
-              <article class="mini-card"><h3>React to a word <button class="define" data-topic="serialRead">Define</button></h3><p>Add an <code>if (inputString == &quot;ping&quot;)</code> check that answers <code>pong</code> — the first hint of a board that follows commands.</p></article>
+              <article class="mini-card"><h3>Turn a word into an action <button class="define" data-topic="digitalWrite">Define</button></h3><p>In setup() add <code>pinMode(LED_BUILTIN, OUTPUT)</code>. In the loop, where the message is ready, add <code>if (inputString == &quot;on&quot;) digitalWrite(LED_BUILTIN, HIGH);</code> and an <code>off</code> line that writes LOW. Type on or off and the onboard LED follows your command — the board acting on words, no wiring.</p></article>
+              <article class="mini-card"><h3>Act on a typed value <button class="define" data-topic="ledBuiltin">Define</button></h3><p>Replace the word check with <code>int n = inputString.toInt();</code> and blink the onboard LED n times. Now a number you type drives real behaviour, and you have watched raw characters become a value the board acts on — exactly the byte-to-command step from the theory.</p></article>
             </div>
           </div>
         </section>
@@ -243,7 +244,7 @@ while True:
             </div>
             <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
               <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
-              <p><strong>How the agent should behave:</strong> keep it to upload-type-read, check board, port, cable, baud rate, and the Newline line ending before touching code, and explain available, readStringUntil, and trim on request.
+              <p><strong>How the agent should behave:</strong> keep the core loop to upload-type-read, and check board, port, cable, baud rate, and the Newline line ending before touching code. On request, explain how input arrives — characters landing in a receive buffer, available() counting them, read() taking one at a time, and read() returning -1 on an empty buffer — so the learner sees why the sketch checks before it reads.
 </p>
             </div>
           </div>
@@ -287,7 +288,7 @@ while True:
 
   <div class="toast" id="toast">Prompt copied</div>
 
-  <script id="lesson-data" type="application/json">{"day": 12, "totalDays": 30, "slug": "day-12-serial-rw", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "serial": {"title": "Serial Monitor", "body": "Serial Monitor is a text window in Arduino IDE. The board can print messages to it over USB. Here, it prints the measured distance so you can see what the sensor is doing.\n", "shortcut": "If the window is blank, check that the baud rate is 115200."}, "serialAvailable": {"title": "Serial.available()", "body": "Serial.available() asks whether the computer has sent any characters the board hasn't read yet. It returns how many are waiting, so the loop only tries to read when something has actually arrived.\n", "shortcut": "Check available() before reading, so the board waits for input instead of reading nothing."}, "serialPrint": {"title": "Serial.println() and printf()", "body": "Serial.println() sends a line of text to the computer and moves to the next line. Serial.printf() does the same but fills in values first — %.1f drops a number in with one decimal place — so the board can report live readings.\n", "shortcut": "println() sends plain lines; printf() slots numbers into a template before sending."}, "serialRead": {"title": "Serial.readStringUntil()", "body": "readStringUntil('\\n') collects incoming characters into a string and stops at the newline you send when you press Enter. That gives the board one complete message to work with instead of a scatter of single letters.\n", "shortcut": "It gathers what you typed up to the Enter key into one whole message."}, "sketch": {"title": "Official sketch", "body": "A sketch is the Arduino name for a program. This lesson uses Freenove's Sketch_19.1_Ultrasonic_Ranging.ino so you can focus first on wiring, observation, and the measurement model.\n", "shortcut": "Treat the sketch as a working example to read and modify, not a spell to copy blindly."}}, "prev": {"day": 11, "slug": "day-11-serial-print", "title": "Make the board talk back"}, "next": {"day": 13, "slug": "day-13-adc", "title": "Read a knob as a number"}}</script>
+  <script id="lesson-data" type="application/json">{"day": 12, "totalDays": 30, "slug": "day-12-serial-rw", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "digitalWrite": {"title": "digitalWrite()", "body": "digitalWrite() sets a pin fully on or fully off. HIGH puts voltage on the pin (LED on); LOW removes it (LED off). It is the simplest way for code to change something in the physical world.\n", "shortcut": "HIGH = on, LOW = off. No in-between — that is what PWM is for later."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "ledBuiltin": {"title": "The onboard LED", "body": "Most ESP32-S3 boards have a small LED wired to a GPIO pin at the factory, so you can prove code runs without wiring anything. In this sketch it is named LED_BUILTIN, which stands for GPIO 2 on this board.\n", "shortcut": "Look for the small LED near the chip — not the steady power LED."}, "serial": {"title": "Serial Monitor", "body": "Serial Monitor is a text window in Arduino IDE. The board can print messages to it over USB. Here, it prints the measured distance so you can see what the sensor is doing.\n", "shortcut": "If the window is blank, check that the baud rate is 115200."}, "serialAvailable": {"title": "Serial.available()", "body": "Serial.available() asks whether the computer has sent any characters the board hasn't read yet. It returns how many are waiting, so the loop only tries to read when something has actually arrived.\n", "shortcut": "Check available() before reading, so the board waits for input instead of reading nothing."}, "serialPrint": {"title": "Serial.println() and printf()", "body": "Serial.println() sends a line of text to the computer and moves to the next line. Serial.printf() does the same but fills in values first — %.1f drops a number in with one decimal place — so the board can report live readings.\n", "shortcut": "println() sends plain lines; printf() slots numbers into a template before sending."}, "serialRead": {"title": "Serial.readStringUntil()", "body": "readStringUntil('\\n') collects incoming characters into a string and stops at the newline you send when you press Enter. That gives the board one complete message to work with instead of a scatter of single letters.\n", "shortcut": "It gathers what you typed up to the Enter key into one whole message."}, "sketch": {"title": "Official sketch", "body": "A sketch is the Arduino name for a program. This lesson uses Freenove's Sketch_19.1_Ultrasonic_Ranging.ino so you can focus first on wiring, observation, and the measurement model.\n", "shortcut": "Treat the sketch as a working example to read and modify, not a spell to copy blindly."}}, "prev": {"day": 11, "slug": "day-11-serial-print", "title": "Make the board talk back"}, "next": {"day": 13, "slug": "day-13-adc", "title": "Read a knob as a number"}}</script>
   <script src="../course.js"></script>
 </body>
 </html>

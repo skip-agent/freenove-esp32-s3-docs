@@ -109,8 +109,8 @@
             <div class="theory-flow" aria-label="Measurement model">
               <article class="flow-step"><span class="n">1 · Compile</span><h3>Text to machine code</h3><p>Your readable C++ is translated into raw instructions built for the ESP32-S3. This is what the board package enabled.</p></article>
               <article class="flow-step"><span class="n">2 · Enter</span><h3>Download mode</h3><p>The IDE pulses the board into the bootloader — the small program that listens for new code instead of running the old one.</p></article>
-              <article class="flow-step"><span class="n">3 · Flash</span><h3>Write to storage</h3><p>The compiled bytes travel down USB and are written into flash</p></article>
-              <article class="flow-step"><span class="n">4 · Run</span><h3>Reset and go</h3><p>The board restarts</p></article>
+              <article class="flow-step"><span class="n">3 · Flash</span><h3>Write to storage</h3><p>The compiled bytes travel down USB and are written into flash, the board&#x27;s permanent storage.</p></article>
+              <article class="flow-step"><span class="n">4 · Run</span><h3>Reset and go</h3><p>The board restarts, the bootloader hands over, and your fresh program runs — and keeps running with the power off and on.</p></article>
             </div>
             <div class="formula-card">
               <span class="label">The chain</span>

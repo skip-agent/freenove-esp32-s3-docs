@@ -148,10 +148,18 @@ theory:
     Strip away the scale, and every connection on the internet is this same
     four-beat exchange. Today it happens entirely inside your own router.
   flow:
-    - { n: Join,   title: Station mode,     body: The board joins your Wi-Fi and the router hands it an address. }
-    - { n: Listen, title: A door opens,     body: server.begin() waits at port 80 — one numbered door at that address. }
-    - { n: Dial,   title: The client calls, body: Your computer knocks with the exact IP and port the monitor printed. }
-    - { n: Talk,   title: One shared line,  body: Both ends read and write the same stream until one hangs up. }
+    - n: "Join"
+      title: "Station mode"
+      body: "The board joins your Wi-Fi and the router hands it an address."
+    - n: "Listen"
+      title: "A door opens"
+      body: "server.begin() waits at port 80 — one numbered door at that address."
+    - n: "Dial"
+      title: "The client calls"
+      body: "Your computer knocks with the exact IP and port the monitor printed."
+    - n: "Talk"
+      title: "One shared line"
+      body: "Both ends read and write the same stream until one hangs up."
   formulaLabel: The model
   formula: "**server** listens at an address and port → **client** dials it → one shared line"
   notes:

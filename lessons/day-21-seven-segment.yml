@@ -218,10 +218,19 @@ theory:
     on-off pattern and your eye reads a character — the code table is just
     sixteen of those patterns, stored and ready.
   flow:
-    - { n: Eight lights, title: Eight bits, body: Segments A through G plus the decimal point line up with the eight bits of one byte. }
-    - { n: Zero lights, title: Common anode, body: All segments share the positive rail so a 0 bit pulls its segment low and lights it., explain: commonAnode }
-    - { n: Look it up, title: The code table, body: The table stores one ready-made pattern per character from 0 to F. }
-    - { n: Deliver it, title: Shift and latch, body: The 74HC595 from Day 20 carries the byte in on three wires and holds it on eight outputs. }
+    - n: "Eight lights"
+      title: "Eight bits"
+      body: "Segments A through G plus the decimal point line up with the eight bits of one byte."
+    - n: "Zero lights"
+      title: "Common anode"
+      body: "All segments share the positive rail so a 0 bit pulls its segment low and lights it."
+      explain: commonAnode
+    - n: "Look it up"
+      title: "The code table"
+      body: "The table stores one ready-made pattern per character from 0 to F."
+    - n: "Deliver it"
+      title: "Shift and latch"
+      body: "The 74HC595 from Day 20 carries the byte in on three wires and holds it on eight outputs."
   formulaLabel: The model
   formula: character → **one byte** → eight segments → a shape you can read
   notes:

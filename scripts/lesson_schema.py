@@ -317,25 +317,35 @@ def validate_lesson(lesson: dict, glossary_keys: set[str]) -> list[str]:
         if raw is not None and not isinstance(raw, list):
             err(f"{name} must be a list")
 
-    # Lists of mappings — each item must be a mapping with its required fields.
+    # Lists of mappings — each item must be a mapping with its required fields,
+    # and no keys beyond the allowed set. The stray-key guard catches inline
+    # `{ n: .., title: .., body: prose, with, commas }` flow items where an
+    # unquoted comma in a value silently splits the prose into phantom keys and
+    # truncates the rendered text — a required-field check alone would miss it,
+    # since the truncated value is still non-empty. Use block style or quote any
+    # value containing a comma.
     mapping_specs = {
-        "wiring.safety": (_as_list(_as_dict(lesson.get("wiring")).get("safety")), ("label", "body")),
-        "code.arduino.notes": (_as_list(arduino.get("notes")), ("code", "text")),
-        "code.micropython.notes": (_as_list(micro.get("notes")), ("code", "text")),
-        "test.checks": (_as_list(test.get("checks")), ("symptom", "fix")),
-        "challenge.cards": (_as_list(challenge.get("cards")), ("title", "body")),
+        "wiring.safety": (_as_list(_as_dict(lesson.get("wiring")).get("safety")), ("label", "body"), ("label", "body", "icon")),
+        "code.arduino.notes": (_as_list(arduino.get("notes")), ("code", "text"), ("code", "text", "explain")),
+        "code.micropython.notes": (_as_list(micro.get("notes")), ("code", "text"), ("code", "text", "explain")),
+        "test.checks": (_as_list(test.get("checks")), ("symptom", "fix"), ("symptom", "fix")),
+        "challenge.cards": (_as_list(challenge.get("cards")), ("title", "body"), ("title", "body", "explain")),
     }
     if theory is not None:
         theory_d = _as_dict(theory)
-        mapping_specs["theory.flow"] = (_as_list(theory_d.get("flow")), ("n", "title", "body"))
-        mapping_specs["theory.notes"] = (_as_list(theory_d.get("notes")), ("title", "body"))
-    for name, (items, req_fields) in mapping_specs.items():
+        mapping_specs["theory.flow"] = (_as_list(theory_d.get("flow")), ("n", "title", "body"), ("n", "title", "body", "explain"))
+        mapping_specs["theory.notes"] = (_as_list(theory_d.get("notes")), ("title", "body"), ("title", "body", "explain"))
+    for name, (items, req_fields, allowed_fields) in mapping_specs.items():
         for i, item in enumerate(items):
             if not _require_mapping(item, f"{name}[{i}]"):
                 continue
             for field in req_fields:
                 _require(errors, _nonempty(item.get(field)),
                          f"{code}: {name}[{i}].{field} is required")
+            stray = sorted(set(item.keys()) - set(allowed_fields))
+            _require(errors, not stray,
+                     f"{code}: {name}[{i}] has unexpected key(s) {stray} — "
+                     f"likely an unquoted comma splitting a value; use block style or quote it")
 
     # Lists of plain strings the renderer emits — each entry must be real text.
     string_lists = {

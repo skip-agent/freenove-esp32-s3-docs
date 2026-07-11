@@ -1,7 +1,7 @@
 # Day 16 — Soft colourful light · tinyskiff.lesson.v1
 # One source of truth: this file renders to the guided page
 # (/course/day-16-soft-colour/), the agent packet, and the course-map entry.
-# Day 15's knob times three — three inputs mapped straight onto three colour channels.
+# The heart of it is map() — rescaling three knob readings onto three colour channels.
 
 schema: tinyskiff.lesson.v1
 lessonCode: TSK-DAY16-SOFTCOLOUR
@@ -15,9 +15,11 @@ learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
   Wire three knobs to three input pins and the RGB LED to three PWM pins, upload
-  the Arduino sketch, and turn the knobs to mix any colour by hand — a small
-  mixing desk where each knob owns one channel of light.
-unlocks: One loop can run three read-map-write chains side by side, so a few lines of code control a whole bank of channels at once.
+  the Arduino sketch, and turn the knobs to mix any colour by hand. Under the
+  colours sits the real lesson — map(), the single line that rescales one range
+  onto another, so a knob reading of 0 to 4095 can drive a colour channel of 0
+  to 255.
+unlocks: You can read map() as plain proportional arithmetic and match its input ends to a sensor's real span, so any reading drives its output across the full range.
 seoDescription: >
   Wire three potentiometers and an RGB LED to the ESP32-S3, upload the sketch,
   and mix colours by hand — each knob maps its reading onto one PWM colour
@@ -27,15 +29,16 @@ hero:
   instrument: none
   headline: Mix your own colour|with three {knobs}
   lede: >
-    Today the colour mixing moves into your hands. Three knobs each feed a reading
-    to the board, and each reading sets the brightness of one colour in the RGB
-    dome — red, green, and blue on their own channels. Turn them together and you
-    are mixing light the way a deckhand trims three sheets at once.
+    Today the colour mixing moves into your hands. Three knobs each feed a
+    reading to the board, and one line of arithmetic — map() — rescales each
+    reading onto one colour's brightness, red, green, and blue on their own
+    channels. Learn how that one line works and you hold the move that turns any
+    sensor into any output for the rest of the course.
   pills:
     - { text: About 25 minutes, key: true }
     - Arduino first
     - MicroPython optional
-    - Day 9's dome meets Day 15's knob
+    - Day 13's reading meets Day 9's dome
 
 parts:
   intro: >
@@ -141,9 +144,11 @@ steps:
 
 code:
   intro: >
-    Day 15 built one chain — read a knob, rescale it, write a brightness. Today
-    the sketch runs that chain three times per pass using three small arrays and
-    one loop. Switch to MicroPython if you'd rather see the same idea in Python —
+    Day 15 ran one chain — read a knob, write a brightness — and its two scales
+    happened to match, so it needed no map() call. A colour channel runs 0 to
+    255 while the knob runs 0 to 4095, so today every pass leans on map() to
+    rescale. Three small arrays and one loop run all three channels in a few
+    lines. Switch to MicroPython if you'd rather see the same idea in Python —
     the wiring never changes.
   arduino:
     file: Sketch_10.2_SoftColorfulLight.ino
@@ -171,7 +176,7 @@ code:
         text: Three matched arrays pair each knob with a colour leg — position 0 links the knob on 12 to the red leg on 38 and so on down the line.
         explain: pinArray
       - code: colors[i] = map(analogRead(adcChns[i]), 0, 4096, 0, 255)
-        text: Reads one knob (0–4095) and rescales it onto the 0–255 brightness range in a single line.
+        text: Reads one knob and rescales it proportionally — where the reading sits between 0 and 4096 is where the colour value lands between 0 and 255.
         explain: mapValue
       - code: ledcWrite(ledPins[i], 256 - colors[i])
         text: Day 9's common-anode inversion — this dome lights when its pin goes LOW so the sketch subtracts the value before writing it.
@@ -205,26 +210,52 @@ code:
       Arduino-first path.
 
 theory:
-  title: Three chains, one loop
-  summary: The same read-map-write chain runs three times per pass — arrays hold the pin numbers and the loop walks them.
+  title: How map() turns a reading into a colour
+  summary: map() finds where a number sits in its input range and drops it at the same spot in the output range — plain proportional arithmetic.
   intro: >
-    Day 15's single control chain — read the knob, rescale the number, write the
-    brightness — appears here three times over, copied by a loop over three
-    arrays.
+    A knob hands you a number from 0 to 4095. A colour channel wants a number
+    from 0 to 255. map() is the one line that bridges the two, and it is the same
+    move behind turning any sensor reading into any output. Day 13 gave you the
+    reading, Day 9 gave you the channel, and map() is the adapter between them.
   flow:
-    - { n: Read three, title: Knobs in, body: analogRead measures each knob on GPIO 12 13 14 every pass. }
-    - { n: Rescale, title: map(), body: Each reading up to 4095 becomes a colour value from 0 to 255. }
-    - { n: Invert, title: 256 minus, body: The common-anode dome lights when its pin goes LOW so the sketch flips the scale before writing. }
-    - { n: Repeat, title: Every 10 ms, body: The loop refreshes all three channels fast enough that the colour rides your hands. }
-  formulaLabel: The model
-  formula: '**colour** = three knob readings → three mapped brightnesses'
+    - n: "In"
+      title: "The reading"
+      body: "analogRead hands back a number from 0 to 4095 — where the knob sits between ground and 3.3V."
+    - n: "Fraction"
+      title: "How far along"
+      body: "map asks where that number sits in its input span as a fraction — halfway up the knob is halfway along 0 to 4096."
+    - n: "Out"
+      title: "Same spot, other scale"
+      body: "It places that same fraction on the output span, so halfway lands at about 128 out of 255."
+    - n: "Colour"
+      title: "Brightness"
+      body: "That 0-to-255 number is the PWM level for one colour leg, and the loop repeats it for red, green, and blue every pass."
+  formulaLabel: The arithmetic
+  formula: "**out** = outLow + (value − inLow) × (outHigh − outLow) ÷ (inHigh − inLow)"
   notes:
-    - title: Why arrays and a loop
-      explain: pinArray
-      body: Writing the pins as three matched arrays lets one loop serve every channel. Adding a fourth channel would mean one more entry in each array and nothing else.
-    - title: The same inversion as Day 9
-      explain: commonAnode
-      body: The common pin sits at 3.3V, so a colour is brightest when its own pin is pulled LOW. Subtracting the value from 256 flips the scale so a bigger knob reading still means a brighter colour.
+    - title: Match the input ends to the real reading
+      explain: mapValue
+      body: >
+        The input ends should be the smallest and largest numbers the sensor
+        truly reaches. Claim a top of 4096 when the knob only reaches 3600 and
+        the colour never quite hits full. Claim a top of 2048 when the knob
+        reaches 4095 and everything past halfway pins at full and stops changing.
+        The output uses its whole range only when the input ends are honest about
+        the reading.
+    - title: map() rescales, it does not clamp
+      explain: adc
+      body: >
+        map() is straight proportional arithmetic, so a reading outside the
+        stated input range lands outside the output range too. When a value might
+        stray past its ends, fence it with constrain() first — the pairing you
+        met in Day 15's glossary.
+    - title: Where 4096 and 255 come from
+      explain: pwm
+      body: >
+        4096 is the top of the ADC's 12-bit scale and 255 is the top of an 8-bit
+        PWM channel, so this map squeezes a 4096-step reading down onto a
+        256-step brightness. Change the chip or the settings and those numbers
+        move, and map() still only needs the four ends.
 
 test:
   mode: visual
@@ -250,34 +281,38 @@ test:
       fix: "Swap in a data-capable USB cable."
 
 challenge:
-  title: "Try this: dial a sunset"
+  title: "Try this: bend the mapping"
   railLabel: Try this
   intro: >
-    Same working circuit, two experiments — one with your hands, one with a
-    single line of code. It fits inside today's 25 minutes.
-  summary: Dial the dome to sunset orange and record the three knob levels, then rewrite one line so two knobs mix the whole colour.
+    Same working circuit, two one-line edits to the red channel — each one puts
+    a different pair of map()'s numbers under your hands. Both fit inside today's
+    25 minutes.
+  summary: Swap red's output ends to run the colour backwards, then narrow red's input top and watch the top of the knob's travel clip at full.
   cards:
-    - title: Dial a sunset
-      explain: rgb
-      body: Turn the knobs until the dome glows sunset orange — red high, green partway, blue low. Write down roughly where each knob sits, as three numbers from 0 to 255.
-    - title: Two-knob mixer
-      explain: pinArray
-      body: In the loop, make the blue channel reuse the green knob's value — set `colors[2] = colors[1]` after the map line — and the mix now lives on two knobs.
+    - title: Reverse one channel
+      explain: mapValue
+      body: "On the map line, swap red's output ends — write `map(analogRead(adcChns[0]), 0, 4096, 255, 0)`. Turning the red knob up now dims red instead of raising it. The output ends are simply the two numbers you choose, and swapping them runs the colour the other way."
+    - title: Narrow the input
+      explain: adc
+      body: "Put the ends back, then drop red's input top from 4096 to 2048 — `map(analogRead(adcChns[0]), 0, 2048, 0, 255)`. Red now reaches full by the knob's halfway point and holds there across the whole top half. That dead travel is what a mismatched input range costs — set the ends to the numbers the knob really reaches."
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent can
     guide you with full context.
   behaviour: >
-    guide one physical connection at a time, wait for you to confirm, explain the
-    knob-to-colour pairing on request, and always check wiring, board, port, and
-    USB before changing code.
+    guide one physical connection at a time, wait for confirmation, and teach
+    map() as proportional arithmetic — where a reading sits in its input range is
+    where it lands in the output range. Always check wiring, board, port, and USB
+    before changing code.
   coachInstructions:
+    - Land the core idea early — map(value, inLow, inHigh, outLow, outHigh) drops a reading at the same fraction of the output range as it sits in the input range, and here it rescales a 0 to 4095 knob onto a 0 to 255 colour channel.
+    - Show the composition — Day 13's analogRead gives the number, Day 9's RGB channel takes the brightness, and map() is the adapter between them.
     - Anchor the pairing early — knob on GPIO 12 drives red on 38, 13 drives green on 39, 14 drives blue on 40 — and have the learner say it back before debugging.
     - If one colour never changes, check that knob's middle wire on 12/13/14 and its outer legs on 3.3V and GND before touching code.
-    - If turning a knob moves the wrong colour, the RGB legs are swapped on 38/39/40 — fix the order rather than the sketch.
-    - If the dome is always dark, check the common pin reaches 3.3V; also confirm all three knobs turned down is correct dark behaviour before treating it as a fault.
-    - The 256-minus inversion is Day 9's common-anode trick — explain it on request and keep the sketch's map upper bound of 4096 exactly as written.
+    - If turning a knob moves the wrong colour, the RGB legs are swapped on 38/39/40 — fix the wiring order rather than the sketch.
+    - The 256-minus write is Day 9's common-anode inversion and stands apart from the mapping — explain it on request and keep the sketch's map input top of 4096 exactly as written.
+    - For the challenge, swapping map's output ends reverses a channel and narrowing its input top clips the top of the knob's travel — both are one-line edits that show what the four map() numbers do.
     - Keep the Arduino path primary; MicroPython pairs the knobs to colours in reverse order (12 drives 40) and that difference is expected, so never "fix" it.
 
 source:

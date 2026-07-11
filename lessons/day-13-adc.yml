@@ -9,15 +9,17 @@ day: 13
 slug: day-13-adc
 title: Read a knob as a number
 status: published
-estimatedTimeMinutes: 20
+estimatedTimeMinutes: 25
 tracks: { main: arduino, optional: micropython }
 learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
   Wire a rotary potentiometer to GPIO 1, upload the Arduino sketch, and watch
   Serial Monitor print a reading from 0 to 4095 — with its voltage — that
-  follows every turn of the knob.
-unlocks: The board can measure how much — the ADC turns any voltage between 0 and 3.3V into a number your code can work with.
+  follows every turn of the knob. Today a pin reads a whole range for the first
+  time. You'll see how the ADC slices the 0 to 3.3V span into 4096 steps, and why
+  that turns a physical knob into a number your code can use.
+unlocks: The board can now measure how much voltage a pin sees — the ADC slices the 0 to 3.3V range into 4096 steps and hands your code a number from 0 to 4095 for the voltage the knob is dialled to.
 seoDescription: >
   Wire a rotary potentiometer to the ESP32-S3, upload the sketch, and read the
   knob's position as a number from 0 to 4095 in Serial Monitor — your first
@@ -27,12 +29,13 @@ hero:
   instrument: none
   headline: Read a knob|as a {number}
   lede: >
-    Today the board learns to measure. You wire a rotary potentiometer — a knob
-    that dials a voltage — to GPIO 1, and the ESP32-S3's ADC turns that voltage
-    into a number between 0 and 4095. Open Serial Monitor and the number follows
-    your hand.
+    Today the board learns to measure. Every pin so far reported one of two
+    states — high or low. Now you wire a rotary potentiometer — a knob that dials
+    a voltage — to GPIO 1, and the ESP32-S3's ADC reads the whole range in
+    between, reporting it as a number from 0 to 4095. Open Serial Monitor and that
+    number follows your hand.
   pills:
-    - { text: About 20 minutes, key: true }
+    - { text: About 25 minutes, key: true }
     - Arduino first
     - MicroPython optional
     - No electronics assumed
@@ -140,7 +143,7 @@ code:
       }
     notes:
       - code: analogRead(PIN_ANALOG_IN)
-        text: Samples the voltage on GPIO 1 and returns a number from 0 to 4095.
+        text: Measures the voltage on GPIO 1 and returns which of the 4096 steps it lands on, as a number from 0 to 4095.
         explain: adc
       - code: adcVal / 4095.0 * 3.3
         text: Converts the reading back into volts — 4095.0 is the top reading, so a full turn lands exactly on 3.30V.
@@ -172,24 +175,51 @@ code:
 
 theory:
   title: Voltage in, number out
-  summary: The ADC measures the voltage on a pin and reports it as a number from 0 to 4095 — the knob dials which voltage it sees.
+  summary: An ADC measures the actual voltage on a pin and reports it as one of 4096 numbered steps — from 0 at ground to 4095 at 3.3V. This is the doorway from the digital world into the analogue one.
   intro: >
-    Two ideas meet today. The potentiometer turns position into voltage, and the
-    ADC turns voltage into a number your code can hold.
+    Every day until now, a pin gave your code one bit — high or low, on or off.
+    A knob doesn't work in bits; it sits anywhere across a range. Today's chip has
+    a piece of hardware, the ADC, built to measure that range and translate it
+    into a number. Understanding how it slices the range is the whole lesson.
   flow:
-    - { n: Turn, title: Wiper slides, body: The knob moves a contact along a track between 3.3V and ground. }
-    - { n: Divide, title: Voltage settles, body: The middle pin sits at a voltage that matches the knob's position. }
-    - { n: Sample, title: ADC measures, body: analogRead converts that voltage into a number from 0 to 4095. }
-    - { n: Report, title: Serial prints, body: The sketch sends the reading and the voltage up the USB cable five times a second. }
+    - n: "Until now"
+      title: Pins spoke in two states
+      body: >
+        Every pin you've used reports one of two things — near 3.3V for HIGH or
+        near 0V for LOW, a single bit. A turning knob rests anywhere across that
+        span, so reading it needs a pin that can measure the whole voltage, not
+        just pick a side.
+    - n: "The knob"
+      title: Position becomes voltage
+      body: >
+        The potentiometer wires across 3.3V and ground as a voltage divider you
+        turn by hand. Its middle pin — the wiper — taps off a voltage that slides
+        smoothly from 0 up to 3.3V as you rotate the shaft.
+    - n: "The slice"
+      title: Voltage becomes a number
+      body: >
+        The ADC — analogue-to-digital converter — divides the 0 to 3.3V range into
+        4096 evenly spaced steps and reports which step the wiper's voltage lands
+        on. That step count is the ADC's resolution — twelve bits, and 2 to the
+        12th is 4096 levels.
+    - n: "The read"
+      title: analogRead hands it over
+      body: >
+        analogRead returns that step as a whole number from 0 to 4095, five times
+        a second. One line of arithmetic scales it back into volts, so you see both
+        the raw step and the voltage it stands for.
   formulaLabel: The conversion
   formula: voltage = **reading** ÷ 4095 × 3.3
   notes:
-    - title: Why the top is 4095
+    - title: Why the top step is 4095
       explain: adc
-      body: Twelve bits give 4096 steps numbered 0 through 4095 — so 4095 means the pin sees the full 3.3V, and the code divides by 4095.0 to match.
-    - title: The knob is a voltage divider
+      body: Twelve bits number the steps 0 through 4095, so the count stops one short of 4096 — 4095 is the top step and stands for the full 3.3V, which is why the code divides by 4095.0. Each single step covers about 0.8 mV, since 3.3V is spread across 4096 levels.
+    - title: The knob is a divider you turn
       explain: voltageDivider
-      body: The track splits 3.3V along its length and the wiper taps off the share at its position — a divider you adjust by hand.
+      body: The resistive track splits 3.3V along its length, and the wiper taps off the share at its position. Turning the shaft moves that tap, so the middle-pin voltage — and the number the ADC reports — follows your hand.
+    - title: Why the last digit wobbles
+      explain: adc
+      body: The finest steps are tiny — under a millivolt each — and any real circuit carries a little electrical noise, so a held reading drifts by a count or two. Judge a knob position by the whole sweep rather than the last digit.
 
 test:
   mode: serial
@@ -220,23 +250,27 @@ challenge:
   intro: >
     Same working circuit, one new habit: reading the world through numbers. It
     fits inside today's 20 minutes.
-  summary: Find the knob's midpoint by numbers alone, map a few positions to their readings, and note how steadily a held value sits.
+  summary: Find the knob's midpoint by numbers alone, then map three positions to their readings and voltages and see whether the dial's angle maps evenly onto the 0 to 4095 scale.
   cards:
     - title: Find the midpoint
-      body: Turn the knob until the reading sits near 2048 — half of 4095. Check the shaft — is it pointing halfway round?
+      body: Turn the knob until the reading sits near 2048 — half of 4095. Now look at the shaft. Is it pointing roughly halfway round its travel? You just found a physical position using nothing but a number.
     - title: Map the sweep
       explain: potentiometer
-      body: Pick three positions — a quarter turn, halfway, three quarters — and write down the reading at each. Then hold one position still and watch how steady the number stays.
+      body: Pick three spots — a quarter turn, halfway, three-quarters — and write down both the reading and the printed voltage at each. Then check the pattern. Does halfway on the dial land near halfway up the scale, close to 2048 and 1.65V? Hold one spot still and watch how few counts the number drifts.
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent can
     guide you with full context.
   behaviour: >
-    guide one wire at a time, wait for you to confirm, explain terms on request,
-    and always check wiring, board, port, and baud rate before changing code.
+    guide one wire at a time, wait for you to confirm, and explain the analogue
+    idea on request — that this pin measures a whole voltage range and reports it
+    as a number from 0 to 4095. Always check wiring, board, port, and baud rate
+    before changing code.
   coachInstructions:
     - Guide one physical connection at a time and wait for learner confirmation before proceeding.
+    - Land the core idea- the ADC measures the actual voltage on GPIO 1 and reports it as a number from 0 to 4095, because twelve bits slice the 0 to 3.3V range into 4096 steps.
+    - Connect the number to the knob- have the learner turn until the reading sits near 2048 and confirm the shaft points roughly halfway round.
     - If values sit stuck at 0 or 4095, check the middle-pin wire on GPIO 1 first, then the outer pins on 3.3V and GND.
     - If the monitor shows garbled text, set the baud rate to 115200 before touching anything else.
     - If the monitor is blank, check board, port, and a data-capable USB cable before changing code.

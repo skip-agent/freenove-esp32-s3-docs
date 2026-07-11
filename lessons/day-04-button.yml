@@ -201,10 +201,18 @@ theory:
     a listener with nothing wired to it invents noise. One resistor fixes that, and
     understanding why is the real lesson of your first wiring day.
   flow:
-    - { n: 1 · Listen, title: An input pin, body: "pinMode INPUT turns GPIO 13 into a high-impedance listener. It senses the pin's voltage — near 3.3V reads HIGH, near 0V reads LOW — while drawing almost no current itself, which is exactly what makes it easy to sway." }
-    - { n: 2 · The catch, title: A floating pin, body: With nothing holding it, that sensitive input picks up ambient electrical noise from the wiring and even your body, and its reading drifts between HIGH and LOW at random. A pin left floating cannot be trusted. }
-    - { n: 3 · The anchor, title: A pull resistor, body: The 10 kΩ resistor ties GPIO 13 up to 3.3V, giving it a steady resting HIGH. The resistor is weak enough that a solid connection elsewhere can still overrule it, which is the whole trick. }
-    - { n: 4 · The press, title: Override to LOW, body: "Pressing connects the pin straight to ground through a near-zero-resistance path. That solid path wins over the gentle pull-up, so the pin snaps to LOW — and the sketch reads the change on its very next pass." }
+    - n: "1 · Listen"
+      title: "An input pin"
+      body: "pinMode INPUT turns GPIO 13 into a high-impedance listener. It senses the pin's voltage — near 3.3V reads HIGH, near 0V reads LOW — while drawing almost no current itself, which is exactly what makes it easy to sway."
+    - n: "2 · The catch"
+      title: "A floating pin"
+      body: "With nothing holding it, that sensitive input picks up ambient electrical noise from the wiring and even your body, and its reading drifts between HIGH and LOW at random. A pin left floating cannot be trusted."
+    - n: "3 · The anchor"
+      title: "A pull resistor"
+      body: "The 10 kΩ resistor ties GPIO 13 up to 3.3V, giving it a steady resting HIGH. The resistor is weak enough that a solid connection elsewhere can still overrule it, which is the whole trick."
+    - n: "4 · The press"
+      title: "Override to LOW"
+      body: "Pressing connects the pin straight to ground through a near-zero-resistance path. That solid path wins over the gentle pull-up, so the pin snaps to LOW — and the sketch reads the change on its very next pass."
   formulaLabel: The loop
   formula: sense (digitalRead) → **decide** (if) → act (digitalWrite) → repeat
   notes:

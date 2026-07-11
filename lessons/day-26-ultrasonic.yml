@@ -172,10 +172,18 @@ theory:
     The whole day is one loop, running many times a second. It's the same idea as
     counting the seconds between lightning and thunder.
   flow:
-    - { n: Send a ping,  title: Trig fires,       body: Trig tells the sensor to emit a short pulse above human hearing. }
-    - { n: Wait for echo, title: It bounces,       body: The pulse hits an object and some of it returns. }
-    - { n: Measure time,  title: Echo holds HIGH,  body: Echo stays HIGH for exactly the round-trip time. }
-    - { n: Convert,       title: Time → distance,  body: Time × speed of sound gives how far the pulse travelled. }
+    - n: "Send a ping"
+      title: "Trig fires"
+      body: "Trig tells the sensor to emit a short pulse above human hearing."
+    - n: "Wait for echo"
+      title: "It bounces"
+      body: "The pulse hits an object and some of it returns."
+    - n: "Measure time"
+      title: "Echo holds HIGH"
+      body: "Echo stays HIGH for exactly the round-trip time."
+    - n: "Convert"
+      title: "Time → distance"
+      body: "Time × speed of sound gives how far the pulse travelled."
   formulaLabel: Useful model
   formula: distance = **speed of sound** × **echo time** ÷ 2
   notes:

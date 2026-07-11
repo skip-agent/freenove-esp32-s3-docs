@@ -246,8 +246,8 @@ if not button.<span class="tok-fn">value</span>():
               <article class="flow-step"><span class="n">Level</span><h3>What the loop sees</h3><p>loop() reads GPIO 13 thousands of times a second. At rest it reads HIGH; through the entire press it reads LOW. That reading is the level — the pin&#x27;s state right now.</p></article>
               <article class="flow-step"><span class="n">The trap</span><h3>A level flips forever</h3><p>Flip the lamp whenever the pin reads LOW and it flips on every pass while you hold — hundreds of times before you let go. The level alone can&#x27;t tell a tap from a long hold.</p></article>
               <article class="flow-step"><span class="n">Edge</span><h3>The moment of change</h3><p>What you mean by a press is the edge: the single HIGH-to-LOW fall when the contact closes. One press has exactly one falling edge, so acting on the edge acts once.</p></article>
-              <article class="flow-step"><span class="n">Bounce</span><h3>The edge arrives messy</h3><p>The switch&#x27;s metal contacts spring apart and back as they meet</p></article>
-              <article class="flow-step"><span class="n">Memory</span><h3>Where on/off lives</h3><p>The LED&#x27;s own driven level is the remembered state. It stays put between loop passes</p></article>
+              <article class="flow-step"><span class="n">Bounce</span><h3>The edge arrives messy</h3><p>The switch&#x27;s metal contacts spring apart and back as they meet, so that one clean edge lands as a burst of edges over a few milliseconds. Left alone, one press reads as several.</p></article>
+              <article class="flow-step"><span class="n">Memory</span><h3>Where on/off lives</h3><p>The LED&#x27;s own driven level is the remembered state. It stays put between loop passes, and each clean edge inverts it — so the lamp holds long after your finger is gone.</p></article>
             </div>
             <div class="formula-card">
               <span class="label">The model</span>

@@ -91,10 +91,18 @@ theory:
     different kind of machine, and understanding how is worth more than any
     step-by-step you'll follow later.
   flow:
-    - { n: One chip, title: A whole computer, body: Processor, memory, and storage all live under that metal shield. Nothing else is needed to run. }
-    - { n: One program, title: No apps, no OS, body: It runs a single program from the instant it gets power. The sketch you upload IS its software. }
-    - { n: The pins, title: GPIO, body: Each numbered pin is a wire your code can drive high or low, or read as a signal in. That's the whole toolkit. }
-    - { n: The catch, title: 3.3 volts, body: Every pin speaks in 3.3V. Powering a part from 5V is fine; pushing 5V into a pin can damage it. }
+    - n: "One chip"
+      title: "A whole computer"
+      body: "Processor, memory, and storage all live under that metal shield. Nothing else is needed to run."
+    - n: "One program"
+      title: "No apps, no OS"
+      body: "It runs a single program from the instant it gets power. The sketch you upload IS its software."
+    - n: "The pins"
+      title: "GPIO"
+      body: "Each numbered pin is a wire your code can drive high or low, or read as a signal in. That's the whole toolkit."
+    - n: "The catch"
+      title: "3.3 volts"
+      body: "Every pin speaks in 3.3V. Powering a part from 5V is fine; pushing 5V into a pin can damage it."
   formulaLabel: The model
   formula: "**one chip** + **one program** + **pins at 3.3V** = everything you'll build"
   notes:

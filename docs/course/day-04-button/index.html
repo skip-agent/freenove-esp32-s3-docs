@@ -246,8 +246,8 @@ else:
             </div>
             <div class="theory-flow" aria-label="Measurement model">
               <article class="flow-step"><span class="n">1 · Listen</span><h3>An input pin</h3><p>pinMode INPUT turns GPIO 13 into a high-impedance listener. It senses the pin&#x27;s voltage — near 3.3V reads HIGH, near 0V reads LOW — while drawing almost no current itself, which is exactly what makes it easy to sway.</p></article>
-              <article class="flow-step"><span class="n">2 · The catch</span><h3>A floating pin</h3><p>With nothing holding it</p></article>
-              <article class="flow-step"><span class="n">3 · The anchor</span><h3>A pull resistor</h3><p>The 10 kΩ resistor ties GPIO 13 up to 3.3V</p></article>
+              <article class="flow-step"><span class="n">2 · The catch</span><h3>A floating pin</h3><p>With nothing holding it, that sensitive input picks up ambient electrical noise from the wiring and even your body, and its reading drifts between HIGH and LOW at random. A pin left floating cannot be trusted.</p></article>
+              <article class="flow-step"><span class="n">3 · The anchor</span><h3>A pull resistor</h3><p>The 10 kΩ resistor ties GPIO 13 up to 3.3V, giving it a steady resting HIGH. The resistor is weak enough that a solid connection elsewhere can still overrule it, which is the whole trick.</p></article>
               <article class="flow-step"><span class="n">4 · The press</span><h3>Override to LOW</h3><p>Pressing connects the pin straight to ground through a near-zero-resistance path. That solid path wins over the gentle pull-up, so the pin snaps to LOW — and the sketch reads the change on its very next pass.</p></article>
             </div>
             <div class="formula-card">

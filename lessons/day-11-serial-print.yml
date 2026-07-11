@@ -9,18 +9,21 @@ day: 11
 slug: day-11-serial-print
 title: Make the board talk back
 status: published
-estimatedTimeMinutes: 15
+estimatedTimeMinutes: 20
 tracks: { main: arduino, optional: micropython }
 learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
   Upload a sketch with no wiring at all, open Serial Monitor, and watch the
-  ESP32-S3 print a start-up line and then count its own running time in seconds —
-  the board's first words back to you over the USB cable.
-unlocks: The board can send text back to your computer over USB, so you can watch what your code is doing instead of only guessing from lights.
+  ESP32-S3 print a start-up line and then count its own running time in seconds.
+  This is the day you gain a window into a running program — the one tool that
+  turns every later "why isn't it working?" into a question you can actually
+  answer by asking the board what it's doing.
+unlocks: The board can send text back over USB, so from here on you can watch a variable's real value instead of inferring it from lights and guesses. This is the debugging tool the rest of the course leans on.
 seoDescription: >
   Open Serial Monitor and watch the ESP32-S3 print text over USB. No wiring — just
-  Serial.begin, println, and printf reporting the board's running time in seconds.
+  Serial.begin, println, and printf reporting the board's running time in seconds,
+  and why serial is your main debugging tool.
 
 hero:
   instrument: none
@@ -28,12 +31,13 @@ hero:
   lede: >
     No wiring today. You upload a short sketch, open Serial Monitor, and the
     ESP32-S3 starts sending text up the same USB cable that carries your code — a
-    start-up line first, then a running clock that ticks up every second.
+    start-up line first, then a running clock that ticks up every second. The same
+    cable, now running text the other way, becomes your window into the program.
   pills:
-    - { text: About 15 minutes, key: true }
+    - { text: About 20 minutes, key: true }
     - Arduino first
     - MicroPython optional
-    - No wiring today
+    - Your main debug tool
 
 parts:
   intro: >
@@ -74,7 +78,7 @@ steps:
   done:
     icon: "📡"
     title: The board has a voice.
-    body: Your ESP32-S3 is sending text back over USB. Head to Test & debug to confirm what should scroll past.
+    body: Your ESP32-S3 is sending text back over USB, and you can read what it's thinking. Head to Test & debug to confirm what should scroll past.
 
 code:
   intro: >
@@ -96,13 +100,13 @@ code:
       }
     notes:
       - code: Serial.begin(115200)
-        text: Opens the USB serial link at 115200 baud — the same number you set in Serial Monitor.
+        text: Opens the USB serial link and sets its speed to 115200 baud — the same number Serial Monitor has to use, so both ends read the stream the same way.
         explain: serialBegin
       - code: Serial.println("ESP32S3 initialization completed!")
-        text: Sends one line of text, then moves to the next line — the board's start-up announcement.
+        text: Sends one line of text up the cable, then moves to the next line — a start-up marker that proves the link is live before any real data flows.
         explain: serialPrint
       - code: 'Serial.printf("Running time : %.1f s\r\n", millis() / 1000.0f)'
-        text: Fills the running time into the text, one decimal place, and sends it once a second.
+        text: Slots a live value into a text template — one decimal place — and sends it, so a number inside the program becomes something you can read.
         explain: millis
   micropython:
     file: 07.1_Serial_Print/Serial_Print.py
@@ -127,25 +131,36 @@ code:
       yet, skip this — it should never block the Arduino-first path.
 
 theory:
-  title: How the board talks over USB
-  summary: One USB cable carries both your upload and the board's replies, as long as both ends agree on the baud rate.
+  title: Serial is your window into a running program
+  summary: The USB-to-serial bridge from Day 2 now runs the other way — text from the board to your screen — which is the only way to see a value the program holds but never shows.
   intro: >
-    There's no new hardware today — the same cable that flashes your code doubles
-    as a two-way text line, provided the board and the monitor keep the same pace.
+    On Day 2 the USB-to-serial bridge carried your code down onto the board. It
+    runs both directions. Today the same wire carries text back up, so the board
+    can report what it's actually doing. Everything before this you judged from the
+    outside — a light on, a light off. From here you can ask the board directly,
+    which is why serial is the single most useful debugging tool in the course.
   flow:
-    - { n: Open the link, title: Serial.begin, body: The board switches the USB line into text mode at a set speed. }
-    - { n: Agree on speed, title: Same baud, body: Serial Monitor must use the same 115200 or the text arrives scrambled. }
-    - { n: Send a line, title: println, body: Each print pushes characters up the cable to your screen. }
-    - { n: Keep reporting, title: Once a second, body: The loop prints the running time again after each delay. }
+    - n: "1 · Open the link"
+      title: "Serial.begin"
+      body: "One line puts the USB bridge into text mode and fixes its speed. Until this runs, the board has no voice."
+    - n: "2 · Agree on speed"
+      title: "Same baud"
+      body: "Baud is bits per second, and both ends must use the same number. Serial Monitor set to 115200 reads the board's 115200 stream cleanly; a mismatch samples the wire at the wrong rate and prints garbage."
+    - n: "3 · Send characters"
+      title: "print / println"
+      body: "Each print pushes characters up the cable to your screen. printf slots a live value into a template first, so a number inside the program lands as readable text."
+    - n: "4 · See the invisible"
+      title: "Watch it change"
+      body: "millis() rises with no light to show it. Printing it every second makes an internal value visible and live — the essence of debugging."
   formulaLabel: The rule
-  formula: readable text = **board baud** = **monitor baud**
+  formula: readable text needs **board baud** = **monitor baud**
   notes:
-    - title: What the baud rate is
+    - title: Why a wrong baud is garbage, not silence
       explain: serialBegin
-      body: Baud is how fast the two sides send signal changes. Both must agree, or the letters turn to gibberish.
-    - title: Where the number comes from
-      explain: millis
-      body: millis() is the board's own stopwatch — milliseconds since it booted — which the sketch divides into seconds.
+      body: The characters still arrive on the wire. Baud sets how often each side reads the signal, so a mismatched monitor samples between the real bits and reconstructs the wrong letters. The fix is always to match the number, never to resend.
+    - title: Printing is how you debug from here on
+      explain: serialPrint
+      body: When a later sketch misbehaves, a print of the suspect value tells you what the code truly saw — a sensor reading, a state, a counter — instead of guessing from an LED. Reach for a print before you rewrite anything.
 
 test:
   mode: serial
@@ -163,42 +178,44 @@ test:
   checksTitle: If it doesn't
   checks:
     - symptom: "Garbled or random characters?"
-      fix: "Set Serial Monitor to 115200 baud to match the sketch."
+      fix: "The characters are arriving; the monitor is reading them at the wrong rate. Set Serial Monitor to 115200 to match the sketch."
     - symptom: "Blank monitor?"
-      fix: "Confirm the right board and port, then press the board's reset button."
+      fix: "Confirm the right board and port, then press the board's reset button so setup() runs and prints the start-up line again."
     - symptom: "Only the first line, no count?"
       fix: "Give it a second — the running time prints once per delay(1000)."
     - symptom: "Upload fails?"
       fix: "Swap in a data-capable USB cable."
 
 challenge:
-  title: "Try this: change what it says"
+  title: "Try this: reveal the board's real speed"
   railLabel: Try this
   intro: >
-    Same working sketch, no wiring — just the text and the timing. It fits inside
-    today's 15 minutes.
-  summary: Change the start-up message and the reporting speed, then add a line of your own to the loop.
+    Printing earns its keep when it shows you something you could never see from
+    the outside. Add a value the program has always held, then make the invisible
+    obvious. No wiring, and it fits inside today's time.
+  summary: Add a counter that the loop increments and prints, then remove the delay so you watch how fast the board truly runs — a number that was there all along but had no way to show itself.
   cards:
-    - title: Rename the start-up line
+    - title: Print a hidden counter
       explain: serialPrint
-      body: Change the words inside `Serial.println("…")` and re-upload — the board greets you however you like.
-    - title: Report faster
+      body: "Before `setup()`, add `int count = 0;`. Inside `loop()`, add `count = count + 1;` then `Serial.println(count);`. Re-upload. You're now watching a value that lived inside the program every run before this, invisible until you printed it."
+    - title: Take the brake off
       explain: millis
-      body: Lower the `delay(1000)` to `delay(250)` so the running time updates four times a second, then add a second `Serial.println` of your own.
+      body: "Comment out `delay(1000);` and re-upload. The counter stops climbing once a second and races into the thousands — the board was always looping this fast, and printing is the only reason you can see it. That is debugging: making the code's real behaviour visible."
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent can
     guide you with full context.
   behaviour: >
-    keep it to upload-and-read, check board, port, cable, and baud rate before
-    touching code, and explain Serial.begin, println, and millis on request.
+    keep it to upload-and-read, check board, port, cable, and baud before touching
+    code, and frame serial as the learner's main debugging tool — the way to see a
+    value the program holds. Explain Serial.begin, println, and millis on request.
   coachInstructions:
     - Keep the day to upload-and-read; there is nothing to wire.
-    - If the monitor shows garbled text, the baud rate is the first thing to check — it must be 115200.
-    - If the monitor is blank, check board, port, and a data-capable cable, then have the learner press reset.
-    - Explain that one USB cable carries both the upload and the board's replies; do not front-load theory.
-    - For the challenge, change only the message text and the delay value, preserving the working sketch.
+    - Frame serial as a window into a running program — the same USB bridge from Day 2, now carrying text from the board back to the screen.
+    - If the monitor shows garbled text, explain the characters are arriving but read at the wrong rate; the fix is to set the monitor to 115200 to match the sketch.
+    - If the monitor is blank, check board, port, and a data-capable cable, then have the learner press reset so setup() prints again.
+    - For the challenge, help them add a counter and print it, then remove delay(1000) so they see how fast the board really loops — the point is that printing reveals a value they could not otherwise see.
     - Keep the Arduino path primary; MicroPython's print() lands in Thonny's shell and is optional only if already set up.
 
 source:

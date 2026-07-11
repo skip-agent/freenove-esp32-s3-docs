@@ -200,11 +200,21 @@ theory:
     on-time into a steady brightness. That is pulse-width modulation, and it is the
     mechanism behind almost every "analog" thing the board does.
   flow:
-    - { n: The limit, title: A pin is binary, body: The output pin has two settings only — fully on or fully off. There is no dial for half a volt. }
-    - { n: The trick, title: Switch faster than sight, body: To fake a middle level PWM flips the pin on and off about 1000 times a second, far past what your eye can resolve. }
-    - { n: Duty cycle, title: The share that's on, body: In each on-off cycle the pin holds on for some fraction. On a quarter of the time reads as roughly quarter brightness; on the whole time is full. }
-    - { n: The hardware, title: ledc does the switching, body: The board's ledc channels generate the pulses in dedicated hardware, so the processor sets one level and never has to babysit the flicker. }
-    - { n: The breath, title: Sweep the duty, body: Sliding the duty from 0 up to 255 and back down is the fade — brightness following the share that's on. }
+    - n: "The limit"
+      title: "A pin is binary"
+      body: "The output pin has two settings only — fully on or fully off. There is no dial for half a volt."
+    - n: "The trick"
+      title: "Switch faster than sight"
+      body: "To fake a middle level PWM flips the pin on and off about 1000 times a second, far past what your eye can resolve."
+    - n: "Duty cycle"
+      title: "The share that's on"
+      body: "In each on-off cycle the pin holds on for some fraction. On a quarter of the time reads as roughly quarter brightness; on the whole time is full."
+    - n: "The hardware"
+      title: "ledc does the switching"
+      body: "The board's ledc channels generate the pulses in dedicated hardware, so the processor sets one level and never has to babysit the flicker."
+    - n: "The breath"
+      title: "Sweep the duty"
+      body: "Sliding the duty from 0 up to 255 and back down is the fade — brightness following the share that's on."
   formulaLabel: The model
   formula: brightness = **duty cycle** = the share of each fast cycle the pin holds on
   notes:

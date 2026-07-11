@@ -162,10 +162,18 @@ theory:
     challenge flips it to access-point mode, where the board hosts a network of
     its own.
   flow:
-    - { n: Ask to join, title: WiFi.begin, body: The board calls your router by name and offers the password. }
-    - { n: Handshake, title: Router checks, body: The router verifies the password and accepts the board onto the network. }
-    - { n: Get an address, title: DHCP assigns, body: The router hands the board an IP address of its own — its berth number. }
-    - { n: Report, title: localIP prints, body: The sketch prints that address so you can write it down for Day 30. }
+    - n: "Ask to join"
+      title: "WiFi.begin"
+      body: "The board calls your router by name and offers the password."
+    - n: "Handshake"
+      title: "Router checks"
+      body: "The router verifies the password and accepts the board onto the network."
+    - n: "Get an address"
+      title: "DHCP assigns"
+      body: "The router hands the board an IP address of its own — its berth number."
+    - n: "Report"
+      title: "localIP prints"
+      body: "The sketch prints that address so you can write it down for Day 30."
   formulaLabel: The two modes
   formula: "station = **join** a network · access point = **be** the network"
   notes:

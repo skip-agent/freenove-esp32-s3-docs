@@ -220,10 +220,18 @@ theory:
     servo listens in 0 to 180, and the PWM hardware wants a duty value — map()
     translates at each border.
   flow:
-    - { n: Turn, title: Knob dials voltage, body: The wiper hands GPIO 14 a voltage that tracks the knob's position. }
-    - { n: Sample, title: ADC measures, body: analogRead turns that voltage into a number from 0 to 4095. }
-    - { n: Map, title: Reading becomes angle, body: map() rescales 0-4095 onto 0-180 so every knob position names an angle. }
-    - { n: Steer, title: Angle becomes pulse, body: A second map() converts the angle to a duty value from 103 to 512 and ledcWrite sends it. }
+    - n: "Turn"
+      title: "Knob dials voltage"
+      body: "The wiper hands GPIO 14 a voltage that tracks the knob's position."
+    - n: "Sample"
+      title: "ADC measures"
+      body: "analogRead turns that voltage into a number from 0 to 4095."
+    - n: "Map"
+      title: "Reading becomes angle"
+      body: "map() rescales 0-4095 onto 0-180 so every knob position names an angle."
+    - n: "Steer"
+      title: "Angle becomes pulse"
+      body: "A second map() converts the angle to a duty value from 103 to 512 and ledcWrite sends it."
   formulaLabel: The chain
   formula: angle = **map**(reading, 0, 4095, 0, 180) → pulse = **map**(angle, 0, 180, 103, 512)
   notes:

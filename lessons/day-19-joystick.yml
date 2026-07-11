@@ -186,10 +186,18 @@ theory:
     them under a single stick — the same arrangement lives inside every gamepad
     you've ever held.
   flow:
-    - { n: Tilt, title: Pots turn, body: Pushing the stick rotates two potentiometers set at right angles. }
-    - { n: Measure, title: ADC reads, body: analogRead turns each pot's voltage into a number from 0 to 4095. }
-    - { n: Press, title: Button drops, body: INPUT_PULLUP holds GPIO 12 at 1 until a press pulls it to 0. }
-    - { n: Report, title: Serial prints, body: Twice a second the sketch prints all three values on one line. }
+    - n: "Tilt"
+      title: "Pots turn"
+      body: "Pushing the stick rotates two potentiometers set at right angles."
+    - n: "Measure"
+      title: "ADC reads"
+      body: "analogRead turns each pot's voltage into a number from 0 to 4095."
+    - n: "Press"
+      title: "Button drops"
+      body: "INPUT_PULLUP holds GPIO 12 at 1 until a press pulls it to 0."
+    - n: "Report"
+      title: "Serial prints"
+      body: "Twice a second the sketch prints all three values on one line."
   formulaLabel: The model
   formula: "one joystick = **two potentiometers** at right angles + **one push button**"
   notes:

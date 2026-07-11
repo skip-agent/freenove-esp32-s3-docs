@@ -224,10 +224,18 @@ theory:
     The chip is a small memory with eight outputs. Watch what the three wires
     each do, and the moving light explains itself.
   flow:
-    - { n: Load, title: Bit by bit, body: Each clock tick pushes the next bit of the byte into the chip. }
-    - { n: Latch, title: One edge, body: A rising edge on the latch pin presents all eight bits at once. }
-    - { n: Light, title: Eight outputs, body: Q0 through Q7 each drive one segment of the bar. }
-    - { n: Shift, title: The byte moves, body: x <<= 1 slides the lit bit along and the light follows it. }
+    - n: "Load"
+      title: "Bit by bit"
+      body: "Each clock tick pushes the next bit of the byte into the chip."
+    - n: "Latch"
+      title: "One edge"
+      body: "A rising edge on the latch pin presents all eight bits at once."
+    - n: "Light"
+      title: "Eight outputs"
+      body: "Q0 through Q7 each drive one segment of the bar."
+    - n: "Shift"
+      title: "The byte moves"
+      body: "x <<= 1 slides the lit bit along and the light follows it."
   formulaLabel: The model
   formula: eight outputs = **one byte** carried over three wires
   notes:

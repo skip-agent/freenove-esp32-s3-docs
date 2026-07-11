@@ -230,9 +230,9 @@ while True:
             </div>
             <div class="theory-flow" aria-label="Measurement model">
               <article class="flow-step"><span class="n">The limit</span><h3>A pin is binary</h3><p>The output pin has two settings only — fully on or fully off. There is no dial for half a volt.</p></article>
-              <article class="flow-step"><span class="n">The trick</span><h3>Switch faster than sight</h3><p>To fake a middle level PWM flips the pin on and off about 1000 times a second</p></article>
+              <article class="flow-step"><span class="n">The trick</span><h3>Switch faster than sight</h3><p>To fake a middle level PWM flips the pin on and off about 1000 times a second, far past what your eye can resolve.</p></article>
               <article class="flow-step"><span class="n">Duty cycle</span><h3>The share that&#x27;s on</h3><p>In each on-off cycle the pin holds on for some fraction. On a quarter of the time reads as roughly quarter brightness; on the whole time is full.</p></article>
-              <article class="flow-step"><span class="n">The hardware</span><h3>ledc does the switching</h3><p>The board&#x27;s ledc channels generate the pulses in dedicated hardware</p></article>
+              <article class="flow-step"><span class="n">The hardware</span><h3>ledc does the switching</h3><p>The board&#x27;s ledc channels generate the pulses in dedicated hardware, so the processor sets one level and never has to babysit the flicker.</p></article>
               <article class="flow-step"><span class="n">The breath</span><h3>Sweep the duty</h3><p>Sliding the duty from 0 up to 255 and back down is the fade — brightness following the share that&#x27;s on.</p></article>
             </div>
             <div class="formula-card">

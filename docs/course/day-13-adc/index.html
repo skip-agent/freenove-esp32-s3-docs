@@ -16,10 +16,10 @@
       <div class="hero-copy">
         <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 13 of 30</p>
         <h1>Read a knob<br />as a <em>number</em></h1>
-        <p class="lede">Today the board learns to measure. You wire a rotary potentiometer — a knob that dials a voltage — to GPIO 1, and the ESP32-S3&#x27;s ADC turns that voltage into a number between 0 and 4095. Open Serial Monitor and the number follows your hand.
+        <p class="lede">Today the board learns to measure. Every pin so far reported one of two states — high or low. Now you wire a rotary potentiometer — a knob that dials a voltage — to GPIO 1, and the ESP32-S3&#x27;s ADC reads the whole range in between, reporting it as a number from 0 to 4095. Open Serial Monitor and that number follows your hand.
 </p>
         <div class="meta-row" aria-label="Lesson facts">
-          <span class="pill is-key">About 20 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">No electronics assumed</span>
+          <span class="pill is-key">About 25 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">No electronics assumed</span>
         </div>
       </div>
       <div class="hero-side no-instrument">
@@ -185,7 +185,7 @@
   <span class="tok-fn">delay</span>(<span class="tok-num">200</span>);
 }</code></pre>
                 <div class="code-notes">
-                  <div class="code-note"><code>analogRead(PIN_ANALOG_IN)</code><span class="note-text">Samples the voltage on GPIO 1 and returns a number from 0 to 4095. <button class="define" data-topic="adc">Define</button></span></div>
+                  <div class="code-note"><code>analogRead(PIN_ANALOG_IN)</code><span class="note-text">Measures the voltage on GPIO 1 and returns which of the 4096 steps it lands on, as a number from 0 to 4095. <button class="define" data-topic="adc">Define</button></span></div>
                   <div class="code-note"><code>adcVal / 4095.0 * 3.3</code><span class="note-text">Converts the reading back into volts — 4095.0 is the top reading, so a full turn lands exactly on 3.30V.</span></div>
                   <div class="code-note"><code>Serial.printf(&quot;ADC Val: %d, \t Voltage: %.2fV\r\n&quot;, adcVal, voltage)</code><span class="note-text">Prints the raw reading and the voltage on one line, five times a second. <button class="define" data-topic="serialPrint">Define</button></span></div>
                 </div>
@@ -217,22 +217,27 @@ voltage = adcVal / <span class="tok-num">4095.0</span> * <span class="tok-num">3
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">05</span> Understand, don&#x27;t memorise</p>
               <h2>Voltage in, number out</h2>
-              <p class="muted">Two ideas meet today. The potentiometer turns position into voltage, and the ADC turns voltage into a number your code can hold.
+              <p class="muted">Every day until now, a pin gave your code one bit — high or low, on or off. A knob doesn&#x27;t work in bits; it sits anywhere across a range. Today&#x27;s chip has a piece of hardware, the ADC, built to measure that range and translate it into a number. Understanding how it slices the range is the whole lesson.
 </p>
             </div>
             <div class="theory-flow" aria-label="Measurement model">
-              <article class="flow-step"><span class="n">Turn</span><h3>Wiper slides</h3><p>The knob moves a contact along a track between 3.3V and ground.</p></article>
-              <article class="flow-step"><span class="n">Divide</span><h3>Voltage settles</h3><p>The middle pin sits at a voltage that matches the knob&#x27;s position.</p></article>
-              <article class="flow-step"><span class="n">Sample</span><h3>ADC measures</h3><p>analogRead converts that voltage into a number from 0 to 4095.</p></article>
-              <article class="flow-step"><span class="n">Report</span><h3>Serial prints</h3><p>The sketch sends the reading and the voltage up the USB cable five times a second.</p></article>
+              <article class="flow-step"><span class="n">Until now</span><h3>Pins spoke in two states</h3><p>Every pin you&#x27;ve used reports one of two things — near 3.3V for HIGH or near 0V for LOW, a single bit. A turning knob rests anywhere across that span, so reading it needs a pin that can measure the whole voltage, not just pick a side.
+</p></article>
+              <article class="flow-step"><span class="n">The knob</span><h3>Position becomes voltage</h3><p>The potentiometer wires across 3.3V and ground as a voltage divider you turn by hand. Its middle pin — the wiper — taps off a voltage that slides smoothly from 0 up to 3.3V as you rotate the shaft.
+</p></article>
+              <article class="flow-step"><span class="n">The slice</span><h3>Voltage becomes a number</h3><p>The ADC — analogue-to-digital converter — divides the 0 to 3.3V range into 4096 evenly spaced steps and reports which step the wiper&#x27;s voltage lands on. That step count is the ADC&#x27;s resolution — twelve bits, and 2 to the 12th is 4096 levels.
+</p></article>
+              <article class="flow-step"><span class="n">The read</span><h3>analogRead hands it over</h3><p>analogRead returns that step as a whole number from 0 to 4095, five times a second. One line of arithmetic scales it back into volts, so you see both the raw step and the voltage it stands for.
+</p></article>
             </div>
             <div class="formula-card">
               <span class="label">The conversion</span>
               <code>voltage = <b>reading</b> ÷ 4095 × 3.3</code>
             </div>
             <div class="two-col" style="margin-top:14px">
-              <article class="mini-card"><h3>Why the top is 4095 <button class="define" data-topic="adc">Define</button></h3><p>Twelve bits give 4096 steps numbered 0 through 4095 — so 4095 means the pin sees the full 3.3V, and the code divides by 4095.0 to match.</p></article>
-              <article class="mini-card"><h3>The knob is a voltage divider <button class="define" data-topic="voltageDivider">Define</button></h3><p>The track splits 3.3V along its length and the wiper taps off the share at its position — a divider you adjust by hand.</p></article>
+              <article class="mini-card"><h3>Why the top step is 4095 <button class="define" data-topic="adc">Define</button></h3><p>Twelve bits number the steps 0 through 4095, so the count stops one short of 4096 — 4095 is the top step and stands for the full 3.3V, which is why the code divides by 4095.0. Each single step covers about 0.8 mV, since 3.3V is spread across 4096 levels.</p></article>
+              <article class="mini-card"><h3>The knob is a divider you turn <button class="define" data-topic="voltageDivider">Define</button></h3><p>The resistive track splits 3.3V along its length, and the wiper taps off the share at its position. Turning the shaft moves that tap, so the middle-pin voltage — and the number the ADC reports — follows your hand.</p></article>
+              <article class="mini-card"><h3>Why the last digit wobbles <button class="define" data-topic="adc">Define</button></h3><p>The finest steps are tiny — under a millivolt each — and any real circuit carries a little electrical noise, so a held reading drifts by a count or two. Judge a knob position by the whole sweep rather than the last digit.</p></article>
             </div>
           </div>
         </section>
@@ -274,8 +279,8 @@ voltage = adcVal / <span class="tok-num">4095.0</span> * <span class="tok-num">3
 </p>
             </div>
             <div class="two-col">
-              <article class="mini-card"><h3>Find the midpoint</h3><p>Turn the knob until the reading sits near 2048 — half of 4095. Check the shaft — is it pointing halfway round?</p></article>
-              <article class="mini-card"><h3>Map the sweep <button class="define" data-topic="potentiometer">Define</button></h3><p>Pick three positions — a quarter turn, halfway, three quarters — and write down the reading at each. Then hold one position still and watch how steady the number stays.</p></article>
+              <article class="mini-card"><h3>Find the midpoint</h3><p>Turn the knob until the reading sits near 2048 — half of 4095. Now look at the shaft. Is it pointing roughly halfway round its travel? You just found a physical position using nothing but a number.</p></article>
+              <article class="mini-card"><h3>Map the sweep <button class="define" data-topic="potentiometer">Define</button></h3><p>Pick three spots — a quarter turn, halfway, three-quarters — and write down both the reading and the printed voltage at each. Then check the pattern. Does halfway on the dial land near halfway up the scale, close to 2048 and 1.65V? Hold one spot still and watch how few counts the number drifts.</p></article>
             </div>
           </div>
         </section>
@@ -293,7 +298,7 @@ voltage = adcVal / <span class="tok-num">4095.0</span> * <span class="tok-num">3
             </div>
             <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
               <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
-              <p><strong>How the agent should behave:</strong> guide one wire at a time, wait for you to confirm, explain terms on request, and always check wiring, board, port, and baud rate before changing code.
+              <p><strong>How the agent should behave:</strong> guide one wire at a time, wait for you to confirm, and explain the analogue idea on request — that this pin measures a whole voltage range and reports it as a number from 0 to 4095. Always check wiring, board, port, and baud rate before changing code.
 </p>
             </div>
           </div>

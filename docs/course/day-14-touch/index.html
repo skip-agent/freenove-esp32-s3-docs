@@ -16,7 +16,7 @@
       <div class="hero-copy">
         <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 14 of 30</p>
         <h1>Make your fingertip<br />the <em>switch</em></h1>
-        <p class="lede">Today your own fingertip becomes the switch. One bare jumper on GPIO 14 acts as a touch pad, and the sketch watches the tiny charge your skin adds to it — one tap flips the LED on, the next tap flips it off.
+        <p class="lede">Today your own fingertip becomes the switch. One bare jumper on GPIO 14 is the touch pad, and the pin keeps charging it and measuring how much charge it holds. Your finger adds a little capacitance of its own, the reading jumps, and the sketch flips the LED — the same way a phone screen and an elevator button know a finger is there.
 </p>
         <div class="meta-row" aria-label="Lesson facts">
           <span class="pill is-key">About 25 minutes</span><span class="pill">Arduino first</span><span class="pill">No electronics assumed</span><span class="pill">Your finger is the button</span>
@@ -46,7 +46,7 @@
           <a href="#wiring"><span class="tick"></span>Chart the circuit</a>
           <a href="#steps"><span class="tick"></span>Build it</a>
           <a href="#code"><span class="tick"></span>Read the code</a>
-          <a href="#theory"><span class="tick"></span>A pin that feels your fingertip</a>
+          <a href="#theory"><span class="tick"></span>How a bare wire feels your finger</a>
           <a href="#test"><span class="tick"></span>Test &amp; debug</a>
           <a href="#challenge"><span class="tick"></span>Try this</a>
           <a href="#agent"><span class="tick"></span>Coach me</a>
@@ -221,24 +221,26 @@
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">05</span> Understand, don&#x27;t memorise</p>
-              <h2>A pin that feels your fingertip</h2>
-              <p class="muted">Your skin holds a small electric charge, and pressing it against the bare wire lets the pin feel that extra capacitance as a bigger number. The rest is bookkeeping the sketch does for you.
+              <h2>How a bare wire feels your finger</h2>
+              <p class="muted">Before the sketch, the one idea that makes a bare wire work as a sensor. The pin is always busy — charging the wire and measuring how much charge it holds, thousands of times a second. Your finger changes that measurement, and touchRead hands you the result as a plain number you can act on.
 </p>
             </div>
             <div class="theory-flow" aria-label="Measurement model">
-              <article class="flow-step"><span class="n">Sense</span><h3>touchRead</h3><p>The pin measures how much charge the bare wire is soaking up.</p></article>
-              <article class="flow-step"><span class="n">Compare</span><h3>Two thresholds</h3><p>Above 200000 counts as a touch and below 60000 counts as a release.</p></article>
-              <article class="flow-step"><span class="n">Remember</span><h3>isProcessed</h3><p>A flag makes sure each touch flips the lamp exactly once.</p></article>
-              <article class="flow-step"><span class="n">Act</span><h3>Flip</h3><p>reverseGPIO reads the LED pin and writes the opposite state.</p></article>
+              <article class="flow-step"><span class="n">Charge</span><h3>Fill a tiny capacitor</h3><p>The pin pushes a small charge onto the bare wire again and again. The wire holds a little of it — that ability to hold charge is its capacitance.</p></article>
+              <article class="flow-step"><span class="n">Measure</span><h3>How much it holds</h3><p>Each cycle the pin measures how the charge builds up on the wire. With nothing near, that settles to a steady resting number.</p></article>
+              <article class="flow-step"><span class="n">Your finger</span><h3>You add capacitance</h3><p>Your body stores charge too. A fingertip near the wire adds its own capacitance, so the wire holds more and the measurement moves.</p></article>
+              <article class="flow-step"><span class="n">Report</span><h3>touchRead</h3><p>touchRead(T14) returns that measurement as a number. On this board it climbs far past its resting value the instant you touch.</p></article>
             </div>
             <div class="formula-card">
               <span class="label">The model</span>
-              <code>touch raises the reading — <b>above 200000</b> is a press and <b>below 60000</b> is a release</code>
+              <code>your finger&#x27;s capacitance lifts the reading past <b>200000 (press)</b>; releasing lets it fall below <b>60000 (release)</b></code>
             </div>
             <div class="two-col" style="margin-top:14px">
-              <article class="mini-card"><h3>On this board a touch pushes the number up <button class="define" data-topic="touchPin">Define</button></h3><p>Idle, the pin reads in the tens of thousands; a firm touch climbs past 200000. Older ESP32 chips reported touch as a drop toward zero, and some reference text still describes that behaviour — on your S3, trust the thresholds in the sketch.
+              <article class="mini-card"><h3>Why no button and no moving part <button class="define" data-topic="touchPin">Define</button></h3><p>Nothing presses or closes here. The pin senses the change in its own electric field as your finger comes near, so a bare wire — even one behind a panel or a sheet of glass — does the whole job. This is the same sensing behind phone screens and elevator buttons.
 </p></article>
-              <article class="mini-card"><h3>The same trick as the table lamp <button class="define" data-topic="toggle">Define</button></h3><p>The isProcessed flag plays the role debounce played on Day 5 — it holds the memory of one press so a long touch counts as a single tap.
+              <article class="mini-card"><h3>Why the threshold sits between resting and touched <button class="define" data-topic="threshold">Define</button></h3><p>The resting reading and the touched reading are two separated levels, and a threshold is any line you draw between them — above it means touched, below it means clear. The sketch draws two lines, a high one (PRESS_VAL) to call a press and a lower one (RELEASE_VAL) to call release, so a reading wavering near a single line can&#x27;t flip the lamp back and forth.
+</p></article>
+              <article class="mini-card"><h3>On this board a touch pushes the number up</h3><p>Idle, the pin reads in the tens of thousands; a firm touch climbs past 200000. Older ESP32 chips reported touch as a drop toward zero, and some reference text still describes that — on your S3, trust the thresholds in the sketch and the numbers you read yourself.
 </p></article>
             </div>
           </div>
@@ -277,11 +279,11 @@
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">07</span> Make the idea yours</p>
               <h2>Try this: tune it to your own hand</h2>
-              <p class="muted">Same working circuit, two numbers to make your own. The stock thresholds fit most hands; yours deserve a proper fit. It sits inside today&#x27;s 25 minutes.
+              <p class="muted">Same working circuit, two numbers to make your own. The stock thresholds fit most hands; yours deserve a proper fit, drawn from readings you take yourself. It sits inside today&#x27;s 25 minutes.
 </p>
             </div>
             <div class="two-col">
-              <article class="mini-card"><h3>Read your numbers <button class="define" data-topic="threshold">Define</button></h3><p>Upload <code>Sketch_09.1_TouchRead.ino</code> again and write down two values — the reading with the wire alone and the reading with your fingertip pinching the bare tip. Set PRESS_VAL a little under your touched value and RELEASE_VAL a little over your idle value, then re-upload the lamp.
+              <article class="mini-card"><h3>Read your numbers <button class="define" data-topic="threshold">Define</button></h3><p>Upload <code>Sketch_09.1_TouchRead.ino</code> — it prints the raw touchRead value once a second. Watch the Serial Monitor and write down two readings- the wire alone, and your fingertip pinching the bare tip. They sit far apart. Set PRESS_VAL a little below your touched number and RELEASE_VAL a little above your idle number — you&#x27;re drawing your own line between the two — then re-upload the lamp.
 </p></article>
               <article class="mini-card"><h3>Demand a firm grip</h3><p>Raise PRESS_VAL step by step until a light brush does nothing and only a firm, deliberate grip flips the lamp. You&#x27;ve just designed how the switch should feel.
 </p></article>
@@ -302,7 +304,7 @@
             </div>
             <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
               <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
-              <p><strong>How the agent should behave:</strong> guide one physical connection at a time, wait for you to confirm, explain terms on request, and always check wiring, board, port, and USB before changing code.
+              <p><strong>How the agent should behave:</strong> guide one physical connection at a time and wait for confirmation, and make sure the learner leaves understanding the mechanism — the pin charges the bare wire and measures its capacitance, a fingertip adds more, and a threshold they pick from their own readings turns that into a touch. Always check wiring, board, port, and USB before changing code.
 </p>
             </div>
           </div>

@@ -190,10 +190,18 @@ theory:
     The sketch walks one chain, once a second. Each line hands its answer to the
     next — count to volts, volts to ohms, ohms to degrees.
   flow:
-    - { n: Read, title: ADC in, body: analogRead samples the midpoint and returns a count from 0 to 4095. }
-    - { n: Volts, title: Count → volts, body: Dividing by 4095 and scaling by 3.3 gives the real voltage at the pin. }
-    - { n: Ohms, title: Volts → ohms, body: The divider maths recovers the thermistor's resistance from that voltage. }
-    - { n: Degrees, title: Ohms → degrees, body: The B-equation with B 3950 turns resistance into Kelvin and then Celsius. }
+    - n: "Read"
+      title: "ADC in"
+      body: "analogRead samples the midpoint and returns a count from 0 to 4095."
+    - n: "Volts"
+      title: "Count → volts"
+      body: "Dividing by 4095 and scaling by 3.3 gives the real voltage at the pin."
+    - n: "Ohms"
+      title: "Volts → ohms"
+      body: "The divider maths recovers the thermistor's resistance from that voltage."
+    - n: "Degrees"
+      title: "Ohms → degrees"
+      body: "The B-equation with B 3950 turns resistance into Kelvin and then Celsius."
   formulaLabel: The chain
   formula: ADC count → **volts** → **ohms** → **degrees**
   notes:

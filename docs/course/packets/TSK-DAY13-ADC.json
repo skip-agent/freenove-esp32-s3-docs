@@ -6,8 +6,8 @@
   "title": "Read a knob as a number",
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
-  "estimatedTimeMinutes": 20,
-  "mission": "Wire a rotary potentiometer to GPIO 1, upload the Arduino sketch, and watch Serial Monitor print a reading from 0 to 4095 — with its voltage — that follows every turn of the knob.",
+  "estimatedTimeMinutes": 25,
+  "mission": "Wire a rotary potentiometer to GPIO 1, upload the Arduino sketch, and watch Serial Monitor print a reading from 0 to 4095 — with its voltage — that follows every turn of the knob. Today a pin reads a whole range for the first time. You'll see how the ADC slices the 0 to 3.3V span into 4096 steps, and why that turns a physical knob into a number your code can use.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -66,6 +66,8 @@
   ],
   "coachInstructions": [
     "Guide one physical connection at a time and wait for learner confirmation before proceeding.",
+    "Land the core idea- the ADC measures the actual voltage on GPIO 1 and reports it as a number from 0 to 4095, because twelve bits slice the 0 to 3.3V range into 4096 steps.",
+    "Connect the number to the knob- have the learner turn until the reading sits near 2048 and confirm the shaft points roughly halfway round.",
     "If values sit stuck at 0 or 4095, check the middle-pin wire on GPIO 1 first, then the outer pins on 3.3V and GND.",
     "If the monitor shows garbled text, set the baud rate to 115200 before touching anything else.",
     "If the monitor is blank, check board, port, and a data-capable USB cable before changing code.",
@@ -86,7 +88,7 @@
     "arduino": [
       {
         "line": "analogRead(PIN_ANALOG_IN)",
-        "explanation": "Samples the voltage on GPIO 1 and returns a number from 0 to 4095."
+        "explanation": "Measures the voltage on GPIO 1 and returns which of the 4096 steps it lands on, as a number from 0 to 4095."
       },
       {
         "line": "adcVal / 4095.0 * 3.3",
@@ -109,16 +111,20 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "The ADC measures the voltage on a pin and reports it as a number from 0 to 4095 — the knob dials which voltage it sees.",
+    "plainLanguage": "An ADC measures the actual voltage on a pin and reports it as one of 4096 numbered steps — from 0 at ground to 4095 at 3.3V. This is the doorway from the digital world into the analogue one.",
     "formula": "voltage = reading ÷ 4095 × 3.3",
     "notes": [
       {
-        "title": "Why the top is 4095",
-        "body": "Twelve bits give 4096 steps numbered 0 through 4095 — so 4095 means the pin sees the full 3.3V, and the code divides by 4095.0 to match."
+        "title": "Why the top step is 4095",
+        "body": "Twelve bits number the steps 0 through 4095, so the count stops one short of 4096 — 4095 is the top step and stands for the full 3.3V, which is why the code divides by 4095.0. Each single step covers about 0.8 mV, since 3.3V is spread across 4096 levels."
       },
       {
-        "title": "The knob is a voltage divider",
-        "body": "The track splits 3.3V along its length and the wiper taps off the share at its position — a divider you adjust by hand."
+        "title": "The knob is a divider you turn",
+        "body": "The resistive track splits 3.3V along its length, and the wiper taps off the share at its position. Turning the shaft moves that tap, so the middle-pin voltage — and the number the ADC reports — follows your hand."
+      },
+      {
+        "title": "Why the last digit wobbles",
+        "body": "The finest steps are tiny — under a millivolt each — and any real circuit carries a little electrical noise, so a held reading drifts by a count or two. Judge a knob position by the whole sweep rather than the last digit."
       }
     ]
   },
@@ -156,5 +162,5 @@
       ]
     }
   ],
-  "challenge": "Find the knob's midpoint by numbers alone, map a few positions to their readings, and note how steadily a held value sits."
+  "challenge": "Find the knob's midpoint by numbers alone, then map three positions to their readings and voltages and see whether the dial's angle maps evenly onto the 0 to 4095 scale."
 }

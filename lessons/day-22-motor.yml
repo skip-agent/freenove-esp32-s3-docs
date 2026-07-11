@@ -251,10 +251,18 @@ theory:
     nothing. Today's chip is the porter that carries the load the message
     describes.
   flow:
-    - { n: Read, title: Knob to number, body: The ADC turns the pot's voltage into a number from 0 to 4095. }
-    - { n: Decide, title: Centre is zero, body: Distance from 2048 is the speed and its side is the direction. }
-    - { n: Signal, title: Three small wires, body: In1 and In2 set direction while Enable1 carries the PWM speed. }
-    - { n: Deliver, title: Chip switches battery, body: The L293D feeds the 9V battery's current through the motor. }
+    - n: "Read"
+      title: "Knob to number"
+      body: "The ADC turns the pot's voltage into a number from 0 to 4095."
+    - n: "Decide"
+      title: "Centre is zero"
+      body: "Distance from 2048 is the speed and its side is the direction."
+    - n: "Signal"
+      title: "Three small wires"
+      body: "In1 and In2 set direction while Enable1 carries the PWM speed."
+    - n: "Deliver"
+      title: "Chip switches battery"
+      body: "The L293D feeds the 9V battery's current through the motor."
   formulaLabel: The model
   formula: "speed = **distance from 2048** · direction = **side of 2048**"
   notes:
