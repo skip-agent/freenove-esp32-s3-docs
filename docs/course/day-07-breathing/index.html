@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Day 7 · Make an LED breathe — TinySkiff ESP32-S3 Lab</title>
-  <meta name="description" content="Fade an LED on the ESP32-S3 with PWM. Upload the sketch and watch the light breathe smoothly from dark to full and back — your first analog-feeling output." />
+  <meta name="description" content="Fade an LED on the ESP32-S3 with PWM. Upload the sketch, watch the light breathe from dark to full and back, and learn how duty cycle and fast switching turn a strictly on-or-off pin into a brightness dial." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -16,7 +16,7 @@
       <div class="hero-copy">
         <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 7 of 30</p>
         <h1>Make a light<br />learn to <em>breathe</em></h1>
-        <p class="lede">Today the LED stops snapping. You keep yesterday&#x27;s single-LED circuit, upload a sketch that sweeps the pin&#x27;s brightness up and then down, and the light fades in and out like a slow breath — the board&#x27;s first move beyond plain on and off.
+        <p class="lede">Today the LED stops snapping. You keep yesterday&#x27;s single-LED circuit and upload a sketch that sweeps the pin&#x27;s brightness from dark to full and back, so the light breathes like a slow tide. The pin still only knows on and off — the fade is that pin flicking thousands of times a second, held on a little longer or shorter each moment. Understand that, and the dimmers, motor speeds, and tones later in the course are all the same move.
 </p>
         <div class="meta-row" aria-label="Lesson facts">
           <span class="pill is-key">About 20 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">Same LED circuit as Blink</span>
@@ -46,7 +46,7 @@
           <a href="#wiring"><span class="tick"></span>Chart the circuit</a>
           <a href="#steps"><span class="tick"></span>Build it</a>
           <a href="#code"><span class="tick"></span>Read the code</a>
-          <a href="#theory"><span class="tick"></span>Dimming by switching fast</a>
+          <a href="#theory"><span class="tick"></span>How a pin builds brightness out of time</a>
           <a href="#test"><span class="tick"></span>Test &amp; debug</a>
           <a href="#challenge"><span class="tick"></span>Try this</a>
           <a href="#agent"><span class="tick"></span>Coach me</a>
@@ -162,7 +162,7 @@
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">04</span> Read just enough code</p>
               <h2>Read the code</h2>
-              <p class="muted">The whole sketch is short. A few lines set up a hardware PWM channel on the pin; two loops sweep its brightness up and then back down. Switch to MicroPython if you&#x27;d rather see the same idea in Python — the wiring never changes.
+              <p class="muted">The whole sketch is short. A few lines hand GPIO 2 to a hardware PWM channel; two loops then sweep its duty cycle up and back down, which is the brightness climbing and sinking. Switch to MicroPython if you&#x27;d rather see the same idea in Python — the wiring never changes.
 </p>
             </div>
             <div class="tabs" role="tablist" aria-label="Code language">
@@ -191,9 +191,9 @@
   }
 }</code></pre>
                 <div class="code-notes">
-                  <div class="code-note"><code>ledcAttachChannel(PIN_LED, FRQ, PWM_BIT, CHN)</code><span class="note-text">Attaches GPIO 2 to a hardware PWM channel so the board can switch it fast on its own. <button class="define" data-topic="ledc">Define</button></span></div>
-                  <div class="code-note"><code>ledcWrite(PIN_LED, i)</code><span class="note-text">Sets the brightness from 0 (dark) to 255 (full) by changing how much of each instant the pin is on. <button class="define" data-topic="pwm">Define</button></span></div>
-                  <div class="code-note"><code>for (int i = 0; i &lt; 255; i++)</code><span class="note-text">The first loop sweeps brightness up and the second sweeps it back down; delay(10) sets how fast each step passes. <button class="define" data-topic="delayMs">Define</button></span></div>
+                  <div class="code-note"><code>ledcAttachChannel(PIN_LED, FRQ, PWM_BIT, CHN)</code><span class="note-text">Hands GPIO 2 to one of the board&#x27;s hardware PWM channels at 1000 Hz with 8-bit resolution, so from here the chip does the fast switching itself. <button class="define" data-topic="ledc">Define</button></span></div>
+                  <div class="code-note"><code>ledcWrite(PIN_LED, i)</code><span class="note-text">Sets the duty cycle from 0 (never on, dark) to 255 (always on, full) — the share of each cycle the pin holds on, which your eye reads as brightness. <button class="define" data-topic="pwm">Define</button></span></div>
+                  <div class="code-note"><code>for (int i = 0; i &lt; 255; i++)</code><span class="note-text">The first loop walks the duty up and the second walks it back down; delay(10) sets how long each of the steps lingers, so it sets the breathing speed. <button class="define" data-topic="delayMs">Define</button></span></div>
                 </div>
               </div>
             </div>
@@ -224,23 +224,24 @@ while True:
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">05</span> Understand, don&#x27;t memorise</p>
-              <h2>Dimming by switching fast</h2>
-              <p class="muted">There&#x27;s no half-voltage trick here — just a pin flipping faster than you can see, held on for a bigger or smaller share of each moment.
+              <h2>How a pin builds brightness out of time</h2>
+              <p class="muted">On Day 3 a pin only ever went full on or full off — HIGH or LOW, nothing between. So how does the same pin now sit at half brightness? It doesn&#x27;t hold half a voltage. It switches on and off a thousand times a second and spends part of each cycle on. Your eye can&#x27;t follow flicker that fast, so it averages the on-time into a steady brightness. That is pulse-width modulation, and it is the mechanism behind almost every &quot;analog&quot; thing the board does.
 </p>
             </div>
             <div class="theory-flow" aria-label="Measurement model">
-              <article class="flow-step"><span class="n">Only two states</span><h3>On or off</h3><p>The pin itself can only be fully on or fully off.</p></article>
-              <article class="flow-step"><span class="n">Switch fast</span><h3>1000 times a second</h3><p>PWM flips it far quicker than your eye can follow.</p></article>
-              <article class="flow-step"><span class="n">Hold longer</span><h3>More on-time</h3><p>The more of each instant the pin stays on the brighter it looks.</p></article>
-              <article class="flow-step"><span class="n">Sweep it</span><h3>Up then down</h3><p>Sliding that share from none to all and back is the breath.</p></article>
+              <article class="flow-step"><span class="n">The limit</span><h3>A pin is binary</h3><p>The output pin has two settings only — fully on or fully off. There is no dial for half a volt.</p></article>
+              <article class="flow-step"><span class="n">The trick</span><h3>Switch faster than sight</h3><p>To fake a middle level PWM flips the pin on and off about 1000 times a second, far past what your eye can resolve.</p></article>
+              <article class="flow-step"><span class="n">Duty cycle</span><h3>The share that&#x27;s on</h3><p>In each on-off cycle the pin holds on for some fraction. On a quarter of the time reads as roughly quarter brightness; on the whole time is full.</p></article>
+              <article class="flow-step"><span class="n">The hardware</span><h3>ledc does the switching</h3><p>The board&#x27;s ledc channels generate the pulses in dedicated hardware, so the processor sets one level and never has to babysit the flicker.</p></article>
+              <article class="flow-step"><span class="n">The breath</span><h3>Sweep the duty</h3><p>Sliding the duty from 0 up to 255 and back down is the fade — brightness following the share that&#x27;s on.</p></article>
             </div>
             <div class="formula-card">
               <span class="label">The model</span>
-              <code>brightness = <b>duty cycle</b> = the share of each instant the pin is on</code>
+              <code>brightness = <b>duty cycle</b> = the share of each fast cycle the pin holds on</code>
             </div>
             <div class="two-col" style="margin-top:14px">
-              <article class="mini-card"><h3>What PWM actually does <button class="define" data-topic="pwm">Define</button></h3><p>Pulse-width modulation switches the pin on and off so fast that your eye blends the flicker into a steady, dimmable glow.</p></article>
-              <article class="mini-card"><h3>Why a channel <button class="define" data-topic="ledc">Define</button></h3><p>The ESP32-S3 has dedicated PWM hardware that keeps switching the pin on its own, so the sketch only has to set a brightness and move on.</p></article>
+              <article class="mini-card"><h3>Two dials, and only one is brightness <button class="define" data-topic="pwm">Define</button></h3><p>Frequency and duty cycle are separate settings. Frequency is how many on-off cycles happen each second (1000 here) and only has to be fast enough to beat your eye. Duty cycle is the share of each cycle that is on, and that one alone sets how bright it looks.</p></article>
+              <article class="mini-card"><h3>Set it once, then walk away <button class="define" data-topic="ledc">Define</button></h3><p>You attach the pin to a channel a single time in setup(). PWM_BIT is 8, so each cycle is split into 256 slices and the level 0 to 255 chooses how many are on. After that the ledc hardware keeps pulsing on its own while ledcWrite() just names a new level.</p></article>
             </div>
           </div>
         </section>
@@ -276,19 +277,13 @@ while True:
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">07</span> Make the idea yours</p>
-              <h2>Try this: find a calm breath</h2>
-              <p class="muted">Same working circuit, one number to play with: the fade speed. It fits inside today&#x27;s 20 minutes.
+              <h2>Try this: slow PWM down until you can see it</h2>
+              <p class="muted">The fade hides the whole trick, because the switching is too fast to watch. Slow the frequency down by a few thousand times and the flicker becomes visible — and you can see, with your own eyes, that a duty number is really an on-time. Work on a copy of the sketch so today&#x27;s breathing one stays intact.
 </p>
             </div>
             <div class="two-col">
-              <article class="mini-card"><h3>Slow the breath <button class="define" data-topic="delayMs">Define</button></h3><p>Change both <code>delay(10)</code> lines together — try 5 for a quick breath, 20 for a slow one — and upload until the fade feels like a resting breath.</p></article>
-              <article class="mini-card"><h3>Hold at the top</h3><p>Add a short <code>delay(300)</code> between the fade-in and fade-out loops so the light pauses at full brightness before it sinks again.</p></article>
-            </div>
-            <div class="logbook">
-              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
-              <label>What fade speed felt most like a calm, resting breath?<textarea rows="2"></textarea></label>
-              <label>How did a pause at full brightness change the feel of the breath?<textarea rows="2"></textarea></label>
-              <label>Where in daily life have you seen a light breathe like this?<textarea rows="2"></textarea></label>
+              <article class="mini-card"><h3>Make the flicker visible <button class="define" data-topic="pwm">Define</button></h3><p>On a copy, set <code>FRQ</code> to <code>4</code> and replace the two fade loops with a single <code>ledcWrite(PIN_LED, 128)</code>, then upload. Instead of a steady half-glow the LED now blinks on and off about four times a second — that blink is the switching your eye normally averages into brightness.</p></article>
+              <article class="mini-card"><h3>Watch the duty cycle change the on-time <button class="define" data-topic="ledc">Define</button></h3><p>Still at <code>FRQ 4</code>, try <code>ledcWrite(PIN_LED, 64)</code>, then <code>192</code>, uploading each. At 64 the on-flash is brief and the dark gap long; at 192 it flips the other way. The number is the duty cycle — the share of each cycle the pin holds on — so you are watching brightness be built out of time. Restore <code>FRQ 1000</code> and the fade loops when you&#x27;re done.</p></article>
             </div>
           </div>
         </section>
@@ -306,7 +301,7 @@ while True:
             </div>
             <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
               <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
-              <p><strong>How the agent should behave:</strong> guide one physical connection at a time, wait for you to confirm, explain terms on request, and always check wiring, board, port, and USB before changing code.
+              <p><strong>How the agent should behave:</strong> guide one physical connection at a time and wait for confirmation, then teach how PWM builds brightness out of time — duty cycle as the share each fast cycle is on, with the ledc hardware doing the switching. Always check wiring, board, port, and USB before changing code.
 </p>
             </div>
           </div>

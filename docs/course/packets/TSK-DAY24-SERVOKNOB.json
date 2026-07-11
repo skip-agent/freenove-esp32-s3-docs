@@ -7,7 +7,7 @@
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
   "estimatedTimeMinutes": 20,
-  "mission": "Wire a rotary potentiometer to GPIO 14 and a servo to GPIO 21, upload the Arduino sketch, and steer the servo's horn by hand — the knob's raw reading and its mapped angle stream to Serial Monitor as proof of the conversion.",
+  "mission": "Wire a rotary potentiometer to GPIO 14 and a servo to GPIO 21, upload the Arduino sketch, and steer the servo's horn by hand. The deeper lesson is underneath the fun- an input and an output live on different number scales, and one map() call is the joint that lets either drive the other. The knob's raw reading and its mapped angle stream to Serial Monitor so you can watch the translation happen line by line.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -86,6 +86,9 @@
   ],
   "coachInstructions": [
     "Guide one physical connection at a time and wait for learner confirmation before proceeding.",
+    "Once the horn tracks the knob, teach the core idea- the knob's 0 to 4095 and the servo's 0 to 180 are different scales, and map() rescales one onto the other so either can drive the other.",
+    "Point out the read-map-write loop- because the angle is recomputed from the live reading on every pass, the horn follows the hand, which is a small closed control system.",
+    "For the challenge, have the learner predict the horn's behaviour from the four map() numbers before uploading, then confirm it against the potVal_2 column.",
     "If the horn ignores the knob, check the pot's middle wire on GPIO 14 first, then its outer pins on 3.3V and GND.",
     "If angles print but the servo never moves, check the signal wire on GPIO 21 and the servo's 5V and GND pair before changing code.",
     "Small jitter at rest is normal servo behaviour; suggest a steadier 5V supply if it's constant, and keep the learner from twisting the horn by hand while powered.",
@@ -134,16 +137,16 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "Day 13's knob and Day 23's servo meet in the middle — two map() calls carry the reading to an angle and the angle to a pulse.",
-    "formula": "angle = map(reading, 0, 4095, 0, 180) → pulse = map(angle, 0, 180, 103, 512)",
+    "plainLanguage": "An input and an output almost never share a number scale, so map() is the universal joint between them — and reading then writing on every loop makes the output follow the input live.",
+    "formula": "read input → map(input, in-low, in-high, out-low, out-high) → write output, every loop",
     "notes": [
       {
-        "title": "Why two map() calls",
-        "body": "Each call bridges one border — sensor range to human range, then human range to hardware range. Keeping the angle in the middle lets you think in degrees."
+        "title": "Why map() and not longhand",
+        "body": "map() is a straight-line rescale between two ranges. It handles any pair of scales with the same four arguments — including reversed ranges and narrowed ones — which is exactly what makes it reusable across every sensor and actuator you meet."
       },
       {
-        "title": "The pulse under the angle",
-        "body": "At 50 Hz with 12-bit precision, duty 103 is roughly a 0.5 ms pulse and 512 is roughly 2.5 ms — the width, repeated every 20 ms, is the position command the servo holds."
+        "title": "The second map is the same trick",
+        "body": "The sketch actually maps twice- reading to angle, then angle to a duty value from 103 to 512 for the PWM hardware. At 50 Hz with 12-bit precision, duty 103 is roughly a 0.5 ms pulse and 512 is roughly 2.5 ms — the width, repeated every 20 ms, is the position command the servo holds. Same universal joint, one border further in."
       }
     ]
   },
@@ -181,10 +184,5 @@
       ]
     }
   ],
-  "challenge": "Limit the horn to a 45° window like a tiller stop, reverse the steering direction, and mark three knob positions that point the horn at known angles.",
-  "logbookPrompts": [
-    "What did your 45° window feel like compared with the full sweep?",
-    "Which map() arguments did you change to reverse the direction, and why did that work?",
-    "Where did your three marks land on the knob — evenly spaced or bunched?"
-  ]
+  "challenge": "Narrow the servo to a 45 to 135 window and reverse the steering, predicting each result from the map() arguments before uploading, then restore the sketch and calibrate the knob."
 }

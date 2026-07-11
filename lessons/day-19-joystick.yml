@@ -14,10 +14,12 @@ tracks: { main: arduino, optional: micropython }
 learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
-  Wire the joystick module's five pins, upload the Arduino sketch, and watch
-  three numbers stream in Serial Monitor — X and Y follow the stick's tilt, and
-  Z drops from 1 to 0 when you press straight down.
-unlocks: One module can hand the board three readings at once — two smooth analog axes and one crisp digital press, on just three signal pins.
+  Wire the joystick's five pins, upload the sketch, and watch three numbers
+  stream in Serial Monitor. Today is about seeing the module for what it is — two
+  of the potentiometers you have already read, set at right angles, plus one push
+  button underneath. Two analog reads become an (X, Y) position on a plane, one
+  digital read catches the press, and every piece is one you have met before.
+unlocks: You can read a joystick as what it is — two analog axes that together name a point on a plane, plus one digital button — and you understand why the resting centre sits near 2048 without ever landing on it.
 seoDescription: >
   Wire a joystick module to the ESP32-S3, read its X and Y axes with analogRead
   and its push button with digitalRead, and watch all three values stream in
@@ -27,10 +29,12 @@ hero:
   instrument: none
   headline: Read two axes|and one {button}
   lede: >
-    Today you wire the control that steers every gamepad. Under the stick sit
-    two potentiometers at right angles and a push button hiding beneath them.
-    The sketch reads all three and prints their values twice a second, so you
-    can watch your hand become numbers.
+    Today you wire the control that steers every gamepad, and take it apart in
+    your head first. Under the stick sit two potentiometers at right angles and a
+    push button beneath them, so the same analogRead from the potentiometer day
+    runs twice, once per axis, and the same digitalRead catches the press. Two
+    numbers together name a point on a plane; the third is a plain button. Watch
+    your hand become a coordinate on screen.
   pills:
     - { text: About 20 minutes, key: true }
     - Arduino first
@@ -121,10 +125,10 @@ steps:
 
 code:
   intro: >
-    The loop is three reads and one print. Two pins are measured with
-    analogRead, one with digitalRead, and printf lines all three up. Switch to
-    MicroPython if you'd rather see the same idea in Python — the wiring never
-    changes.
+    The loop is three reads and one print — two axes with analogRead, the button
+    with digitalRead, the two skills from earlier days sitting side by side. A
+    printf line sends all three up at once. Switch to MicroPython if you'd rather
+    see the same idea in Python; the wiring never changes.
   arduino:
     file: Sketch_13.1_Joystick.ino
     sketch: C/Sketches/Sketch_13.1_Joystick/Sketch_13.1_Joystick.ino
@@ -179,26 +183,40 @@ code:
       otherwise skip it — it should never block the Arduino-first path.
 
 theory:
-  title: Two dials and a button in one grip
-  summary: The stick tilts two potentiometers at right angles while a push button waits underneath — three sensors sharing one thumb.
+  title: A point on a plane, plus a press
+  summary: Two potentiometers at right angles turn the stick into an (X, Y) point on a plane, and a push button underneath reads the press — every part you have already met.
   intro: >
-    You already know every part inside this module. The joystick simply packs
-    them under a single stick — the same arrangement lives inside every gamepad
-    you've ever held.
+    Nothing here is new. Reading a potentiometer with analogRead was the
+    potentiometer day; reading a button that rests HIGH and drops on a press was
+    the button day. A joystick stacks two of those pots at right angles and hides
+    a button beneath them, so one grip hands the board a position and a press.
+    Seeing it as a composite, three familiar things in one part, is the whole
+    lesson.
   flow:
-    - { n: Tilt, title: Pots turn, body: Pushing the stick rotates two potentiometers set at right angles. }
-    - { n: Measure, title: ADC reads, body: analogRead turns each pot's voltage into a number from 0 to 4095. }
-    - { n: Press, title: Button drops, body: INPUT_PULLUP holds GPIO 12 at 1 until a press pulls it to 0. }
-    - { n: Report, title: Serial prints, body: Twice a second the sketch prints all three values on one line. }
+    - n: "Two dials"
+      title: "Right angles"
+      body: "Under the stick sit two potentiometers mounted at right angles — one follows left-and-right, the other forward-and-back. Each is the same dial from the potentiometer day."
+    - n: "Two numbers"
+      title: "analogRead, twice"
+      body: "analogRead measures each pot's voltage as a number from 0 to 4095. Two axes means two of the reads you already know, one for X and one for Y."
+    - n: "One point"
+      title: "X and Y together"
+      body: "On their own, X and Y are two loose dials. Together they name a point on a plane — X across, Y up and down — which is how a stick's position becomes a coordinate the code can steer with."
+    - n: "One press"
+      title: "digitalRead, once"
+      body: "Push straight down and a hidden button closes to ground. INPUT_PULLUP holds GPIO 12 at 1 until the press pulls it to 0 — the same button-and-pull-up from earlier, riding on a third pin."
   formulaLabel: The model
-  formula: "one joystick = **two potentiometers** at right angles + **one push button**"
+  formula: "one joystick = **two ADC axes** naming a point (X, Y) on a plane + **one button** (Z)"
   notes:
-    - title: Two of the same dial
+    - title: Why the centre is near 2048, never exactly
+      explain: adc
+      body: "At rest each pot sits near the middle of its travel, so each axis reads near the middle of the 0-to-4095 range — about 2048. Real pots and the ADC never land dead centre, so expect resting numbers anywhere from about 1800 to 2200, each board its own. The centre is a neighbourhood, not a single value."
+    - title: Why the axes move independently
       explain: potentiometer
-      body: Each axis is the dial you've already read — one turned by side-to-side motion, one by forward-and-back. At rest both sit near the middle of their travel.
+      body: "The two pots share nothing but the stick. Tilt purely left-to-right and X swings while Y barely moves; tilt forward and Y swings while X holds. Because each axis is its own dial, the pair can point anywhere inside the square between the corners — that independence is what makes a plane rather than a line."
     - title: Why Z rests at 1
       explain: inputPullup
-      body: The internal pull-up holds the button pin HIGH with nothing connected in the module. Pressing the stick closes the switch to ground, so the reading drops to 0.
+      body: "The internal pull-up holds the button pin HIGH with nothing else connected in the module. Pressing the stick closes the switch to ground, so the reading drops to 0 — a plain digital button carried alongside the two analog axes."
 
 test:
   mode: serial
@@ -213,9 +231,9 @@ test:
     - "X,Y,Z: 1921,  1839,  0"
   expectedNote: >
     A new line lands twice a second. At rest both axes sit near mid-scale —
-    anywhere around 1800–2200 is healthy, and your exact numbers will differ. A
-    full push drives one axis toward 0 or 4095, and a straight-down press flips
-    Z from 1 to 0.
+    around 2048, though real pots land anywhere from about 1800 to 2200, and your
+    exact numbers will differ. A full push drives one axis toward 0 or 4095, and a
+    straight-down press flips Z from 1 to 0.
   checksTitle: If it doesn't
   checks:
     - symptom: "One axis stuck at 0 or 4095?"
@@ -230,35 +248,39 @@ test:
       fix: "Swap in a data-capable USB cable."
 
 challenge:
-  title: "Try this: chart your stick"
+  title: "Try this: read your stick as coordinates"
   railLabel: Try this
   intro: >
-    Same working circuit, one new habit: learning your instrument's true
-    numbers. It fits inside today's 20 minutes.
-  summary: Find your joystick's true centre and corner numbers, sketch the four compass directions as value pairs, and count how far the resting centre drifts.
+    Same working circuit, one new habit — reading the stick as a point rather
+    than two loose numbers. It fits inside today's 20 minutes.
+  summary: Record the resting centre and notice it never lands on a clean 2048, push each axis to both extremes to find its real span, then read a few tilts as (X, Y) points to feel the plane the stick lives on.
   cards:
-    - title: Find true centre
-      body: Let the stick rest and write down the X and Y values. Watch a few more lines land and count how far the numbers drift while nothing touches the stick.
-    - title: Map the corners
+    - title: Find your true centre
+      explain: adc
+      body: "Let the stick rest and write down the X and Y numbers. Neither will be exactly 2048 — note how far each sits from it, then watch a few more lines to see the resting values drift by a handful even while nothing touches the stick. That is the centre-is-a-neighbourhood idea in your own numbers."
+    - title: Reach both extremes
+      body: "Push X fully one way, then fully the other, and record its lowest and highest — near 0 and near 4095. Do the same for Y. Those four numbers are your two axis spans: the edges of the square the stick can point inside."
+    - title: Read a tilt as a point
       explain: joystick
-      body: Push the stick to north, south, east, and west, and record the X and Y pair at each full deflection. Sketch them as a compass with your centre numbers in the middle.
-  logbook:
-    - What are your resting centre numbers, and how much do they drift?
-    - What value pairs mark north, south, east, and west?
-    - Where have you held a control like this before?
+      body: "Now hold the stick partway toward a corner and read the pair as one coordinate — X across, Y up. Nudge it and watch both numbers change together. That moving (X, Y) pair is exactly the position a game would steer with, and why two dials beat one."
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent
     can guide you with full context.
   behaviour: >
-    guide one physical connection at a time, wait for you to confirm, explain
+    guide one physical connection at a time and wait for confirmation, but teach
+    the joystick as a composite — two analog axes that together name a point on a
+    plane, plus one digital button, all skills the learner already has. Explain
     terms on request, and always check wiring, board, port, and USB before
     changing code.
   coachInstructions:
+    - Frame the module as a composite of things already learned — two potentiometers read with analogRead (the X and Y axes) and one push button read with digitalRead and an internal pull-up.
+    - Land the 2D-position idea — X and Y alone are two dials, but together they name a point on a plane, which is how a stick steers.
+    - Explain that each axis rests near 2048 but never exactly, so healthy resting values fall roughly between 1800 and 2200 and differ from board to board.
     - Guide one physical connection at a time and wait for learner confirmation before proceeding.
     - If one axis is stuck at 0 or 4095, check that axis's wire first — VRX belongs on GPIO 14 and VRY on GPIO 13.
-    - If X and Y move for the wrong direction of tilt, the VRX and VRY wires have traded places.
+    - If X and Y respond to the wrong direction of tilt, the VRX and VRY wires have traded places.
     - If Z never leaves 1, check the SW wire on GPIO 12 and coach a firm straight-down press.
     - If both axes read the same dead value, check the module's +5V and GND connections before touching code.
     - Keep the Arduino path primary; MicroPython is optional only if already set up.

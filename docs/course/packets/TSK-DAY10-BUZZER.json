@@ -7,7 +7,7 @@
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
   "estimatedTimeMinutes": 25,
-  "mission": "Wire an active buzzer through an NPN transistor, add a push button, upload the Arduino sketch, and turn your board into a doorbell — press for a beep, let go for silence.",
+  "mission": "Wire an active buzzer through an NPN transistor, add a push button, upload the Arduino sketch, and turn your board into a doorbell — press for a beep, let go for silence. While you build it, learn what that beep actually is: sound is air being pushed back and forth, and its pitch is a frequency you can set. That is the idea the passive-buzzer siren pays off, and the counterpart to Day 7, where the pin's on-time set brightness.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -92,11 +92,14 @@
   ],
   "coachInstructions": [
     "Guide one physical connection at a time and wait for learner confirmation before proceeding.",
+    "Land the core idea- sound is vibrating air, and pitch is frequency, the number of on/off cycles a second that reach the buzzer.",
+    "Tie it to Day 7- there the duty cycle set brightness; here the frequency sets pitch while the duty stays roughly fixed, the same fast-switching pin doing a new job.",
+    "Explain active versus passive plainly- an active buzzer has its own oscillator and plays one fixed note, while a passive buzzer is silent until the pin feeds it a frequency, which tone() generates.",
+    "Point out that musical notes are just specific frequencies, so 262 Hz is a middle C and 392 Hz the G above it.",
     "Check the transistor's orientation first — emitter, base, and collector each have a job, and a reversed transistor is the most common cause of no sound.",
     "Confirm the buzzer's + pin goes to the 5V rail, not 3.3V, or the sound will be faint or absent.",
-    "If there is no sound, check the transistor legs and the 5V buzzer connection before changing code.",
     "If the buzzer always sounds, suspect the button wiring or its 10 kΩ pull-up on GPIO 21.",
-    "Keep the Arduino path primary; MicroPython and the passive-buzzer siren are optional only if already set up."
+    "Keep the Arduino path primary; the passive-buzzer pitch experiment and MicroPython are optional only if already set up."
   ],
   "steps": [
     "Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.",
@@ -135,16 +138,20 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "The pin reads the button and switches a transistor, and the transistor drives the 5V buzzer the pin couldn't power alone.",
-    "formula": "press → transistor switches 5V → buzzer sounds",
+    "plainLanguage": "Sound is air vibrating, and pitch is how many on/off cycles a second reach the buzzer — the counterpart to Day 7, where the pin's on-time set brightness.",
+    "formula": "on/off cycles per second = frequency = pitch (Day 7 varied on-time for brightness; here the rate sets the note)",
     "notes": [
       {
-        "title": "Active vs passive buzzers",
-        "body": "An active buzzer has its own oscillator and plays one fixed tone. A passive buzzer is silent until you feed it a changing signal, so you choose the pitch."
+        "title": "The tie back to Day 7",
+        "body": "Day 7's pin also flicked far too fast to watch, and its duty cycle, the share of each cycle held on, set the brightness. Here the duty stays near half and the frequency is the knob, so the same fast-switching pin makes pitch instead of light."
       },
       {
-        "title": "What the transistor is for",
-        "body": "The pin can't supply the buzzer's current. The transistor lets the small pin signal switch the larger 5V current on and off."
+        "title": "Why the active buzzer ignores all this",
+        "body": "Its built-in oscillator fixes its own pitch, so switching it faster from the pin just chops the same note on and off. Only a passive buzzer hands you the frequency, which is why melodies and sirens need the passive kind."
+      },
+      {
+        "title": "Where the transistor fits",
+        "body": "The pin still can't supply the buzzer's current, so it switches a transistor and the transistor drives the 5V buzzer. The pin decides on or off; the transistor does the lifting."
       }
     ]
   },
@@ -182,10 +189,5 @@
       ]
     }
   ],
-  "challenge": "Design a two-beep pattern that means something, then try the passive buzzer to hear a pitch you control.",
-  "logbookPrompts": [
-    "What did your two-beep signal mean, and could someone else read it?",
-    "What was the transistor doing every time the buzzer sounded?",
-    "Where in daily life does one fixed tone do a whole job?"
-  ]
+  "challenge": "Play three named frequencies on the passive buzzer, hear each land as a higher note, then string them into a short rising phrase — and confirm the active buzzer can't do it."
 }

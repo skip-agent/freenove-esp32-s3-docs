@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Day 11 · Make the board talk back — TinySkiff ESP32-S3 Lab</title>
-  <meta name="description" content="Open Serial Monitor and watch the ESP32-S3 print text over USB. No wiring — just Serial.begin, println, and printf reporting the board&#x27;s running time in seconds." />
+  <meta name="description" content="Open Serial Monitor and watch the ESP32-S3 print text over USB. No wiring — just Serial.begin, println, and printf reporting the board&#x27;s running time in seconds, and why serial is your main debugging tool." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -16,10 +16,10 @@
       <div class="hero-copy">
         <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 11 of 30</p>
         <h1>Make the board<br /><em>talk back</em></h1>
-        <p class="lede">No wiring today. You upload a short sketch, open Serial Monitor, and the ESP32-S3 starts sending text up the same USB cable that carries your code — a start-up line first, then a running clock that ticks up every second.
+        <p class="lede">No wiring today. You upload a short sketch, open Serial Monitor, and the ESP32-S3 starts sending text up the same USB cable that carries your code — a start-up line first, then a running clock that ticks up every second. The same cable, now running text the other way, becomes your window into the program.
 </p>
         <div class="meta-row" aria-label="Lesson facts">
-          <span class="pill is-key">About 15 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">No wiring today</span>
+          <span class="pill is-key">About 20 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">Your main debug tool</span>
         </div>
       </div>
       <div class="hero-side no-instrument">
@@ -45,7 +45,7 @@
           <a href="#parts"><span class="tick"></span>What you need</a>
           <a href="#steps"><span class="tick"></span>Build it</a>
           <a href="#code"><span class="tick"></span>Read the code</a>
-          <a href="#theory"><span class="tick"></span>How the board talks over USB</a>
+          <a href="#theory"><span class="tick"></span>Serial is your window into a running program</a>
           <a href="#test"><span class="tick"></span>Test &amp; debug</a>
           <a href="#challenge"><span class="tick"></span>Try this</a>
           <a href="#agent"><span class="tick"></span>Coach me</a>
@@ -101,7 +101,7 @@
             </ol>
             <div class="done-banner" id="doneBanner" role="status">
               <span class="icon" aria-hidden="true">📡</span>
-              <div><strong>The board has a voice.</strong><p>Your ESP32-S3 is sending text back over USB. Head to Test &amp; debug to confirm what should scroll past.</p></div>
+              <div><strong>The board has a voice.</strong><p>Your ESP32-S3 is sending text back over USB, and you can read what it&#x27;s thinking. Head to Test &amp; debug to confirm what should scroll past.</p></div>
             </div>
           </div>
         </section>
@@ -129,9 +129,9 @@
   <span class="tok-fn">delay</span>(<span class="tok-num">1000</span>);
 }</code></pre>
                 <div class="code-notes">
-                  <div class="code-note"><code>Serial.begin(115200)</code><span class="note-text">Opens the USB serial link at 115200 baud — the same number you set in Serial Monitor. <button class="define" data-topic="serialBegin">Define</button></span></div>
-                  <div class="code-note"><code>Serial.println(&quot;ESP32S3 initialization completed!&quot;)</code><span class="note-text">Sends one line of text, then moves to the next line — the board&#x27;s start-up announcement. <button class="define" data-topic="serialPrint">Define</button></span></div>
-                  <div class="code-note"><code>Serial.printf(&quot;Running time : %.1f s\r\n&quot;, millis() / 1000.0f)</code><span class="note-text">Fills the running time into the text, one decimal place, and sends it once a second. <button class="define" data-topic="millis">Define</button></span></div>
+                  <div class="code-note"><code>Serial.begin(115200)</code><span class="note-text">Opens the USB serial link and sets its speed to 115200 baud — the same number Serial Monitor has to use, so both ends read the stream the same way. <button class="define" data-topic="serialBegin">Define</button></span></div>
+                  <div class="code-note"><code>Serial.println(&quot;ESP32S3 initialization completed!&quot;)</code><span class="note-text">Sends one line of text up the cable, then moves to the next line — a start-up marker that proves the link is live before any real data flows. <button class="define" data-topic="serialPrint">Define</button></span></div>
+                  <div class="code-note"><code>Serial.printf(&quot;Running time : %.1f s\r\n&quot;, millis() / 1000.0f)</code><span class="note-text">Slots a live value into a text template — one decimal place — and sends it, so a number inside the program becomes something you can read. <button class="define" data-topic="millis">Define</button></span></div>
                 </div>
               </div>
             </div>
@@ -160,23 +160,23 @@ while True:
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">04</span> Understand, don&#x27;t memorise</p>
-              <h2>How the board talks over USB</h2>
-              <p class="muted">There&#x27;s no new hardware today — the same cable that flashes your code doubles as a two-way text line, provided the board and the monitor keep the same pace.
+              <h2>Serial is your window into a running program</h2>
+              <p class="muted">On Day 2 the USB-to-serial bridge carried your code down onto the board. It runs both directions. Today the same wire carries text back up, so the board can report what it&#x27;s actually doing. Everything before this you judged from the outside — a light on, a light off. From here you can ask the board directly, which is why serial is the single most useful debugging tool in the course.
 </p>
             </div>
             <div class="theory-flow" aria-label="Measurement model">
-              <article class="flow-step"><span class="n">Open the link</span><h3>Serial.begin</h3><p>The board switches the USB line into text mode at a set speed.</p></article>
-              <article class="flow-step"><span class="n">Agree on speed</span><h3>Same baud</h3><p>Serial Monitor must use the same 115200 or the text arrives scrambled.</p></article>
-              <article class="flow-step"><span class="n">Send a line</span><h3>println</h3><p>Each print pushes characters up the cable to your screen.</p></article>
-              <article class="flow-step"><span class="n">Keep reporting</span><h3>Once a second</h3><p>The loop prints the running time again after each delay.</p></article>
+              <article class="flow-step"><span class="n">1 · Open the link</span><h3>Serial.begin</h3><p>One line puts the USB bridge into text mode and fixes its speed. Until this runs, the board has no voice.</p></article>
+              <article class="flow-step"><span class="n">2 · Agree on speed</span><h3>Same baud</h3><p>Baud is bits per second, and both ends must use the same number. Serial Monitor set to 115200 reads the board&#x27;s 115200 stream cleanly; a mismatch samples the wire at the wrong rate and prints garbage.</p></article>
+              <article class="flow-step"><span class="n">3 · Send characters</span><h3>print / println</h3><p>Each print pushes characters up the cable to your screen. printf slots a live value into a template first, so a number inside the program lands as readable text.</p></article>
+              <article class="flow-step"><span class="n">4 · See the invisible</span><h3>Watch it change</h3><p>millis() rises with no light to show it. Printing it every second makes an internal value visible and live — the essence of debugging.</p></article>
             </div>
             <div class="formula-card">
               <span class="label">The rule</span>
-              <code>readable text = <b>board baud</b> = <b>monitor baud</b></code>
+              <code>readable text needs <b>board baud</b> = <b>monitor baud</b></code>
             </div>
             <div class="two-col" style="margin-top:14px">
-              <article class="mini-card"><h3>What the baud rate is <button class="define" data-topic="serialBegin">Define</button></h3><p>Baud is how fast the two sides send signal changes. Both must agree, or the letters turn to gibberish.</p></article>
-              <article class="mini-card"><h3>Where the number comes from <button class="define" data-topic="millis">Define</button></h3><p>millis() is the board&#x27;s own stopwatch — milliseconds since it booted — which the sketch divides into seconds.</p></article>
+              <article class="mini-card"><h3>Why a wrong baud is garbage, not silence <button class="define" data-topic="serialBegin">Define</button></h3><p>The characters still arrive on the wire. Baud sets how often each side reads the signal, so a mismatched monitor samples between the real bits and reconstructs the wrong letters. The fix is always to match the number, never to resend.</p></article>
+              <article class="mini-card"><h3>Printing is how you debug from here on <button class="define" data-topic="serialPrint">Define</button></h3><p>When a later sketch misbehaves, a print of the suspect value tells you what the code truly saw — a sensor reading, a state, a counter — instead of guessing from an LED. Reach for a print before you rewrite anything.</p></article>
             </div>
           </div>
         </section>
@@ -200,8 +200,8 @@ while True:
               <div>
                 <span class="checks-title">If it doesn&#x27;t</span>
                 <ul class="checklist">
-                  <li><strong>Garbled or random characters?</strong> Set Serial Monitor to 115200 baud to match the sketch.</li>
-                  <li><strong>Blank monitor?</strong> Confirm the right board and port, then press the board&#x27;s reset button.</li>
+                  <li><strong>Garbled or random characters?</strong> The characters are arriving; the monitor is reading them at the wrong rate. Set Serial Monitor to 115200 to match the sketch.</li>
+                  <li><strong>Blank monitor?</strong> Confirm the right board and port, then press the board&#x27;s reset button so setup() runs and prints the start-up line again.</li>
                   <li><strong>Only the first line, no count?</strong> Give it a second — the running time prints once per delay(1000).</li>
                   <li><strong>Upload fails?</strong> Swap in a data-capable USB cable.</li>
                 </ul>
@@ -213,19 +213,13 @@ while True:
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">06</span> Make the idea yours</p>
-              <h2>Try this: change what it says</h2>
-              <p class="muted">Same working sketch, no wiring — just the text and the timing. It fits inside today&#x27;s 15 minutes.
+              <h2>Try this: reveal the board&#x27;s real speed</h2>
+              <p class="muted">Printing earns its keep when it shows you something you could never see from the outside. Add a value the program has always held, then make the invisible obvious. No wiring, and it fits inside today&#x27;s time.
 </p>
             </div>
             <div class="two-col">
-              <article class="mini-card"><h3>Rename the start-up line <button class="define" data-topic="serialPrint">Define</button></h3><p>Change the words inside <code>Serial.println(&quot;…&quot;)</code> and re-upload — the board greets you however you like.</p></article>
-              <article class="mini-card"><h3>Report faster <button class="define" data-topic="millis">Define</button></h3><p>Lower the <code>delay(1000)</code> to <code>delay(250)</code> so the running time updates four times a second, then add a second <code>Serial.println</code> of your own.</p></article>
-            </div>
-            <div class="logbook">
-              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
-              <label>What message did you have the board greet you with?<textarea rows="2"></textarea></label>
-              <label>How fast could the running time update before it was hard to read?<textarea rows="2"></textarea></label>
-              <label>What would you want the board to report back to you in a real project?<textarea rows="2"></textarea></label>
+              <article class="mini-card"><h3>Print a hidden counter <button class="define" data-topic="serialPrint">Define</button></h3><p>Before <code>setup()</code>, add <code>int count = 0;</code>. Inside <code>loop()</code>, add <code>count = count + 1;</code> then <code>Serial.println(count);</code>. Re-upload. You&#x27;re now watching a value that lived inside the program every run before this, invisible until you printed it.</p></article>
+              <article class="mini-card"><h3>Take the brake off <button class="define" data-topic="millis">Define</button></h3><p>Comment out <code>delay(1000);</code> and re-upload. The counter stops climbing once a second and races into the thousands — the board was always looping this fast, and printing is the only reason you can see it. That is debugging: making the code&#x27;s real behaviour visible.</p></article>
             </div>
           </div>
         </section>
@@ -243,7 +237,7 @@ while True:
             </div>
             <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
               <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
-              <p><strong>How the agent should behave:</strong> keep it to upload-and-read, check board, port, cable, and baud rate before touching code, and explain Serial.begin, println, and millis on request.
+              <p><strong>How the agent should behave:</strong> keep it to upload-and-read, check board, port, cable, and baud before touching code, and frame serial as the learner&#x27;s main debugging tool — the way to see a value the program holds. Explain Serial.begin, println, and millis on request.
 </p>
             </div>
           </div>

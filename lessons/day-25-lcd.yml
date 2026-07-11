@@ -14,10 +14,13 @@ tracks: { main: arduino, optional: micropython }
 learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
-  Wire the LCD1602's four backpack pins to the board, install the bundled I2C
-  library once, upload the Arduino sketch, and read "hello, world!" plus a live
-  seconds counter on the glass — your project's first screen.
-unlocks: Two signal wires can carry a whole screen, so anything the project measures can be shown right on the device.
+  Wire the LCD1602's four backpack pins, add the bundled I2C library once, and
+  upload the sketch that greets you on the top row while the bottom row counts
+  seconds. The real prize is the idea underneath: how two shared wires can drive
+  a whole screen, and how the board reaches this display by a number so that many
+  devices could hang off those same two wires. That bus is how most screens and
+  sensors will attach to your project from here on.
+unlocks: You understand the I2C bus — two shared wires, each device reached by its own address — and can place your own text anywhere on a sixteen-by-two screen.
 seoDescription: >
   Wire the I2C LCD1602 module to the ESP32-S3, install the LiquidCrystal_I2C
   library, and display "hello, world!" with a live seconds counter — a whole
@@ -29,8 +32,9 @@ hero:
   lede: >
     Today the project gets a face. You wire the LCD1602's four pins to the board,
     add one library to the Arduino IDE, and upload a sketch that greets you on the
-    top row while the bottom row counts the seconds — a whole screen carried over
-    two signal wires.
+    top row while the bottom row counts the seconds. The screen rides on just two
+    signal wires — a shared bus the board could hang many more devices off, each
+    one called up by its own address.
   pills:
     - { text: About 25 minutes, key: true }
     - Arduino first
@@ -205,26 +209,39 @@ code:
       should never block the Arduino-first path.
 
 theory:
-  title: Two wires carry the whole screen
-  summary: I2C moves every character over one data wire and one clock wire; the backpack chip turns those messages into the signals the bare LCD needs.
+  title: One bus, two wires, devices by address
+  summary: "I2C lets the board drive a whole screen over two shared wires — one for data, one for a clock — by opening every message with the display's address. The backpack chip turns those messages into the many signals a bare LCD needs."
   intro: >
-    A bare LCD1602 wants over a dozen wires. The backpack soldered to its back
-    shrinks that to two signals, because I2C sends everything as addressed
-    messages down a shared pair.
+    A bare LCD1602 has a row of pins that each carry one signal, and driving it
+    directly means wiring about a dozen of them. The little backpack on the back
+    trades that for two wires by putting the display on an I2C bus — the same
+    two-wire scheme most screens and sensors use. Understanding the bus is worth
+    more than today's circuit, because you'll meet it again and again.
   flow:
-    - { n: One bus, title: Two shared wires, body: SDA carries the data while SCL keeps the beat for both ends. }
-    - { n: Address, title: 0x27 or 0x3F, body: Every device on the bus has a number so the board can call this one by name. }
-    - { n: Translate, title: The backpack chip, body: It turns bus messages into the many parallel signals the bare LCD needs. }
-    - { n: Print, title: Cursor then text, body: The sketch parks the cursor at a row and column and writes characters there. }
+    - n: "1 · The problem"
+      title: "A dozen pins"
+      body: "A bare character LCD expects a fistful of parallel wires, one per signal. Wiring that by hand for every display would fill the board fast."
+    - n: "2 · The bus"
+      title: "Two shared wires"
+      body: "The backpack chip takes bytes over just two lines: SDA carries the data one bit at a time, and SCL is a clock that ticks so both ends agree when each bit counts."
+    - n: "3 · Who talks"
+      title: "Board asks, device answers"
+      body: "The board is the one that starts every exchange. Devices sit on the bus and listen, and reply only when they're spoken to — so many can share the same two wires without talking over each other."
+    - n: "4 · By name"
+      title: "The address"
+      body: "The board opens each message with a number — the device's address. This display answers to 0x27 (some boards to 0x3F). Send to the wrong number and the display never hears its name, so the screen stays blank."
+    - n: "5 · Placing text"
+      title: "Row and column"
+      body: "Once it's addressed and awake, the LCD holds a grid of sixteen columns by two rows. You set a cursor to a row and column, then print, and the characters land at that spot."
   formulaLabel: The model
-  formula: two wires → **address** → cursor position → characters
+  formula: "a dozen pins → **two shared wires** → the right **address** → cursor at row and column → characters"
   notes:
     - title: Another kind of serial
       explain: serial
-      body: The bits travel single file down SDA the way they travel down USB to your Serial Monitor; SCL is the shared clock that tells both ends when each bit counts.
-    - title: Two possible addresses
+      body: The bits travel single file down SDA the way they travel down USB to your Serial Monitor. The extra wire, SCL, is a shared clock that tells both ends exactly when to read each bit — which is what lets several devices share one pair of lines.
+    - title: Why the address can be one of two
       explain: i2c
-      body: Backpacks built on the PCF8574T chip answer at 0x27 and PCF8574AT boards answer at 0x3F. The sketch tries 0x27 first and switches by itself when nothing replies.
+      body: The backpack's PCF8574T chip answers at 0x27, while the PCF8574AT version answers at 0x3F. The sketch pings 0x27 first, and when nothing replies it switches to 0x3F on its own — a small demonstration that a wrong address means silence.
 
 test:
   mode: visual
@@ -250,36 +267,36 @@ test:
       fix: "Re-upload the sketch, then press the board's reset button."
 
 challenge:
-  title: "Try this: make the screen yours"
+  title: "Try this: drive the grid, then reason about the address"
   railLabel: Try this
   intro: >
-    Same working circuit, three edits to the two print lines. It fits inside
-    today's 25 minutes.
-  summary: Put your boat's name on row 0, turn the counter into minutes and seconds, then overflow a row on purpose and fix it.
+    Same working circuit. The first two cards make the row-and-column model real
+    by putting your own text exactly where you want it. The last one asks you to
+    predict what the bus does when the address is wrong — no wiring change needed.
+  summary: Put your own text on row 0, then centre a word by column using setCursor, then reason through what a wrong address would do to the screen.
   cards:
     - title: Name the boat
-      body: Change `lcd.print("hello, world!")` to your boat's name and upload — row 0 is yours now.
-    - title: Minutes and seconds
-      explain: millis
-      body: Make row 1 read like a clock — print `millis() / 60000` for the minutes, print a colon, then print `(millis() / 1000) % 60` for the seconds.
-    - title: Overflow the row
       explain: lcd1602
-      body: Print a message longer than sixteen characters and watch where the extra letters go. Then trim the message until the whole line fits the glass again.
-  logbook:
-    - What did the screen do with the characters past column sixteen?
-    - How would you show a sensor reading from an earlier day on this screen?
-    - Where on a real boat would a two-line display earn its keep?
+      body: Change `lcd.print("hello, world!")` to your boat's name and upload. Row 0 is yours now — the greeting was only ever text you were free to replace.
+    - title: Place it by column
+      body: "Before that print, add `lcd.setCursor(4,0)` and upload again. The word now starts four columns in. Try other numbers from 0 to 15 and watch the text slide along the row — that pair is column then row, the display's whole coordinate system."
+    - title: Predict a wrong address
+      explain: i2c
+      body: "The sketch tries 0x27, and if nothing answers it falls back to 0x3F. Ask yourself: if you forced the address to a number no device on your bus uses, what would the screen do — and why? Then look back at the backlight-on-but-blank case in Test & debug and see if your reasoning matches."
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent can
     guide you with full context.
   behaviour: >
-    guide one physical connection at a time, wait for you to confirm, explain
-    terms on request, and always check wiring, board, port, and USB before
+    guide one physical connection at a time and wait for confirmation, then teach
+    the I2C bus behind the circuit — two shared wires, a clock, and each device
+    reached by its own address. Always check wiring, board, port, and USB before
     changing code.
   coachInstructions:
     - Guide one backpack pin at a time — GND, VCC to 5V, SDA to GPIO 14, SCL to GPIO 13 — and wait for learner confirmation before proceeding.
+    - Land the core idea — I2C carries the whole screen over two shared wires (SDA data, SCL clock), and the board reaches this display by its address (0x27, some at 0x3F); a wrong address means the display never answers and the screen stays blank.
+    - Make the row-and-column model concrete — the display is a grid sixteen columns wide and two rows tall, and setCursor takes column then row, so text lands wherever they point the cursor before printing.
     - The top gotcha is the contrast dial; a lit backlight with blank rows means turn the dial on the back of the module, never a code change.
     - If nothing glows at all, check VCC on the 5V pin and GND before touching the signal wires or the sketch.
     - A compile error naming LiquidCrystal_I2C.h means the ZIP library step was skipped — walk them through Sketch → Include Library → Add .ZIP Library… with the kit's LiquidCrystal_I2C-1.1.2.zip.

@@ -6,8 +6,8 @@
   "title": "Send a comet down the bar",
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
-  "estimatedTimeMinutes": 20,
-  "mission": "Rebuild the Day 6 LED bar, upload the Arduino sketch, and watch a bright head with a fading tail glide along the bar and back — the first time each segment holds its own brightness instead of full on or full off.",
+  "estimatedTimeMinutes": 25,
+  "mission": "Rebuild the Day 6 LED bar, upload the Arduino sketch, and watch a bright head with a fading tail glide along the bar and back. The real lesson sits underneath the light: the board draws one still frame, pauses, then draws the next — motion built from stills on a timer, the same idea behind every film and video game. A moving comet turns out to be a list of brightnesses, shifted one step each frame.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -66,10 +66,12 @@
   ],
   "coachInstructions": [
     "Start by confirming the Day 6 LED bar is still wired; only eight segments are driven today, and two staying dark is expected.",
+    "Land the core idea — motion here is still frames on a timer, where each loop pass sets eight brightnesses and pauses, and shifting the brightness list one step per frame is what moves the comet.",
+    "Point out that the tail lives in the dutys list as values that fall off behind the head; the loop only ever shows a moving slice of that list.",
     "Remind the learner that each driven segment needs its own 220 Ω series resistor — a shared or missing resistor is the common mistake here.",
     "If only one segment lights with no tail, suspect Day 6's on/off sketch is still loaded; have the learner upload 04.2 before changing anything else.",
     "If a segment in the path stays dark, check that segment's resistor and its jumper to its GPIO pin, not the whole circuit.",
-    "Explain PWM, the dutys gradient, and the sliding window on request; do not dump theory before the learner has a working comet.",
+    "For the challenge, have them slow delay right down first to watch single frames land, before reshaping the tail or reversing the gradient; do not dump theory before the learner has a working comet.",
     "Keep the Arduino path primary; MicroPython is optional only if already set up."
   ],
   "steps": [
@@ -84,15 +86,15 @@
     "arduino": [
       {
         "line": "ledcAttachChannel(ledPins[i], 1000, 10, chns[i])",
-        "explanation": "Gives each of the eight pins its own PWM channel, so every segment can hold a brightness of its own."
+        "explanation": "Gives each of the eight pins its own PWM channel, so every segment can hold a brightness of its own — the per-LED control each frame needs."
       },
       {
         "line": "const int dutys[] = {0,..., 1023,512,256,128,64,32,16,8, ...,0}",
-        "explanation": "A brightness gradient — bright to dim — with dark padding on each side; those falling numbers are the fading tail."
+        "explanation": "A brightness for every position — bright head down to a faint glow, with dark padding on each side. Those falling numbers are the tail, baked into the data rather than redrawn each frame."
       },
       {
         "line": "ledcWrite(ledPins[j], dutys[i + j])",
-        "explanation": "Reads an eight-wide window of the gradient and slides it one step each pass, which is what makes the comet move."
+        "explanation": "Shows one eight-wide slice of the list — a single frame; the i offset moves that slice one step further each pass, so successive frames make the comet travel."
       }
     ],
     "micropython": [
@@ -107,12 +109,20 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "Give each LED its own brightness, shape a bright-to-dim gradient, then slide that gradient one step at a time so the head leads and the tail fades.",
-    "formula": "eight brightnesses → a falling gradient → slide it one step → head leads, tail fades",
+    "plainLanguage": "Each pass of the loop draws one still frame — eight brightnesses on the bar — then shifts the pattern one step; frames arriving faster than the eye can separate them read as a single moving comet.",
+    "formula": "set eight brightnesses → pause → shift one step → repeat = a moving picture",
     "notes": [
       {
-        "title": "What PWM is doing",
-        "body": "PWM flicks each pin on and off very fast; the fraction of time it stays on sets how bright that segment looks, so a whole row can carry a smooth gradient."
+        "title": "How each LED holds a brightness",
+        "body": "PWM flicks each pin on and off very fast; the fraction of time it stays on sets how bright that segment looks, so one row can carry a smooth gradient of its own."
+      },
+      {
+        "title": "Why the steps look smooth",
+        "body": "Each frame lingers on your eye for an instant, and the next arrives before it fades. Around ten frames a second, they merge into continuous motion — the same trick a film reel uses."
+      },
+      {
+        "title": "One long list, a moving window",
+        "body": "The brightness list is longer than the bar and padded with dark at both ends. Each frame shows a different eight-LED slice of it, so the comet can slide in from a dark bar and back out again."
       }
     ]
   },
@@ -150,10 +160,5 @@
       ]
     }
   ],
-  "challenge": "Change the trail by editing the dutys values, then change the sweep speed with the delay, and note what each edit does to the comet.",
-  "logbookPrompts": [
-    "What did a longer or shorter tail change about how the comet looked?",
-    "Which sweep speed felt best, and why?",
-    "What real-world moving light works like this comet and tail?"
-  ]
+  "challenge": "Slow the frames down until you can see them land one at a time, then reshape the tail and swap which end leads — and predict each result before you upload."
 }

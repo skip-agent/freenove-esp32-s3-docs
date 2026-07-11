@@ -6,8 +6,8 @@
   "title": "Soft light: map input to brightness",
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
-  "estimatedTimeMinutes": 20,
-  "mission": "Wire a potentiometer to one pin and an LED to another, upload the Arduino sketch, and turn the knob to set the LED's brightness — the reading on one pin drives the glow on the other, live.",
+  "estimatedTimeMinutes": 25,
+  "mission": "Wire a potentiometer to one pin and an LED to another, upload the Arduino sketch, and turn the knob to set the LED's brightness. Then see the mechanism underneath — the knob is a voltage divider that splits 3.3V into a value the board reads, and that value becomes the light, live. One unbroken loop, from your hand to the glow.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -56,17 +56,17 @@
     {
       "partPin": "Pot middle pin",
       "connectTo": "GPIO 1",
-      "reason": "The board reads the knob's voltage here."
+      "reason": "The divider's midpoint — the board reads this voltage as a number."
     },
     {
       "partPin": "Pot outer pin",
       "connectTo": "3.3V",
-      "reason": "Gives the knob its top voltage."
+      "reason": "Sets the top of the knob's voltage divider at 3.3V."
     },
     {
       "partPin": "Pot other outer pin",
       "connectTo": "GND",
-      "reason": "Gives the knob its bottom voltage."
+      "reason": "Sets the bottom of the divider at 0V."
     },
     {
       "partPin": "LED long leg (+)",
@@ -81,17 +81,20 @@
   ],
   "coachInstructions": [
     "Guide one physical connection at a time and wait for learner confirmation before proceeding.",
+    "Teach the voltage divider as the core idea — the knob is two resistances across 3.3V and ground, the wiper taps the midpoint, and turning it slides that midpoint voltage between 0 and 3.3V.",
     "The pot's middle pin goes to GPIO 1. One page of the manual's prose names a different pin; the code uses GPIO 1 and the code is truth — always route the middle pin to GPIO 1.",
     "If the LED is stuck at full or stuck dark at every position, suspect the middle-pin wire on GPIO 1 first.",
-    "If turning the knob changes nothing at all, check the outer pot pins on 3.3V and GND.",
+    "If turning the knob changes nothing at all, check the outer pot pins on 3.3V and GND — the two ends of the divider.",
     "If the LED never lights, check its direction, the 220 Ω resistor, and the GPIO 14 wire before changing code.",
-    "If asked why there's no map() call, explain that 12-bit PWM matches the 12-bit ADC so the raw reading is already a valid duty; the MicroPython path remaps to 0–1023 and its numbers will differ."
+    "For the Serial challenge, have them add Serial.begin(115200) and Serial.println(adcVal), watch the reading sweep 0 to 4095, then flip the mapping and predict which end goes dark.",
+    "If asked why there's no map() call, explain that 12-bit PWM matches the 12-bit ADC so the raw reading is already a valid duty; the MicroPython path remaps to 0–1023 and its numbers will differ.",
+    "If they ask how a real sensor fits in, explain that the same divider with a photoresistor or thermistor in place of the knob moves on its own as light or heat changes."
   ],
   "steps": [
     "Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.",
     "Stand the potentiometer on the breadboard so each of its three pins lands in its own row.",
     "Wire one outer pot pin to 3.3V and the other outer pin to GND.",
-    "Run the pot's middle pin to GPIO 1 — this is the wire the board reads.",
+    "Run the pot's middle pin — the divider's midpoint — to GPIO 1, the wire the board reads.",
     "Place the LED so its long leg (+) is on the GPIO 14 side and its short leg (−) heads toward ground.",
     "Put the 220 Ω resistor in series between GPIO 14 and the LED's long leg.",
     "Compare every wire to the chart before you plug in USB.",
@@ -125,16 +128,20 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "The knob's voltage becomes a number, the number becomes a duty, and the duty becomes brightness — a complete control chain in four lines.",
-    "formula": "knob voltage → ADC number → PWM duty → brightness",
+    "plainLanguage": "The knob is a voltage divider; its midpoint voltage becomes an ADC number, the number becomes a PWM duty, and the duty becomes brightness — one control loop, run many times a second.",
+    "formula": "voltage divider → ADC number → PWM duty → brightness",
     "notes": [
+      {
+        "title": "Why the knob is a voltage divider",
+        "body": "Two resistances in series split the supply at their meeting point in proportion to their sizes. The knob makes that split adjustable — the wiper moves the boundary between the upper stretch of track and the lower one, so the midpoint voltage moves with your wrist."
+      },
+      {
+        "title": "The same divider, without a hand",
+        "body": "Replace one half of the divider with a photoresistor and the split shifts on its own as the light changes — no knob to turn. That is how most of the kit's sensors reach the ADC, which is why this one pattern is worth knowing cold."
+      },
       {
         "title": "Why there's no map() call",
         "body": "The sketch sets the PWM to 12 bits on purpose. Both scales run 0 to 4095, so the ADC reading is already a valid duty and passes through untouched. When the scales differ — as in the MicroPython version — you remap first."
-      },
-      {
-        "title": "What the potentiometer is doing",
-        "body": "Its two outer pins hold 3.3V and 0V across a resistive track, and the middle pin slides along that track as you turn — picking off any voltage in between."
       }
     ]
   },
@@ -172,10 +179,5 @@
       ]
     }
   ],
-  "challenge": "Reverse the knob so turning up dims the light, then turn the smooth fade into a three-step lamp with if-bands.",
-  "logbookPrompts": [
-    "Which way round did your knob end up — clockwise for brighter or for dimmer?",
-    "Where did you put the band edges for the three-step lamp, and how did it feel to use?",
-    "What in your home would you rather control with a knob like this?"
-  ]
+  "challenge": "Print the raw ADC value to the Serial Monitor, watch it sweep 0 to 4095 as you turn the knob, then use what you see to predict and flip the mapping direction."
 }

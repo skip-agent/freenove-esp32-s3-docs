@@ -6,8 +6,8 @@
   "title": "Make the board talk back",
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
-  "estimatedTimeMinutes": 15,
-  "mission": "Upload a sketch with no wiring at all, open Serial Monitor, and watch the ESP32-S3 print a start-up line and then count its own running time in seconds — the board's first words back to you over the USB cable.",
+  "estimatedTimeMinutes": 20,
+  "mission": "Upload a sketch with no wiring at all, open Serial Monitor, and watch the ESP32-S3 print a start-up line and then count its own running time in seconds. This is the day you gain a window into a running program — the one tool that turns every later \"why isn't it working?\" into a question you can actually answer by asking the board what it's doing.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -35,10 +35,10 @@
   "wiring": [],
   "coachInstructions": [
     "Keep the day to upload-and-read; there is nothing to wire.",
-    "If the monitor shows garbled text, the baud rate is the first thing to check — it must be 115200.",
-    "If the monitor is blank, check board, port, and a data-capable cable, then have the learner press reset.",
-    "Explain that one USB cable carries both the upload and the board's replies; do not front-load theory.",
-    "For the challenge, change only the message text and the delay value, preserving the working sketch.",
+    "Frame serial as a window into a running program — the same USB bridge from Day 2, now carrying text from the board back to the screen.",
+    "If the monitor shows garbled text, explain the characters are arriving but read at the wrong rate; the fix is to set the monitor to 115200 to match the sketch.",
+    "If the monitor is blank, check board, port, and a data-capable cable, then have the learner press reset so setup() prints again.",
+    "For the challenge, help them add a counter and print it, then remove delay(1000) so they see how fast the board really loops — the point is that printing reveals a value they could not otherwise see.",
     "Keep the Arduino path primary; MicroPython's print() lands in Thonny's shell and is optional only if already set up."
   ],
   "steps": [
@@ -53,15 +53,15 @@
     "arduino": [
       {
         "line": "Serial.begin(115200)",
-        "explanation": "Opens the USB serial link at 115200 baud — the same number you set in Serial Monitor."
+        "explanation": "Opens the USB serial link and sets its speed to 115200 baud — the same number Serial Monitor has to use, so both ends read the stream the same way."
       },
       {
         "line": "Serial.println(\"ESP32S3 initialization completed!\")",
-        "explanation": "Sends one line of text, then moves to the next line — the board's start-up announcement."
+        "explanation": "Sends one line of text up the cable, then moves to the next line — a start-up marker that proves the link is live before any real data flows."
       },
       {
         "line": "Serial.printf(\"Running time : %.1f s\\r\\n\", millis() / 1000.0f)",
-        "explanation": "Fills the running time into the text, one decimal place, and sends it once a second."
+        "explanation": "Slots a live value into a text template — one decimal place — and sends it, so a number inside the program becomes something you can read."
       }
     ],
     "micropython": [
@@ -76,16 +76,16 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "One USB cable carries both your upload and the board's replies, as long as both ends agree on the baud rate.",
-    "formula": "readable text = board baud = monitor baud",
+    "plainLanguage": "The USB-to-serial bridge from Day 2 now runs the other way — text from the board to your screen — which is the only way to see a value the program holds but never shows.",
+    "formula": "readable text needs board baud = monitor baud",
     "notes": [
       {
-        "title": "What the baud rate is",
-        "body": "Baud is how fast the two sides send signal changes. Both must agree, or the letters turn to gibberish."
+        "title": "Why a wrong baud is garbage, not silence",
+        "body": "The characters still arrive on the wire. Baud sets how often each side reads the signal, so a mismatched monitor samples between the real bits and reconstructs the wrong letters. The fix is always to match the number, never to resend."
       },
       {
-        "title": "Where the number comes from",
-        "body": "millis() is the board's own stopwatch — milliseconds since it booted — which the sketch divides into seconds."
+        "title": "Printing is how you debug from here on",
+        "body": "When a later sketch misbehaves, a print of the suspect value tells you what the code truly saw — a sensor reading, a state, a counter — instead of guessing from an LED. Reach for a print before you rewrite anything."
       }
     ]
   },
@@ -102,13 +102,13 @@
     {
       "symptom": "Garbled or random characters",
       "firstChecks": [
-        "Set Serial Monitor to 115200 baud to match the sketch."
+        "The characters are arriving; the monitor is reading them at the wrong rate. Set Serial Monitor to 115200 to match the sketch."
       ]
     },
     {
       "symptom": "Blank monitor",
       "firstChecks": [
-        "Confirm the right board and port, then press the board's reset button."
+        "Confirm the right board and port, then press the board's reset button so setup() runs and prints the start-up line again."
       ]
     },
     {
@@ -124,10 +124,5 @@
       ]
     }
   ],
-  "challenge": "Change the start-up message and the reporting speed, then add a line of your own to the loop.",
-  "logbookPrompts": [
-    "What message did you have the board greet you with?",
-    "How fast could the running time update before it was hard to read?",
-    "What would you want the board to report back to you in a real project?"
-  ]
+  "challenge": "Add a counter that the loop increments and prints, then remove the delay so you watch how fast the board truly runs — a number that was there all along but had no way to show itself."
 }

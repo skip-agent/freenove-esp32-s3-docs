@@ -1,139 +1,157 @@
-# Day 2 — Install the Arduino IDE and see the board · tinyskiff.lesson.v1
-# A setup day: no wiring, no sketch to write. The proof is that the board
-# appears as a port in the IDE, so `test.mode: visual`.
+# Day 2 — Install the toolchain and understand uploading · tinyskiff.lesson.v1
+# A setup day, but a real one- while the IDE installs, you learn what "uploading"
+# actually does end to end. The proof is that the board appears as a port, so
+# `test.mode: visual`.
 
 schema: tinyskiff.lesson.v1
 lessonCode: TSK-DAY02-SETUP
 day: 2
 slug: day-02-setup
-title: Install the Arduino IDE and see the board
+title: Install the toolchain and learn what uploading really does
 status: published
-estimatedTimeMinutes: 25
+estimatedTimeMinutes: 30
 tracks: { main: arduino }
 learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
-  Install the Arduino IDE, add support for the ESP32-S3, and confirm your
-  computer can see the board. Get this right once and every later day is just
-  open-upload-watch.
-unlocks: Your computer and the board can talk. From here, uploading code is a two-click habit.
+  Install the Arduino IDE, add ESP32-S3 support, and get your computer to see the
+  board. While it installs, learn what actually happens when you press Upload —
+  compile, download mode, flash, run — so that when something goes wrong on a
+  later day you can reason about where in that chain it broke instead of guessing.
+unlocks: Your computer and board can talk, and you understand every stage of an upload — so troubleshooting becomes a diagnosis, not a shrug.
 seoDescription: >
-  Day 2 of the TinySkiff ESP32-S3 course: install the Arduino IDE, add the ESP32
-  board package and CH343 driver if needed, and confirm the board appears as a port.
+  Day 2 of the TinySkiff ESP32-S3 course: install the Arduino IDE and ESP32 board
+  package, understand what uploading really does (compile, bootloader, flash,
+  run), and confirm the board appears as a serial port.
 
 hero:
   instrument: none
-  headline: Get the toolchain|talking {once}
+  headline: What "upload"|actually {does}
   lede: >
-    This is the one genuinely fiddly day — installing software and a driver. It's
-    worth doing slowly, because once your board shows up as a port, you never
-    have to think about setup again.
+    This is the one genuinely fiddly day — software and a driver. So while it
+    installs, we spend the time well: by the end you'll know exactly what happens
+    between pressing Upload and the board running your code. That understanding is
+    what turns every future error from a wall into a checklist.
   pills:
-    - { text: About 25 minutes, key: true }
+    - { text: About 30 minutes, key: true }
     - Software only
     - Nothing to wire
-    - Do it once
+    - Understand the chain
 
 parts:
   intro: >
-    Everything today is on your computer and the cable. Tap *Define* on anything
-    unfamiliar.
+    Everything today lives on your computer and the cable. Tap *Define* on
+    anything unfamiliar.
   items:
     - name: ESP32-S3 board
       image: shared/item-esp32-s3-board.jpg
       imageKind: Manual photo
       alt: Official manual photo of the ESP32-S3 development board.
-      blurb: The board you'll get your computer to recognise.
+      blurb: The board your computer will learn to see, then write programs onto.
       explain: esp32
     - name: Arduino IDE
       image: shared/item-arduino-ide.png
       imageKind: Manual screenshot
       alt: Official manual screenshot of the Arduino IDE interface.
-      blurb: The free app that will compile and upload your code.
+      blurb: The free app that compiles your sketch and sends it down the cable into flash.
       explain: arduino
 
 steps:
   intro: >
-    Follow these in order. If a step stalls, the Test & debug section below is
-    where the common snags live.
+    Follow these in order — this is the fiddliest setup of the course, and worth
+    doing slowly once. If a step stalls, the Test & debug section below maps the
+    common snags to the stage of the chain they belong to.
   items:
     - Download and install the Arduino IDE from arduino.cc for your operating system.
-    - In Preferences, add the ESP32 boards URL, then install the ESP32 package from Boards Manager. {boardPackage}
-    - If your system needs it, install the CH343 USB driver. {usbDriver}
-    - Plug the board in with a data-capable USB-C cable. {usbData}
-    - Choose your ESP32-S3 under Tools → Board, then pick its Port. {serialPort}
+    - In Preferences, add the ESP32 boards URL, then install the ESP32 package from Boards Manager. This is what teaches the IDE to compile for your chip. {boardPackage}
+    - If your board doesn't appear later, install the CH343 USB driver — the software for the translator chip that lets USB reach the board. {usbSerial}
+    - Plug the board in with a data-capable USB-C cable. A charge-only cable powers it but carries no data. {usbData}
+    - Choose your ESP32-S3 under Tools → Board (which chip to compile for), then pick its Port (which connection to talk over). {serialPort}
   done:
     icon: "🔌"
     title: Handshake complete.
-    body: Your board is a selectable port now. Day 3 sends it its first code.
+    body: Your board is a selectable port, and you know what that port really is. Day 3 sends it its first program.
 
 theory:
-  title: Board vs port
-  summary: One setting says what the chip is; the other says where to find it.
+  title: What happens when you press Upload
+  summary: Compile your code for this chip, drop the board into download mode, write it to flash, then run it.
   intro: >
-    Two settings trip people up on Day 2. They sound similar but do different
-    jobs, and both have to be right before anything uploads.
+    Upload feels like one button, but four distinct things happen in order.
+    Knowing them is the difference between "it didn't work" and "it got past
+    compile, so the problem is the connection, not my code."
   flow:
-    - { n: Board package, title: Teach the IDE, body: Adds the know-how to compile for the ESP32-S3. }
-    - { n: Board setting,  title: What it is, body: Tells the IDE which chip you're targeting. }
-    - { n: Port setting,   title: Where it is, body: Tells the IDE which USB connection to use. }
-    - { n: Driver,         title: If unseen,  body: Lets the computer recognise the board's USB chip. }
-  formulaLabel: The rule
-  formula: "**right board** + **right port** = uploads work"
+    - n: "1 · Compile"
+      title: "Text to machine code"
+      body: "Your readable C++ is translated into raw instructions built for the ESP32-S3. This is what the board package enabled."
+    - n: "2 · Enter"
+      title: "Download mode"
+      body: "The IDE pulses the board into the bootloader — the small program that listens for new code instead of running the old one."
+    - n: "3 · Flash"
+      title: "Write to storage"
+      body: "The compiled bytes travel down USB and are written into flash, the board's permanent storage."
+    - n: "4 · Run"
+      title: "Reset and go"
+      body: "The board restarts, the bootloader hands over, and your fresh program runs — and keeps running with the power off and on."
+  formulaLabel: The chain
+  formula: "compile → **download mode** → flash → run"
   notes:
-    - title: Why a port might not appear
-      explain: usbDriver
-      body: A missing driver or a charge-only cable are the two usual reasons the board never shows up.
+    - title: Why there's a driver and a "port"
+      explain: usbSerial
+      body: The board's bootloader speaks old-fashioned serial; your computer speaks USB. A translator chip bridges them, which is why the board shows up as a port and why some systems need its driver first.
+    - title: Board vs port, made concrete
+      explain: serialPort
+      body: Board is a compile-time choice — which chip's instructions to build. Port is a delivery choice — which connected device to send them to. Both must be right, for different reasons.
 
 test:
   mode: visual
   intro: >
-    There's no sketch to run yet. Success is simply that the IDE can see the board.
+    There's no sketch to run yet. Success today is that your computer can see the
+    board as a port — the physical end of that USB-to-serial bridge.
   expectedTitle: How you know it worked
   readoutLabel: Tools → Port
   expected:
     - Your ESP32-S3 appears as a selectable port in Tools → Port.
     - The board name is selectable under Tools → Board.
-    - No error appears when you select them.
-  expectedNote: You don't need to upload anything today — seeing the port is the whole win.
+    - Selecting both produces no error.
+  expectedNote: Seeing the port is the whole win today — that port is the serial bridge your code will travel across on Day 3.
   checksTitle: If it doesn't
   checks:
-    - symptom: "No port appears?"
-      fix: "Install the CH343 driver, then unplug and replug the board."
+    - symptom: "No port appears at all?"
+      fix: "The bridge isn't reaching your computer- install the CH343 driver, then unplug and replug."
     - symptom: "Only a charging sound, no port?"
-      fix: "Swap in a data-capable USB-C cable — some only carry power."
-    - symptom: "Board not in the list?"
-      fix: "Re-open Boards Manager and confirm the ESP32 package finished installing."
+      fix: "The cable carries power but no data — swap in a data-capable USB-C cable."
+    - symptom: "Board name missing from the list?"
+      fix: "The compile step has no target yet — re-open Boards Manager and confirm the ESP32 package finished installing."
 
 challenge:
-  title: "Try this: break it, then fix it"
+  title: "Try this: watch the port appear"
   railLabel: Try this
   intro: >
-    The best way to trust a setting is to change it and put it back. You'll
-    recognise the mistake instantly next time it happens by accident.
-  summary: Deliberately select the wrong port, notice what changes, then restore the correct board and port.
+    The best way to make "port" real is to watch one blink into existence. This
+    shows you, with your own eyes, that the board arrives as a serial device the
+    moment it's connected — the thing the IDE is choosing in Tools → Port.
+  summary: List your computer's serial devices with the board unplugged, plug it in, list again to see the new device appear, then unplug to watch it vanish.
   cards:
-    - title: Pick the wrong port
-      body: Choose a different port (or none). Notice the IDE has nowhere to send code.
-    - title: Put it right
-      body: Reselect your ESP32-S3 board and its real port. That pairing is your normal starting point every day.
-  logbook:
-    - What board and port did you end up selecting?
-    - Did you need the CH343 driver on your system?
-    - What was the trickiest part of setup, so you remember it next time?
+    - title: Look before
+      body: "With the board unplugged, list serial devices. macOS/Linux terminal: `ls /dev/tty.*` (or `/dev/ttyACM*`, `/dev/ttyUSB*`). Windows: open Device Manager and expand Ports (COM & LPT). Note what's there."
+    - title: Plug in and look again
+      explain: usbSerial
+      body: Connect the board and run the same command. A new entry appears — that's your board arriving through the USB-to-serial bridge. Unplug it and it disappears. That entry is exactly what Tools → Port lists.
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent can
     guide you with full context.
   behaviour: >
-    walk the install one step at a time, and when the board doesn't appear, check
-    driver, cable, board, and port in that order before anything else.
+    walk the install one step at a time, and use the wait to teach the four-stage
+    upload chain so later troubleshooting is a diagnosis. When the board doesn't
+    appear, locate the failure in the chain- driver, cable, board, port.
   coachInstructions:
     - Walk the install one step at a time; this is the fiddliest day of the course.
-    - If no port appears, check the CH343 driver, then a data-capable cable, then board and port selection.
-    - There is no code to upload today — confirming the board appears as a port is the success condition.
-    - Reassure the learner that this setup is a one-time cost.
+    - Use the install wait to teach the upload chain- compile, enter download mode, write to flash, reset and run.
+    - Frame every problem by its stage- no port means the serial bridge (driver or cable); board missing from the list means the compile target (board package) isn't installed.
+    - If no port appears, check the CH343 driver, then a data-capable cable, then board and port selection, in that order.
+    - There's no code to upload today — the board appearing as a port is the success condition, and it's a one-time cost.
 
 source:
   license: CC BY-NC-SA 3.0

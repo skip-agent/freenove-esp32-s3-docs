@@ -7,7 +7,7 @@
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
   "estimatedTimeMinutes": 25,
-  "mission": "Upload the BLE pass-through sketch, find the board with the LightBlue app on your phone, and pass text both ways — type in Serial Monitor and read it on the phone, write on the phone and read it in Serial Monitor.",
+  "mission": "Upload the BLE pass-through sketch and use your phone to find the board on the air and talk to it — type in Serial Monitor and read it on the phone, write on the phone and read it in Serial Monitor. Along the way, learn the model every BLE gadget uses: the board advertises, the phone discovers and connects, then the two trade data through characteristics.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -34,6 +34,7 @@
   ],
   "wiring": [],
   "coachInstructions": [
+    "Land the model first- the board advertises, the phone discovers and connects, then the two trade data through characteristics, which are named value slots each side writes into or is notified from.",
     "Establish which end is failing — board side (Serial Monitor) or phone side (LightBlue) — before changing anything.",
     "If the name never appears in the app, have the learner power-cycle the board and rescan; remind them BLE devices skip the phone's Settings→Bluetooth pairing list and only show inside a GATT app.",
     "If nothing reaches the phone, confirm they subscribed to the characteristic ending 0003; if the text is garbled, set Data Format to utf-string.",
@@ -84,16 +85,20 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "The board advertises, the phone connects, and two one-way characteristics — write in, notify out — make a serial-style pipe over radio.",
-    "formula": "one write lane in + one notify lane out = a two-way text pipe",
+    "plainLanguage": "The board advertises, your phone discovers and connects, then the two trade data through characteristics — named value slots, each with its own UUID, that one side writes into and the other reads or is notified from.",
+    "formula": "advertise → discover → connect → write in / notify out through a characteristic",
     "notes": [
       {
+        "title": "A characteristic is the value slot",
+        "body": "The characteristic is the thing you actually read or write — a named slot inside the service. This service has two: an RX slot the phone writes into, and a TX slot the board notifies through. Two one-way slots make the round trip."
+      },
+      {
         "title": "Why the long UUIDs",
-        "body": "A UUID is a name long enough that nobody else's gadget will ever share it by accident. This particular trio is the Nordic UART set — a convention so common that serial-over-BLE apps recognise it on sight."
+        "body": "A UUID is a name long enough that no other gadget will ever share it by accident, the way a port number names a service. This trio is the Nordic UART set — a convention so common that serial-over-BLE apps recognise it on sight."
       },
       {
         "title": "Why you must subscribe",
-        "body": "A notify characteristic only sends to phones that asked. Subscribing is how the phone says \"keep me posted\" — until then, the board's messages have nowhere to go."
+        "body": "A notify slot only sends to phones that asked for it. Subscribing is how the phone says keep me posted; until it does, the board's messages have nowhere to land."
       }
     ]
   },
@@ -136,10 +141,5 @@
       ]
     }
   ],
-  "challenge": "Rename the broadcast to your boat's name and rescan, then send messages from the far end of your home to find the edge of BLE's range.",
-  "logbookPrompts": [
-    "What name did you broadcast, and how quickly did it show up in a rescan?",
-    "Where in your home did the link drop out?",
-    "What would you want your board to report to your phone in a real project?"
-  ]
+  "challenge": "In LightBlue, connect to the board and open its service to see the two characteristics and their properties, then subscribe to the notify slot and write to the write slot to send text both ways through them."
 }

@@ -15,14 +15,15 @@ learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
   Wire a photoresistor and a 10 kΩ resistor into a voltage divider on GPIO 1,
-  put an LED on GPIO 14, upload the Arduino sketch, and watch the lamp shift
-  brightness as you cover and light the sensor — the first day the board senses
-  the room on its own.
-unlocks: A sensor in a voltage divider lets the ADC read the room itself, so the board can respond to its surroundings while your hands stay in your pockets.
+  put an LED on GPIO 14, and upload the Arduino sketch so the lamp answers the
+  room's light. Then learn the move underneath every automatic light — holding
+  the reading against a threshold so the board decides, on its own, when the room
+  has gone dark enough to switch the lamp on.
+unlocks: A sensor in a voltage divider lets the ADC read the room, and a threshold turns that reading into a decision — the pattern behind every device that acts on its surroundings with no hand on a switch.
 seoDescription: >
   Build a night lamp with the ESP32-S3. A photoresistor voltage divider on GPIO 1
-  reads the room's light, and the sketch maps that reading onto an LED's
-  brightness on GPIO 14.
+  reads the room's light, and you learn to compare that reading against a
+  threshold so the board decides when to switch an LED on GPIO 14.
 
 hero:
   instrument: none
@@ -30,8 +31,9 @@ hero:
   lede: >
     Every knob and button so far has been something you operated. Today a
     photoresistor and one fixed resistor turn the room's light into a voltage,
-    the ADC turns that voltage into a number, and the number sets an LED's
-    brightness — cover the sensor with your hand and the lamp answers.
+    the ADC turns that voltage into a number, and a threshold turns that number
+    into a decision — set the light level that counts as dark, and the lamp
+    switches itself.
   pills:
     - { text: About 25 minutes, key: true }
     - Arduino first
@@ -198,25 +200,37 @@ code:
       Arduino-first path.
 
 theory:
-  title: Four small conversions
-  summary: Light shifts a resistance, the divider turns that into a voltage, the ADC turns the voltage into a number, and constrain plus map turn the number into brightness.
+  title: A reading becomes a decision
+  summary: A photoresistor in a divider hands the ADC a number, and comparing that number to a threshold turns it into a yes-or-no decision the lamp acts on.
   intro: >
-    The whole day is one chain of four conversions, each small enough to hold in
-    your head, running many times a second.
+    Days 13 and 15 built the first half — a photoresistor in a voltage divider
+    becomes a number, and that number can drive an output. The sketch you upload
+    today uses it as a dimmer, so the lamp follows the room's light up and down.
+    The move that makes a device feel like it decides for itself comes next:
+    holding that same reading against a threshold and switching on which side of
+    the line it lands. That is what the challenge builds.
   flow:
-    - { n: Light, title: Resistance shifts, body: The photoresistor's resistance follows the light falling on it. }
-    - { n: Divide, title: Volts at the midpoint, body: The 10 kΩ divider turns that resistance into a voltage on GPIO 1. }
-    - { n: Read, title: ADC to a number, body: analogRead measures the voltage as a value from 0 to 4095. }
-    - { n: Drive, title: Map to brightness, body: constrain and map squeeze the reading into a PWM level for the LED. }
-  formulaLabel: The chain
-  formula: light → **resistance** → voltage → number → brightness
+    - n: "1"
+      title: Light bends a resistance
+      body: "The photoresistor's resistance follows the light on it — bright light lowers it, darkness raises it."
+    - n: "2"
+      title: The divider makes a number
+      body: "Paired with the fixed 10 kΩ resistor it forms a voltage divider, so the midpoint voltage on GPIO 1 rises and falls with the light. The ADC reads that voltage as a value from 0 to 4095 — the reading you met on Day 13."
+    - n: "3"
+      title: Compare to a threshold
+      body: "Pick one number as the boundary. On one side the room is bright and the lamp stays off; on the other it is dark and the lamp comes on. One comparison turns a live reading into a clean on-or-off decision. Which reading counts as dark depends on how the divider sits, so you measure it — cover the sensor and note the value."
+    - n: "4"
+      title: Steady the boundary
+      body: "Right at the line the reading jitters across the boundary and the lamp chatters on and off. A small gap between the on-point and the off-point, or averaging a few readings before you compare, holds it steady."
+  formulaLabel: The decision
+  formula: "**dark room** → reading crosses the threshold → lamp on"
   notes:
-    - title: Why the window is 372 to 2048
-      explain: mapValue
-      body: A room rarely swings the ADC across its whole range. constrain fences the reading inside a realistic window, and map stretches that window over the full 0–4095 brightness scale, so the lamp spends all its range on light levels your room actually produces.
-    - title: What the 10 kΩ resistor is doing
+    - title: Why one fixed line flickers
+      explain: threshold
+      body: A real reading wobbles by a few counts even in steady light. When the room sits right at the threshold, that wobble crosses the line many times a second and the lamp flickers. Give the lamp two lines instead — turn on past a darker number, turn off past a brighter one — and the gap between them is wider than the wobble, so the lamp commits to one state. Averaging several readings before you compare smooths the same jitter.
+    - title: What the fixed resistor adds
       explain: voltageDivider
-      body: On its own the photoresistor only changes resistance, which a pin can't read directly. Paired with a fixed resistor it forms a divider, and the midpoint voltage rises and falls with the light — exactly the kind of signal the ADC measures.
+      body: A pin reads voltage, and a photoresistor on its own offers only a changing resistance. Pair it with a fixed resistor and the two split 3.3V at their midpoint in proportion to their resistances, so the midpoint voltage tracks the light — and that midpoint is the value the ADC turns into your reading and the threshold judges.
 
 test:
   mode: visual
@@ -242,38 +256,39 @@ test:
       fix: "Swap in a data-capable USB cable."
 
 challenge:
-  title: "Try this: make it your room's lamp"
+  title: "Try this: set the threshold to your own room"
   railLabel: Try this
   intro: >
-    Same working circuit, two edits to the numbers. It fits inside today's 25
-    minutes.
-  summary: Discover your room's own LIGHT_MIN and LIGHT_MAX by watching real readings, then flip the mapping so darkness makes the lamp glow.
+    Your room's dark and bright readings belong to your room, your board, and
+    where the sensor sits — so you measure them, then pick a threshold between
+    them and let the lamp switch on the boundary you chose. It fits inside
+    today's time.
+  summary: Print the live reading, cover the sensor to capture your room's dark value and light it to capture the bright value, pick a threshold between the two, then switch the LED on across that line instead of dimming it.
   cards:
-    - title: Find your room's numbers
+    - title: Read your room's real numbers
       explain: adc
-      body: Add `Serial.begin(115200);` to setup and `Serial.println(adcVal);` to the loop, re-upload, and open Serial Monitor. Note the values at your room's darkest and brightest, then write those into LIGHT_MIN and LIGHT_MAX.
-    - title: Flip the lamp's direction
-      explain: mapValue
-      body: Swap the last two arguments of map so 0 and 4095 trade places, then re-upload. Whatever your lamp did before, it now does in reverse — set it so darkness makes it glow, and you have a true night lamp.
-  logbook:
-    - What LIGHT_MIN and LIGHT_MAX did your room actually call for?
-    - Which way did covering the sensor move the lamp before you flipped it?
-    - Where in your home would a lamp that senses darkness earn its keep?
+      body: Add `Serial.begin(115200);` to setup and `Serial.println(adcVal);` to the loop, re-upload, and open Serial Monitor. Cup your hand fully over the photoresistor and note the dark reading, then light it with a phone torch and note the bright reading. Those two numbers are your room's real range, and they tell you which reading means dark on your board.
+    - title: Switch on a threshold you chose
+      explain: threshold
+      body: Pick a number partway between your dark and bright readings. Replace the map line with a comparison — on the dark side of your threshold call `ledcWrite(PIN_LED, 4095)` to light the lamp, on the bright side call `ledcWrite(PIN_LED, 0)` to switch it off. If it flickers right at the boundary, move the on-point and off-point a little apart so one small wobble can't cross both.
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent can
     guide you with full context.
   behaviour: >
-    guide one physical connection at a time, wait for you to confirm, explain
-    terms on request, and always check wiring, board, port, and USB before
-    changing code.
+    guide one physical connection at a time and wait for confirmation, keep the
+    build primary, then teach the day's real idea — turning the ADC reading into
+    a decision with a threshold — and have the learner measure their own room's
+    dark and bright values before choosing one.
   coachInstructions:
     - Guide one physical connection at a time and wait for learner confirmation before proceeding.
     - The divider midpoint to GPIO 1 is the crux — if the LED never changes, check the photoresistor's legs and that midpoint wire before touching code.
     - If the LED sits at full brightness, suspect the divider is on the wrong rail — verify the 10 kΩ goes to 3.3V and the photoresistor's far leg to GND against the chart.
     - If nothing lights, check the LED's direction, the 220 Ω resistor, and the GPIO 14 wire before changing code.
-    - The direction of the brightness change depends on the divider's orientation — treat "cover shifts it one way and a torch shifts it back" as success rather than insisting on a particular direction.
+    - Once the shipped sketch runs, teach the real idea — a threshold turns the live reading into an on-or-off decision — and have the learner read their own dark and bright numbers by covering and lighting the sensor before picking a threshold between them.
+    - Which reading counts as dark depends on how the divider sits, so let the learner's measured values set the comparison direction rather than asserting one.
+    - If the lamp chatters right at the boundary, give the fix concretely — separate the on-point and off-point into a small gap, or average a few readings before comparing.
     - Keep the Arduino path primary; MicroPython is optional only if already set up, and its gentler response curve (10-bit duty with the full 0–4095 window) is expected to differ from Arduino's.
 
 source:

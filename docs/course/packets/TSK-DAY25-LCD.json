@@ -7,7 +7,7 @@
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
   "estimatedTimeMinutes": 25,
-  "mission": "Wire the LCD1602's four backpack pins to the board, install the bundled I2C library once, upload the Arduino sketch, and read \"hello, world!\" plus a live seconds counter on the glass — your project's first screen.",
+  "mission": "Wire the LCD1602's four backpack pins, add the bundled I2C library once, and upload the sketch that greets you on the top row while the bottom row counts seconds. The real prize is the idea underneath: how two shared wires can drive a whole screen, and how the board reaches this display by a number so that many devices could hang off those same two wires. That bus is how most screens and sensors will attach to your project from here on.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -71,6 +71,8 @@
   ],
   "coachInstructions": [
     "Guide one backpack pin at a time — GND, VCC to 5V, SDA to GPIO 14, SCL to GPIO 13 — and wait for learner confirmation before proceeding.",
+    "Land the core idea — I2C carries the whole screen over two shared wires (SDA data, SCL clock), and the board reaches this display by its address (0x27, some at 0x3F); a wrong address means the display never answers and the screen stays blank.",
+    "Make the row-and-column model concrete — the display is a grid sixteen columns wide and two rows tall, and setCursor takes column then row, so text lands wherever they point the cursor before printing.",
     "The top gotcha is the contrast dial; a lit backlight with blank rows means turn the dial on the back of the module, never a code change.",
     "If nothing glows at all, check VCC on the 5V pin and GND before touching the signal wires or the sketch.",
     "A compile error naming LiquidCrystal_I2C.h means the ZIP library step was skipped — walk them through Sketch → Include Library → Add .ZIP Library… with the kit's LiquidCrystal_I2C-1.1.2.zip.",
@@ -119,16 +121,16 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "I2C moves every character over one data wire and one clock wire; the backpack chip turns those messages into the signals the bare LCD needs.",
-    "formula": "two wires → address → cursor position → characters",
+    "plainLanguage": "I2C lets the board drive a whole screen over two shared wires — one for data, one for a clock — by opening every message with the display's address. The backpack chip turns those messages into the many signals a bare LCD needs.",
+    "formula": "a dozen pins → two shared wires → the right address → cursor at row and column → characters",
     "notes": [
       {
         "title": "Another kind of serial",
-        "body": "The bits travel single file down SDA the way they travel down USB to your Serial Monitor; SCL is the shared clock that tells both ends when each bit counts."
+        "body": "The bits travel single file down SDA the way they travel down USB to your Serial Monitor. The extra wire, SCL, is a shared clock that tells both ends exactly when to read each bit — which is what lets several devices share one pair of lines."
       },
       {
-        "title": "Two possible addresses",
-        "body": "Backpacks built on the PCF8574T chip answer at 0x27 and PCF8574AT boards answer at 0x3F. The sketch tries 0x27 first and switches by itself when nothing replies."
+        "title": "Why the address can be one of two",
+        "body": "The backpack's PCF8574T chip answers at 0x27, while the PCF8574AT version answers at 0x3F. The sketch pings 0x27 first, and when nothing replies it switches to 0x3F on its own — a small demonstration that a wrong address means silence."
       }
     ]
   },
@@ -166,10 +168,5 @@
       ]
     }
   ],
-  "challenge": "Put your boat's name on row 0, turn the counter into minutes and seconds, then overflow a row on purpose and fix it.",
-  "logbookPrompts": [
-    "What did the screen do with the characters past column sixteen?",
-    "How would you show a sensor reading from an earlier day on this screen?",
-    "Where on a real boat would a two-line display earn its keep?"
-  ]
+  "challenge": "Put your own text on row 0, then centre a word by column using setCursor, then reason through what a wrong address would do to the screen."
 }

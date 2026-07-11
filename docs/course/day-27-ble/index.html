@@ -45,7 +45,7 @@
           <a href="#parts"><span class="tick"></span>What you need</a>
           <a href="#steps"><span class="tick"></span>Build it</a>
           <a href="#code"><span class="tick"></span>Read the code</a>
-          <a href="#theory"><span class="tick"></span>A serial pipe over radio</a>
+          <a href="#theory"><span class="tick"></span>How a phone finds and talks to your board</a>
           <a href="#test"><span class="tick"></span>Test &amp; debug</a>
           <a href="#challenge"><span class="tick"></span>Try this</a>
           <a href="#agent"><span class="tick"></span>Coach me</a>
@@ -186,23 +186,25 @@ p.<span class="tok-fn">send</span>(tx_data)</code></pre>
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">04</span> Understand, don&#x27;t memorise</p>
-              <h2>A serial pipe over radio</h2>
-              <p class="muted">BLE organises everything a device offers into services, and each service into characteristics — small named mailboxes the phone can read, write, or subscribe to. Today&#x27;s service holds exactly two, one for each direction.
+              <h2>How a phone finds and talks to your board</h2>
+              <p class="muted">BLE is how a small device lets a phone find it and talk to it over the air, with no cable and no pairing menu. Everything the board offers is laid out as a service, and a service holds characteristics — the actual value slots each side reads or writes. A characteristic is a named mailbox with a unique ID, and today&#x27;s service holds two of them, one lane each way. This is the same model your fitness band and any wireless sensor use to reach your phone.
 </p>
             </div>
             <div class="theory-flow" aria-label="Measurement model">
-              <article class="flow-step"><span class="n">Advertise</span><h3>The board calls out</h3><p>The sketch broadcasts the name ESP32S3_Bluetooth so nearby phones can find it.</p></article>
-              <article class="flow-step"><span class="n">Connect</span><h3>The phone answers</h3><p>LightBlue opens a connection and finds the service by its UUID.</p></article>
-              <article class="flow-step"><span class="n">Write in</span><h3>Phone → board</h3><p>Text written to the characteristic ending 0002 lands in the sketch and prints to Serial Monitor.</p></article>
-              <article class="flow-step"><span class="n">Notify out</span><h3>Board → phone</h3><p>Text typed in Serial Monitor is pushed through the characteristic ending 0003 to every subscriber.</p></article>
+              <article class="flow-step"><span class="n">Advertise</span><h3>The board calls out</h3><p>From boot the sketch broadcasts the name ESP32S3_Bluetooth on the radio, so any phone within range can find it.</p></article>
+              <article class="flow-step"><span class="n">Discover</span><h3>The phone scans</h3><p>A BLE scanner app like LightBlue listens for those broadcasts and lists the board, which is why it shows up inside the app and never in the phone&#x27;s own Bluetooth settings.</p></article>
+              <article class="flow-step"><span class="n">Connect</span><h3>The phone opens a link</h3><p>Tapping the board opens a connection and reads its menu: one service, found by its UUID, holding the characteristics on offer.</p></article>
+              <article class="flow-step"><span class="n">Write in</span><h3>Phone → board</h3><p>Text the phone writes into the characteristic ending 0002 lands in the sketch and prints to Serial Monitor.</p></article>
+              <article class="flow-step"><span class="n">Notify out</span><h3>Board → phone</h3><p>Text typed in Serial Monitor is pushed out through the characteristic ending 0003 to every phone that subscribed.</p></article>
             </div>
             <div class="formula-card">
-              <span class="label">Useful model</span>
-              <code>one <b>write</b> lane in + one <b>notify</b> lane out = a two-way text pipe</code>
+              <span class="label">The model</span>
+              <code>advertise → discover → connect → <b>write in / notify out</b> through a characteristic</code>
             </div>
             <div class="two-col" style="margin-top:14px">
-              <article class="mini-card"><h3>Why the long UUIDs <button class="define" data-topic="uuid">Define</button></h3><p>A UUID is a name long enough that nobody else&#x27;s gadget will ever share it by accident. This particular trio is the Nordic UART set — a convention so common that serial-over-BLE apps recognise it on sight.</p></article>
-              <article class="mini-card"><h3>Why you must subscribe <button class="define" data-topic="bleCharacteristic">Define</button></h3><p>A notify characteristic only sends to phones that asked. Subscribing is how the phone says &quot;keep me posted&quot; — until then, the board&#x27;s messages have nowhere to go.</p></article>
+              <article class="mini-card"><h3>A characteristic is the value slot <button class="define" data-topic="bleCharacteristic">Define</button></h3><p>The characteristic is the thing you actually read or write — a named slot inside the service. This service has two: an RX slot the phone writes into, and a TX slot the board notifies through. Two one-way slots make the round trip.</p></article>
+              <article class="mini-card"><h3>Why the long UUIDs <button class="define" data-topic="uuid">Define</button></h3><p>A UUID is a name long enough that no other gadget will ever share it by accident, the way a port number names a service. This trio is the Nordic UART set — a convention so common that serial-over-BLE apps recognise it on sight.</p></article>
+              <article class="mini-card"><h3>Why you must subscribe <button class="define" data-topic="ble">Define</button></h3><p>A notify slot only sends to phones that asked for it. Subscribing is how the phone says keep me posted; until it does, the board&#x27;s messages have nowhere to land.</p></article>
             </div>
           </div>
         </section>
@@ -241,19 +243,13 @@ p.<span class="tok-fn">send</span>(tx_data)</code></pre>
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">06</span> Make the idea yours</p>
-              <h2>Try this: name your boat, find the edge</h2>
-              <p class="muted">Same working sketch, two experiments — one line of code, then a walk. It fits inside today&#x27;s 25 minutes.
+              <h2>Try this: read the board&#x27;s menu, then drive both lanes</h2>
+              <p class="muted">You&#x27;ve traded a line each way; now slow down and see the structure that made it work. Connect from the scanner app, look at the service the board offers, then push text through each characteristic yourself. It fits inside today&#x27;s 25 minutes.
 </p>
             </div>
             <div class="two-col">
-              <article class="mini-card"><h3>Fly your own name <button class="define" data-topic="ble">Define</button></h3><p>Change <code>setupBLE(&quot;ESP32S3_Bluetooth&quot;)</code> to <code>setupBLE(&quot;YourBoatName&quot;)</code>, re-upload, and rescan in LightBlue — your board now broadcasts under its own flag.</p></article>
-              <article class="mini-card"><h3>Find the range edge</h3><p>Stay subscribed on the phone and walk to the far end of your home while a helper (or a repeated send) keeps messages coming from Serial Monitor. Note where they stop arriving.</p></article>
-            </div>
-            <div class="logbook">
-              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
-              <label>What name did you broadcast, and how quickly did it show up in a rescan?<textarea rows="2"></textarea></label>
-              <label>Where in your home did the link drop out?<textarea rows="2"></textarea></label>
-              <label>What would you want your board to report to your phone in a real project?<textarea rows="2"></textarea></label>
+              <article class="mini-card"><h3>Read the board&#x27;s menu <button class="define" data-topic="bleCharacteristic">Define</button></h3><p>With the board connected in LightBlue, open its service and read the list of characteristics. One ends 0002 and is marked Write; one ends 0003 and is marked Notify. Those two slots are the whole conversation, and the property on each tells you which way it carries data.</p></article>
+              <article class="mini-card"><h3>Drive each lane yourself <button class="define" data-topic="ble">Define</button></h3><p>Subscribe to the 0003 characteristic, type a line in Serial Monitor, and watch it arrive on the phone. Then write a message into the 0002 characteristic and watch it land in Serial Monitor. You&#x27;ve now sent text both ways through the slots by hand.</p></article>
             </div>
           </div>
         </section>
@@ -271,7 +267,7 @@ p.<span class="tok-fn">send</span>(tx_data)</code></pre>
             </div>
             <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
               <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
-              <p><strong>How the agent should behave:</strong> work one end at a time — board side in Serial Monitor, phone side in LightBlue — confirm the waiting line before touching the app, and treat subscribe, data format, and reset-after-disconnect as the first checks.
+              <p><strong>How the agent should behave:</strong> teach the BLE model plainly — the board advertises, the phone discovers and connects, then the two exchange data through characteristics — while working one end at a time, board side in Serial Monitor and phone side in LightBlue. Confirm the waiting line before touching the app, and treat subscribe, data format, and reset-after-disconnect as the first checks.
 </p>
             </div>
           </div>

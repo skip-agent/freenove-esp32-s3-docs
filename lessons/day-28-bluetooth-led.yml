@@ -15,9 +15,10 @@ learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
   Wire one LED to GPIO 2, upload the Bluetooth sketch, and switch the light from
-  your phone — write led_on and led_off in LightBlue and watch the board obey a
-  command sent over the air.
-unlocks: Words typed on your phone can drive a pin, so the board now takes commands with no wire between you and it.
+  your phone — write led_on and led_off in LightBlue and watch a value sent over
+  the air trip a callback on the board and drive the pin. Today your words close
+  a control loop with no wire between you and the board.
+unlocks: You understand how a value written from your phone becomes an action — it lands in a BLE characteristic, trips a callback, and drives a pin — the event-driven pattern behind every remote control.
 seoDescription: >
   Control an LED on the ESP32-S3 from your phone over Bluetooth. Wire one LED,
   upload the sketch, and send led_on and led_off from LightBlue to switch the
@@ -27,10 +28,11 @@ hero:
   instrument: none
   headline: Switch the light|from your {phone}
   lede: >
-    Today your words start moving hardware. You wire a single LED, upload a
-    sketch that listens over Bluetooth for two exact commands, and switch the
-    light from across the room — write led_on and it lights, led_off and it goes
-    dark. Yesterday's pipe now carries orders.
+    Today your words start moving hardware. You wire a single LED and upload a
+    sketch that waits over Bluetooth for two exact commands — write led_on and it
+    lights, led_off and it goes dark. Underneath, each word lands in a mailbox on
+    the board, trips a callback, and drives the pin, so the board acts the instant
+    your message arrives. Yesterday's pipe now carries orders.
   pills:
     - { text: About 25 minutes, key: true }
     - Arduino first
@@ -95,7 +97,7 @@ wiring:
     zoomCaption: Official Freenove circuit, C Tutorial Chapter 20, page 193.
     source: { pdf: C_Tutorial.pdf, chapter: 20, chapterTitle: Bluetooth, page: 193 }
   pins:
-    - { from: LED long leg (+), to: GPIO 2 via 220 Ω, why: This pin obeys the command your phone sends., explain: led }
+    - { from: LED long leg (+), to: GPIO 2 via 220 Ω, why: The pin a matched command drives HIGH or LOW., explain: led }
     - { from: LED short leg (−), to: GND, why: Completes the LED's path back to zero volts., explain: gnd }
   safety:
     - label: Mind the LED's legs.
@@ -125,10 +127,11 @@ steps:
 
 code:
   intro: >
-    The BLE plumbing at the top of this sketch is Day 27's, line for line — same
-    service, same name. Today's new idea lives in loop, where the board compares
-    whatever arrived against two known commands and acts. Switch to MicroPython
-    if you'd rather see the same idea in Python — the wiring never changes.
+    The BLE plumbing at the top of this sketch is Day 27's, line for line — the
+    same service, the same name, and the same callback that copies each incoming
+    write into rxload. Today's new idea lives in loop, where the board reads that
+    buffer, matches it against two known commands, and drives the pin. Switch to
+    MicroPython to see the same idea in Python — the wiring never changes.
   arduino:
     file: Sketch_20.2_BluetoothToLed.ino
     sketch: C/Sketches/Sketch_20.2_BluetoothToLed/Sketch_20.2_BluetoothToLed.ino
@@ -160,16 +163,16 @@ code:
       }
     notes:
       - code: setupBLE("ESP32S3_Bluetooth")
-        text: The same radio setup as Day 27 — the board advertises under the same name, with the same service underneath.
+        text: Starts the same radio as Day 27 and registers the callback that fires on every write, so an arriving command lands in rxload without the loop asking for it.
         explain: ble
       - code: 'strncmp(rxload, "led_on", 6) == 0'
-        text: True when the first six characters the phone wrote spell led_on — underscore included. The buffer rxload holds whatever landed in the write characteristic.
+        text: Reads the mailbox and tests whether the first six characters spell led_on, underscore included — the match is what turns a received value into a command.
         explain: bleCharacteristic
       - code: digitalWrite(LED, HIGH)
-        text: The matched command drives GPIO 2 HIGH and the LED lights; led_off drives it LOW again.
+        text: The matched command drives GPIO 2 HIGH and the LED lights; led_off drives it LOW — the moment the phone's word becomes a voltage.
         explain: digitalWrite
       - code: Serial.println(rxload)
-        text: Echoes every received command to Serial Monitor, so you can watch the words arrive as the LED obeys.
+        text: Echoes each received command to Serial Monitor, so you can watch the word arrive at the same instant the LED obeys.
         explain: serial
   micropython:
     file: 19.2_BLE_LED/BLE_LED.py
@@ -186,7 +189,7 @@ code:
               led.value(0)
     notes:
       - code: rx_data == b'led_on'
-        text: Compares the received bytes to the exact command — every character must match, where the Arduino sketch checks only the front of the buffer.
+        text: The on_rx function IS the callback here — it compares the whole received bytes to the exact command, where the Arduino sketch checks only the front of the buffer.
       - code: led.value(1)
         text: Drives GPIO 2 HIGH and the LED lights.
     note: >
@@ -196,26 +199,40 @@ code:
       skip it — it should never block the Arduino-first path.
 
 theory:
-  title: The shape of a command
-  summary: The board reads whatever arrived, compares it to two known words, and acts — the shape of every command protocol.
+  title: How a command becomes an action
+  summary: A value the phone writes into the board's mailbox trips a callback, and the arriving bytes drive the pin — a control loop closed over the air.
   intro: >
-    Day 27 gave you a pipe between phone and board. Day 4 gave you digitalWrite.
-    Put them together and you have remote control — and the pattern in today's
-    loop is the skeleton of every protocol you'll ever meet.
+    Day 27 opened a pipe: a value could travel from your phone into the board.
+    Day 4 gave you digitalWrite, a value that moves a pin. Today the two ends
+    meet. The write characteristic is a mailbox the phone drops a value into; a
+    callback you registered is the doorbell that fires the instant it lands; and
+    the bytes that arrive decide what the pin does. That is remote control, and
+    the shape underneath is event-driven — the board stays ready and does work
+    only when a message arrives.
   flow:
-    - { n: Send, title: Phone writes, body: LightBlue writes your text into the board's write characteristic. }
-    - { n: Receive, title: Buffer fills, body: The sketch copies the incoming bytes into rxload. }
-    - { n: Compare, title: Two known words, body: strncmp checks the buffer against led_on and led_off. }
-    - { n: Act, title: Pin moves, body: digitalWrite drives GPIO 2 HIGH or LOW and the LED follows. }
-  formulaLabel: The model
-  formula: phone text → **match a known command** → digitalWrite
+    - n: "Mailbox"
+      title: "The write characteristic"
+      body: "LightBlue writes your text into the board's RX characteristic, a named slot the board offers for exactly this. The phone drops a value in, and the board decides what that value means."
+    - n: "Doorbell"
+      title: "A callback fires"
+      body: "setupBLE handed the radio a standing instruction: when a write arrives, run this. The moment your phone sends, the radio runs it and copies the incoming bytes into rxload. The board waits, ready, and the arrival itself wakes it."
+    - n: "Match"
+      title: "Two known words"
+      body: "The loop reads rxload and compares it against led_on and led_off with strncmp. Whatever matches becomes a command, and the rest is text that scrolls past."
+    - n: "Act"
+      title: "The pin follows"
+      body: "A matched command calls digitalWrite on GPIO 2 — HIGH lights the LED, LOW puts it out. The value that left your phone is now a voltage on a wire."
+  formulaLabel: The loop
+  formula: "phone writes the characteristic → **callback fires** → match a known word → digitalWrite"
   notes:
+    - title: Woken by the arrival
+      body: The radio holds your callback and fires it the instant a write lands, so the board spends its time ready and acts only when a message comes. That is event-driven control, and it scales — one board can hold many callbacks, each waiting for its own message.
     - title: Why spelling is the whole protocol
       explain: bleCharacteristic
-      body: The board compares raw characters. led_on with an underscore is a command; anything else is just text that scrolls past, and the LED holds its state.
-    - title: What the radio adds
+      body: The board compares raw characters. led_on with an underscore is a command; any other spelling is text that arrives, gets echoed, and leaves the LED where it was. The meaning lives in the match, so both ends must agree on the words.
+    - title: The radio only carries bytes
       explain: ble
-      body: BLE only carries the bytes. The meaning — which words count as commands and what they do — lives entirely in the sketch you wrote.
+      body: BLE moves the characters and nothing more. Which words count as commands, and what each one does, lives entirely in the sketch — the same bytes could dim a light, log a reading, or steer a motor.
 
 test:
   mode: visual
@@ -243,37 +260,39 @@ test:
       fix: "Set the baud rate to 115200."
 
 challenge:
-  title: "Try this: grow the protocol"
+  title: "Try this: map values to the light"
   railLabel: Try this
   intro: >
-    Same working circuit, one new power: you decide what the commands are. It
-    fits inside today's 25 minutes.
-  summary: Add a third command that blinks the LED twice, rename the commands to your own words, and note the exact spelling discipline a protocol demands.
+    Same working circuit, one new question — what should each value the phone
+    sends mean? First watch which values the board acts on, then turn the light
+    from a switch into a dial. Both fit inside today's 25 minutes.
+  summary: Send several values from LightBlue and watch which ones become actions, then add a PWM branch that reads the received value as a brightness so the phone dials the light.
   cards:
-    - title: Add led_blink
-      explain: digitalWrite
-      body: Add a third strncmp branch for `led_blink` that flashes the LED twice — HIGH, a short delay, LOW, and again. Upload and send your new word.
-    - title: Rename the commands
-      body: Change `led_on` and `led_off` to words of your own — keep the character counts in each strncmp honest — and drive the light with your own vocabulary.
-  logbook:
-    - What did your third command do, and what did you name it?
-    - What happened when a command was off by a single character?
-    - What device in your life is obeying exact spellings like this right now?
+    - title: Send values, watch the map
+      explain: bleCharacteristic
+      body: In LightBlue, write led_on and led_off, then near-misses like LED_ON, Led_on, and ledon. Serial Monitor echoes every one as it lands — proof the callback caught it — while the LED moves only for the two exact commands. You are watching the map from a received value to an action, where the board acts on the values it knows and lets the rest pass by.
+    - title: Turn words into brightness
+      explain: ledc
+      body: Attach GPIO 2 to a PWM channel once, then add a branch that reads the received text as a number from 0 to 255 and calls ledcWrite with it. Send 0, 64, and 255 from your phone and the light dims and brightens — the value you type maps straight onto brightness, so the phone becomes a dimmer.
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent can
     guide you with full context.
   behaviour: >
-    guide one physical step at a time, wait for you to confirm, explain terms on
-    request, and always check wiring, board, port, and USB before changing code.
+    guide one physical step at a time, wait for confirmation, and teach the
+    control loop plainly — a value written into the characteristic trips a
+    callback that drives the pin. Always check wiring, board, port, and USB
+    before changing code, and use Serial Monitor to separate a delivery problem
+    from a wiring one.
   coachInstructions:
     - Guide one physical step at a time and wait for learner confirmation before proceeding.
+    - Teach the core loop — the phone writes a value into the write characteristic, a callback the sketch registered fires on arrival and copies it into rxload, then the loop matches it and calls digitalWrite; the arrival wakes the board, which is what makes it event-driven control.
     - The commands are led_on and led_off with underscores, written as utf-string; the manual's captions show hyphens and are wrong — always follow the code, never print the hyphen form.
     - If the LED never reacts, check Serial Monitor at 115200 first — an echoed command with a dark LED points at wiring on GPIO 2; no echo points at the phone side or the spelling.
     - If the LED is wired but dead, confirm long leg to GPIO 2 through the 220 Ω resistor and short leg to GND before changing code.
     - If the phone can't find the board, repeat Day 27's LightBlue connection steps and have the learner press reset before reconnecting.
-    - Keep the Arduino path primary; the MicroPython version broadcasts as ESP32S3 and matches each command byte-for-byte, so expect those two differences.
+    - Keep the Arduino path primary; the MicroPython version's on_rx is the same callback, it broadcasts as ESP32S3, and it matches each command byte-for-byte, so expect those differences.
 
 source:
   license: CC BY-NC-SA 3.0

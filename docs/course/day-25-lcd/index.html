@@ -16,7 +16,7 @@
       <div class="hero-copy">
         <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 25 of 30</p>
         <h1>Put words<br />on a <em>screen</em></h1>
-        <p class="lede">Today the project gets a face. You wire the LCD1602&#x27;s four pins to the board, add one library to the Arduino IDE, and upload a sketch that greets you on the top row while the bottom row counts the seconds — a whole screen carried over two signal wires.
+        <p class="lede">Today the project gets a face. You wire the LCD1602&#x27;s four pins to the board, add one library to the Arduino IDE, and upload a sketch that greets you on the top row while the bottom row counts the seconds. The screen rides on just two signal wires — a shared bus the board could hang many more devices off, each one called up by its own address.
 </p>
         <div class="meta-row" aria-label="Lesson facts">
           <span class="pill is-key">About 25 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">First I2C device</span>
@@ -46,7 +46,7 @@
           <a href="#wiring"><span class="tick"></span>Chart the circuit</a>
           <a href="#steps"><span class="tick"></span>Build it</a>
           <a href="#code"><span class="tick"></span>Read the code</a>
-          <a href="#theory"><span class="tick"></span>Two wires carry the whole screen</a>
+          <a href="#theory"><span class="tick"></span>One bus, two wires, devices by address</a>
           <a href="#test"><span class="tick"></span>Test &amp; debug</a>
           <a href="#challenge"><span class="tick"></span>Try this</a>
           <a href="#agent"><span class="tick"></span>Coach me</a>
@@ -252,23 +252,24 @@ while True:
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">05</span> Understand, don&#x27;t memorise</p>
-              <h2>Two wires carry the whole screen</h2>
-              <p class="muted">A bare LCD1602 wants over a dozen wires. The backpack soldered to its back shrinks that to two signals, because I2C sends everything as addressed messages down a shared pair.
+              <h2>One bus, two wires, devices by address</h2>
+              <p class="muted">A bare LCD1602 has a row of pins that each carry one signal, and driving it directly means wiring about a dozen of them. The little backpack on the back trades that for two wires by putting the display on an I2C bus — the same two-wire scheme most screens and sensors use. Understanding the bus is worth more than today&#x27;s circuit, because you&#x27;ll meet it again and again.
 </p>
             </div>
             <div class="theory-flow" aria-label="Measurement model">
-              <article class="flow-step"><span class="n">One bus</span><h3>Two shared wires</h3><p>SDA carries the data while SCL keeps the beat for both ends.</p></article>
-              <article class="flow-step"><span class="n">Address</span><h3>0x27 or 0x3F</h3><p>Every device on the bus has a number so the board can call this one by name.</p></article>
-              <article class="flow-step"><span class="n">Translate</span><h3>The backpack chip</h3><p>It turns bus messages into the many parallel signals the bare LCD needs.</p></article>
-              <article class="flow-step"><span class="n">Print</span><h3>Cursor then text</h3><p>The sketch parks the cursor at a row and column and writes characters there.</p></article>
+              <article class="flow-step"><span class="n">1 · The problem</span><h3>A dozen pins</h3><p>A bare character LCD expects a fistful of parallel wires, one per signal. Wiring that by hand for every display would fill the board fast.</p></article>
+              <article class="flow-step"><span class="n">2 · The bus</span><h3>Two shared wires</h3><p>The backpack chip takes bytes over just two lines: SDA carries the data one bit at a time, and SCL is a clock that ticks so both ends agree when each bit counts.</p></article>
+              <article class="flow-step"><span class="n">3 · Who talks</span><h3>Board asks, device answers</h3><p>The board is the one that starts every exchange. Devices sit on the bus and listen, and reply only when they&#x27;re spoken to — so many can share the same two wires without talking over each other.</p></article>
+              <article class="flow-step"><span class="n">4 · By name</span><h3>The address</h3><p>The board opens each message with a number — the device&#x27;s address. This display answers to 0x27 (some boards to 0x3F). Send to the wrong number and the display never hears its name, so the screen stays blank.</p></article>
+              <article class="flow-step"><span class="n">5 · Placing text</span><h3>Row and column</h3><p>Once it&#x27;s addressed and awake, the LCD holds a grid of sixteen columns by two rows. You set a cursor to a row and column, then print, and the characters land at that spot.</p></article>
             </div>
             <div class="formula-card">
               <span class="label">The model</span>
-              <code>two wires → <b>address</b> → cursor position → characters</code>
+              <code>a dozen pins → <b>two shared wires</b> → the right <b>address</b> → cursor at row and column → characters</code>
             </div>
             <div class="two-col" style="margin-top:14px">
-              <article class="mini-card"><h3>Another kind of serial <button class="define" data-topic="serial">Define</button></h3><p>The bits travel single file down SDA the way they travel down USB to your Serial Monitor; SCL is the shared clock that tells both ends when each bit counts.</p></article>
-              <article class="mini-card"><h3>Two possible addresses <button class="define" data-topic="i2c">Define</button></h3><p>Backpacks built on the PCF8574T chip answer at 0x27 and PCF8574AT boards answer at 0x3F. The sketch tries 0x27 first and switches by itself when nothing replies.</p></article>
+              <article class="mini-card"><h3>Another kind of serial <button class="define" data-topic="serial">Define</button></h3><p>The bits travel single file down SDA the way they travel down USB to your Serial Monitor. The extra wire, SCL, is a shared clock that tells both ends exactly when to read each bit — which is what lets several devices share one pair of lines.</p></article>
+              <article class="mini-card"><h3>Why the address can be one of two <button class="define" data-topic="i2c">Define</button></h3><p>The backpack&#x27;s PCF8574T chip answers at 0x27, while the PCF8574AT version answers at 0x3F. The sketch pings 0x27 first, and when nothing replies it switches to 0x3F on its own — a small demonstration that a wrong address means silence.</p></article>
             </div>
           </div>
         </section>
@@ -305,20 +306,14 @@ while True:
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">07</span> Make the idea yours</p>
-              <h2>Try this: make the screen yours</h2>
-              <p class="muted">Same working circuit, three edits to the two print lines. It fits inside today&#x27;s 25 minutes.
+              <h2>Try this: drive the grid, then reason about the address</h2>
+              <p class="muted">Same working circuit. The first two cards make the row-and-column model real by putting your own text exactly where you want it. The last one asks you to predict what the bus does when the address is wrong — no wiring change needed.
 </p>
             </div>
             <div class="two-col">
-              <article class="mini-card"><h3>Name the boat</h3><p>Change <code>lcd.print(&quot;hello, world!&quot;)</code> to your boat&#x27;s name and upload — row 0 is yours now.</p></article>
-              <article class="mini-card"><h3>Minutes and seconds <button class="define" data-topic="millis">Define</button></h3><p>Make row 1 read like a clock — print <code>millis() / 60000</code> for the minutes, print a colon, then print <code>(millis() / 1000) % 60</code> for the seconds.</p></article>
-              <article class="mini-card"><h3>Overflow the row <button class="define" data-topic="lcd1602">Define</button></h3><p>Print a message longer than sixteen characters and watch where the extra letters go. Then trim the message until the whole line fits the glass again.</p></article>
-            </div>
-            <div class="logbook">
-              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
-              <label>What did the screen do with the characters past column sixteen?<textarea rows="2"></textarea></label>
-              <label>How would you show a sensor reading from an earlier day on this screen?<textarea rows="2"></textarea></label>
-              <label>Where on a real boat would a two-line display earn its keep?<textarea rows="2"></textarea></label>
+              <article class="mini-card"><h3>Name the boat <button class="define" data-topic="lcd1602">Define</button></h3><p>Change <code>lcd.print(&quot;hello, world!&quot;)</code> to your boat&#x27;s name and upload. Row 0 is yours now — the greeting was only ever text you were free to replace.</p></article>
+              <article class="mini-card"><h3>Place it by column</h3><p>Before that print, add <code>lcd.setCursor(4,0)</code> and upload again. The word now starts four columns in. Try other numbers from 0 to 15 and watch the text slide along the row — that pair is column then row, the display&#x27;s whole coordinate system.</p></article>
+              <article class="mini-card"><h3>Predict a wrong address <button class="define" data-topic="i2c">Define</button></h3><p>The sketch tries 0x27, and if nothing answers it falls back to 0x3F. Ask yourself: if you forced the address to a number no device on your bus uses, what would the screen do — and why? Then look back at the backlight-on-but-blank case in Test &amp; debug and see if your reasoning matches.</p></article>
             </div>
           </div>
         </section>
@@ -336,7 +331,7 @@ while True:
             </div>
             <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
               <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
-              <p><strong>How the agent should behave:</strong> guide one physical connection at a time, wait for you to confirm, explain terms on request, and always check wiring, board, port, and USB before changing code.
+              <p><strong>How the agent should behave:</strong> guide one physical connection at a time and wait for confirmation, then teach the I2C bus behind the circuit — two shared wires, a clock, and each device reached by its own address. Always check wiring, board, port, and USB before changing code.
 </p>
             </div>
           </div>

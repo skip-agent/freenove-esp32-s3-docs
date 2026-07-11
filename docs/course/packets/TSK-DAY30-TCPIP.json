@@ -40,7 +40,9 @@
     "If Processing cannot connect, confirm both machines are on the same network and that the learner dialled the exact IP and port the monitor just printed.",
     "If ControlP5 errors on Run, install it via Processing's Add Library window before debugging anything else.",
     "If lines go missing, have the learner connect first, then type, and end every line with Enter.",
-    "This is the final day — when the exchange works, invite the learner to log what they'd build next before packing up."
+    "Ground the mechanism when asked- one side listens as a server at an address and port, the other dials in as a client, and TCP then hands both ends the same reliable stream in order; ports are what let one machine host many services.",
+    "For the challenge, have them open the board's printed IP in a phone browser on the same Wi-Fi and watch the `GET /` request land in Serial Monitor — proof that a browser is just a TCP client dialling address and port.",
+    "This is the final day — when the exchange works, invite the learner to note what they'd build next before packing up."
   ],
   "steps": [
     "Open Sketch_24.2_WiFiServer.ino in Arduino IDE.",
@@ -79,16 +81,20 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "A server listens at an address and port; a client dials it. That is the whole shape of the internet, and your board now has it.",
-    "formula": "server listens at an address and port → client dials it → one shared line",
+    "plainLanguage": "A server listens at an address and a port, a client dials that exact address and port, and then both ends read and write one reliable stream that always arrives in order. That is how the whole web moves data, and your board now does it too.",
+    "formula": "server listens at an address and port → client dials that address and port → one reliable stream, in order, both ways",
     "notes": [
       {
         "title": "Day 29 gave it the address",
-        "body": "Yesterday the board joined the network and the router handed it a number. Today it opens a door at that number and offers a service — an address, a port, and something listening."
+        "body": "Yesterday the board joined the network and the router handed it a number. Today it opens a door at that number and offers a service that answers when dialled — an address, a port, and something listening."
       },
       {
-        "title": "What \"on the internet\" means",
-        "body": "Every web server in the world is this same shape at larger scale — an address, a port, a service that answers when dialled. Your board now has all three."
+        "title": "Why the stream is reliable",
+        "body": "Networks drop and shuffle pieces of data all the time. TCP hides that for you — it numbers each chunk, re-sends anything that goes missing, and reassembles them in order before your code ever sees them. You read clean text in the right sequence, and every web server in the world leans on exactly this."
+      },
+      {
+        "title": "One address, many doors",
+        "body": "A port is a number that picks which service you mean at an address. The board answers on 80 here, while other ports could serve other things — which is how a single machine hosts many services at once without them getting tangled."
       }
     ]
   },
@@ -131,10 +137,5 @@
       ]
     }
   ],
-  "challenge": "Run the client sketch with sketchWiFi as the server, teach the board to answer \"aye\" to \"ahoy\", and note what you'd build next — the whole kit is yours now.",
-  "logbookPrompts": [
-    "What was the first line your board and your computer exchanged?",
-    "Which role did you leave the board in — listening or dialling — and why?",
-    "Thirty days on, the whole kit is yours. What will you build next?"
-  ]
+  "challenge": "From your phone on the same Wi-Fi, open the board's address in a browser and watch the raw request land in Serial Monitor, type a reply back to the phone, then teach the board to answer \"aye\" to \"ahoy\" on its own — and note what you'd build next, because the whole kit is yours now."
 }

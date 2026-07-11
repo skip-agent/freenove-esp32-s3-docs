@@ -14,10 +14,12 @@ tracks: { main: arduino, optional: micropython }
 learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
-  Wire Day 20's 74HC595 to a 7-segment display, upload the Arduino sketch, and
-  watch the display count 0 through F, one character per second — the same
-  three wires from the board now draw a shape you can read at a glance.
-unlocks: One byte can be a picture — eight bits mapped onto eight segments turn the shift register's outputs into a readable character.
+  Wire Day 20's 74HC595 to a 7-segment display and upload the Arduino sketch,
+  then watch it count 0 through F, one character per second. The real lesson
+  sits underneath: how a numeral turns into a pattern of lit bars, how that
+  pattern packs into one byte, and why the sketch keeps a small table of those
+  bytes to look up rather than working each character out on the fly.
+unlocks: You can read the encoding a seven-segment display runs on — seven bars become eight bits, each numeral is one byte's on-off pattern, and a lookup table turns a chosen digit into the byte the shift register sends.
 seoDescription: >
   Drive a 7-segment display from the ESP32-S3 with a 74HC595 shift register.
   Upload the sketch and watch it count 0 through F — one byte per character,
@@ -28,9 +30,11 @@ hero:
   headline: Turn one byte|into a {digit}
   lede: >
     Today the shift register earns its keep. You wire its eight outputs to a
-    7-segment display, upload a sketch that sends one pattern byte per
-    character, and the display counts 0 through F — a readable digit from the
-    same three wires you ran on Day 20.
+    7-segment display and upload a sketch that sends one byte per character, and
+    the display counts 0 through F. Each byte is an encoding: eight bits that say
+    which of the seven bars to light. Choosing a character is choosing the right
+    byte, and the sketch keeps a table of them so it only has to look each up —
+    the same three wires you ran on Day 20.
   pills:
     - { text: About 30 minutes, key: true }
     - Arduino first
@@ -175,7 +179,7 @@ code:
       }
     notes:
       - code: byte num[]
-        text: Sixteen ready-made segment patterns — one byte per character, 0 through F.
+        text: The lookup table of segment patterns — sixteen bytes, one per character 0 through F, so num[i] is the ready-made encoding for character i.
         explain: sevenSegment
       - code: shiftOut(dataPin, clockPin, LSBFIRST, value)
         text: Clocks the byte into the chip one bit at a time — the same move as Day 20.
@@ -211,26 +215,43 @@ code:
       block the Arduino-first path.
 
 theory:
-  title: A byte is a picture
-  summary: Eight segments line up with eight bits, so one byte holds a whole character — and on this display a 0 bit is what lights a segment.
+  title: A digit is a pattern, and a byte is that pattern
+  summary: Number the seven bars a to g, give each one its own bit, and the whole on-off pattern for a character fits in a single byte — so showing a digit is just looking its byte up.
   intro: >
-    The display is eight little lights arranged as a figure. Feed them the right
-    on-off pattern and your eye reads a character — the code table is just
-    sixteen of those patterns, stored and ready.
+    A seven-segment display doesn't understand the number 3. It only knows which
+    of its bars are lit. Turning "3" into something it can show means deciding
+    which segments to switch on, packing that decision into a byte, and handing
+    that byte to Day 20's shift register. That translation from a numeral to a
+    pattern of bits is the whole idea today, and a small lookup table carries it.
   flow:
-    - { n: Eight lights, title: Eight bits, body: Segments A through G plus the decimal point line up with the eight bits of one byte. }
-    - { n: Zero lights, title: Common anode, body: All segments share the positive rail so a 0 bit pulls its segment low and lights it., explain: commonAnode }
-    - { n: Look it up, title: The code table, body: The table stores one ready-made pattern per character from 0 to F. }
-    - { n: Deliver it, title: Shift and latch, body: The 74HC595 from Day 20 carries the byte in on three wires and holds it on eight outputs. }
+    - n: "1"
+      title: "Seven named bars"
+      body: "A single digit is drawn by seven bars, labelled a to g, plus a decimal point. Any numeral is a particular set of those bars switched on: a 7 lights three of them, an 8 lights all seven."
+    - n: "2"
+      title: "One bit per segment"
+      body: "Give each segment its own bit and the whole on-off pattern fits in eight bits. On this display the bit order from the top down is DP G F E D C B A, so each bit owns exactly one bar."
+    - n: "3"
+      title: "A 0 bit lights the bar"
+      body: "The display is common anode: every segment shares the positive rail, so a bar lights when its bit is pulled LOW. A 0 turns a segment on and a 1 leaves it dark, which is why 0xff is a blank display."
+      explain: commonAnode
+    - n: "4"
+      title: "Look it up, don't compute it"
+      body: "There is no tidy formula from the numeral 3 to its segments, so the sketch stores the answer once. num[3] is the ready-made byte for a 3, and choosing which digit to show becomes choosing an entry from the table."
+    - n: "5"
+      title: "Day 20 delivers it"
+      body: "The 74HC595 sends whatever byte you hand it out onto its eight pins. Show a 3 by looking up num[3] and shifting that byte out — the same three wires as yesterday."
+      explain: shiftRegister
   formulaLabel: The model
-  formula: character → **one byte** → eight segments → a shape you can read
+  formula: digit → **index the table** → one byte → eight segments → a shape you can read
   notes:
-    - title: How the byte maps to segments
+    - title: How a byte becomes a shape
       explain: sevenSegment
-      body: From the top bit down the order is DP G F E D C B A. So 0xc0 is 1100 0000 — DP and G stay dark while the other six light up and draw a 0.
+      body: "Read 0xb0 as bits, 1011 0000, in segment order DP G F E D C B A. The 0 bits — G, D, C, B, A — are the lit bars, and A B C D G drawn together is a 3. Every entry in the table is one of these patterns worked out in advance."
+    - title: Why a table, not arithmetic
+      body: "Which bars a numeral lights follows no equation — a 2 and a 5 share almost nothing. Ten patterns cover 0 to 9 (this sketch keeps sixteen, adding A to F for hex counting), each stored once so the loop only has to index them."
     - title: Why 0 means on
       explain: commonAnode
-      body: This display is common anode — every segment's positive side is tied to the rail, so an output has to sit LOW to let current flow and light its segment. 0xff is all HIGH, which is a blank display.
+      body: "Common anode ties every segment's positive side to the rail, so an output must sit LOW to let current flow and light its bar. That inverts the intuition: 0 is on, 1 is off, and all ones (0xff) shows nothing."
 
 test:
   mode: visual
@@ -256,34 +277,35 @@ test:
       fix: "Run Day 20's chip power and orientation checklist, then confirm the common pins (3 and 8) reach the positive rail."
 
 challenge:
-  title: "Try this: draw your own byte"
+  title: "Try this: decode a byte, then bend the count"
   railLabel: Try this
   intro: >
-    Same working circuit, three small moves — pick a digit, change the pace, and
-    invent one character the table never had. It fits inside today's 30 minutes.
-  summary: Show your favourite digit from power-on, slow the count, then work out the byte for the letter H and put it on the display.
+    The table is the whole trick, so take it apart. Read one byte back into a
+    shape, shorten the count to change the sequence, then hand-build a character
+    the table never had — all on the working circuit, inside today's 30 minutes.
+  summary: Decode num[3] into the segments it lights and confirm it draws a 3, shorten the loop to count only 0 through 9, then work out the byte for the letter H and put it on the display.
   cards:
-    - title: Pick a boot digit
-      body: Add a `writeData(num[7])` call at the end of `setup()` and empty out `loop()` — your favourite digit (swap the 7) now holds steady from the moment power arrives.
-    - title: Slow the count
-      explain: delayMs
-      body: Change `delay(1000)` to 2000 and upload — each character now holds for two seconds. Find a pace you could actually read across the room.
-    - title: Draw an H
-      body: Segments F E G B C make an H, and in bit order DP G F E D C B A that pattern is the byte `0x89`. Call `writeData(0x89)` and check the shape that appears.
-  logbook:
-    - Which character surprised you when it appeared, and why?
-    - What byte would draw the first letter of your name — and can this display manage it?
-    - Where in daily life did you last read a seven-segment digit?
+    - title: Decode a byte back into a shape
+      explain: sevenSegment
+      body: Take num[3] from the table — the byte `0xb0` — and write it out as bits, 1011 0000, in segment order DP G F E D C B A. The 0 bits are the lit bars, so mark them and you get G D C B A, which draws a 3. Watch the count reach 3 and confirm your reading matches the display.
+    - title: Count only 0-9
+      body: Change the loop's `for (int i = 0; i < 16; i++)` to `i < 10` and upload. The display now counts 0 through 9 and wraps, skipping A to F — you have changed the sequence by changing which table entries the loop walks.
+    - title: Build your own character
+      body: Segments B C E F G draw an H, and in bit order DP G F E D C B A that pattern is the byte `0x89`. Empty out `loop()`, add `writeData(0x89)` to the end of `setup()`, and check that the H holds steady from power-on.
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent can
     guide you with full context.
   behaviour: >
-    guide one physical connection at a time, wait for you to confirm, explain
-    terms on request, and always check wiring, board, port, and USB before
-    changing code.
+    guide one physical connection at a time, then teach the encoding underneath:
+    how a numeral becomes a set of lit segments, how that set packs into one
+    byte, and why a lookup table is the clean way to keep them. Explain terms on
+    request, and always check wiring, board, port, and USB before changing code.
   coachInstructions:
+    - Teach the core idea that a numeral is a pattern of lit bars and one byte with one bit per segment encodes that pattern — num[3] is 0xb0, whose 0 bits light the segments that draw a 3.
+    - Make sure they see why it is a lookup table — there is no formula from a digit to its segments, so ten patterns for 0-9 (sixteen here, adding A-F for hex) are stored once and indexed.
+    - Reinforce that the display is common anode, so a 0 bit lights its segment and 0xff blanks everything; this inverted sense is what trips people up.
     - Confirm the three Day 20 control wires first (GPIO 12 to DS, GPIO 13 to ST_CP, GPIO 14 to SH_CP) before touching the eight segment wires.
     - The eight resistor paths from Q0-Q7 to the segments are today's main failure surface — have the learner verify them against the diagram one row at a time.
     - If every segment is always lit, check the latch wire on GPIO 13 — the patterns are likely never reaching the outputs.

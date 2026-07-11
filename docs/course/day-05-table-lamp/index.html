@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Day 5 · Make a mini table lamp — TinySkiff ESP32-S3 Lab</title>
-  <meta name="description" content="Turn the button-and-LED circuit into a mini table lamp. Change the sketch so one press latches the LED on and the next turns it off, with debounce for clean presses." />
+  <meta name="description" content="Turn the button-and-LED circuit into a mini table lamp. Learn the difference between a pin&#x27;s steady level and the edge of a press, hold an on/off state across loops, and debounce the switch so one press flips the lamp exactly once." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -16,10 +16,10 @@
       <div class="hero-copy">
         <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 5 of 30</p>
         <h1>Turn a press<br />into a <em>lamp</em></h1>
-        <p class="lede">Yesterday the LED only glowed while you held the button. Today it stays. With a little memory and a trick called debounce, one press latches the light on and the next press turns it off — the leap from a raw button to a product.
+        <p class="lede">Yesterday the LED glowed only while you held the button. Today it stays. The loop reads that button thousands of times a second, so the leap to a lamp is teaching it to fire on the single moment a press begins — the edge — to remember whether the light is on, and to shrug off the milliseconds a switch bounces as it closes. That&#x27;s the jump from a raw button to a product.
 </p>
         <div class="meta-row" aria-label="Lesson facts">
-          <span class="pill is-key">About 20 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">Same circuit as Day 4</span>
+          <span class="pill is-key">About 25 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">Same circuit as Day 4</span>
         </div>
       </div>
       <div class="hero-side no-instrument">
@@ -46,7 +46,7 @@
           <a href="#wiring"><span class="tick"></span>Chart the circuit</a>
           <a href="#steps"><span class="tick"></span>Build it</a>
           <a href="#code"><span class="tick"></span>Read the code</a>
-          <a href="#theory"><span class="tick"></span>Memory and debounce</a>
+          <a href="#theory"><span class="tick"></span>Level, edge, and the bounce between them</a>
           <a href="#test"><span class="tick"></span>Test &amp; debug</a>
           <a href="#challenge"><span class="tick"></span>Try this</a>
           <a href="#agent"><span class="tick"></span>Coach me</a>
@@ -110,7 +110,7 @@
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">02</span> Make the physical circuit</p>
               <h2>Chart the circuit</h2>
-              <p class="muted">This is the Day 4 circuit, unchanged — the same chart, so the same chart applies. Click it to enlarge, or skip straight to the sketch if your circuit is still assembled.
+              <p class="muted">This is the Day 4 circuit, unchanged. Click the chart to enlarge, or skip straight to the sketch if your breadboard is still assembled — everything new today lives in the code.
 </p>
             </div>
             <div class="wire-layout">
@@ -125,7 +125,7 @@
                 <div class="pin-row">
                   <span class="pin-name"><span class="pin-dot"></span>LED long leg (+) <button class="define" data-topic="led">Define</button></span>
                   <span class="pin-arrow">→</span><span class="pin-dest">GPIO 2 via 220 Ω</span>
-                  <span class="pin-why">This pin switches the LED on and off.</span>
+                  <span class="pin-why">The pin the code drives HIGH or LOW to hold the lamp on or off.</span>
                 </div>
                 <div class="pin-row">
                   <span class="pin-name"><span class="pin-dot"></span>LED short leg (−) <button class="define" data-topic="gnd">Define</button></span>
@@ -135,12 +135,12 @@
                 <div class="pin-row">
                   <span class="pin-name"><span class="pin-dot"></span>Push button <button class="define" data-topic="digitalRead">Define</button></span>
                   <span class="pin-arrow">→</span><span class="pin-dest">GPIO 13</span>
-                  <span class="pin-why">The board reads this pin to catch each press.</span>
+                  <span class="pin-why">The pin the loop watches for the HIGH-to-LOW fall that marks a press.</span>
                 </div>
                 <div class="pin-row">
                   <span class="pin-name"><span class="pin-dot"></span>10 kΩ resistor <button class="define" data-topic="pullResistor">Define</button></span>
                   <span class="pin-arrow">→</span><span class="pin-dest">3.3V</span>
-                  <span class="pin-why">Holds GPIO 13 HIGH until a press pulls it LOW.</span>
+                  <span class="pin-why">Holds GPIO 13 steady at HIGH until a press pulls it LOW — so the fall is a clean edge.</span>
                 </div>
               </div>
             </div>
@@ -173,7 +173,7 @@
             </ol>
             <div class="done-banner" id="doneBanner" role="status">
               <span class="icon" aria-hidden="true">🛋️</span>
-              <div><strong>You built a lamp.</strong><p>A momentary button now behaves like a real switch. Head to Test &amp; debug to confirm the toggle and check for double-presses.</p></div>
+              <div><strong>You built a lamp.</strong><p>A momentary button now behaves like a real switch — firing on the edge of a press and holding its state. Head to Test &amp; debug to confirm the toggle and check for bounce double-presses.</p></div>
             </div>
           </div>
         </section>
@@ -182,7 +182,7 @@
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">04</span> Read just enough code</p>
               <h2>Read the code</h2>
-              <p class="muted">The circuit is the same; the loop is what changed. It now remembers the LED&#x27;s state, waits out the switch&#x27;s chatter, and flips only on a clean press. Switch to MicroPython to see the same idea in Python.
+              <p class="muted">The circuit is the same; the loop is what changed. It now catches the press at its edge, waits out the switch&#x27;s bounce, and inverts the LED&#x27;s remembered state on one clean press. Switch to MicroPython to see the same idea in Python.
 </p>
             </div>
             <div class="tabs" role="tablist" aria-label="Code language">
@@ -205,9 +205,9 @@
   <span class="tok-fn">digitalWrite</span>(pin, !<span class="tok-fn">digitalRead</span>(pin));
 }</code></pre>
                 <div class="code-notes">
-                  <div class="code-note"><code>delay(20)</code><span class="note-text">The debounce pause — long enough for the switch&#x27;s chatter to settle. <button class="define" data-topic="debounce">Define</button></span></div>
-                  <div class="code-note"><code>reverseGPIO(PIN_LED)</code><span class="note-text">Flips the LED to the opposite of whatever it is now — on becomes off, off becomes on. <button class="define" data-topic="toggle">Define</button></span></div>
-                  <div class="code-note"><code>while (digitalRead(PIN_BUTTON) == LOW);</code><span class="note-text">Waits right here until you let go, so one press can&#x27;t count twice. <button class="define" data-topic="debounce">Define</button></span></div>
+                  <div class="code-note"><code>delay(20)</code><span class="note-text">Waits out the switch&#x27;s physical bounce, so the recheck below reads a settled level rather than mid-bounce noise. <button class="define" data-topic="debounce">Define</button></span></div>
+                  <div class="code-note"><code>reverseGPIO(PIN_LED)</code><span class="note-text">Inverts the LED&#x27;s own current level — on becomes off, off becomes on. That level is the state the lamp keeps between loop passes. <button class="define" data-topic="toggle">Define</button></span></div>
+                  <div class="code-note"><code>while (digitalRead(PIN_BUTTON) == LOW);</code><span class="note-text">Holds here for the whole press, so the long LOW of your finger is consumed once. The loop reacts to the falling edge, then waits for release. <button class="define" data-topic="debounce">Define</button></span></div>
                 </div>
               </div>
             </div>
@@ -225,8 +225,8 @@ if not button.<span class="tok-fn">value</span>():
         while not button.<span class="tok-fn">value</span>():
             time.<span class="tok-fn">sleep_ms</span>(<span class="tok-num">20</span>)</code></pre>
                 <div class="code-notes">
-                  <div class="code-note"><code>time.sleep_ms(20)</code><span class="note-text">The same 20 ms debounce pause, written in Python.</span></div>
-                  <div class="code-note"><code>while not button.value()</code><span class="note-text">Holds until you release, so the press registers once.</span></div>
+                  <div class="code-note"><code>time.sleep_ms(20)</code><span class="note-text">The same 20 ms pause to let the switch&#x27;s bounce settle before the recheck.</span></div>
+                  <div class="code-note"><code>while not button.value()</code><span class="note-text">Holds until you release, so the press&#x27;s edge registers exactly once.</span></div>
                 </div>
               </div>
               <p class="micropython-note">Same pins, same wiring, same behaviour. Run it in Thonny if MicroPython is set up; otherwise skip it — it should never block the Arduino-first path.
@@ -238,23 +238,25 @@ if not button.<span class="tok-fn">value</span>():
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">05</span> Understand, don&#x27;t memorise</p>
-              <h2>Memory and debounce</h2>
-              <p class="muted">Two small ideas turn a button into a lamp: the code remembers the light&#x27;s state, and it refuses to trust a press until the switch has stopped bouncing.
+              <h2>Level, edge, and the bounce between them</h2>
+              <p class="muted">A press feels instant, but to the board it is a long stretch of time the loop reads over and over. Making one press flip the lamp exactly once means seeing the difference between the pin&#x27;s steady level and the single moment it changes, holding the light&#x27;s on/off state between loop passes, and getting past the switch&#x27;s mechanical bounce. Those three ideas are the whole lesson.
 </p>
             </div>
             <div class="theory-flow" aria-label="Measurement model">
-              <article class="flow-step"><span class="n">Notice</span><h3>A press starts</h3><p>The loop sees GPIO 13 go LOW and pauses briefly.</p></article>
-              <article class="flow-step"><span class="n">Confirm</span><h3>Check again</h3><p>If it is still LOW after the pause the press was real.</p></article>
-              <article class="flow-step"><span class="n">Flip</span><h3>Toggle the LED</h3><p>reverseGPIO sets the LED to the opposite of what it was.</p></article>
-              <article class="flow-step"><span class="n">Wait</span><h3>Until release</h3><p>The code holds until you let go so one press counts once.</p></article>
+              <article class="flow-step"><span class="n">Level</span><h3>What the loop sees</h3><p>loop() reads GPIO 13 thousands of times a second. At rest it reads HIGH; through the entire press it reads LOW. That reading is the level — the pin&#x27;s state right now.</p></article>
+              <article class="flow-step"><span class="n">The trap</span><h3>A level flips forever</h3><p>Flip the lamp whenever the pin reads LOW and it flips on every pass while you hold — hundreds of times before you let go. The level alone can&#x27;t tell a tap from a long hold.</p></article>
+              <article class="flow-step"><span class="n">Edge</span><h3>The moment of change</h3><p>What you mean by a press is the edge: the single HIGH-to-LOW fall when the contact closes. One press has exactly one falling edge, so acting on the edge acts once.</p></article>
+              <article class="flow-step"><span class="n">Bounce</span><h3>The edge arrives messy</h3><p>The switch&#x27;s metal contacts spring apart and back as they meet, so that one clean edge lands as a burst of edges over a few milliseconds. Left alone, one press reads as several.</p></article>
+              <article class="flow-step"><span class="n">Memory</span><h3>Where on/off lives</h3><p>The LED&#x27;s own driven level is the remembered state. It stays put between loop passes, and each clean edge inverts it — so the lamp holds long after your finger is gone.</p></article>
             </div>
             <div class="formula-card">
               <span class="label">The model</span>
-              <code>one clean press → <b>flip</b> the remembered state → the lamp stays</code>
+              <code>one clean <b>falling edge</b> → invert the remembered state → the lamp holds</code>
             </div>
             <div class="two-col" style="margin-top:14px">
-              <article class="mini-card"><h3>Why the LED bounced before <button class="define" data-topic="debounce">Define</button></h3><p>A switch chatters for a few milliseconds as it closes. Without the pause the board would toggle many times per press.</p></article>
-              <article class="mini-card"><h3>What toggling really is <button class="define" data-topic="toggle">Define</button></h3><p>Instead of following the button live, the code keeps a state and inverts it — that memory is the whole difference from Day 4.</p></article>
+              <article class="mini-card"><h3>Why a press reads LOW <button class="define" data-topic="activeLow">Define</button></h3><p>The 10 kΩ resistor ties GPIO 13 to HIGH at rest, and a press pulls it to ground. So a press is a fall from HIGH to LOW — which is exactly the edge the sketch watches for.</p></article>
+              <article class="mini-card"><h3>How this sketch catches the edge <button class="define" data-topic="debounce">Define</button></h3><p>It acts the instant it first reads LOW, then the wait-until-release line holds through the rest of the press. The long LOW of your hold is spent there and never counted again — one press in, one flip out.</p></article>
+              <article class="mini-card"><h3>Why the contact bounces at all <button class="define" data-topic="debounce">Define</button></h3><p>The two metal contacts do not settle the instant they touch; they physically rebound a few times in a couple of milliseconds, like a dropped ball. The 20 ms pause lets them come to rest before the code rechecks.</p></article>
             </div>
           </div>
         </section>
@@ -273,14 +275,14 @@ if not button.<span class="tok-fn">value</span>():
                   <div class="bar"><span>Lamp</span></div>
                   <ul class="observe-lines"><li>Press once and release — the LED latches on and stays on.</li><li>Press once more — it turns off and stays off.</li><li>Each full press flips the light exactly once, cleanly.</li></ul>
                 </div>
-                <p class="micropython-note">If a single press sometimes flips twice, the debounce pause is doing its job when it&#x27;s present — and failing when it&#x27;s removed.</p>
+                <p class="micropython-note">A single press that flips twice is the switch&#x27;s bounce slipping past — the 20 ms pause is what holds it back, which is exactly what the challenge lets you observe.</p>
               </div>
               <div>
                 <span class="checks-title">If it doesn&#x27;t</span>
                 <ul class="checklist">
-                  <li><strong>One press flips it twice?</strong> Confirm the debounce delay and the wait-until-release line are both present.</li>
+                  <li><strong>One press flips it twice?</strong> A bounce edge got through — confirm the 20 ms debounce delay and the wait-until-release line are both present.</li>
                   <li><strong>Nothing latches?</strong> Re-run Day 4&#x27;s checks — LED direction, the resistors, GPIO 2 and 13.</li>
-                  <li><strong>LED flickers while held?</strong> You may be on the Day 4 sketch — upload Sketch_02.2_TableLamp.</li>
+                  <li><strong>LED flickers while held?</strong> The loop is following the LOW level all through the hold — you&#x27;re likely on the Day 4 sketch, so upload Sketch_02.2_TableLamp.</li>
                   <li><strong>Upload fails?</strong> Swap in a data-capable USB cable.</li>
                 </ul>
               </div>
@@ -291,19 +293,13 @@ if not button.<span class="tok-fn">value</span>():
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">07</span> Make the idea yours</p>
-              <h2>Try this: change how the lamp feels</h2>
-              <p class="muted">Same working lamp, one deliberate change to its behaviour. Pick one and note what changed — it fits inside today&#x27;s 30 minutes.
+              <h2>Try this: make the level and the bounce visible</h2>
+              <p class="muted">The two ideas behind the lamp are easy to see once you take each guard away for a moment. Work on a copy of the sketch, run both experiments, then restore the original — it fits inside today&#x27;s time.
 </p>
             </div>
             <div class="two-col">
-              <article class="mini-card"><h3>Tune the debounce <button class="define" data-topic="debounce">Define</button></h3><p>Try <code>delay(5)</code> and then <code>delay(80)</code>. Find where presses feel crisp without ever double-flipping.</p></article>
-              <article class="mini-card"><h3>Name the interaction</h3><p>In one sentence, describe how this lamp should feel to use — then judge whether your timing delivers it.</p></article>
-            </div>
-            <div class="logbook">
-              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
-              <label>What debounce value felt best, and how did too-short and too-long each fail?<textarea rows="2"></textarea></label>
-              <label>How is a toggle different from the hold-to-light button of Day 4?<textarea rows="2"></textarea></label>
-              <label>What household thing could you now rebuild as a tiny product?<textarea rows="2"></textarea></label>
+              <article class="mini-card"><h3>Watch the loop read the level <button class="define" data-topic="digitalRead">Define</button></h3><p>Comment out the <code>while (digitalRead(PIN_BUTTON) == LOW);</code> line, upload, and hold the button down. The LED strobes — the loop now flips on every pass it reads LOW, hundreds of times through your hold. Uncomment the line and a hold gives one clean flip again, because the loop acts on the falling edge and then waits for release.</p></article>
+              <article class="mini-card"><h3>Catch the bounce <button class="define" data-topic="debounce">Define</button></h3><p>Put that line back, then change <code>delay(20)</code> to <code>delay(0)</code> so nothing waits out the bounce. Press slowly a dozen times — now and then one press flips the lamp twice, because the board caught the contact&#x27;s rebound as a second edge. Restore <code>delay(20)</code> and the double-flips stop.</p></article>
             </div>
           </div>
         </section>
@@ -321,7 +317,7 @@ if not button.<span class="tok-fn">value</span>():
             </div>
             <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
               <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
-              <p><strong>How the agent should behave:</strong> keep it to upload-and-watch on the existing circuit, explain debounce and toggle on request, and check wiring, board, port, and USB before changing code.
+              <p><strong>How the agent should behave:</strong> keep it to upload-and-watch on the existing circuit, and teach the real idea — the pin&#x27;s steady level versus the edge of a press, the on/off state held across loops, and why a switch bounces. Check wiring, board, port, and USB before changing code.
 </p>
             </div>
           </div>
@@ -365,7 +361,7 @@ if not button.<span class="tok-fn">value</span>():
 
   <div class="toast" id="toast">Prompt copied</div>
 
-  <script id="lesson-data" type="application/json">{"day": 5, "totalDays": 30, "slug": "day-05-table-lamp", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "debounce": {"title": "Debounce", "body": "A switch does not snap cleanly from open to closed. For a few milliseconds it chatters between the two, and the board is fast enough to read that chatter as many presses. Debouncing waits a moment and checks again so one press counts once.\n", "shortcut": "A tiny wait-and-recheck turns mechanical chatter into one clean press."}, "digitalRead": {"title": "digitalRead()", "body": "digitalRead() checks whether a pin is currently HIGH or LOW and hands that answer back to your code. Here it reads GPIO 13 every loop to find out whether the button is being pressed.\n", "shortcut": "digitalWrite() sets a pin; digitalRead() asks a pin."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "gnd": {"title": "Ground / GND", "body": "Ground is the shared zero-voltage reference. The board and sensor need a common ground so a signal like HIGH or LOW means the same thing to both parts.\n", "shortcut": "A missing ground can make everything look haunted. Check it early."}, "gpio": {"title": "GPIO extension board", "body": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself.\n", "shortcut": "When a lesson says GPIO 13, look for the pin labelled 13 on the extension board."}, "jumpers": {"title": "Jumper wires", "body": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles.\n", "shortcut": "If a reading seems impossible, gently reseat the jumper wires before changing code."}, "led": {"title": "LED", "body": "A LED is a one-way light. It only lights when its longer leg (the +) faces the pin and its shorter leg (the −) faces ground. Too much current burns it out, so a LED always sits behind a resistor.\n", "shortcut": "Long leg toward the pin side; short leg toward ground."}, "pullResistor": {"title": "Pull resistor (10 kΩ)", "body": "An input pin left floating drifts between HIGH and LOW and reads at random. A 10 kΩ resistor gently ties the pin to a known level, so it reads a steady value until a button press forces the other one.\n", "shortcut": "The 10 kΩ resistors stop GPIO 13 from guessing while the button is idle."}, "pushButton": {"title": "Push button", "body": "This push button has four pins in two connected pairs. Pressing it bridges the pairs and completes the circuit; releasing it breaks the connection again. It is the simplest way to hand the board a yes-or-no input.\n", "shortcut": "Pressed means connected; released means open."}, "resistor": {"title": "Resistor", "body": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction.\n", "shortcut": "The 220 Ω resistor protects the LED; either way round is fine."}, "toggle": {"title": "Toggle", "body": "A toggle flips a remembered state each time, instead of following the button live. Press once and the LED latches on; press again and it latches off. That memory is what turns a momentary button into a lamp switch.\n", "shortcut": "Button-and-LED reacts while held; the lamp remembers and flips."}}, "prev": {"day": 4, "slug": "day-04-button", "title": "Make a button light an LED"}, "next": {"day": 6, "slug": "day-06-led-bar", "title": "Make ten lights flow like water"}}</script>
+  <script id="lesson-data" type="application/json">{"day": 5, "totalDays": 30, "slug": "day-05-table-lamp", "explainers": {"activeLow": {"title": "Why a press reads LOW", "body": "In this wiring, pressing the button pulls GPIO 13 toward ground, so a press reads LOW and rest reads HIGH. That is why the sketch checks for LOW. It feels backwards at first and is very common in real circuits.\n", "shortcut": "Pressed reads LOW here — the code checks for LOW on purpose."}, "arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "debounce": {"title": "Debounce", "body": "A switch does not snap cleanly from open to closed. For a few milliseconds it chatters between the two, and the board is fast enough to read that chatter as many presses. Debouncing waits a moment and checks again so one press counts once.\n", "shortcut": "A tiny wait-and-recheck turns mechanical chatter into one clean press."}, "digitalRead": {"title": "digitalRead()", "body": "digitalRead() checks whether a pin is currently HIGH or LOW and hands that answer back to your code. Here it reads GPIO 13 every loop to find out whether the button is being pressed.\n", "shortcut": "digitalWrite() sets a pin; digitalRead() asks a pin."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "gnd": {"title": "Ground / GND", "body": "Ground is the shared zero-voltage reference. The board and sensor need a common ground so a signal like HIGH or LOW means the same thing to both parts.\n", "shortcut": "A missing ground can make everything look haunted. Check it early."}, "gpio": {"title": "GPIO extension board", "body": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself.\n", "shortcut": "When a lesson says GPIO 13, look for the pin labelled 13 on the extension board."}, "jumpers": {"title": "Jumper wires", "body": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles.\n", "shortcut": "If a reading seems impossible, gently reseat the jumper wires before changing code."}, "led": {"title": "LED", "body": "A LED is a one-way light. It only lights when its longer leg (the +) faces the pin and its shorter leg (the −) faces ground. Too much current burns it out, so a LED always sits behind a resistor.\n", "shortcut": "Long leg toward the pin side; short leg toward ground."}, "pullResistor": {"title": "Pull resistor (10 kΩ)", "body": "An input pin left floating drifts between HIGH and LOW and reads at random. A 10 kΩ resistor gently ties the pin to a known level, so it reads a steady value until a button press forces the other one.\n", "shortcut": "The 10 kΩ resistors stop GPIO 13 from guessing while the button is idle."}, "pushButton": {"title": "Push button", "body": "This push button has four pins in two connected pairs. Pressing it bridges the pairs and completes the circuit; releasing it breaks the connection again. It is the simplest way to hand the board a yes-or-no input.\n", "shortcut": "Pressed means connected; released means open."}, "resistor": {"title": "Resistor", "body": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction.\n", "shortcut": "The 220 Ω resistor protects the LED; either way round is fine."}, "toggle": {"title": "Toggle", "body": "A toggle flips a remembered state each time, instead of following the button live. Press once and the LED latches on; press again and it latches off. That memory is what turns a momentary button into a lamp switch.\n", "shortcut": "Button-and-LED reacts while held; the lamp remembers and flips."}}, "prev": {"day": 4, "slug": "day-04-button", "title": "Make a button light an LED"}, "next": {"day": 6, "slug": "day-06-led-bar", "title": "Make ten lights flow like water"}}</script>
   <script src="../course.js"></script>
 </body>
 </html>

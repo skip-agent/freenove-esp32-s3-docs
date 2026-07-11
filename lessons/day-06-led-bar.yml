@@ -1,7 +1,8 @@
 # Day 6 — LED bar · tinyskiff.lesson.v1
 # One source of truth: this file renders to the guided page
 # (/course/day-06-led-bar/), the agent packet, and the course-map entry.
-# Ten outputs at once — one array, one loop, a light that sweeps.
+# The real lesson is the array + loop — ten outputs from code that names a pin
+# once, plus why every segment still needs its own current-limiting resistor.
 
 schema: tinyskiff.lesson.v1
 lessonCode: TSK-DAY06-LEDBAR
@@ -15,21 +16,26 @@ learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
   Wire a ten-segment LED bar — each segment on its own pin through its own
-  220 Ω resistor — upload the Arduino sketch, and watch a single lit segment
-  sweep along the bar and back, over and over.
-unlocks: One list of pins and one loop can drive ten outputs, so you stop repeating yourself and start thinking in patterns.
+  220 Ω resistor — and drive all ten from a sketch that never names a pin more
+  than once. Ten pins live in one array; one loop walks that array and lights
+  whichever pin it points at. The sweep you see is the loop's counter climbing
+  through the list and back. Learn that, and adding an eleventh output later is
+  one more number, not another block of copied code.
+unlocks: You can drive many identical outputs from one array and one loop instead of copying a line per output, and you know why each LED needs its own resistor to survive.
 seoDescription: >
-  Wire a ten-segment LED bar to the ESP32-S3, upload the sketch, and watch a
-  lit segment flow along the bar and back — your first many-output circuit
-  driven by a pin array and a loop.
+  Drive a ten-segment LED bar from the ESP32-S3 with a single array of pins and
+  one loop instead of ten copied lines, watch a lit segment sweep along the bar
+  and back, and learn why every LED needs its own current-limiting resistor.
 
 hero:
   instrument: none
   headline: Ten lights|that {flow}
   lede: >
-    Today one light moves. You wire ten LED segments, each on its own pin, then
-    upload a sketch that lights them one at a time down the bar and back — the
-    first circuit where a list of pins and a single loop do the work of ten.
+    Ten outputs is where copy-paste stops scaling. So today you meet the fix you
+    will use for every many-part circuit after this — put the pins in an array
+    and let one loop walk it. Wire ten segments, upload, and watch a single lit
+    segment sweep down the bar and back. The motion is nothing but the loop's
+    counter stepping through the list.
   pills:
     - { text: About 25 minutes, key: true }
     - Arduino first
@@ -64,7 +70,7 @@ parts:
       image: shared/item-resistor.png
       imageKind: Manual photo
       alt: Official manual photo of a resistor with coloured value bands.
-      blurb: One in series with each segment to keep every current gentle.
+      blurb: One per segment, in series, to set the current so each LED lights instead of burning out. Ten LEDs means ten resistors.
       explain: resistor
     - name: Jumper wires
       image: shared/item-jumper-wire.png
@@ -95,8 +101,8 @@ wiring:
     zoomCaption: Official Freenove circuit, C Tutorial Chapter 3, page 56.
     source: { pdf: C_Tutorial.pdf, chapter: 3, chapterTitle: LED Bar, page: 56 }
   pins:
-    - { from: 10 bar segments (via 220 Ω each), to: GPIO 21 47 48 38 39 40 41 42 2 1, why: Each pin lights one segment of the bar., explain: pinArray }
-    - { from: Bar common row, to: GND, why: Returns every segment to zero volts., explain: gnd }
+    - { from: 10 bar segments (via 220 Ω each), to: GPIO 21 47 48 38 39 40 41 42 2 1, why: Each segment gets its own pin so code can address them one at a time. This exact order is the order the array uses. Its 220 Ω resistor sets the current that keeps that segment alive., explain: pinArray }
+    - { from: Bar common row, to: GND, why: Every segment returns through one shared row to zero volts, closing all ten circuits with a single wire., explain: gnd }
   safety:
     - label: The bar can go in backwards.
       icon: "⚓"
@@ -124,9 +130,11 @@ steps:
 
 code:
   intro: >
-    The sketch stays short even with ten LEDs, because the pins live in one list
-    and a loop walks it. Switch to MicroPython if you'd rather see the same idea
-    in Python — the wiring never changes.
+    The code for ten LEDs is the same length as the code for two. The pins live
+    in one array and a loop does each job once per pass — one pinMode line
+    prepares all ten, one digitalWrite line drives whichever the loop points at.
+    Switch to MicroPython if you'd rather see the same idea in Python — the
+    wiring never changes.
   arduino:
     file: Sketch_03.1_FlowingLight.ino
     sketch: C/Sketches/Sketch_03.1_FlowingLight/Sketch_03.1_FlowingLight.ino
@@ -155,13 +163,18 @@ code:
       }
     notes:
       - code: byte ledPins[] = {21, 47, 48, 38, 39, 40, 41, 42, 2, 1}
-        text: One list holds all ten pins in bar order, so the loop can reach each by number.
+        text: All ten pins in one array, in bar order. The array holds the pattern; position 0 is the first segment, position 9 the last.
         explain: pinArray
+      - code: ledCounts = sizeof(ledPins)
+        text: Counts the array so the loop knows where to stop. Add or remove a pin and the loops adjust on their own, with no other edit.
+      - code: pinMode(ledPins[i], OUTPUT)
+        text: Runs once per pin in setup(), so a single line prepares all ten instead of ten copied lines.
+        explain: pinMode
       - code: digitalWrite(ledPins[i], HIGH)
-        text: Lights whichever segment the loop is pointing at right now; the next line turns it off.
+        text: "ledPins[i] reads the pin at position i, and the loop drives just that one HIGH; the next line sets it LOW before i moves on."
         explain: digitalWrite
       - code: for (int i = ledCounts - 1; i > -1; i--)
-        text: Walks the same list backwards, which is what sends the light flowing back the other way.
+        text: Same array, index counting down from 9 to 0, so the light steps back the other way.
         explain: pinArray
   micropython:
     file: 03.1_FlowingLight/FlowingLight.py
@@ -187,22 +200,36 @@ code:
       skip it — it should never block the Arduino-first path.
 
 theory:
-  title: One list, one loop
-  summary: Keep the pins in an array, then walk the list to light them in turn — forward, then back.
+  title: An array of pins, walked by a loop
+  summary: Ten pins live in one array; a loop's counter steps through it, lighting whichever pin its index points at. The moving light is that index over time.
   intro: >
-    There's no trick here — the loop just points at one pin after another and
-    lights whatever it's pointing at, faster than the eye separates.
+    The instinct with ten LEDs is to write the blink code ten times over. That
+    works, and it is a trap — it does not scale, and every change means editing
+    ten places. The move that does scale is the whole lesson. Name the pins once,
+    as a numbered list, and write the work once, as a loop that reads the list by
+    position. The count of outputs stops mattering to the code.
   flow:
-    - { n: List, title: the pin array, body: All ten pins sit in one array in bar order. }
-    - { n: Light, title: HIGH, body: The loop lights the pin it's pointing at right now. }
-    - { n: Step, title: i++, body: It turns that one off and moves to the next pin. }
-    - { n: Sweep, title: back again, body: A second loop walks the list in reverse so the light flows back. }
+    - n: "1"
+      title: "Pins in an array"
+      body: "ledPins holds all ten pin numbers in bar order. An array is a numbered shelf- position 0 is the first segment, position 9 the last. The array is the pattern; the wiring just follows it."
+    - n: "2"
+      title: "An index selects one"
+      body: "The loop keeps a counter, i. ledPins[i] means read the pin number sitting at position i — so a single line can address any segment by changing one number."
+    - n: "3"
+      title: "Light, then step"
+      body: "The loop drives that one pin HIGH, waits, sets it LOW, then i++ moves the index one place along the array to the next pin."
+    - n: "4"
+      title: "Motion is the index over time"
+      body: "As i climbs 0 to 9, the lit pin marches down the bar. One counter, changing over time, is the whole of the motion. Reverse the count, 9 down to 0, and the light flows back."
   formulaLabel: The model
-  formula: one array of pins → walk it forward → walk it back → repeat
+  formula: "**pins in an array** + **a loop over the index** = ten outputs from code you wrote once"
   notes:
-    - title: Why a pin array
+    - title: Why an array beats ten variables
       explain: pinArray
-      body: Ten separate variables would mean ten copies of every line. One array lets a single loop stand in for all of them.
+      body: Ten named variables would mean ten copies of pinMode and two more of every blink line. The array collapses all of that into one loop, and it takes the count of pins from the list itself — so growing the bar is one more number, not another block of code.
+    - title: Why each segment still needs its own resistor
+      explain: resistor
+      body: A LED left to itself pulls far more current than it can survive and burns out in an instant. It has no way to limit itself. The 220 Ω resistor in series does the limiting — the voltage across it sets how much current flows, and that current is what a LED actually runs on. Ten LEDs on ten pins means ten resistors; one shared resistor would starve or overload them together.
 
 test:
   mode: visual
@@ -214,49 +241,51 @@ test:
     - One lit segment starts at one end of the bar.
     - It travels along the bar a segment at a time to the far end.
     - Then it flows back the other way, and repeats for as long as the board has power.
-  expectedNote: Only one segment is lit at any instant — the flow is that single light moving, not a growing row.
+  expectedNote: Only one segment is lit at any instant, so the flow you see is that single light stepping from one row to the next.
   checksTitle: If it doesn't
   checks:
     - symptom: "Whole bar stays dark?"
-      fix: "Rotate the LED bar 180° — its direction is easy to reverse — then re-check the common row to ground."
+      fix: "The bar is likely in backwards — its direction is easy to reverse. Rotate it 180°, then re-check the common row to ground."
     - symptom: "One segment never lights?"
-      fix: "Check that segment's own 220 Ω resistor and its jumper to its GPIO pin."
+      fix: "That one segment is a broken circuit of its own — check its 220 Ω resistor and its jumper to the right GPIO pin. Its neighbours working tells you the code and ground are fine."
+    - symptom: "Segments light in a scrambled order, not a clean sweep?"
+      fix: "A jumper is on the wrong GPIO, so a pin sits out of sequence versus the array. Re-check each wire against the pin order 21 47 48 38 39 40 41 42 2 1."
     - symptom: "Nothing happens at all?"
-      fix: "Re-check the common row to ground, then that the sketch uploaded."
+      fix: "Re-check the common row to ground, then that the sketch actually uploaded."
     - symptom: "Upload fails?"
       fix: "Swap in a data-capable USB cable."
 
 challenge:
-  title: "Try this: bend the flow"
+  title: "Try this: prove the array is the pattern"
   railLabel: Try this
   intro: >
-    Same working circuit, two small edits to the sketch. Both fit inside today's
-    time and leave the wiring untouched.
-  summary: Reverse the direction the light flows, then change how fast it moves by editing the delay, and note what each edit does.
+    Two edits that touch only the array — no rewiring, and you never open the
+    loops. If the motion follows what you type in the list, you have proven the
+    pattern lives in the array and the loop just reads it.
+  summary: Reorder the numbers in the pin array and watch the sweep reorder to match, then delete two numbers and watch the sweep shorten on its own — the loop follows the list without being touched.
   cards:
-    - title: Reverse the flow
-      body: Swap which loop runs first so the light starts its sweep from the other end. Predict which end it begins from before you upload.
-    - title: Change the speed
-      explain: delayMs
-      body: Set every `delay(100)` to a larger or smaller number and upload. Find the speed where the flow still reads as a single moving light.
-  logbook:
-    - Which delay made the flow feel best, and why?
-    - What changed when you ran the reverse loop first?
-    - What real-world display works like this moving bar?
+    - title: Scramble the list
+      explain: pinArray
+      body: In `byte ledPins[]`, swap two of the pin numbers — put 48 where 47 was, and 47 where 48 was — and upload. Nothing on the breadboard changed, yet the light now jumps between those two segments out of order. The sequence you see is the array's order, and the wiring only decides which physical LED each number reaches.
+    - title: Make the bar shorter
+      body: Delete two numbers from the end of the array so it holds eight instead of ten, and upload. The sweep now covers eight segments and turns back early — even though you never edited a loop. The loops read their length from the array itself, so shortening the list shortens the pattern for free.
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent can
     guide you with full context.
   behaviour: >
-    guide one segment at a time, wait for you to confirm, explain terms on
-    request, and always check wiring, board, port, and USB before changing code.
+    guide one segment at a time, wait for you to confirm, and always check
+    wiring, board, port, and USB before changing code. Once the bar is sweeping,
+    make the array-and-loop idea land- the pins are one list, the loop walks it
+    by index, and the moving light is that index over time.
   coachInstructions:
     - Guide one segment at a time and wait for learner confirmation before moving to the next; ten connections are easy to lose track of.
-    - Remind the learner that each segment needs its own 220 Ω series resistor — a shared or missing resistor is the common mistake here.
+    - Teach the core idea once the circuit works- ten pins in one array, one loop stepping through it by index, so code written once drives all ten. Frame the moving light as one counter climbing through the list over time.
+    - Explain the resistor as current-limiting, not decoration- a LED alone pulls too much current and burns out, and the 220 Ω resistor in series sets the current it runs on. Each segment needs its own; a shared or missing resistor is the common mistake here.
     - If the whole bar stays dark, have the learner rotate the LED bar 180° and re-check the common row to ground before changing code.
-    - If one segment never lights, check that segment's resistor and its jumper to its GPIO pin, not the whole circuit.
-    - Explain the pin array and the forward and reverse loops on request; do not dump theory before the learner has a working circuit.
+    - If one segment never lights, check that segment's resistor and its jumper to its GPIO pin, not the whole circuit — its neighbours working proves the code and ground are fine.
+    - For the challenge, have them edit only the array (reorder, then shorten) and predict the result first; the point is that the pattern lives in the list, not the loop or the wiring.
     - Keep the Arduino path primary; MicroPython is optional only if already set up.
 
 source:

@@ -15,9 +15,10 @@ learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
   Wire a DC motor through the L293D driver chip, power it from its own 9V
-  battery, and turn a potentiometer to command the motor's speed and direction —
-  the board sends the plan, the chip switches the current.
-unlocks: The board can command real motion — a driver chip lets its small signals steer heavy current on the board's behalf.
+  battery, and turn a potentiometer to command speed and direction. This is the
+  first day the board commands real power rather than lighting an LED — its pins
+  send the plan, and the chip carries the current that plan describes.
+unlocks: The board can command real motion — a driver chip lets its small, delicate signals steer heavy battery current, and an H-bridge inside it reverses that current on command.
 seoDescription: >
   Drive a DC motor from the ESP32-S3 with the L293D driver chip and a 9V
   battery. Turn a potentiometer to set speed and direction — your first safe
@@ -29,8 +30,9 @@ hero:
   lede: >
     Today the board moves something. A knob sets the plan, three small signals
     carry it to the L293D driver chip, and the chip switches a 9V battery's
-    current through a DC motor. Sweep the knob and the shaft speeds up, slows,
-    stops at centre, and spins the other way.
+    current through a DC motor — the load a bare GPIO pin could never carry
+    itself. Sweep the knob and the shaft speeds up, slows, stops at centre, and
+    spins the other way.
   pills:
     - { text: About 30 minutes, key: true }
     - Arduino first
@@ -245,33 +247,44 @@ code:
 
 theory:
   title: Small signals, borrowed muscle
-  summary: The board sends three small signals — two for direction, one PWM for speed — and the L293D switches the battery's current through the motor.
+  summary: A GPIO pin sends three small signals — two for direction, one PWM for speed — and the L293D switches its own battery's current through the motor.
   intro: >
     A GPIO pin is a messenger. It can say a lot, and it can carry almost
     nothing. Today's chip is the porter that carries the load the message
-    describes.
+    describes — and it is the first day the board commands real power instead of
+    a single LED.
   flow:
-    - { n: Read, title: Knob to number, body: The ADC turns the pot's voltage into a number from 0 to 4095. }
-    - { n: Decide, title: Centre is zero, body: Distance from 2048 is the speed and its side is the direction. }
-    - { n: Signal, title: Three small wires, body: In1 and In2 set direction while Enable1 carries the PWM speed. }
-    - { n: Deliver, title: Chip switches battery, body: The L293D feeds the 9V battery's current through the motor. }
+    - n: "1"
+      title: "A pin's true size"
+      body: "A GPIO pin carries meaning on a trickle of current, a few milliamps at a delicate 3.3 volts. This motor wants 0.2 to 0.3 amps just to spin free — hundreds of times more than the pin can give."
+    - n: "2"
+      title: "A motor fights back"
+      body: "A spinning motor is also a small generator, and switching its current makes it kick back a voltage spike. That current draw and that kickback, fed straight into a GPIO pin, would damage the chip."
+    - n: "3"
+      title: "The porter with its own supply"
+      body: "The L293D runs from the motor's own 9V battery. It takes the pin's small signal and uses it to switch that heavy current, so the delicate logic and the motor's power stay on separate wires."
+    - n: "4"
+      title: "An H-bridge runs current either way"
+      body: "Inside sit four switches that route the battery through the motor one way or the reverse. In1 and In2 pick which pair closes, so the same motor spins forward or back with no rewiring."
+    - n: "5"
+      title: "PWM sets the throttle"
+      body: "Enable1 gates the bridge. A PWM signal there switches it on and off thousands of times a second, and the share of on-time is how hard the motor drives."
   formulaLabel: The model
-  formula: "speed = **distance from 2048** · direction = **side of 2048**"
+  formula: "small signal + **the chip's own battery** = real motion · direction from **which way current runs** · speed from **PWM duty**"
   notes:
-    - title: Why the chip is here
-      explain: motorDriver
-      body: >
-        A GPIO pin can offer a few milliamps, and this motor draws around
-        0.2–0.3 A before it even does any work. The L293D takes the pin's small
-        signal and switches the battery's heavy current — the board decides, the
-        chip delivers.
     - title: Two power worlds, one ground
       explain: externalPower
       body: >
         The 9V battery moves the motor; USB feeds the board. The two supplies
         only agree on what HIGH and LOW mean because they share a ground on the
-        extension board — that shared wire is what makes the chip's inputs
-        readable.
+        extension board — that shared wire is what lets the chip read the board's
+        signals.
+    - title: Why reversing costs nothing
+      explain: dcMotor
+      body: >
+        A DC motor spins the other way the moment its current reverses. The
+        H-bridge does exactly that on command, so direction is a matter of which
+        two switches close — never a second motor or a gearbox.
 
 test:
   mode: visual
@@ -301,29 +314,30 @@ test:
       fix: "Check the pot's middle wire on GPIO 1 — the pin the code reads as A0."
 
 challenge:
-  title: "Try this: find the starting push"
+  title: "Try this: read the three signals in the motion"
   railLabel: Try this
   intro: >
-    Same working circuit, two experiments with the numbers on your screen. It
-    fits inside today's 30 minutes.
-  summary: Find the smallest speed number that actually starts the motor turning, then make the serial output signed so reverse reads as negative.
+    Same working circuit, two experiments that tie what you see the shaft do
+    back to the three signals driving it. Both fit inside today's 30 minutes.
+  summary: Print the direction flag next to the speed and sweep the knob through both directions to watch In1/In2 flip and the PWM number climb, then find the smallest number that actually starts the shaft turning.
   cards:
+    - title: Map the signals to the motion
+      explain: motorDriver
+      body: >
+        Add a Serial print of rotationDir next to the speed number, upload, and
+        open Serial Monitor. Sweep the knob slowly from one end to the other. At
+        centre both numbers fall to zero and the shaft stops. Cross centre and
+        the direction flag flips — that is In1 and In2 swapping — and the shaft
+        reverses. The further you turn, the higher the speed number Enable1's PWM
+        carries, and the faster it spins. Every one of the three control pins is
+        now visible in what the motor does.
     - title: Find the breakaway number
       explain: dcMotor
       body: >
-        Creep the knob out from centre while watching Serial Monitor. Note the
-        number on screen the moment the shaft first turns — that's the push
-        this motor needs to beat its own friction. Try it in both directions.
-    - title: Print a signed speed
-      explain: serial
-      body: >
-        Change the sketch so Serial prints `potenVal - 2048` in place of the
-        abs() value. Now one direction reads positive and the other negative —
-        a single number that tells the whole story of the shaft.
-  logbook:
-    - What speed number first got the shaft moving — and was it the same in both directions?
-    - Why does the motor need current before it moves at all?
-    - What would you drive with this chip if the motor were a wheel, a pump, or a winch?
+        Creep the knob out from centre while watching Serial Monitor, in both
+        directions. Note the number on screen the moment the shaft first turns —
+        that is the push this motor needs to beat its own friction, the current
+        floor below which the signal is real but the shaft stays still.
 
 agent:
   intro: >
@@ -331,9 +345,12 @@ agent:
     guide you with full context.
   behaviour: >
     guide one physical connection at a time, wait for you to confirm, keep the
-    9V-battery rule front and centre, and always check wiring, power, board,
-    and port before changing code.
+    9V-battery rule front and centre, and explain the driver as the porter that
+    carries current a GPIO pin never could — direction from the H-bridge, speed
+    from PWM. Always check wiring, power, board, and port before changing code.
   coachInstructions:
+    - Teach why the chip exists first- a GPIO pin offers a few milliamps at 3.3V while the motor draws 0.2-0.3A and kicks back a voltage spike when its current is switched, so the L293D carries that current from its own 9V battery.
+    - Explain direction as the H-bridge routing battery current either way- In1 and In2 pick which way it flows, and PWM on Enable1 sets how hard the motor drives.
     - Before anything powers up, confirm the 9V battery is connected to the extension board — Freenove warns that powering the motor from the ESP32-S3 directly may cause permanent damage to the board.
     - Confirm the battery and the board share a common ground through the extension board before debugging any behaviour.
     - If the motor never spins, check the battery and the extension board's power switch first, then the L293D's orientation by its notch.

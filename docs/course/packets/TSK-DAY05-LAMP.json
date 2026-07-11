@@ -6,8 +6,8 @@
   "title": "Make a mini table lamp",
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
-  "estimatedTimeMinutes": 20,
-  "mission": "Keep yesterday's button-and-LED circuit and change only the code, so a single press latches the LED on and the next press turns it off — a real lamp switch instead of a button you have to hold.",
+  "estimatedTimeMinutes": 25,
+  "mission": "Keep yesterday's button-and-LED circuit and change only the code, so one press latches the LED on and the next turns it off. The whole trick is teaching the board to act on the moment a press begins rather than the whole time your finger is down — and to see past the few milliseconds a switch bounces as it closes.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -66,7 +66,7 @@
     {
       "partPin": "LED long leg (+)",
       "connectTo": "GPIO 2 via 220 Ω",
-      "reason": "This pin switches the LED on and off."
+      "reason": "The pin the code drives HIGH or LOW to hold the lamp on or off."
     },
     {
       "partPin": "LED short leg (−)",
@@ -76,20 +76,22 @@
     {
       "partPin": "Push button",
       "connectTo": "GPIO 13",
-      "reason": "The board reads this pin to catch each press."
+      "reason": "The pin the loop watches for the HIGH-to-LOW fall that marks a press."
     },
     {
       "partPin": "10 kΩ resistor",
       "connectTo": "3.3V",
-      "reason": "Holds GPIO 13 HIGH until a press pulls it LOW."
+      "reason": "Holds GPIO 13 steady at HIGH until a press pulls it LOW — so the fall is a clean edge."
     }
   ],
   "coachInstructions": [
     "Confirm the learner still has the Day 4 circuit before uploading; do not re-wire unless something is broken.",
     "Keep the day to upload-and-watch; the new material is in the sketch, not the breadboard.",
-    "Explain debounce and toggle on request, using the learner's own double-press observations.",
-    "If a press flips the LED twice, check that both the debounce delay and the wait-until-release line are present.",
-    "Preserve the working lamp sketch before suggesting timing changes.",
+    "Land the core idea- the loop reads GPIO 13 thousands of times a second and reads LOW through the whole hold, so a lamp must act on the one falling edge (the moment of the press) and then wait out the rest.",
+    "Explain that the LED's own driven level is the remembered on/off state, held between loop passes, and that each clean edge inverts it.",
+    "Explain bounce physically- the switch's contacts rebound for a few milliseconds as they close, so the 20 ms pause lets them settle before the recheck.",
+    "If a press flips the LED twice, that is a bounce edge getting through; check that both the debounce delay and the wait-until-release line are present.",
+    "Use the challenge to make it concrete- removing the wait-until-release line exposes the level (a hold strobes the LED); removing the debounce exposes the bounce (occasional double-flips). Have them restore both.",
     "Keep the Arduino path primary; MicroPython is optional only if already set up."
   ],
   "steps": [
@@ -104,39 +106,43 @@
     "arduino": [
       {
         "line": "delay(20)",
-        "explanation": "The debounce pause — long enough for the switch's chatter to settle."
+        "explanation": "Waits out the switch's physical bounce, so the recheck below reads a settled level rather than mid-bounce noise."
       },
       {
         "line": "reverseGPIO(PIN_LED)",
-        "explanation": "Flips the LED to the opposite of whatever it is now — on becomes off, off becomes on."
+        "explanation": "Inverts the LED's own current level — on becomes off, off becomes on. That level is the state the lamp keeps between loop passes."
       },
       {
         "line": "while (digitalRead(PIN_BUTTON) == LOW);",
-        "explanation": "Waits right here until you let go, so one press can't count twice."
+        "explanation": "Holds here for the whole press, so the long LOW of your finger is consumed once. The loop reacts to the falling edge, then waits for release."
       }
     ],
     "micropython": [
       {
         "line": "time.sleep_ms(20)",
-        "explanation": "The same 20 ms debounce pause, written in Python."
+        "explanation": "The same 20 ms pause to let the switch's bounce settle before the recheck."
       },
       {
         "line": "while not button.value()",
-        "explanation": "Holds until you release, so the press registers once."
+        "explanation": "Holds until you release, so the press's edge registers exactly once."
       }
     ]
   },
   "theoryModel": {
-    "plainLanguage": "Remember the last state, wait out the switch's chatter, and flip only on a clean, released press.",
-    "formula": "one clean press → flip the remembered state → the lamp stays",
+    "plainLanguage": "The loop reads a steady level thousands of times a second, so a lamp must act on the edge — the moment of the press — and wait out the switch's physical bounce.",
+    "formula": "one clean falling edge → invert the remembered state → the lamp holds",
     "notes": [
       {
-        "title": "Why the LED bounced before",
-        "body": "A switch chatters for a few milliseconds as it closes. Without the pause the board would toggle many times per press."
+        "title": "Why a press reads LOW",
+        "body": "The 10 kΩ resistor ties GPIO 13 to HIGH at rest, and a press pulls it to ground. So a press is a fall from HIGH to LOW — which is exactly the edge the sketch watches for."
       },
       {
-        "title": "What toggling really is",
-        "body": "Instead of following the button live, the code keeps a state and inverts it — that memory is the whole difference from Day 4."
+        "title": "How this sketch catches the edge",
+        "body": "It acts the instant it first reads LOW, then the wait-until-release line holds through the rest of the press. The long LOW of your hold is spent there and never counted again — one press in, one flip out."
+      },
+      {
+        "title": "Why the contact bounces at all",
+        "body": "The two metal contacts do not settle the instant they touch; they physically rebound a few times in a couple of milliseconds, like a dropped ball. The 20 ms pause lets them come to rest before the code rechecks."
       }
     ]
   },
@@ -146,13 +152,13 @@
       "Press once more — it turns off and stays off.",
       "Each full press flips the light exactly once, cleanly."
     ],
-    "successCriteria": "If a single press sometimes flips twice, the debounce pause is doing its job when it's present — and failing when it's removed."
+    "successCriteria": "A single press that flips twice is the switch's bounce slipping past — the 20 ms pause is what holds it back, which is exactly what the challenge lets you observe."
   },
   "troubleshooting": [
     {
       "symptom": "One press flips it twice",
       "firstChecks": [
-        "Confirm the debounce delay and the wait-until-release line are both present."
+        "A bounce edge got through — confirm the 20 ms debounce delay and the wait-until-release line are both present."
       ]
     },
     {
@@ -164,7 +170,7 @@
     {
       "symptom": "LED flickers while held",
       "firstChecks": [
-        "You may be on the Day 4 sketch — upload Sketch_02.2_TableLamp."
+        "The loop is following the LOW level all through the hold — you're likely on the Day 4 sketch, so upload Sketch_02.2_TableLamp."
       ]
     },
     {
@@ -174,10 +180,5 @@
       ]
     }
   ],
-  "challenge": "Change one aspect of the lamp's feel — the debounce timing, or a double-press behaviour — and describe the result.",
-  "logbookPrompts": [
-    "What debounce value felt best, and how did too-short and too-long each fail?",
-    "How is a toggle different from the hold-to-light button of Day 4?",
-    "What household thing could you now rebuild as a tiny product?"
-  ]
+  "challenge": "Remove the wait-until-release line to watch the loop follow the LOW level for the whole hold, then remove the debounce to catch the switch bouncing, and put both back to fix each fault."
 }

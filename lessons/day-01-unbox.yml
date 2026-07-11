@@ -1,105 +1,154 @@
-# Day 1 — Unbox and meet the ESP32-S3 · tinyskiff.lesson.v1
-# An orientation day: no wiring, no code, no upload. Parts + steps + a small
-# challenge. Renders to /course/day-01-unbox/, the agent packet, and the map.
+# Day 1 — Meet the ESP32-S3 · tinyskiff.lesson.v1
+# An orientation day: no wiring, no code, no upload. But a real one — the board
+# tour, the microcontroller mental model, GPIO, and the 3.3V rule that keeps you
+# out of trouble all course. Renders to /course/day-01-unbox/, the agent packet,
+# and the map.
 
 schema: tinyskiff.lesson.v1
 lessonCode: TSK-DAY01-UNBOX
 day: 1
 slug: day-01-unbox
-title: Unbox safely and meet the ESP32-S3
+title: Meet the ESP32-S3 — what this chip actually is
 status: published
-estimatedTimeMinutes: 15
+estimatedTimeMinutes: 20
 tracks: { main: arduino }
 learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
-  Open the kit, find the board at the heart of it, and learn to handle it safely.
-  Nothing to wire or upload yet — today is about getting your bearings.
-unlocks: You can recognise the board, its USB port, and where to find the pin labels you'll use every day from here.
+  Understand what you're actually holding: a whole computer on one chip that runs
+  a single program forever. Learn the board part by part, meet the pins your code
+  will control, and learn the one voltage rule that keeps you from frying
+  anything. No wiring or uploading yet — today buys you a mental model that makes
+  every later day make sense.
+unlocks: You know what a microcontroller is, can name every important part of the board on sight, understand what a GPIO pin is, and know the 3.3V rule that protects your kit.
 seoDescription: >
-  Day 1 of the TinySkiff ESP32-S3 course: unbox the kit, meet the board, learn
-  to handle it safely, and find the pinout you'll use all course.
+  Day 1 of the TinySkiff ESP32-S3 course: what a microcontroller actually is, a
+  guided tour of the board's parts, what GPIO pins are, and the 3.3V logic rule
+  that keeps beginners out of trouble.
 
 hero:
   instrument: none
-  headline: Meet the board|before you {build}
+  headline: A whole computer|on one {chip}
   lede: >
-    Every day after this one starts with the same small computer in your hand.
-    Fifteen minutes now to know what it is, how to hold it, and where its labels
-    live will save you a dozen puzzled moments later.
+    The board in your hand is not a gadget with a chip in it — it is a complete
+    computer the size of a stamp, and by the end of the course you will have
+    written the only program it runs. Twenty minutes today to understand what it
+    is and how it's laid out turns the next 29 days from copying steps into
+    knowing why they work.
   pills:
-    - { text: About 15 minutes, key: true }
+    - { text: About 20 minutes, key: true }
     - No tools needed
     - Nothing to wire
-    - No electronics assumed
+    - Builds the mental model
 
 parts:
   intro: >
-    Tip the kit out and find these three. Tap *Define* on anything unfamiliar —
-    the answer opens as a field note you can read and dismiss.
+    Tip the kit out and find these two — they're what today is about. Tap
+    *Define* on anything unfamiliar; the answer opens as a field note you can read
+    and dismiss.
   items:
     - name: ESP32-S3 board
       image: shared/item-esp32-s3-board.jpg
       imageKind: Manual photo
       alt: Official manual photo of the ESP32-S3 development board.
-      blurb: The small computer at the centre of every project this course.
-      explain: esp32
+      blurb: The metal can holds an entire computer; the rest of the board feeds it.
+      explain: module
     - name: GPIO extension board
       image: shared/item-gpio-extension-board.png
       imageKind: Manual photo
       alt: Official manual image of the ESP32-S3 GPIO extension board.
-      blurb: Spreads the board's pins into labelled rows you can reach.
+      blurb: Fans the chip's pins out into labelled rows you can actually reach and wire.
       explain: gpio
-    - name: Pinout map
-      image: shared/item-pinout.png
-      imageKind: Manual reference
-      alt: Official ESP32-S3 pinout diagram labelling every GPIO, power, and USB pin on the board.
-      blurb: The labelled map of every pin. Keep it close once wiring starts.
-      explain: pinout
+
+reference:
+  intro: >
+    The pinout map does not come in the box — so here it is, yours to keep. It
+    names every pin on the board- the power rails, ground, USB, and the numbered
+    GPIO pins your code uses. This is the one reference you'll come back to on
+    every wiring day, so take a moment with it now. Tap to enlarge.
+  items:
+    - image: shared/item-pinout.png
+      alt: Official ESP32-S3 pinout diagram labelling every GPIO, power, ground, and USB pin on the board, with a colour key for pin functions.
+      caption: Freenove ESP32-S3-WROOM pinout — the map from a physical pin to the number your code uses.
+      zoomCaption: The full ESP32-S3-WROOM pinout. Each numbered GPIO, the 3.3V and 5V power pins, the GND pins, and the USB pins are labelled, with a colour key for what each pin can do.
 
 steps:
   intro: >
-    No rush and no risk today — just find things and look closely.
+    A guided tour, not a checklist. Hold the board by the edges and find each
+    thing in turn — you're learning the geography you'll navigate for a month.
   items:
-    - Open the kit and lay the parts out where you can see them.
-    - Find the ESP32-S3 board and hold it by the edges. {esd}
-    - Locate the USB port on the board — that's how code and power arrive. {usbData}
-    - Find the tiny onboard LED near the chip; you'll blink it on Day 3.
-    - Open the pinout map and notice the numbered GPIO pins along the sides. {pinout}
+    - Find the metal can in the middle. That shield covers the whole computer — processor, memory, and the flash chip that will hold your program. {module}
+    - Find the USB-C port along one edge. Power and code both arrive here, and the board will talk back to your screen through it. {usbData}
+    - Find the two small buttons near the port. One is RESET, one is BOOT — together they control whether the board runs your program or listens for a new one. {bootReset}
+    - Find the small onboard LED near the chip. It's wired to one pin and needs no external parts, which is why you'll blink it on Day 3 before touching a single wire. {ledBuiltin}
+    - Look along both long edges and find the two rows of numbered pins. Each one is a GPIO — a wire your program can switch on, or read a signal from. {gpio}
+    - Take the pinout map provided above and match a few of its printed numbers to the physical pins on the board. That map is how "GPIO 13" in code becomes a specific pin you can touch. {pinout}
   done:
     icon: "🧭"
-    title: You've got your bearings.
-    body: You can recognise the board, its port, and its pin labels. Day 2 gets the software talking to it.
+    title: You can read the board now.
+    body: You know what the chip is, where power and code arrive, how it's told to run or reprogram, and what its pins are for. Day 2 gets your computer talking to it.
+
+theory:
+  title: What you're actually holding
+  summary: A whole computer on one chip that runs one program forever — and speaks in 3.3 volts.
+  intro: >
+    Before any code, the single idea that makes the ESP32-S3 click. Your laptop
+    runs an operating system that starts and stops many apps. This chip is a
+    different kind of machine, and understanding how is worth more than any
+    step-by-step you'll follow later.
+  flow:
+    - n: "One chip"
+      title: "A whole computer"
+      body: "Processor, memory, and storage all live under that metal shield. Nothing else is needed to run."
+    - n: "One program"
+      title: "No apps, no OS"
+      body: "It runs a single program from the instant it gets power. The sketch you upload IS its software."
+    - n: "The pins"
+      title: "GPIO"
+      body: "Each numbered pin is a wire your code can drive high or low, or read as a signal in. That's the whole toolkit."
+    - n: "The catch"
+      title: "3.3 volts"
+      body: "Every pin speaks in 3.3V. Powering a part from 5V is fine; pushing 5V into a pin can damage it."
+  formulaLabel: The model
+  formula: "**one chip** + **one program** + **pins at 3.3V** = everything you'll build"
+  notes:
+    - title: Why the metal shield
+      explain: module
+      body: It keeps the Wi-Fi and Bluetooth radio inside clean and stops it leaking interference into the rest of the board.
+    - title: The power path
+      explain: regulator
+      body: USB gives 5V; the chip needs 3.3V. A regulator on the board steps it down — which is exactly why the pins are 3.3V devices.
 
 challenge:
-  title: "Try this: name three parts"
+  title: "Try this: read the pinout like a chart"
   railLabel: Try this
   intro: >
-    A tiny memory exercise — no pressure, just a way to make the board feel
-    familiar before you start using it.
-  summary: Identify three parts from the kit by name, and trace the path a signal takes from the USB port into the board.
+    The pinout is the one reference you'll reopen every wiring day. Spending five
+    minutes finding your way around it now makes every later circuit faster to
+    follow — and shows you why the 3.3V rule matters before you can break it.
+  summary: Use the pinout to locate the power rails, the BOOT pin, and the onboard LED's pin, then reason about why 5V from a sensor can't go straight into a GPIO.
   cards:
-    - title: Name three parts
-      body: Pick any three pieces and name them out loud. Check the kit's parts list if you're unsure.
-    - title: Trace the USB path
-      body: Follow where the USB port leads on the board. That's the road your code travels in on.
-  logbook:
-    - Which three parts did you name?
-    - Where is the board's USB port, and where is the onboard LED?
-    - What's one thing about the board that surprised you?
+    - title: Find the rails
+      explain: regulator
+      body: On the pinout, find the 3.3V pin, the 5V pin, and a GND (ground) pin. Those three feed power to everything you'll wire. Notice 3.3V and 5V are separate — that difference is the whole safety story.
+    - title: Find the special pins
+      explain: bootReset
+      body: Locate GPIO0 on the map — that's the BOOT pin the button pulls at power-up. Then find the pin the onboard LED sits on. Not every pin is interchangeable, and the map is how you tell.
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent can
     guide you with full context.
   behaviour: >
-    keep it calm and orientation-only, name parts on request, and reinforce safe
-    handling (edges, static) without turning it into a lecture.
+    teach the microcontroller mental model plainly, run the board tour part by
+    part on request, and make sure the learner leaves understanding GPIO and the
+    3.3V rule — without turning safe handling into a lecture.
   coachInstructions:
-    - This is an orientation day — there is nothing to wire or upload.
-    - Help the learner identify parts and find the board's USB port and onboard LED.
-    - Reinforce safe handling — hold by the edges, mind static — briefly, not as a lecture.
-    - Point to the pinout map as the reference they'll use once wiring begins.
+    - This is an orientation day — nothing to wire or upload — but it carries real ideas; don't let the learner skip them.
+    - Land the core model first- a microcontroller is a whole computer on one chip that runs one program from power-on, and the uploaded sketch is that program.
+    - Walk the board tour on request- metal can (the computer), USB-C port, BOOT/RESET buttons, onboard LED, the GPIO rows, and the pinout map.
+    - Make sure they leave understanding what a GPIO pin is and the 3.3V rule- pins are 3.3V, powering a part from 5V is fine but feeding 5V into a pin can damage it.
+    - Reinforce safe handling briefly- hold by the edges, mind static — as a reason, not a lecture.
 
 source:
   license: CC BY-NC-SA 3.0

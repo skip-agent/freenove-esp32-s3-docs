@@ -16,7 +16,7 @@
       <div class="hero-copy">
         <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 21 of 30</p>
         <h1>Turn one byte<br />into a <em>digit</em></h1>
-        <p class="lede">Today the shift register earns its keep. You wire its eight outputs to a 7-segment display, upload a sketch that sends one pattern byte per character, and the display counts 0 through F — a readable digit from the same three wires you ran on Day 20.
+        <p class="lede">Today the shift register earns its keep. You wire its eight outputs to a 7-segment display and upload a sketch that sends one byte per character, and the display counts 0 through F. Each byte is an encoding: eight bits that say which of the seven bars to light. Choosing a character is choosing the right byte, and the sketch keeps a table of them so it only has to look each up — the same three wires you ran on Day 20.
 </p>
         <div class="meta-row" aria-label="Lesson facts">
           <span class="pill is-key">About 30 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">Same three wires as Day 20</span>
@@ -46,7 +46,7 @@
           <a href="#wiring"><span class="tick"></span>Chart the circuit</a>
           <a href="#steps"><span class="tick"></span>Build it</a>
           <a href="#code"><span class="tick"></span>Read the code</a>
-          <a href="#theory"><span class="tick"></span>A byte is a picture</a>
+          <a href="#theory"><span class="tick"></span>A digit is a pattern, and a byte is that pattern</a>
           <a href="#test"><span class="tick"></span>Test &amp; debug</a>
           <a href="#challenge"><span class="tick"></span>Try this</a>
           <a href="#agent"><span class="tick"></span>Coach me</a>
@@ -224,7 +224,7 @@ byte num[] = {
   <span class="tok-fn">digitalWrite</span>(latchPin, HIGH);
 }</code></pre>
                 <div class="code-notes">
-                  <div class="code-note"><code>byte num[]</code><span class="note-text">Sixteen ready-made segment patterns — one byte per character, 0 through F. <button class="define" data-topic="sevenSegment">Define</button></span></div>
+                  <div class="code-note"><code>byte num[]</code><span class="note-text">The lookup table of segment patterns — sixteen bytes, one per character 0 through F, so num[i] is the ready-made encoding for character i. <button class="define" data-topic="sevenSegment">Define</button></span></div>
                   <div class="code-note"><code>shiftOut(dataPin, clockPin, LSBFIRST, value)</code><span class="note-text">Clocks the byte into the chip one bit at a time — the same move as Day 20. <button class="define" data-topic="shiftOut">Define</button></span></div>
                   <div class="code-note"><code>writeData(0xff)</code><span class="note-text">All eight bits set to 1 means every segment off — this line blanks the display.</span></div>
                   <div class="code-note"><code>delay(1000)</code><span class="note-text">Holds each character on the display for one full second. <button class="define" data-topic="delayMs">Define</button></span></div>
@@ -258,23 +258,25 @@ for count in <span class="tok-fn">range</span>(<span class="tok-num">16</span>):
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">05</span> Understand, don&#x27;t memorise</p>
-              <h2>A byte is a picture</h2>
-              <p class="muted">The display is eight little lights arranged as a figure. Feed them the right on-off pattern and your eye reads a character — the code table is just sixteen of those patterns, stored and ready.
+              <h2>A digit is a pattern, and a byte is that pattern</h2>
+              <p class="muted">A seven-segment display doesn&#x27;t understand the number 3. It only knows which of its bars are lit. Turning &quot;3&quot; into something it can show means deciding which segments to switch on, packing that decision into a byte, and handing that byte to Day 20&#x27;s shift register. That translation from a numeral to a pattern of bits is the whole idea today, and a small lookup table carries it.
 </p>
             </div>
             <div class="theory-flow" aria-label="Measurement model">
-              <article class="flow-step"><span class="n">Eight lights</span><h3>Eight bits</h3><p>Segments A through G plus the decimal point line up with the eight bits of one byte.</p></article>
-              <article class="flow-step"><span class="n">Zero lights</span><h3>Common anode</h3><p>All segments share the positive rail so a 0 bit pulls its segment low and lights it.</p></article>
-              <article class="flow-step"><span class="n">Look it up</span><h3>The code table</h3><p>The table stores one ready-made pattern per character from 0 to F.</p></article>
-              <article class="flow-step"><span class="n">Deliver it</span><h3>Shift and latch</h3><p>The 74HC595 from Day 20 carries the byte in on three wires and holds it on eight outputs.</p></article>
+              <article class="flow-step"><span class="n">1</span><h3>Seven named bars</h3><p>A single digit is drawn by seven bars, labelled a to g, plus a decimal point. Any numeral is a particular set of those bars switched on: a 7 lights three of them, an 8 lights all seven.</p></article>
+              <article class="flow-step"><span class="n">2</span><h3>One bit per segment</h3><p>Give each segment its own bit and the whole on-off pattern fits in eight bits. On this display the bit order from the top down is DP G F E D C B A, so each bit owns exactly one bar.</p></article>
+              <article class="flow-step"><span class="n">3</span><h3>A 0 bit lights the bar</h3><p>The display is common anode: every segment shares the positive rail, so a bar lights when its bit is pulled LOW. A 0 turns a segment on and a 1 leaves it dark, which is why 0xff is a blank display.</p></article>
+              <article class="flow-step"><span class="n">4</span><h3>Look it up, don&#x27;t compute it</h3><p>There is no tidy formula from the numeral 3 to its segments, so the sketch stores the answer once. num[3] is the ready-made byte for a 3, and choosing which digit to show becomes choosing an entry from the table.</p></article>
+              <article class="flow-step"><span class="n">5</span><h3>Day 20 delivers it</h3><p>The 74HC595 sends whatever byte you hand it out onto its eight pins. Show a 3 by looking up num[3] and shifting that byte out — the same three wires as yesterday.</p></article>
             </div>
             <div class="formula-card">
               <span class="label">The model</span>
-              <code>character → <b>one byte</b> → eight segments → a shape you can read</code>
+              <code>digit → <b>index the table</b> → one byte → eight segments → a shape you can read</code>
             </div>
             <div class="two-col" style="margin-top:14px">
-              <article class="mini-card"><h3>How the byte maps to segments <button class="define" data-topic="sevenSegment">Define</button></h3><p>From the top bit down the order is DP G F E D C B A. So 0xc0 is 1100 0000 — DP and G stay dark while the other six light up and draw a 0.</p></article>
-              <article class="mini-card"><h3>Why 0 means on <button class="define" data-topic="commonAnode">Define</button></h3><p>This display is common anode — every segment&#x27;s positive side is tied to the rail, so an output has to sit LOW to let current flow and light its segment. 0xff is all HIGH, which is a blank display.</p></article>
+              <article class="mini-card"><h3>How a byte becomes a shape <button class="define" data-topic="sevenSegment">Define</button></h3><p>Read 0xb0 as bits, 1011 0000, in segment order DP G F E D C B A. The 0 bits — G, D, C, B, A — are the lit bars, and A B C D G drawn together is a 3. Every entry in the table is one of these patterns worked out in advance.</p></article>
+              <article class="mini-card"><h3>Why a table, not arithmetic</h3><p>Which bars a numeral lights follows no equation — a 2 and a 5 share almost nothing. Ten patterns cover 0 to 9 (this sketch keeps sixteen, adding A to F for hex counting), each stored once so the loop only has to index them.</p></article>
+              <article class="mini-card"><h3>Why 0 means on <button class="define" data-topic="commonAnode">Define</button></h3><p>Common anode ties every segment&#x27;s positive side to the rail, so an output must sit LOW to let current flow and light its bar. That inverts the intuition: 0 is on, 1 is off, and all ones (0xff) shows nothing.</p></article>
             </div>
           </div>
         </section>
@@ -311,20 +313,14 @@ for count in <span class="tok-fn">range</span>(<span class="tok-num">16</span>):
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">07</span> Make the idea yours</p>
-              <h2>Try this: draw your own byte</h2>
-              <p class="muted">Same working circuit, three small moves — pick a digit, change the pace, and invent one character the table never had. It fits inside today&#x27;s 30 minutes.
+              <h2>Try this: decode a byte, then bend the count</h2>
+              <p class="muted">The table is the whole trick, so take it apart. Read one byte back into a shape, shorten the count to change the sequence, then hand-build a character the table never had — all on the working circuit, inside today&#x27;s 30 minutes.
 </p>
             </div>
             <div class="two-col">
-              <article class="mini-card"><h3>Pick a boot digit</h3><p>Add a <code>writeData(num[7])</code> call at the end of <code>setup()</code> and empty out <code>loop()</code> — your favourite digit (swap the 7) now holds steady from the moment power arrives.</p></article>
-              <article class="mini-card"><h3>Slow the count <button class="define" data-topic="delayMs">Define</button></h3><p>Change <code>delay(1000)</code> to 2000 and upload — each character now holds for two seconds. Find a pace you could actually read across the room.</p></article>
-              <article class="mini-card"><h3>Draw an H</h3><p>Segments F E G B C make an H, and in bit order DP G F E D C B A that pattern is the byte <code>0x89</code>. Call <code>writeData(0x89)</code> and check the shape that appears.</p></article>
-            </div>
-            <div class="logbook">
-              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
-              <label>Which character surprised you when it appeared, and why?<textarea rows="2"></textarea></label>
-              <label>What byte would draw the first letter of your name — and can this display manage it?<textarea rows="2"></textarea></label>
-              <label>Where in daily life did you last read a seven-segment digit?<textarea rows="2"></textarea></label>
+              <article class="mini-card"><h3>Decode a byte back into a shape <button class="define" data-topic="sevenSegment">Define</button></h3><p>Take num[3] from the table — the byte <code>0xb0</code> — and write it out as bits, 1011 0000, in segment order DP G F E D C B A. The 0 bits are the lit bars, so mark them and you get G D C B A, which draws a 3. Watch the count reach 3 and confirm your reading matches the display.</p></article>
+              <article class="mini-card"><h3>Count only 0-9</h3><p>Change the loop&#x27;s <code>for (int i = 0; i &lt; 16; i++)</code> to <code>i &lt; 10</code> and upload. The display now counts 0 through 9 and wraps, skipping A to F — you have changed the sequence by changing which table entries the loop walks.</p></article>
+              <article class="mini-card"><h3>Build your own character</h3><p>Segments B C E F G draw an H, and in bit order DP G F E D C B A that pattern is the byte <code>0x89</code>. Empty out <code>loop()</code>, add <code>writeData(0x89)</code> to the end of <code>setup()</code>, and check that the H holds steady from power-on.</p></article>
             </div>
           </div>
         </section>
@@ -342,7 +338,7 @@ for count in <span class="tok-fn">range</span>(<span class="tok-num">16</span>):
             </div>
             <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
               <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
-              <p><strong>How the agent should behave:</strong> guide one physical connection at a time, wait for you to confirm, explain terms on request, and always check wiring, board, port, and USB before changing code.
+              <p><strong>How the agent should behave:</strong> guide one physical connection at a time, then teach the encoding underneath: how a numeral becomes a set of lit segments, how that set packs into one byte, and why a lookup table is the clean way to keep them. Explain terms on request, and always check wiring, board, port, and USB before changing code.
 </p>
             </div>
           </div>

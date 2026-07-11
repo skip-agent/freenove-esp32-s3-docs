@@ -9,26 +9,33 @@ day: 7
 slug: day-07-breathing
 title: Make an LED breathe
 status: published
-estimatedTimeMinutes: 20
+estimatedTimeMinutes: 25
 tracks: { main: arduino, optional: micropython }
 learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
-  Wire the same single LED as Blink, upload the Arduino sketch, and watch it fade
-  up to full and back down to dark over and over — your first pin that does more
-  than switch on and off.
-unlocks: A pin can sit at any brightness in between on and off, so the board can shade a light instead of only flipping it.
+  Keep yesterday's single-LED circuit, upload the Arduino sketch, and watch the
+  light fade up to full and back down to dark on a loop. The fade is the part you
+  see; the real lesson is how a pin that only knows on and off produces every
+  brightness in between — by switching far too fast to watch and staying on for a
+  bigger or smaller share of each instant. That one trick, PWM, runs dimmers,
+  motor speeds, and servos for the rest of the course.
+unlocks: You understand PWM — brightness is the duty cycle, the share of each fast on/off cycle the pin holds on — and you know the ESP32-S3's ledc hardware does that switching so your code just names a level.
 seoDescription: >
-  Fade an LED on the ESP32-S3 with PWM. Upload the sketch and watch the light
-  breathe smoothly from dark to full and back — your first analog-feeling output.
+  Fade an LED on the ESP32-S3 with PWM. Upload the sketch, watch the light breathe
+  from dark to full and back, and learn how duty cycle and fast switching turn a
+  strictly on-or-off pin into a brightness dial.
 
 hero:
   instrument: none
   headline: Make a light|learn to {breathe}
   lede: >
-    Today the LED stops snapping. You keep yesterday's single-LED circuit, upload a
-    sketch that sweeps the pin's brightness up and then down, and the light fades in
-    and out like a slow breath — the board's first move beyond plain on and off.
+    Today the LED stops snapping. You keep yesterday's single-LED circuit and
+    upload a sketch that sweeps the pin's brightness from dark to full and back, so
+    the light breathes like a slow tide. The pin still only knows on and off — the
+    fade is that pin flicking thousands of times a second, held on a little longer
+    or shorter each moment. Understand that, and the dimmers, motor speeds, and
+    tones later in the course are all the same move.
   pills:
     - { text: About 20 minutes, key: true }
     - Arduino first
@@ -120,10 +127,10 @@ steps:
 
 code:
   intro: >
-    The whole sketch is short. A few lines set up a hardware PWM channel on the
-    pin; two loops sweep its brightness up and then back down. Switch to
-    MicroPython if you'd rather see the same idea in Python — the wiring never
-    changes.
+    The whole sketch is short. A few lines hand GPIO 2 to a hardware PWM channel;
+    two loops then sweep its duty cycle up and back down, which is the brightness
+    climbing and sinking. Switch to MicroPython if you'd rather see the same idea in
+    Python — the wiring never changes.
   arduino:
     file: Sketch_04.1_BreathingLight.ino
     sketch: C/Sketches/Sketch_04.1_BreathingLight/Sketch_04.1_BreathingLight.ino
@@ -149,13 +156,13 @@ code:
       }
     notes:
       - code: ledcAttachChannel(PIN_LED, FRQ, PWM_BIT, CHN)
-        text: Attaches GPIO 2 to a hardware PWM channel so the board can switch it fast on its own.
+        text: Hands GPIO 2 to one of the board's hardware PWM channels at 1000 Hz with 8-bit resolution, so from here the chip does the fast switching itself.
         explain: ledc
       - code: ledcWrite(PIN_LED, i)
-        text: Sets the brightness from 0 (dark) to 255 (full) by changing how much of each instant the pin is on.
+        text: Sets the duty cycle from 0 (never on, dark) to 255 (always on, full) — the share of each cycle the pin holds on, which your eye reads as brightness.
         explain: pwm
       - code: for (int i = 0; i < 255; i++)
-        text: The first loop sweeps brightness up and the second sweeps it back down; delay(10) sets how fast each step passes.
+        text: The first loop walks the duty up and the second walks it back down; delay(10) sets how long each of the steps lingers, so it sets the breathing speed.
         explain: delayMs
   micropython:
     file: 04.1_BreatheLight/BreatheLight.py
@@ -183,25 +190,40 @@ code:
       the Arduino-first path.
 
 theory:
-  title: Dimming by switching fast
-  summary: The pin is still only on or off — switching it quickly and holding on longer looks brighter to your eye.
+  title: How a pin builds brightness out of time
+  summary: A pin can only be fully on or fully off, so PWM fakes every middle brightness by switching fast and holding on for a chosen share of each cycle.
   intro: >
-    There's no half-voltage trick here — just a pin flipping faster than you can
-    see, held on for a bigger or smaller share of each moment.
+    On Day 3 a pin only ever went full on or full off — HIGH or LOW, nothing
+    between. So how does the same pin now sit at half brightness? It doesn't hold
+    half a voltage. It switches on and off a thousand times a second and spends part
+    of each cycle on. Your eye can't follow flicker that fast, so it averages the
+    on-time into a steady brightness. That is pulse-width modulation, and it is the
+    mechanism behind almost every "analog" thing the board does.
   flow:
-    - { n: Only two states, title: On or off, body: The pin itself can only be fully on or fully off. }
-    - { n: Switch fast, title: 1000 times a second, body: PWM flips it far quicker than your eye can follow. }
-    - { n: Hold longer, title: More on-time, body: The more of each instant the pin stays on the brighter it looks. }
-    - { n: Sweep it, title: Up then down, body: Sliding that share from none to all and back is the breath. }
+    - n: "The limit"
+      title: "A pin is binary"
+      body: "The output pin has two settings only — fully on or fully off. There is no dial for half a volt."
+    - n: "The trick"
+      title: "Switch faster than sight"
+      body: "To fake a middle level PWM flips the pin on and off about 1000 times a second, far past what your eye can resolve."
+    - n: "Duty cycle"
+      title: "The share that's on"
+      body: "In each on-off cycle the pin holds on for some fraction. On a quarter of the time reads as roughly quarter brightness; on the whole time is full."
+    - n: "The hardware"
+      title: "ledc does the switching"
+      body: "The board's ledc channels generate the pulses in dedicated hardware, so the processor sets one level and never has to babysit the flicker."
+    - n: "The breath"
+      title: "Sweep the duty"
+      body: "Sliding the duty from 0 up to 255 and back down is the fade — brightness following the share that's on."
   formulaLabel: The model
-  formula: brightness = **duty cycle** = the share of each instant the pin is on
+  formula: brightness = **duty cycle** = the share of each fast cycle the pin holds on
   notes:
-    - title: What PWM actually does
+    - title: Two dials, and only one is brightness
       explain: pwm
-      body: Pulse-width modulation switches the pin on and off so fast that your eye blends the flicker into a steady, dimmable glow.
-    - title: Why a channel
+      body: Frequency and duty cycle are separate settings. Frequency is how many on-off cycles happen each second (1000 here) and only has to be fast enough to beat your eye. Duty cycle is the share of each cycle that is on, and that one alone sets how bright it looks.
+    - title: Set it once, then walk away
       explain: ledc
-      body: The ESP32-S3 has dedicated PWM hardware that keeps switching the pin on its own, so the sketch only has to set a brightness and move on.
+      body: You attach the pin to a channel a single time in setup(). PWM_BIT is 8, so each cycle is split into 256 slices and the level 0 to 255 chooses how many are on. After that the ledc hardware keeps pulsing on its own while ledcWrite() just names a new level.
 
 test:
   mode: visual
@@ -225,37 +247,39 @@ test:
       fix: "Swap in a data-capable USB cable."
 
 challenge:
-  title: "Try this: find a calm breath"
+  title: "Try this: slow PWM down until you can see it"
   railLabel: Try this
   intro: >
-    Same working circuit, one number to play with: the fade speed. It fits inside
-    today's 20 minutes.
-  summary: Change the delay in the fade loops to find a resting-breath rhythm, then make the light pause at full before it fades back.
+    The fade hides the whole trick, because the switching is too fast to watch.
+    Slow the frequency down by a few thousand times and the flicker becomes
+    visible — and you can see, with your own eyes, that a duty number is really an
+    on-time. Work on a copy of the sketch so today's breathing one stays intact.
+  summary: Drop the PWM frequency to a few hertz and hold one fixed brightness so the switching becomes a visible blink, then change the level and watch the on-flash grow and shrink — duty cycle made tangible.
   cards:
-    - title: Slow the breath
-      explain: delayMs
-      body: Change both `delay(10)` lines together — try 5 for a quick breath, 20 for a slow one — and upload until the fade feels like a resting breath.
-    - title: Hold at the top
-      body: Add a short `delay(300)` between the fade-in and fade-out loops so the light pauses at full brightness before it sinks again.
-  logbook:
-    - What fade speed felt most like a calm, resting breath?
-    - How did a pause at full brightness change the feel of the breath?
-    - Where in daily life have you seen a light breathe like this?
+    - title: Make the flicker visible
+      explain: pwm
+      body: On a copy, set `FRQ` to `4` and replace the two fade loops with a single `ledcWrite(PIN_LED, 128)`, then upload. Instead of a steady half-glow the LED now blinks on and off about four times a second — that blink is the switching your eye normally averages into brightness.
+    - title: Watch the duty cycle change the on-time
+      explain: ledc
+      body: Still at `FRQ 4`, try `ledcWrite(PIN_LED, 64)`, then `192`, uploading each. At 64 the on-flash is brief and the dark gap long; at 192 it flips the other way. The number is the duty cycle — the share of each cycle the pin holds on — so you are watching brightness be built out of time. Restore `FRQ 1000` and the fade loops when you're done.
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent can
     guide you with full context.
   behaviour: >
-    guide one physical connection at a time, wait for you to confirm, explain
-    terms on request, and always check wiring, board, port, and USB before
-    changing code.
+    guide one physical connection at a time and wait for confirmation, then teach
+    how PWM builds brightness out of time — duty cycle as the share each fast cycle
+    is on, with the ledc hardware doing the switching. Always check wiring, board,
+    port, and USB before changing code.
   coachInstructions:
-    - Keep the day light on theory; let the learner see the LED breathe before explaining how PWM works.
+    - Let the learner see the LED breathe first, then land the mechanism- a pin is only ever on or off, so PWM fakes every in-between brightness by switching fast and holding on for a bigger or smaller share of each cycle.
+    - Separate the two dials clearly- frequency is how fast it switches (1000 Hz, just past what the eye can follow) and duty cycle is the share that's on, which is the brightness.
+    - Point out that the ledc hardware does the switching- the pin is attached to a channel once in setup(), then ledcWrite() just names a level from 0 to 255 while the chip keeps pulsing on its own.
     - Confirm this is the same single-LED circuit as Blink — LED direction and the 220 Ω series resistor are the usual first mistakes.
     - If the LED snaps hard on and off instead of fading, suspect the Blink sketch is still loaded and have them re-upload 04.1.
     - If the LED stays dim or dark, check the 220 Ω resistor, the GPIO 2 wire, and the LED's direction before changing code.
-    - Before any speed change, preserve the working sketch, then adjust only the two delay values together.
+    - For the slow-frequency experiment, always work on a copy- drop FRQ to about 4 and hold one fixed ledcWrite so the flicker is visible, then restore FRQ 1000 and the fade loops.
     - Keep the Arduino path primary; MicroPython is optional only if already set up, and its 0–1023 duty is expected to differ from Arduino's 0–255.
 
 source:

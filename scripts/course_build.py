@@ -37,6 +37,7 @@ SOURCE_PREFIX = "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main"
 # unless the lesson overrides title/railLabel (e.g. theory, challenge).
 SECTIONS = {
     "parts":     {"kicker": "First, know the pieces",         "title": "What you need",     "rail": "What you need"},
+    "reference": {"kicker": "Provided for you — no need to find it", "title": "Reference",  "rail": "Reference"},
     "wiring":    {"kicker": "Make the physical circuit",       "title": "Chart the circuit", "rail": "Chart the circuit"},
     "steps":     {"kicker": "One action at a time",            "title": "Build it",          "rail": "Build it"},
     "code":      {"kicker": "Read just enough code",           "title": "Read the code",     "rail": "Read the code"},
@@ -45,7 +46,7 @@ SECTIONS = {
     "challenge": {"kicker": "Make the idea yours",             "title": "Try this",          "rail": "Try this"},
     "agent":     {"kicker": "Learn it with a hand on the tiller", "title": "Coach me through it", "rail": "Coach me"},
 }
-SECTION_ORDER = ["parts", "wiring", "steps", "code", "theory", "test", "challenge", "agent"]
+SECTION_ORDER = ["parts", "reference", "wiring", "steps", "code", "theory", "test", "challenge", "agent"]
 
 # A minimal, deterministic C/MicroPython highlighter — enough to colour the code
 # focus without a client-side highlighter. Keywords/types get one colour, numbers
@@ -267,6 +268,34 @@ def _parts_section(index: int, block: dict) -> str:
         </section>"""
 
 
+def _reference_section(index: int, block: dict) -> str:
+    """Reference material the kit does NOT ship (pinout map, code tables, charts).
+
+    The lesson provides it inline as a zoomable figure so the learner never has to
+    go hunting through the manual for it. Renders one or more figures.
+    """
+    meta = _section_meta("reference", block)
+    figs = []
+    for item in block.get("items") or []:
+        img = esc(item.get("image"))
+        cap = esc(item.get("caption"))
+        figs.append(f"""              <figure class="image-frame">
+                <button class="zoom" type="button" data-zoom="../assets/{img}" data-cap="{esc(item.get("zoomCaption", item.get("caption")))}">
+                  <img src="../assets/{img}" alt="{esc(item.get("alt"))}" />
+                  <span class="zoom-hint">Click to enlarge</span>
+                </button>
+                <figcaption class="caption">{cap}</figcaption>
+              </figure>""")
+    return f"""        <section id="reference" class="card">
+          <div class="card-inner">
+{_section_head(index, meta, block.get("intro", ""))}
+            <div class="reference-stack">
+{chr(10).join(figs)}
+            </div>
+          </div>
+        </section>"""
+
+
 def _wiring_section(index: int, block: dict) -> str:
     meta = _section_meta("wiring", block)
     diagram = block.get("diagram") or {}
@@ -458,18 +487,11 @@ def _challenge_section(index: int, block: dict) -> str:
     for card in block.get("cards") or []:
         chip = _chip(card)
         cards.append(f"""              <article class="mini-card"><h3>{esc(card.get("title"))}{chip}</h3><p>{inline(card.get("body"))}</p></article>""")
-    prompts = []
-    for prompt in block.get("logbook") or []:
-        prompts.append(f"""              <label>{esc(prompt)}<textarea rows="2"></textarea></label>""")
     return f"""        <section id="challenge" class="card">
           <div class="card-inner">
 {_section_head(index, meta, block.get("intro", ""))}
             <div class="two-col">
 {chr(10).join(cards)}
-            </div>
-            <div class="logbook">
-              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
-{chr(10).join(prompts)}
             </div>
           </div>
         </section>"""
@@ -561,7 +583,8 @@ def render_lesson(lesson: dict, glossary: dict, order: list[dict],
                for kind in SECTION_ORDER if lesson.get(kind)]
 
     renderers = {
-        "parts": _parts_section, "wiring": _wiring_section, "steps": _steps_section,
+        "parts": _parts_section, "reference": _reference_section,
+        "wiring": _wiring_section, "steps": _steps_section,
         "code": _code_section, "theory": _theory_section, "test": _test_section,
         "challenge": _challenge_section,
         # agent takes the lesson code too, adapted to the uniform (index, block) call
@@ -859,7 +882,6 @@ def emit_packet(lesson: dict, glossary: dict) -> dict:
         for c in test.get("checks") or []
     ]
     packet["challenge"] = plain_text((lesson.get("challenge") or {}).get("summary"))
-    packet["logbookPrompts"] = list((lesson.get("challenge") or {}).get("logbook") or [])
     return packet
 
 

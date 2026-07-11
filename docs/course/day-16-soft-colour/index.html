@@ -16,10 +16,10 @@
       <div class="hero-copy">
         <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 16 of 30</p>
         <h1>Mix your own colour<br />with three <em>knobs</em></h1>
-        <p class="lede">Today the colour mixing moves into your hands. Three knobs each feed a reading to the board, and each reading sets the brightness of one colour in the RGB dome — red, green, and blue on their own channels. Turn them together and you are mixing light the way a deckhand trims three sheets at once.
+        <p class="lede">Today the colour mixing moves into your hands. Three knobs each feed a reading to the board, and one line of arithmetic — map() — rescales each reading onto one colour&#x27;s brightness, red, green, and blue on their own channels. Learn how that one line works and you hold the move that turns any sensor into any output for the rest of the course.
 </p>
         <div class="meta-row" aria-label="Lesson facts">
-          <span class="pill is-key">About 25 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">Day 9&#x27;s dome meets Day 15&#x27;s knob</span>
+          <span class="pill is-key">About 25 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">Day 13&#x27;s reading meets Day 9&#x27;s dome</span>
         </div>
       </div>
       <div class="hero-side no-instrument">
@@ -46,7 +46,7 @@
           <a href="#wiring"><span class="tick"></span>Chart the circuit</a>
           <a href="#steps"><span class="tick"></span>Build it</a>
           <a href="#code"><span class="tick"></span>Read the code</a>
-          <a href="#theory"><span class="tick"></span>Three chains, one loop</a>
+          <a href="#theory"><span class="tick"></span>How map() turns a reading into a colour</a>
           <a href="#test"><span class="tick"></span>Test &amp; debug</a>
           <a href="#challenge"><span class="tick"></span>Try this</a>
           <a href="#agent"><span class="tick"></span>Coach me</a>
@@ -200,7 +200,7 @@
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">04</span> Read just enough code</p>
               <h2>Read the code</h2>
-              <p class="muted">Day 15 built one chain — read a knob, rescale it, write a brightness. Today the sketch runs that chain three times per pass using three small arrays and one loop. Switch to MicroPython if you&#x27;d rather see the same idea in Python — the wiring never changes.
+              <p class="muted">Day 15 ran one chain — read a knob, write a brightness — and its two scales happened to match, so it needed no map() call. A colour channel runs 0 to 255 while the knob runs 0 to 4095, so today every pass leans on map() to rescale. Three small arrays and one loop run all three channels in a few lines. Switch to MicroPython if you&#x27;d rather see the same idea in Python — the wiring never changes.
 </p>
             </div>
             <div class="tabs" role="tablist" aria-label="Code language">
@@ -228,7 +228,7 @@
 }</code></pre>
                 <div class="code-notes">
                   <div class="code-note"><code>const byte adcChns[] = {12, 13, 14}</code><span class="note-text">Three matched arrays pair each knob with a colour leg — position 0 links the knob on 12 to the red leg on 38 and so on down the line. <button class="define" data-topic="pinArray">Define</button></span></div>
-                  <div class="code-note"><code>colors[i] = map(analogRead(adcChns[i]), 0, 4096, 0, 255)</code><span class="note-text">Reads one knob (0–4095) and rescales it onto the 0–255 brightness range in a single line. <button class="define" data-topic="mapValue">Define</button></span></div>
+                  <div class="code-note"><code>colors[i] = map(analogRead(adcChns[i]), 0, 4096, 0, 255)</code><span class="note-text">Reads one knob and rescales it proportionally — where the reading sits between 0 and 4096 is where the colour value lands between 0 and 255. <button class="define" data-topic="mapValue">Define</button></span></div>
                   <div class="code-note"><code>ledcWrite(ledPins[i], 256 - colors[i])</code><span class="note-text">Day 9&#x27;s common-anode inversion — this dome lights when its pin goes LOW so the sketch subtracts the value before writing it. <button class="define" data-topic="commonAnode">Define</button></span></div>
                   <div class="code-note"><code>ledcAttachChannel(ledPins[i], 1000, 8, pwmChns[i])</code><span class="note-text">Gives each colour leg its own hardware PWM channel at 1 kHz with 8-bit brightness. <button class="define" data-topic="ledc">Define</button></span></div>
                 </div>
@@ -261,23 +261,27 @@ pwm2.<span class="tok-fn">duty</span>(<span class="tok-num">1023</span>-<span cl
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">05</span> Understand, don&#x27;t memorise</p>
-              <h2>Three chains, one loop</h2>
-              <p class="muted">Day 15&#x27;s single control chain — read the knob, rescale the number, write the brightness — appears here three times over, copied by a loop over three arrays.
+              <h2>How map() turns a reading into a colour</h2>
+              <p class="muted">A knob hands you a number from 0 to 4095. A colour channel wants a number from 0 to 255. map() is the one line that bridges the two, and it is the same move behind turning any sensor reading into any output. Day 13 gave you the reading, Day 9 gave you the channel, and map() is the adapter between them.
 </p>
             </div>
             <div class="theory-flow" aria-label="Measurement model">
-              <article class="flow-step"><span class="n">Read three</span><h3>Knobs in</h3><p>analogRead measures each knob on GPIO 12 13 14 every pass.</p></article>
-              <article class="flow-step"><span class="n">Rescale</span><h3>map()</h3><p>Each reading up to 4095 becomes a colour value from 0 to 255.</p></article>
-              <article class="flow-step"><span class="n">Invert</span><h3>256 minus</h3><p>The common-anode dome lights when its pin goes LOW so the sketch flips the scale before writing.</p></article>
-              <article class="flow-step"><span class="n">Repeat</span><h3>Every 10 ms</h3><p>The loop refreshes all three channels fast enough that the colour rides your hands.</p></article>
+              <article class="flow-step"><span class="n">In</span><h3>The reading</h3><p>analogRead hands back a number from 0 to 4095 — where the knob sits between ground and 3.3V.</p></article>
+              <article class="flow-step"><span class="n">Fraction</span><h3>How far along</h3><p>map asks where that number sits in its input span as a fraction — halfway up the knob is halfway along 0 to 4096.</p></article>
+              <article class="flow-step"><span class="n">Out</span><h3>Same spot, other scale</h3><p>It places that same fraction on the output span, so halfway lands at about 128 out of 255.</p></article>
+              <article class="flow-step"><span class="n">Colour</span><h3>Brightness</h3><p>That 0-to-255 number is the PWM level for one colour leg, and the loop repeats it for red, green, and blue every pass.</p></article>
             </div>
             <div class="formula-card">
-              <span class="label">The model</span>
-              <code><b>colour</b> = three knob readings → three mapped brightnesses</code>
+              <span class="label">The arithmetic</span>
+              <code><b>out</b> = outLow + (value − inLow) × (outHigh − outLow) ÷ (inHigh − inLow)</code>
             </div>
             <div class="two-col" style="margin-top:14px">
-              <article class="mini-card"><h3>Why arrays and a loop <button class="define" data-topic="pinArray">Define</button></h3><p>Writing the pins as three matched arrays lets one loop serve every channel. Adding a fourth channel would mean one more entry in each array and nothing else.</p></article>
-              <article class="mini-card"><h3>The same inversion as Day 9 <button class="define" data-topic="commonAnode">Define</button></h3><p>The common pin sits at 3.3V, so a colour is brightest when its own pin is pulled LOW. Subtracting the value from 256 flips the scale so a bigger knob reading still means a brighter colour.</p></article>
+              <article class="mini-card"><h3>Match the input ends to the real reading <button class="define" data-topic="mapValue">Define</button></h3><p>The input ends should be the smallest and largest numbers the sensor truly reaches. Claim a top of 4096 when the knob only reaches 3600 and the colour never quite hits full. Claim a top of 2048 when the knob reaches 4095 and everything past halfway pins at full and stops changing. The output uses its whole range only when the input ends are honest about the reading.
+</p></article>
+              <article class="mini-card"><h3>map() rescales, it does not clamp <button class="define" data-topic="adc">Define</button></h3><p>map() is straight proportional arithmetic, so a reading outside the stated input range lands outside the output range too. When a value might stray past its ends, fence it with constrain() first — the pairing you met in Day 15&#x27;s glossary.
+</p></article>
+              <article class="mini-card"><h3>Where 4096 and 255 come from <button class="define" data-topic="pwm">Define</button></h3><p>4096 is the top of the ADC&#x27;s 12-bit scale and 255 is the top of an 8-bit PWM channel, so this map squeezes a 4096-step reading down onto a 256-step brightness. Change the chip or the settings and those numbers move, and map() still only needs the four ends.
+</p></article>
             </div>
           </div>
         </section>
@@ -314,19 +318,13 @@ pwm2.<span class="tok-fn">duty</span>(<span class="tok-num">1023</span>-<span cl
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">07</span> Make the idea yours</p>
-              <h2>Try this: dial a sunset</h2>
-              <p class="muted">Same working circuit, two experiments — one with your hands, one with a single line of code. It fits inside today&#x27;s 25 minutes.
+              <h2>Try this: bend the mapping</h2>
+              <p class="muted">Same working circuit, two one-line edits to the red channel — each one puts a different pair of map()&#x27;s numbers under your hands. Both fit inside today&#x27;s 25 minutes.
 </p>
             </div>
             <div class="two-col">
-              <article class="mini-card"><h3>Dial a sunset <button class="define" data-topic="rgb">Define</button></h3><p>Turn the knobs until the dome glows sunset orange — red high, green partway, blue low. Write down roughly where each knob sits, as three numbers from 0 to 255.</p></article>
-              <article class="mini-card"><h3>Two-knob mixer <button class="define" data-topic="pinArray">Define</button></h3><p>In the loop, make the blue channel reuse the green knob&#x27;s value — set <code>colors[2] = colors[1]</code> after the map line — and the mix now lives on two knobs.</p></article>
-            </div>
-            <div class="logbook">
-              <p class="logbook-head"><span aria-hidden="true">✍️</span> Logbook</p>
-              <label>What three numbers made your sunset orange?<textarea rows="2"></textarea></label>
-              <label>Which colour surprised you most when you mixed it?<textarea rows="2"></textarea></label>
-              <label>With blue riding the green knob, which colours could you no longer reach?<textarea rows="2"></textarea></label>
+              <article class="mini-card"><h3>Reverse one channel <button class="define" data-topic="mapValue">Define</button></h3><p>On the map line, swap red&#x27;s output ends — write <code>map(analogRead(adcChns[0]), 0, 4096, 255, 0)</code>. Turning the red knob up now dims red instead of raising it. The output ends are simply the two numbers you choose, and swapping them runs the colour the other way.</p></article>
+              <article class="mini-card"><h3>Narrow the input <button class="define" data-topic="adc">Define</button></h3><p>Put the ends back, then drop red&#x27;s input top from 4096 to 2048 — <code>map(analogRead(adcChns[0]), 0, 2048, 0, 255)</code>. Red now reaches full by the knob&#x27;s halfway point and holds there across the whole top half. That dead travel is what a mismatched input range costs — set the ends to the numbers the knob really reaches.</p></article>
             </div>
           </div>
         </section>
@@ -344,7 +342,7 @@ pwm2.<span class="tok-fn">duty</span>(<span class="tok-num">1023</span>-<span cl
             </div>
             <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
               <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
-              <p><strong>How the agent should behave:</strong> guide one physical connection at a time, wait for you to confirm, explain the knob-to-colour pairing on request, and always check wiring, board, port, and USB before changing code.
+              <p><strong>How the agent should behave:</strong> guide one physical connection at a time, wait for confirmation, and teach map() as proportional arithmetic — where a reading sits in its input range is where it lands in the output range. Always check wiring, board, port, and USB before changing code.
 </p>
             </div>
           </div>
