@@ -15,9 +15,12 @@ learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
   Wire a rotary potentiometer to GPIO 14 and a servo to GPIO 21, upload the
-  Arduino sketch, and steer the servo's horn by hand — the knob's raw reading
-  and its mapped angle stream to Serial Monitor as proof of the conversion.
-unlocks: An analogue input can drive an analogue output — one map() call joins any sensor reading to any actuator range.
+  Arduino sketch, and steer the servo's horn by hand. The deeper lesson is
+  underneath the fun- an input and an output live on different number scales,
+  and one map() call is the joint that lets either drive the other. The knob's
+  raw reading and its mapped angle stream to Serial Monitor so you can watch the
+  translation happen line by line.
+unlocks: You can join any analogue sensor to any actuator- map() rescales one range onto the other, and reading then writing every loop makes the output track the input live.
 seoDescription: >
   Wire a rotary potentiometer and a servo to the ESP32-S3, upload the sketch,
   and steer the servo horn with the knob while Serial Monitor prints the raw
@@ -28,10 +31,11 @@ hero:
   headline: Steer the horn|with a {knob}
   lede: >
     Today the board gets a helm. You wire the knob from Day 13 and the servo
-    from Day 23 into one circuit, and a two-line conversion joins them — turn
-    the knob and the horn swings with your hand, live. Serial Monitor prints
-    the raw reading and the finished angle side by side so you can watch the
-    mapping happen.
+    from Day 23 into one circuit and let one command them together. The knob
+    counts in 0 to 4095, the servo answers in 0 to 180, and a single map() call
+    is the joint between the two scales — turn the knob and the horn swings with
+    your hand, live. Serial Monitor prints the raw reading and the finished
+    angle side by side so you can watch each translation land.
   pills:
     - { text: About 20 minutes, key: true }
     - Arduino first
@@ -213,34 +217,37 @@ code:
       set up; otherwise skip it — it should never block the Arduino-first path.
 
 theory:
-  title: Reading → angle → pulse
-  summary: Day 13's knob and Day 23's servo meet in the middle — two map() calls carry the reading to an angle and the angle to a pulse.
+  title: One map() joins any input to any output
+  summary: An input and an output almost never share a number scale, so map() is the universal joint between them — and reading then writing on every loop makes the output follow the input live.
   intro: >
-    Everything in today's loop is a rescale. The knob speaks in 0 to 4095, the
-    servo listens in 0 to 180, and the PWM hardware wants a duty value — map()
-    translates at each border.
+    Today is the first time an analogue input drives an analogue output, and the
+    idea behind it is bigger than a knob and a servo. A sensor reports on its own
+    scale, an actuator obeys on a different one, and the two scales rarely line
+    up. map() is the piece that connects them. Read the input, map it onto the
+    output's range, write the output, and repeat- that read-map-write loop is the
+    shape of nearly every hand control you will ever build.
   flow:
-    - n: "Turn"
-      title: "Knob dials voltage"
-      body: "The wiper hands GPIO 14 a voltage that tracks the knob's position."
-    - n: "Sample"
-      title: "ADC measures"
-      body: "analogRead turns that voltage into a number from 0 to 4095."
-    - n: "Map"
-      title: "Reading becomes angle"
-      body: "map() rescales 0-4095 onto 0-180 so every knob position names an angle."
-    - n: "Steer"
-      title: "Angle becomes pulse"
-      body: "A second map() converts the angle to a duty value from 103 to 512 and ledcWrite sends it."
-  formulaLabel: The chain
-  formula: angle = **map**(reading, 0, 4095, 0, 180) → pulse = **map**(angle, 0, 180, 103, 512)
+    - n: "1"
+      title: "Two scales that don't match"
+      body: "The knob reports a number from 0 to 4095; the servo obeys an angle from 0 to 180. The sensor's raw numbers mean nothing to the actuator as they stand — 4095 is not an angle."
+    - n: "2"
+      title: "map() is the universal joint"
+      body: "map(reading, 0, 4095, 0, 180) sends each point on the input range to the matching point on the output range, in proportion- 0 to 0, 4095 to 180, the middle to 90. Change the sensor or the actuator and the same call still bridges them; only the four numbers change."
+    - n: "3"
+      title: "Read then write, every pass"
+      body: "The loop reads the knob and writes the servo on every trip, dozens of times a second. Because the angle is recomputed from the live reading each pass, the horn follows your hand the instant you move it."
+    - n: "4"
+      title: "A small closed control system"
+      body: "The knob commands, the servo obeys, and the loop keeps closing the distance between them. That read-map-write triangle is a control system in miniature, and it scales to any sensor paired with any actuator."
+  formulaLabel: The model
+  formula: "read input → **map**(input, in-low, in-high, out-low, out-high) → write output, every loop"
   notes:
-    - title: Why two map() calls
+    - title: Why map() and not longhand
       explain: mapValue
-      body: Each call bridges one border — sensor range to human range, then human range to hardware range. Keeping the angle in the middle lets you think in degrees.
-    - title: The pulse under the angle
+      body: map() is a straight-line rescale between two ranges. It handles any pair of scales with the same four arguments — including reversed ranges and narrowed ones — which is exactly what makes it reusable across every sensor and actuator you meet.
+    - title: The second map is the same trick
       explain: pulseWidth
-      body: At 50 Hz with 12-bit precision, duty 103 is roughly a 0.5 ms pulse and 512 is roughly 2.5 ms — the width, repeated every 20 ms, is the position command the servo holds.
+      body: The sketch actually maps twice- reading to angle, then angle to a duty value from 103 to 512 for the PWM hardware. At 50 Hz with 12-bit precision, duty 103 is roughly a 0.5 ms pulse and 512 is roughly 2.5 ms — the width, repeated every 20 ms, is the position command the servo holds. Same universal joint, one border further in.
 
 test:
   mode: serial
@@ -267,31 +274,38 @@ test:
       fix: "Set Serial Monitor to 115200 baud to match the sketch."
 
 challenge:
-  title: "Try this: tiller stops"
+  title: "Try this: predict the mapping, then change it"
   railLabel: Try this
   intro: >
-    Same working circuit, three small rewrites of one line. Each teaches you
-    something about owning the mapping. It fits inside today's 20 minutes.
-  summary: Limit the horn to a 45° window like a tiller stop, reverse the steering direction, and mark three knob positions that point the horn at known angles.
+    Same working circuit, one line rewritten two ways. The point of each is to
+    predict the horn's behaviour from the four map() numbers before you upload,
+    then watch the serial pairs prove you right or catch you out. It fits inside
+    today's 20 minutes.
+  summary: Narrow the servo to a 45 to 135 window and reverse the steering, predicting each result from the map() arguments before uploading, then restore the sketch and calibrate the knob.
   cards:
-    - title: Fit tiller stops
+    - title: Narrow the lane
       explain: mapValue
-      body: Change the first map() so the angle runs 67 to 112 — a 45° window around centre, like the stops on a boat's tiller. The knob still sweeps end to end; the horn stays inside its lane.
-    - title: Steer the other way
-      body: Swap the output ends — map to 180 down to 0 — and the horn runs against the knob. One line reverses the helm.
-    - title: Mark the helm
-      body: With the original sketch restored, find the knob positions that print 0, 90, and 180, and mark each on the knob with a sliver of tape. You've calibrated a control.
+      body: Change the first map() to map the reading onto 45 to 135 — a 90° window around centre. Predict first- where do the two ends of the knob point now, and what will potVal_2 print at each end? Upload and check the serial pairs against your guess.
+    - title: Reverse the helm
+      body: Swap the output ends so the reading maps onto 180 then 0. Before uploading, call it- which way does the horn swing when you turn the knob clockwise now? One line runs the servo against the knob.
+    - title: Restore and calibrate
+      body: Put the original 0 to 180 mapping back, then find the knob positions that print potVal_2 near 0, 90, and 180 and mark each with a sliver of tape. You've calibrated a control by reading its own output.
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent
     can guide you with full context.
   behaviour: >
-    guide one wire at a time, wait for you to confirm, explain terms on
-    request, and always check wiring, board, port, and baud rate before
-    changing code.
+    guide one wire at a time, wait for you to confirm, and always check wiring,
+    board, port, and baud rate before changing code. Once it runs, teach the
+    real idea- an input and an output live on different scales, map() is the
+    joint between them, and reading then writing every loop makes the horn track
+    the knob live.
   coachInstructions:
     - Guide one physical connection at a time and wait for learner confirmation before proceeding.
+    - Once the horn tracks the knob, teach the core idea- the knob's 0 to 4095 and the servo's 0 to 180 are different scales, and map() rescales one onto the other so either can drive the other.
+    - Point out the read-map-write loop- because the angle is recomputed from the live reading on every pass, the horn follows the hand, which is a small closed control system.
+    - For the challenge, have the learner predict the horn's behaviour from the four map() numbers before uploading, then confirm it against the potVal_2 column.
     - If the horn ignores the knob, check the pot's middle wire on GPIO 14 first, then its outer pins on 3.3V and GND.
     - If angles print but the servo never moves, check the signal wire on GPIO 21 and the servo's 5V and GND pair before changing code.
     - Small jitter at rest is normal servo behaviour; suggest a steadier 5V supply if it's constant, and keep the learner from twisting the horn by hand while powered.

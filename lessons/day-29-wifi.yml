@@ -14,24 +14,28 @@ tracks: { main: arduino, optional: micropython }
 learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
-  Upload the Wi-Fi station sketch with your own network name and password, watch
-  the ESP32-S3 join your router over Serial Monitor, and read back the IP
-  address it is assigned — then flip the board into access-point mode and join
-  its network from your phone.
-unlocks: The ESP32-S3 carries its own Wi-Fi radio — it can join your network as a station or host a network of its own as an access point.
+  Upload the Wi-Fi station sketch with your own network name and password, and
+  watch the ESP32-S3 join your router over Serial Monitor. Learn what joining a
+  network actually means — the board finds your network by name, proves the
+  password, and the router hands it an IP address of its own — then read that
+  address back and reach the board across your network to prove it is really on
+  it. That is the doorway to Day 30, where another machine talks to the board.
+unlocks: You understand how the board joins a Wi-Fi network as a station and is handed its own IP address by the router, how that differs from access-point mode where the board hosts the network, and how other machines can now reach the board by that address.
 seoDescription: >
-  Connect the ESP32-S3 to your Wi-Fi in station mode, read its IP address in
-  Serial Monitor, then host your own network with soft-AP mode. No wiring — just
-  WiFi.begin, your credentials, and the radio already on the board.
+  Connect the ESP32-S3 to Wi-Fi in station mode: the board finds your network by
+  name, authenticates with the password, and the router assigns it an IP address
+  you read in Serial Monitor. Then reach the board with a ping to confirm it is
+  on your network, and see how station mode differs from access-point mode.
 
 hero:
   instrument: none
   headline: Put the board|on the {network}
   lede: >
     No wiring today — the radio is already inside the ESP32-S3. You hand the
-    board your Wi-Fi name and password, watch it join your network, and read
-    back the address your router assigns it. That address is the board's berth
-    number, and Day 30 dials it.
+    board your Wi-Fi name and password, watch it join your network the way a
+    phone does, and read back the address your router assigns it. That address
+    is the board's berth number on the local network — reach it once from your
+    computer and you have opened the door Day 30 walks through.
   pills:
     - { text: About 25 minutes, key: true }
     - Arduino first
@@ -76,7 +80,7 @@ steps:
     - Select your ESP32-S3 board and its port, then press **Upload**.
     - Open Serial Monitor and set the baud rate to `115200`. {serial}
     - Watch `Setup start`, then dots while the board negotiates, then the IP address your router assigns. {ipAddress}
-    - Write that address in your logbook — Day 30 dials it.
+    - Note that address down — Day 30 dials it.
   done:
     icon: "📶"
     title: You're aboard the network.
@@ -116,13 +120,13 @@ code:
       }
     notes:
       - code: WiFi.begin(ssid_Router, password_Router)
-        text: Asks to join your router by name — station mode — using the credentials you typed into the two strings above.
+        text: Starts the join — the board finds your network by name and offers the password from the two strings above. This is station mode, the board acting as a guest on your network.
         explain: stationMode
       - code: while (WiFi.status() != WL_CONNECTED)
         text: Waits for the router to accept the board, printing a dot every half second — and it will wait forever, so endless dots mean wrong credentials.
         explain: wifi
       - code: Serial.println(WiFi.localIP())
-        text: Prints the IP address your router assigned — the board's berth number, and the number Day 30 dials.
+        text: Prints the IP address the router leased once the join succeeds — the board's own number on the network, and the address Day 30 dials.
         explain: ipAddress
   micropython:
     file: 20.1_Station_mode/Station_mode.py
@@ -154,41 +158,45 @@ code:
       never block the Arduino-first day.
 
 theory:
-  title: One radio, two roles
-  summary: A station joins an existing network and is assigned an address; an access point hosts a network and hands out addresses itself.
+  title: What it means to join a network and get an address
+  summary: Joining is a short handshake — the board finds your network by name, proves the password, and the router leases it an IP address of its own.
   intro: >
-    Chapter 23 of the manual gives the radio three working modes. Today's upload
-    is station mode — the board joins your network the way your phone does. The
-    challenge flips it to access-point mode, where the board hosts a network of
-    its own.
+    "Connecting to Wi-Fi" sounds like one thing, but the board runs a three-part
+    handshake to get on, and it ends with something it did not have before: an
+    address of its own on the local network. Today's sketch runs this in station
+    mode — the board joins your network the way a phone does. The same radio can
+    play the opposite role, an access point that hosts a network instead, and
+    knowing the difference is what makes the address make sense.
   flow:
-    - n: "Ask to join"
-      title: "WiFi.begin"
-      body: "The board calls your router by name and offers the password."
-    - n: "Handshake"
-      title: "Router checks"
-      body: "The router verifies the password and accepts the board onto the network."
-    - n: "Get an address"
-      title: "DHCP assigns"
-      body: "The router hands the board an IP address of its own — its berth number."
-    - n: "Report"
-      title: "localIP prints"
-      body: "The sketch prints that address so you can write it down for Day 30."
+    - n: "1"
+      title: "Associate"
+      body: "The board looks for your network by its name, the SSID, and asks the router to let it join."
+    - n: "2"
+      title: "Authenticate"
+      body: "It offers the password you typed into the sketch; the router checks it and either accepts the board or turns it away."
+    - n: "3"
+      title: "Get an address"
+      body: "Once accepted, the router leases the board a free IP address — its own number on the local network, so other devices can find it."
+    - n: "4"
+      title: "Report"
+      body: "The sketch reads that assigned address with localIP and prints it, which is why you always use the number the board shows rather than any example."
   formulaLabel: The two modes
-  formula: "station = **join** a network · access point = **be** the network"
+  formula: "station = **join** a network and be handed an address · access point = **be** the network and hand them out"
   notes:
-    - title: Where the address comes from
+    - title: Why the address is the router's to give
       explain: ipAddress
       body: >
-        Your router runs a small harbourmaster service called DHCP. Every device
-        that joins gets assigned a free berth — an IP address — which is why the
-        one your board prints will differ from the one in this lesson.
-    - title: Both roles at once
+        The router runs a service called DHCP that keeps a pool of free
+        addresses and leases one to every device that joins. The board does not
+        choose its own number, so the IP it prints will differ from the one in
+        this lesson — always read the address the board shows, never the example.
+    - title: Station versus access point
       explain: apMode
       body: >
-        The third mode, AP+Station (`Sketch_23.3_AP_Station`), runs both at the
-        same time — the board stays joined to your router while hosting its own
-        network.
+        In station mode the board is a guest on your network, joining a router
+        that hands out the addresses. In access-point mode it becomes the network
+        itself — broadcasting its own name and leasing addresses to phones that
+        join it, with no router involved. The two roles can even run at once.
 
 test:
   mode: serial
@@ -216,49 +224,59 @@ test:
       fix: "The board speaks 2.4 GHz Wi-Fi only. Check that your router broadcasts a 2.4 GHz band."
     - symptom: "Blank monitor?"
       fix: "Confirm 115200 baud, then the board and port."
-    - symptom: "AP name missing from your phone's list?"
-      fix: "The access-point password must be at least 8 characters. Re-upload Sketch_23.2 and rescan."
+    - symptom: "Ping gets no reply?"
+      fix: "Ping the exact address the monitor printed, from a computer on the same 2.4 GHz network, and allow a few seconds — the board answers once it is fully joined."
 
 challenge:
-  title: "Try this: be the network"
+  title: "Try this: reach the board across your network"
   railLabel: Try this
   intro: >
-    Same board, opposite role. The second official sketch turns the ESP32-S3
-    into an access point — a network your phone can see and join. It fits
-    inside today's 25 minutes.
-  summary: Flip the board into access-point mode with Sketch_23.2, join WiFi_Name from your phone, then rename the network after your boat and find the board on your router's device list.
+    The address the monitor printed is a real, routable number — not a label the
+    board keeps to itself. The fastest way to prove the board is truly on your
+    network, and to set up Day 30, is to reach it from another machine that
+    shares the same Wi-Fi.
+  summary: Read the board's IP address from Serial Monitor, ping it from a computer on the same network to confirm the board answers, then note the address for Day 30.
   cards:
-    - title: Host your own network
-      explain: apMode
-      body: >
-        Upload `Sketch_23.2_WiFi_AP` — the line `WiFi.softAP(ssid_AP,
-        password_AP)` turns the board into an access point, and the monitor
-        prints `Soft-AP IP address = …`. Your phone's Wi-Fi list now shows
-        `WiFi_Name`; join it with the password `12345678`.
-    - title: Fly your own name
-      body: >
-        Change `ssid_AP` to your boat's name, pick a new password of 8 or more
-        characters, and re-upload. Rescan on your phone and there it is.
-    - title: Find the board on the chart
+    - title: Read the address
       explain: ipAddress
       body: >
-        Back in station mode, open your router's device list and find your
-        board there — the same IP address the monitor printed.
+        In Serial Monitor, find the line after `Connected, IP address:` —
+        something like `192.168.1.23`. That is the board's own number on your
+        network, leased to it by the router. Copy it exactly.
+    - title: Ping it from your computer
+      body: >
+        On a computer joined to the same 2.4 GHz Wi-Fi, open a terminal and run
+        `ping 192.168.1.23`, swapping in your board's address. Replies coming
+        back mean the board is reachable at that address — the whole point of
+        putting it on the network. On macOS or Linux press Ctrl-C to stop.
+    - title: Note it for Day 30
+      explain: ipAddress
+      body: >
+        Write the address down. Day 30 has your computer dial exactly this
+        number to open a connection to the board, so keeping it handy saves a
+        re-upload. If the board reboots you can reopen the monitor to read it
+        again.
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent can
     guide you with full context.
   behaviour: >
-    keep credentials private — the learner edits them into the sketch locally,
-    never into chat — and check the 2.4 GHz band, both placeholder strings, and
-    baud rate before changing code.
+    teach what joining a network actually means — the board finds the network by
+    name, authenticates with the password, and the router leases it an IP address
+    of its own — and keep credentials private, since the learner edits them into
+    the sketch locally, never into chat. Before touching code, check the 2.4 GHz
+    band, both placeholder strings, and the baud rate. Have the learner read the
+    printed address and reach the board with a ping to prove it is on the network.
   coachInstructions:
     - Never ask the learner to paste their Wi-Fi password into the chat; have them edit the two strings in the sketch locally.
+    - Teach the join as three moves — the board associates with the network by name, authenticates with the password, and the router leases it an IP address of its own.
+    - Make the router-assigned address concrete- it comes from the router's DHCP, so the board's IP will differ from any example; always use the one the serial monitor prints.
+    - Draw the contrast with access-point mode when it helps- in station mode the board joins a network and is handed an address; in AP mode it hosts a network and hands addresses out.
     - If dots march forever, the network name or password is wrong — have the learner fix both `"********"` strings, re-upload, and press reset; the connect loop has no timeout.
     - The board joins 2.4 GHz networks only; if it never connects, confirm the router broadcasts a 2.4 GHz band before touching code.
     - Remind the learner to keep the double quotes around the credentials and to match the network name exactly, including capitals.
-    - For the access-point challenge, the password must be at least 8 characters or the network will not appear on the phone; re-upload and rescan after any change.
+    - For the challenge, have the learner ping the printed IP from a computer on the same network to confirm the board is reachable, and note the address for Day 30.
     - Keep the Arduino path primary; MicroPython is optional only if already set up.
 
 source:

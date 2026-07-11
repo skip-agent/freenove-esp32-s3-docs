@@ -15,8 +15,12 @@ learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
   Build a tiny digital tape measure with the HC-SR04 ultrasonic sensor, upload
-  the Arduino sketch, and watch distance readings appear in Serial Monitor.
-unlocks: The ESP32-S3 can measure the physical world by timing how long a signal takes to leave and come back.
+  the Arduino sketch, and read live distances in Serial Monitor. The real prize
+  is the method underneath: the sensor measures one thing — how long a sound
+  pulse takes to fly out and echo back — and because sound travels at a known
+  speed, that single time reading becomes a distance in centimetres. Learn that
+  pipeline and you can measure the physical world with a stopwatch.
+unlocks: You can measure distance by timing an echo — send a pulse, time how long it takes to return, and convert that time to centimetres using the speed of sound. It's the same principle behind sonar and a boat's depth sounder.
 seoDescription: >
   Build a tiny digital tape measure with the HC-SR04 ultrasonic sensor. Wire it,
   upload the sketch, and watch distance readings appear in Serial Monitor.
@@ -29,9 +33,10 @@ hero:
   headline: Measure the room|with {sound}
   lede: >
     Today you build a tiny depth sounder. The HC-SR04 sends a ping you can't
-    hear, listens for the echo, and the ESP32-S3 times the round trip to work out
-    how far away things are — the same trick a boat uses to read the water beneath
-    it.
+    hear, then holds a pin HIGH for exactly as long as the sound takes to travel
+    out and echo back. The ESP32-S3 times that pulse and, knowing how fast sound
+    moves, works out how far away things are — the same trick a boat uses to read
+    the water beneath it.
   pills:
     - { text: About 30 minutes, key: true }
     - Arduino first
@@ -125,9 +130,10 @@ steps:
 
 code:
   intro: >
-    You don't need the whole sketch today — just four lines that do the real
-    work. Switch to MicroPython if you'd rather see the same idea in Python; the
-    wiring never changes.
+    You don't need the whole sketch today — just four lines that carry the whole
+    idea: name the two pins, time the echo, then turn that time into centimetres.
+    Switch to MicroPython if you'd rather see the same idea in Python; the wiring
+    stays the same.
   arduino:
     file: Sketch_19.1_Ultrasonic_Ranging.ino
     sketch: C/Sketches/Sketch_19.1_Ultrasonic_Ranging/Sketch_19.1_Ultrasonic_Ranging.ino
@@ -140,13 +146,13 @@ code:
       distance = (float)pingTime * soundVelocity / 2 / 10000;
     notes:
       - code: "#define trigPin 13"
-        text: Names GPIO 13 `trigPin` so the rest of the sketch reads plainly.
+        text: Gives GPIO 13 the name `trigPin`, so the pin's job stays readable wherever the sketch drives it.
         explain: define
       - code: pulseIn(echoPin, HIGH, timeOut)
-        text: Times how long Echo stays HIGH — that's the raw measurement.
+        text: Starts a stopwatch when Echo rises and stops it when Echo falls, returning the sound's round-trip time — the one measurement everything else is built from.
         explain: pulsein
       - code: … / 2 / 10000
-        text: Sound goes out *and* back, so halve it; the `/ 10000` just lands the answer in centimetres.
+        text: Halves the round trip to get the one-way distance, then scales the microsecond timing down into centimetres.
         explain: divideTwo
   micropython:
     file: 18.1_Ultrasonic_Ranging/Ultrasonic_Ranging.py
@@ -166,33 +172,44 @@ code:
       this — it should never block the Arduino-first day.
 
 theory:
-  title: Physics of a ping
-  summary: Send a ping, wait for the echo, measure the time, and convert time into distance.
+  title: Measuring distance by timing an echo
+  summary: The sensor never touches the object — it times how long a sound pulse takes to fly out and echo back, and the board turns that time into distance.
   intro: >
-    The whole day is one loop, running many times a second. It's the same idea as
-    counting the seconds between lightning and thunder.
+    The trick behind the whole day is that the HC-SR04 measures time, not
+    distance. It fires a sound pulse, then reports exactly how long that pulse
+    takes to reach an object and return. Because sound moves at a known, steady
+    speed, the board can turn that time into centimetres. It's the same idea as
+    counting the seconds between lightning and thunder to judge how far off a
+    storm is — you're timing something at a known speed and reading off a
+    distance.
   flow:
-    - n: "Send a ping"
-      title: "Trig fires"
-      body: "Trig tells the sensor to emit a short pulse above human hearing."
-    - n: "Wait for echo"
-      title: "It bounces"
-      body: "The pulse hits an object and some of it returns."
-    - n: "Measure time"
-      title: "Echo holds HIGH"
-      body: "Echo stays HIGH for exactly the round-trip time."
-    - n: "Convert"
-      title: "Time → distance"
-      body: "Time × speed of sound gives how far the pulse travelled."
-  formulaLabel: Useful model
+    - n: "1"
+      title: "Send the pulse"
+      body: "The board holds Trig HIGH for about 10 microseconds. That short command tells the HC-SR04 to emit a burst of ultrasonic clicks, a pitch far above what you can hear."
+    - n: "2"
+      title: "Echo marks the flight"
+      body: "The instant the burst leaves, the sensor raises the Echo pin and holds it HIGH. It keeps Echo HIGH for exactly as long as the sound is in flight — out to the object and back again."
+    - n: "3"
+      title: "pulseIn times it"
+      body: "pulseIn(echoPin, HIGH, timeOut) starts a stopwatch when Echo rises and stops it when Echo falls. What it hands back is the round-trip time, measured in microseconds."
+    - n: "4"
+      title: "Speed turns time into length"
+      body: "Sound travels at a fixed speed in room air, about 343 metres per second. Multiply that speed by the round-trip time and you get the total path the sound covered."
+    - n: "5"
+      title: "Halve the round trip"
+      body: "The sound went to the object and came straight back, so it covered the gap twice. Divide the total path by two, and you're left with the one-way distance to the object."
+  formulaLabel: The model
   formula: distance = **speed of sound** × **echo time** ÷ 2
   notes:
-    - title: Why readings wobble
+    - title: Why you divide by two
+      explain: divideTwo
+      body: The pulse makes a round trip — sensor to object, then object back to sensor. The raw echo time covers both legs, so halving it leaves the single one-way distance you actually want.
+    - title: Why the speed of sound matters
       explain: wobble
-      body: Real sensors react to object shape, angle, movement, and air. A little wobble is normal — watch the trend, not one number.
-    - title: Why flat targets help
+      body: The whole conversion leans on sound moving at a known speed. That speed shifts slightly with air temperature, which is one reason a reading can drift by a little even when nothing has moved.
+    - title: Why flat targets read cleaner
       explain: flat
-      body: Flat objects bounce more sound straight back. Curved or soft ones scatter it, so the echo gets weaker.
+      body: A flat surface square to the sensor bounces most of the sound straight back, giving Echo a strong, sharp pulse to time. Curved or soft targets scatter the sound, so the return is weaker and the timing less certain.
 
 test:
   intro: >
@@ -217,30 +234,34 @@ test:
       fix: "Aim straight at a flat object."
 
 challenge:
-  title: "Try this: a mini range log"
+  title: "Try this: check the sensor against a ruler"
   railLabel: Try this
   intro: >
-    Same working setup, one new skill: turning a measurement into a judgement. It
-    fits inside today's 30 minutes.
-  summary: Measure three targets, record expected and actual distances, then choose a keep-out-zone threshold and explain why.
+    You've got a distance sensor and a claim to test — that timing an echo really
+    does measure length. Hold it to a ruler and see. It fits inside today's 30
+    minutes.
+  summary: Measure a known distance with a ruler, compare it to the sensor's reading, then swap the flat target for a soft or angled one and watch the echo change.
   cards:
-    - title: Measure three targets
-      body: A book, a wall, and one object you pick. Note the expected distance, the reading, and anything odd.
-    - title: Choose a threshold
-      explain: threshold
-      body: Pick a "too close" distance — say 15 cm. Later that line can become a beep or a warning.
+    - title: Measure it, then check it
+      body: "Stand a book at a ruler-measured 15 cm from the sensor face, read what Serial Monitor reports, then repeat at 30 cm. Close agreement means the time-to-distance math is sound. A steady offset — the reading always a centimetre or two off in the same direction — tells you where the sensor's real zero point sits: the transducer face, not the board edge you measured from."
+    - title: Break the echo on purpose
+      explain: flat
+      body: "Aim at a flat wall and note a steady reading. Now swap in a folded towel, or tilt the target to about 45 degrees, and watch the number get weaker, jumpier, or drop to zero. You're seeing the mechanism from the outside: a clean reading needs a strong echo, and soft or angled surfaces scatter the sound away instead of bouncing it back."
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent can
     guide you with full context.
   behaviour: >
-    guide one physical step at a time, wait for you to confirm, explain terms on
-    request, and always check wiring, board, port, and USB before changing code.
+    guide one physical step at a time and wait for the learner to confirm. Once
+    the circuit is reading, teach the real method — the sensor times an echo and
+    the board converts that time into distance — and make sure the divide-by-two
+    lands. Always check wiring, board, port, and USB before changing code.
   coachInstructions:
     - Guide one physical step at a time and wait for learner confirmation before proceeding.
-    - Offer short explanations on request; do not dump theory before the learner has a working circuit.
-    - If the learner is stuck, check wiring, board/port, baud rate, and USB cable before changing code.
+    - "Once the circuit is reading, teach the core method: Trig sends a pulse, Echo stays HIGH for the round-trip time, pulseIn measures that time, and the fixed speed of sound converts it to distance."
+    - "Make sure the divide-by-two lands: the sound travels to the object and back, so the round trip is halved to get the one-way distance."
+    - If a reading is 0 or frozen, check Trig, Echo, GND, and whether the target is flat and square before touching code.
     - Preserve a working baseline before suggesting modifications.
     - Keep the Arduino path primary; MicroPython is optional only if already set up.
 

@@ -16,7 +16,7 @@
       <div class="hero-copy">
         <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 28 of 30</p>
         <h1>Switch the light<br />from your <em>phone</em></h1>
-        <p class="lede">Today your words start moving hardware. You wire a single LED, upload a sketch that listens over Bluetooth for two exact commands, and switch the light from across the room — write led_on and it lights, led_off and it goes dark. Yesterday&#x27;s pipe now carries orders.
+        <p class="lede">Today your words start moving hardware. You wire a single LED and upload a sketch that waits over Bluetooth for two exact commands — write led_on and it lights, led_off and it goes dark. Underneath, each word lands in a mailbox on the board, trips a callback, and drives the pin, so the board acts the instant your message arrives. Yesterday&#x27;s pipe now carries orders.
 </p>
         <div class="meta-row" aria-label="Lesson facts">
           <span class="pill is-key">About 25 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">Same one-LED circuit as Blink</span>
@@ -46,7 +46,7 @@
           <a href="#wiring"><span class="tick"></span>Chart the circuit</a>
           <a href="#steps"><span class="tick"></span>Build it</a>
           <a href="#code"><span class="tick"></span>Read the code</a>
-          <a href="#theory"><span class="tick"></span>The shape of a command</a>
+          <a href="#theory"><span class="tick"></span>How a command becomes an action</a>
           <a href="#test"><span class="tick"></span>Test &amp; debug</a>
           <a href="#challenge"><span class="tick"></span>Try this</a>
           <a href="#agent"><span class="tick"></span>Coach me</a>
@@ -115,7 +115,7 @@
                 <div class="pin-row">
                   <span class="pin-name"><span class="pin-dot"></span>LED long leg (+) <button class="define" data-topic="led">Define</button></span>
                   <span class="pin-arrow">→</span><span class="pin-dest">GPIO 2 via 220 Ω</span>
-                  <span class="pin-why">This pin obeys the command your phone sends.</span>
+                  <span class="pin-why">The pin a matched command drives HIGH or LOW.</span>
                 </div>
                 <div class="pin-row">
                   <span class="pin-name"><span class="pin-dot"></span>LED short leg (−) <button class="define" data-topic="gnd">Define</button></span>
@@ -165,7 +165,7 @@
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">04</span> Read just enough code</p>
               <h2>Read the code</h2>
-              <p class="muted">The BLE plumbing at the top of this sketch is Day 27&#x27;s, line for line — same service, same name. Today&#x27;s new idea lives in loop, where the board compares whatever arrived against two known commands and acts. Switch to MicroPython if you&#x27;d rather see the same idea in Python — the wiring never changes.
+              <p class="muted">The BLE plumbing at the top of this sketch is Day 27&#x27;s, line for line — the same service, the same name, and the same callback that copies each incoming write into rxload. Today&#x27;s new idea lives in loop, where the board reads that buffer, matches it against two known commands, and drives the pin. Switch to MicroPython to see the same idea in Python — the wiring never changes.
 </p>
             </div>
             <div class="tabs" role="tablist" aria-label="Code language">
@@ -200,10 +200,10 @@
   }
 }</code></pre>
                 <div class="code-notes">
-                  <div class="code-note"><code>setupBLE(&quot;ESP32S3_Bluetooth&quot;)</code><span class="note-text">The same radio setup as Day 27 — the board advertises under the same name, with the same service underneath. <button class="define" data-topic="ble">Define</button></span></div>
-                  <div class="code-note"><code>strncmp(rxload, &quot;led_on&quot;, 6) == 0</code><span class="note-text">True when the first six characters the phone wrote spell led_on — underscore included. The buffer rxload holds whatever landed in the write characteristic. <button class="define" data-topic="bleCharacteristic">Define</button></span></div>
-                  <div class="code-note"><code>digitalWrite(LED, HIGH)</code><span class="note-text">The matched command drives GPIO 2 HIGH and the LED lights; led_off drives it LOW again. <button class="define" data-topic="digitalWrite">Define</button></span></div>
-                  <div class="code-note"><code>Serial.println(rxload)</code><span class="note-text">Echoes every received command to Serial Monitor, so you can watch the words arrive as the LED obeys. <button class="define" data-topic="serial">Define</button></span></div>
+                  <div class="code-note"><code>setupBLE(&quot;ESP32S3_Bluetooth&quot;)</code><span class="note-text">Starts the same radio as Day 27 and registers the callback that fires on every write, so an arriving command lands in rxload without the loop asking for it. <button class="define" data-topic="ble">Define</button></span></div>
+                  <div class="code-note"><code>strncmp(rxload, &quot;led_on&quot;, 6) == 0</code><span class="note-text">Reads the mailbox and tests whether the first six characters spell led_on, underscore included — the match is what turns a received value into a command. <button class="define" data-topic="bleCharacteristic">Define</button></span></div>
+                  <div class="code-note"><code>digitalWrite(LED, HIGH)</code><span class="note-text">The matched command drives GPIO 2 HIGH and the LED lights; led_off drives it LOW — the moment the phone&#x27;s word becomes a voltage. <button class="define" data-topic="digitalWrite">Define</button></span></div>
+                  <div class="code-note"><code>Serial.println(rxload)</code><span class="note-text">Echoes each received command to Serial Monitor, so you can watch the word arrive at the same instant the LED obeys. <button class="define" data-topic="serial">Define</button></span></div>
                 </div>
               </div>
             </div>
@@ -220,7 +220,7 @@ def <span class="tok-fn">on_rx</span>(rx_data):
     elif rx_data == b&#x27;led_off&#x27;:
         led.<span class="tok-fn">value</span>(<span class="tok-num">0</span>)</code></pre>
                 <div class="code-notes">
-                  <div class="code-note"><code>rx_data == b&#x27;led_on&#x27;</code><span class="note-text">Compares the received bytes to the exact command — every character must match, where the Arduino sketch checks only the front of the buffer.</span></div>
+                  <div class="code-note"><code>rx_data == b&#x27;led_on&#x27;</code><span class="note-text">The on_rx function IS the callback here — it compares the whole received bytes to the exact command, where the Arduino sketch checks only the front of the buffer.</span></div>
                   <div class="code-note"><code>led.value(1)</code><span class="note-text">Drives GPIO 2 HIGH and the LED lights.</span></div>
                 </div>
               </div>
@@ -233,23 +233,24 @@ def <span class="tok-fn">on_rx</span>(rx_data):
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">05</span> Understand, don&#x27;t memorise</p>
-              <h2>The shape of a command</h2>
-              <p class="muted">Day 27 gave you a pipe between phone and board. Day 4 gave you digitalWrite. Put them together and you have remote control — and the pattern in today&#x27;s loop is the skeleton of every protocol you&#x27;ll ever meet.
+              <h2>How a command becomes an action</h2>
+              <p class="muted">Day 27 opened a pipe: a value could travel from your phone into the board. Day 4 gave you digitalWrite, a value that moves a pin. Today the two ends meet. The write characteristic is a mailbox the phone drops a value into; a callback you registered is the doorbell that fires the instant it lands; and the bytes that arrive decide what the pin does. That is remote control, and the shape underneath is event-driven — the board stays ready and does work only when a message arrives.
 </p>
             </div>
             <div class="theory-flow" aria-label="Measurement model">
-              <article class="flow-step"><span class="n">Send</span><h3>Phone writes</h3><p>LightBlue writes your text into the board&#x27;s write characteristic.</p></article>
-              <article class="flow-step"><span class="n">Receive</span><h3>Buffer fills</h3><p>The sketch copies the incoming bytes into rxload.</p></article>
-              <article class="flow-step"><span class="n">Compare</span><h3>Two known words</h3><p>strncmp checks the buffer against led_on and led_off.</p></article>
-              <article class="flow-step"><span class="n">Act</span><h3>Pin moves</h3><p>digitalWrite drives GPIO 2 HIGH or LOW and the LED follows.</p></article>
+              <article class="flow-step"><span class="n">Mailbox</span><h3>The write characteristic</h3><p>LightBlue writes your text into the board&#x27;s RX characteristic, a named slot the board offers for exactly this. The phone drops a value in, and the board decides what that value means.</p></article>
+              <article class="flow-step"><span class="n">Doorbell</span><h3>A callback fires</h3><p>setupBLE handed the radio a standing instruction: when a write arrives, run this. The moment your phone sends, the radio runs it and copies the incoming bytes into rxload. The board waits, ready, and the arrival itself wakes it.</p></article>
+              <article class="flow-step"><span class="n">Match</span><h3>Two known words</h3><p>The loop reads rxload and compares it against led_on and led_off with strncmp. Whatever matches becomes a command, and the rest is text that scrolls past.</p></article>
+              <article class="flow-step"><span class="n">Act</span><h3>The pin follows</h3><p>A matched command calls digitalWrite on GPIO 2 — HIGH lights the LED, LOW puts it out. The value that left your phone is now a voltage on a wire.</p></article>
             </div>
             <div class="formula-card">
-              <span class="label">The model</span>
-              <code>phone text → <b>match a known command</b> → digitalWrite</code>
+              <span class="label">The loop</span>
+              <code>phone writes the characteristic → <b>callback fires</b> → match a known word → digitalWrite</code>
             </div>
             <div class="two-col" style="margin-top:14px">
-              <article class="mini-card"><h3>Why spelling is the whole protocol <button class="define" data-topic="bleCharacteristic">Define</button></h3><p>The board compares raw characters. led_on with an underscore is a command; anything else is just text that scrolls past, and the LED holds its state.</p></article>
-              <article class="mini-card"><h3>What the radio adds <button class="define" data-topic="ble">Define</button></h3><p>BLE only carries the bytes. The meaning — which words count as commands and what they do — lives entirely in the sketch you wrote.</p></article>
+              <article class="mini-card"><h3>Woken by the arrival</h3><p>The radio holds your callback and fires it the instant a write lands, so the board spends its time ready and acts only when a message comes. That is event-driven control, and it scales — one board can hold many callbacks, each waiting for its own message.</p></article>
+              <article class="mini-card"><h3>Why spelling is the whole protocol <button class="define" data-topic="bleCharacteristic">Define</button></h3><p>The board compares raw characters. led_on with an underscore is a command; any other spelling is text that arrives, gets echoed, and leaves the LED where it was. The meaning lives in the match, so both ends must agree on the words.</p></article>
+              <article class="mini-card"><h3>The radio only carries bytes <button class="define" data-topic="ble">Define</button></h3><p>BLE moves the characters and nothing more. Which words count as commands, and what each one does, lives entirely in the sketch — the same bytes could dim a light, log a reading, or steer a motor.</p></article>
             </div>
           </div>
         </section>
@@ -287,13 +288,13 @@ def <span class="tok-fn">on_rx</span>(rx_data):
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">07</span> Make the idea yours</p>
-              <h2>Try this: grow the protocol</h2>
-              <p class="muted">Same working circuit, one new power: you decide what the commands are. It fits inside today&#x27;s 25 minutes.
+              <h2>Try this: map values to the light</h2>
+              <p class="muted">Same working circuit, one new question — what should each value the phone sends mean? First watch which values the board acts on, then turn the light from a switch into a dial. Both fit inside today&#x27;s 25 minutes.
 </p>
             </div>
             <div class="two-col">
-              <article class="mini-card"><h3>Add led_blink <button class="define" data-topic="digitalWrite">Define</button></h3><p>Add a third strncmp branch for <code>led_blink</code> that flashes the LED twice — HIGH, a short delay, LOW, and again. Upload and send your new word.</p></article>
-              <article class="mini-card"><h3>Rename the commands</h3><p>Change <code>led_on</code> and <code>led_off</code> to words of your own — keep the character counts in each strncmp honest — and drive the light with your own vocabulary.</p></article>
+              <article class="mini-card"><h3>Send values, watch the map <button class="define" data-topic="bleCharacteristic">Define</button></h3><p>In LightBlue, write led_on and led_off, then near-misses like LED_ON, Led_on, and ledon. Serial Monitor echoes every one as it lands — proof the callback caught it — while the LED moves only for the two exact commands. You are watching the map from a received value to an action, where the board acts on the values it knows and lets the rest pass by.</p></article>
+              <article class="mini-card"><h3>Turn words into brightness <button class="define" data-topic="ledc">Define</button></h3><p>Attach GPIO 2 to a PWM channel once, then add a branch that reads the received text as a number from 0 to 255 and calls ledcWrite with it. Send 0, 64, and 255 from your phone and the light dims and brightens — the value you type maps straight onto brightness, so the phone becomes a dimmer.</p></article>
             </div>
           </div>
         </section>
@@ -311,7 +312,7 @@ def <span class="tok-fn">on_rx</span>(rx_data):
             </div>
             <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
               <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
-              <p><strong>How the agent should behave:</strong> guide one physical step at a time, wait for you to confirm, explain terms on request, and always check wiring, board, port, and USB before changing code.
+              <p><strong>How the agent should behave:</strong> guide one physical step at a time, wait for confirmation, and teach the control loop plainly — a value written into the characteristic trips a callback that drives the pin. Always check wiring, board, port, and USB before changing code, and use Serial Monitor to separate a delivery problem from a wiring one.
 </p>
             </div>
           </div>
@@ -355,7 +356,7 @@ def <span class="tok-fn">on_rx</span>(rx_data):
 
   <div class="toast" id="toast">Prompt copied</div>
 
-  <script id="lesson-data" type="application/json">{"day": 28, "totalDays": 30, "slug": "day-28-bluetooth-led", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "ble": {"title": "Bluetooth Low Energy", "body": "BLE is short-range radio built for small messages. The board runs as a peripheral: it broadcasts its name, a phone connects, and the two exchange data through a service the board offers. This differs from the classic Bluetooth in your phone's pairing menu — a BLE device is opened with a GATT app like LightBlue, and never appears in that menu.\n", "shortcut": "Find the board inside the LightBlue app's scan list, never in the phone's Bluetooth settings."}, "bleCharacteristic": {"title": "Characteristics — write and notify", "body": "A BLE service holds characteristics — named slots the phone can use. This one has two: an RX slot the phone WRITES into (phone → board) and a TX slot the board NOTIFIES through (board → phone, for subscribers). Two one-way lanes make the two-way link.\n", "shortcut": "Phone writes into RX; board notifies out of TX. Subscribe to TX to hear the board."}, "digitalWrite": {"title": "digitalWrite()", "body": "digitalWrite() sets a pin fully on or fully off. HIGH puts voltage on the pin (LED on); LOW removes it (LED off). It is the simplest way for code to change something in the physical world.\n", "shortcut": "HIGH = on, LOW = off. No in-between — that is what PWM is for later."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "gnd": {"title": "Ground / GND", "body": "Ground is the shared zero-voltage reference. The board and sensor need a common ground so a signal like HIGH or LOW means the same thing to both parts.\n", "shortcut": "A missing ground can make everything look haunted. Check it early."}, "gpio": {"title": "GPIO extension board", "body": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself.\n", "shortcut": "When a lesson says GPIO 13, look for the pin labelled 13 on the extension board."}, "jumpers": {"title": "Jumper wires", "body": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles.\n", "shortcut": "If a reading seems impossible, gently reseat the jumper wires before changing code."}, "led": {"title": "LED", "body": "A LED is a one-way light. It only lights when its longer leg (the +) faces the pin and its shorter leg (the −) faces ground. Too much current burns it out, so a LED always sits behind a resistor.\n", "shortcut": "Long leg toward the pin side; short leg toward ground."}, "resistor": {"title": "Resistor", "body": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction.\n", "shortcut": "The 220 Ω resistor protects the LED; either way round is fine."}, "serial": {"title": "Serial Monitor", "body": "Serial Monitor is a text window in Arduino IDE. The board can print messages to it over USB. Here, it prints the measured distance so you can see what the sensor is doing.\n", "shortcut": "If the window is blank, check that the baud rate is 115200."}}, "prev": {"day": 27, "slug": "day-27-ble", "title": "BLE pass-through: talk at short range"}, "next": {"day": 29, "slug": "day-29-wifi", "title": "Put the board on the network"}}</script>
+  <script id="lesson-data" type="application/json">{"day": 28, "totalDays": 30, "slug": "day-28-bluetooth-led", "explainers": {"arduino": {"title": "Arduino IDE", "body": "Arduino IDE is the desktop app that opens the sketch, compiles it, uploads it to the ESP32-S3, and shows messages from the board in Serial Monitor.\n", "shortcut": "Today, the IDE is both your uploader and your measuring display."}, "ble": {"title": "Bluetooth Low Energy", "body": "BLE is short-range radio built for small messages. The board runs as a peripheral: it broadcasts its name, a phone connects, and the two exchange data through a service the board offers. This differs from the classic Bluetooth in your phone's pairing menu — a BLE device is opened with a GATT app like LightBlue, and never appears in that menu.\n", "shortcut": "Find the board inside the LightBlue app's scan list, never in the phone's Bluetooth settings."}, "bleCharacteristic": {"title": "Characteristics — write and notify", "body": "A BLE service holds characteristics — named slots the phone can use. This one has two: an RX slot the phone WRITES into (phone → board) and a TX slot the board NOTIFIES through (board → phone, for subscribers). Two one-way lanes make the two-way link.\n", "shortcut": "Phone writes into RX; board notifies out of TX. Subscribe to TX to hear the board."}, "digitalWrite": {"title": "digitalWrite()", "body": "digitalWrite() sets a pin fully on or fully off. HIGH puts voltage on the pin (LED on); LOW removes it (LED off). It is the simplest way for code to change something in the physical world.\n", "shortcut": "HIGH = on, LOW = off. No in-between — that is what PWM is for later."}, "esp32": {"title": "ESP32-S3 board", "body": "A development board is a friendly package around a tiny computer chip. The ESP32-S3 runs your uploaded sketch, controls pins, reads sensors, and can also use USB, Wi-Fi, and Bluetooth. In this lesson, it sends the ping signal and measures the echo time.\n", "shortcut": "Think of it as the project's brain, not just a USB gadget."}, "gnd": {"title": "Ground / GND", "body": "Ground is the shared zero-voltage reference. The board and sensor need a common ground so a signal like HIGH or LOW means the same thing to both parts.\n", "shortcut": "A missing ground can make everything look haunted. Check it early."}, "gpio": {"title": "GPIO extension board", "body": "GPIO means general-purpose input/output. These pins are connection points your code can use. The extension board makes them easier to see, reach, and wire without cramming everything onto the ESP32-S3 itself.\n", "shortcut": "When a lesson says GPIO 13, look for the pin labelled 13 on the extension board."}, "jumpers": {"title": "Jumper wires", "body": "Jumper wires make temporary connections without soldering. Female-to-male wires have a socket on one end and a pin on the other, useful when a sensor module and board use different connector styles.\n", "shortcut": "If a reading seems impossible, gently reseat the jumper wires before changing code."}, "led": {"title": "LED", "body": "A LED is a one-way light. It only lights when its longer leg (the +) faces the pin and its shorter leg (the −) faces ground. Too much current burns it out, so a LED always sits behind a resistor.\n", "shortcut": "Long leg toward the pin side; short leg toward ground."}, "ledc": {"title": "ledcWrite() and PWM channels", "body": "The ESP32-S3 has hardware PWM \"channels\" (its LEDC controller). You attach a pin to a channel once, then ledcWrite() sets its level. The board does the fast switching for you, so your loop just names a brightness number.\n", "shortcut": "Attach the pin to a channel once; then ledcWrite(pin, level) sets brightness."}, "resistor": {"title": "Resistor", "body": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction.\n", "shortcut": "The 220 Ω resistor protects the LED; either way round is fine."}, "serial": {"title": "Serial Monitor", "body": "Serial Monitor is a text window in Arduino IDE. The board can print messages to it over USB. Here, it prints the measured distance so you can see what the sensor is doing.\n", "shortcut": "If the window is blank, check that the baud rate is 115200."}}, "prev": {"day": 27, "slug": "day-27-ble", "title": "BLE pass-through: talk at short range"}, "next": {"day": 29, "slug": "day-29-wifi", "title": "Put the board on the network"}}</script>
   <script src="../course.js"></script>
 </body>
 </html>

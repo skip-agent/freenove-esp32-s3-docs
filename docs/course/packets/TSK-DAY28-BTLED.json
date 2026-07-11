@@ -7,7 +7,7 @@
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
   "estimatedTimeMinutes": 25,
-  "mission": "Wire one LED to GPIO 2, upload the Bluetooth sketch, and switch the light from your phone — write led_on and led_off in LightBlue and watch the board obey a command sent over the air.",
+  "mission": "Wire one LED to GPIO 2, upload the Bluetooth sketch, and switch the light from your phone — write led_on and led_off in LightBlue and watch a value sent over the air trip a callback on the board and drive the pin. Today your words close a control loop with no wire between you and the board.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -56,7 +56,7 @@
     {
       "partPin": "LED long leg (+)",
       "connectTo": "GPIO 2 via 220 Ω",
-      "reason": "This pin obeys the command your phone sends."
+      "reason": "The pin a matched command drives HIGH or LOW."
     },
     {
       "partPin": "LED short leg (−)",
@@ -66,11 +66,12 @@
   ],
   "coachInstructions": [
     "Guide one physical step at a time and wait for learner confirmation before proceeding.",
+    "Teach the core loop — the phone writes a value into the write characteristic, a callback the sketch registered fires on arrival and copies it into rxload, then the loop matches it and calls digitalWrite; the arrival wakes the board, which is what makes it event-driven control.",
     "The commands are led_on and led_off with underscores, written as utf-string; the manual's captions show hyphens and are wrong — always follow the code, never print the hyphen form.",
     "If the LED never reacts, check Serial Monitor at 115200 first — an echoed command with a dark LED points at wiring on GPIO 2; no echo points at the phone side or the spelling.",
     "If the LED is wired but dead, confirm long leg to GPIO 2 through the 220 Ω resistor and short leg to GND before changing code.",
     "If the phone can't find the board, repeat Day 27's LightBlue connection steps and have the learner press reset before reconnecting.",
-    "Keep the Arduino path primary; the MicroPython version broadcasts as ESP32S3 and matches each command byte-for-byte, so expect those two differences."
+    "Keep the Arduino path primary; the MicroPython version's on_rx is the same callback, it broadcasts as ESP32S3, and it matches each command byte-for-byte, so expect those differences."
   ],
   "steps": [
     "Seat the ESP32-S3 on the GPIO extension board and keep USB unplugged while you wire.",
@@ -87,25 +88,25 @@
     "arduino": [
       {
         "line": "setupBLE(\"ESP32S3_Bluetooth\")",
-        "explanation": "The same radio setup as Day 27 — the board advertises under the same name, with the same service underneath."
+        "explanation": "Starts the same radio as Day 27 and registers the callback that fires on every write, so an arriving command lands in rxload without the loop asking for it."
       },
       {
         "line": "strncmp(rxload, \"led_on\", 6) == 0",
-        "explanation": "True when the first six characters the phone wrote spell led_on — underscore included. The buffer rxload holds whatever landed in the write characteristic."
+        "explanation": "Reads the mailbox and tests whether the first six characters spell led_on, underscore included — the match is what turns a received value into a command."
       },
       {
         "line": "digitalWrite(LED, HIGH)",
-        "explanation": "The matched command drives GPIO 2 HIGH and the LED lights; led_off drives it LOW again."
+        "explanation": "The matched command drives GPIO 2 HIGH and the LED lights; led_off drives it LOW — the moment the phone's word becomes a voltage."
       },
       {
         "line": "Serial.println(rxload)",
-        "explanation": "Echoes every received command to Serial Monitor, so you can watch the words arrive as the LED obeys."
+        "explanation": "Echoes each received command to Serial Monitor, so you can watch the word arrive at the same instant the LED obeys."
       }
     ],
     "micropython": [
       {
         "line": "rx_data == b'led_on'",
-        "explanation": "Compares the received bytes to the exact command — every character must match, where the Arduino sketch checks only the front of the buffer."
+        "explanation": "The on_rx function IS the callback here — it compares the whole received bytes to the exact command, where the Arduino sketch checks only the front of the buffer."
       },
       {
         "line": "led.value(1)",
@@ -114,16 +115,20 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "The board reads whatever arrived, compares it to two known words, and acts — the shape of every command protocol.",
-    "formula": "phone text → match a known command → digitalWrite",
+    "plainLanguage": "A value the phone writes into the board's mailbox trips a callback, and the arriving bytes drive the pin — a control loop closed over the air.",
+    "formula": "phone writes the characteristic → callback fires → match a known word → digitalWrite",
     "notes": [
       {
-        "title": "Why spelling is the whole protocol",
-        "body": "The board compares raw characters. led_on with an underscore is a command; anything else is just text that scrolls past, and the LED holds its state."
+        "title": "Woken by the arrival",
+        "body": "The radio holds your callback and fires it the instant a write lands, so the board spends its time ready and acts only when a message comes. That is event-driven control, and it scales — one board can hold many callbacks, each waiting for its own message."
       },
       {
-        "title": "What the radio adds",
-        "body": "BLE only carries the bytes. The meaning — which words count as commands and what they do — lives entirely in the sketch you wrote."
+        "title": "Why spelling is the whole protocol",
+        "body": "The board compares raw characters. led_on with an underscore is a command; any other spelling is text that arrives, gets echoed, and leaves the LED where it was. The meaning lives in the match, so both ends must agree on the words."
+      },
+      {
+        "title": "The radio only carries bytes",
+        "body": "BLE moves the characters and nothing more. Which words count as commands, and what each one does, lives entirely in the sketch — the same bytes could dim a light, log a reading, or steer a motor."
       }
     ]
   },
@@ -161,5 +166,5 @@
       ]
     }
   ],
-  "challenge": "Add a third command that blinks the LED twice, rename the commands to your own words, and note the exact spelling discipline a protocol demands."
+  "challenge": "Send several values from LightBlue and watch which ones become actions, then add a PWM branch that reads the received value as a brightness so the phone dials the light."
 }

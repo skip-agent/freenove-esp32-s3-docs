@@ -15,10 +15,12 @@ tracks: { main: arduino, optional: micropython }
 learnerProfile: adult beginner; curious and capable; no electronics assumed
 
 mission: >
-  Upload the BLE pass-through sketch, find the board with the LightBlue app on
-  your phone, and pass text both ways — type in Serial Monitor and read it on
-  the phone, write on the phone and read it in Serial Monitor.
-unlocks: The ESP32-S3 carries its own radio, so your board and your phone can trade text at short range over Bluetooth Low Energy.
+  Upload the BLE pass-through sketch and use your phone to find the board on the
+  air and talk to it — type in Serial Monitor and read it on the phone, write on
+  the phone and read it in Serial Monitor. Along the way, learn the model every
+  BLE gadget uses: the board advertises, the phone discovers and connects, then
+  the two trade data through characteristics.
+unlocks: You understand how a phone finds a BLE device and exchanges data with it through a service and its characteristics — the same model behind fitness bands and wireless sensors — and you've driven that exchange both ways yourself.
 seoDescription: >
   Turn the ESP32-S3 into a BLE serial pipe. Upload the pass-through sketch,
   connect with the LightBlue phone app, and send text both ways between Serial
@@ -164,34 +166,43 @@ code:
       should never block the Arduino-first day.
 
 theory:
-  title: A serial pipe over radio
-  summary: The board advertises, the phone connects, and two one-way characteristics — write in, notify out — make a serial-style pipe over radio.
+  title: How a phone finds and talks to your board
+  summary: The board advertises, your phone discovers and connects, then the two trade data through characteristics — named value slots, each with its own UUID, that one side writes into and the other reads or is notified from.
   intro: >
-    BLE organises everything a device offers into services, and each service
-    into characteristics — small named mailboxes the phone can read, write, or
-    subscribe to. Today's service holds exactly two, one for each direction.
+    BLE is how a small device lets a phone find it and talk to it over the air,
+    with no cable and no pairing menu. Everything the board offers is laid out as
+    a service, and a service holds characteristics — the actual value slots each
+    side reads or writes. A characteristic is a named mailbox with a unique ID,
+    and today's service holds two of them, one lane each way. This is the same
+    model your fitness band and any wireless sensor use to reach your phone.
   flow:
     - n: "Advertise"
       title: "The board calls out"
-      body: "The sketch broadcasts the name ESP32S3_Bluetooth so nearby phones can find it."
+      body: "From boot the sketch broadcasts the name ESP32S3_Bluetooth on the radio, so any phone within range can find it."
+    - n: "Discover"
+      title: "The phone scans"
+      body: "A BLE scanner app like LightBlue listens for those broadcasts and lists the board, which is why it shows up inside the app and never in the phone's own Bluetooth settings."
     - n: "Connect"
-      title: "The phone answers"
-      body: "LightBlue opens a connection and finds the service by its UUID."
+      title: "The phone opens a link"
+      body: "Tapping the board opens a connection and reads its menu: one service, found by its UUID, holding the characteristics on offer."
     - n: "Write in"
       title: "Phone → board"
-      body: "Text written to the characteristic ending 0002 lands in the sketch and prints to Serial Monitor."
+      body: "Text the phone writes into the characteristic ending 0002 lands in the sketch and prints to Serial Monitor."
     - n: "Notify out"
       title: "Board → phone"
-      body: "Text typed in Serial Monitor is pushed through the characteristic ending 0003 to every subscriber."
-  formulaLabel: Useful model
-  formula: "one **write** lane in + one **notify** lane out = a two-way text pipe"
+      body: "Text typed in Serial Monitor is pushed out through the characteristic ending 0003 to every phone that subscribed."
+  formulaLabel: The model
+  formula: "advertise → discover → connect → **write in / notify out** through a characteristic"
   notes:
+    - title: A characteristic is the value slot
+      explain: bleCharacteristic
+      body: "The characteristic is the thing you actually read or write — a named slot inside the service. This service has two: an RX slot the phone writes into, and a TX slot the board notifies through. Two one-way slots make the round trip."
     - title: Why the long UUIDs
       explain: uuid
-      body: A UUID is a name long enough that nobody else's gadget will ever share it by accident. This particular trio is the Nordic UART set — a convention so common that serial-over-BLE apps recognise it on sight.
+      body: "A UUID is a name long enough that no other gadget will ever share it by accident, the way a port number names a service. This trio is the Nordic UART set — a convention so common that serial-over-BLE apps recognise it on sight."
     - title: Why you must subscribe
-      explain: bleCharacteristic
-      body: A notify characteristic only sends to phones that asked. Subscribing is how the phone says "keep me posted" — until then, the board's messages have nowhere to go.
+      explain: ble
+      body: "A notify slot only sends to phones that asked for it. Subscribing is how the phone says keep me posted; until it does, the board's messages have nowhere to land."
 
 test:
   mode: serial
@@ -221,28 +232,34 @@ test:
       fix: "Press the board's reset button, then rescan — this sketch advertises once at boot, a known quirk."
 
 challenge:
-  title: "Try this: name your boat, find the edge"
+  title: "Try this: read the board's menu, then drive both lanes"
   railLabel: Try this
   intro: >
-    Same working sketch, two experiments — one line of code, then a walk. It
-    fits inside today's 25 minutes.
-  summary: Rename the broadcast to your boat's name and rescan, then send messages from the far end of your home to find the edge of BLE's range.
+    You've traded a line each way; now slow down and see the structure that made
+    it work. Connect from the scanner app, look at the service the board offers,
+    then push text through each characteristic yourself. It fits inside today's
+    25 minutes.
+  summary: In LightBlue, connect to the board and open its service to see the two characteristics and their properties, then subscribe to the notify slot and write to the write slot to send text both ways through them.
   cards:
-    - title: Fly your own name
+    - title: Read the board's menu
+      explain: bleCharacteristic
+      body: "With the board connected in LightBlue, open its service and read the list of characteristics. One ends 0002 and is marked Write; one ends 0003 and is marked Notify. Those two slots are the whole conversation, and the property on each tells you which way it carries data."
+    - title: Drive each lane yourself
       explain: ble
-      body: Change `setupBLE("ESP32S3_Bluetooth")` to `setupBLE("YourBoatName")`, re-upload, and rescan in LightBlue — your board now broadcasts under its own flag.
-    - title: Find the range edge
-      body: Stay subscribed on the phone and walk to the far end of your home while a helper (or a repeated send) keeps messages coming from Serial Monitor. Note where they stop arriving.
+      body: "Subscribe to the 0003 characteristic, type a line in Serial Monitor, and watch it arrive on the phone. Then write a message into the 0002 characteristic and watch it land in Serial Monitor. You've now sent text both ways through the slots by hand."
 
 agent:
   intro: >
     Every lesson ships with a code and a machine-readable packet, so an agent can
     guide you with full context.
   behaviour: >
-    work one end at a time — board side in Serial Monitor, phone side in
-    LightBlue — confirm the waiting line before touching the app, and treat
-    subscribe, data format, and reset-after-disconnect as the first checks.
+    teach the BLE model plainly — the board advertises, the phone discovers and
+    connects, then the two exchange data through characteristics — while working
+    one end at a time, board side in Serial Monitor and phone side in LightBlue.
+    Confirm the waiting line before touching the app, and treat subscribe, data
+    format, and reset-after-disconnect as the first checks.
   coachInstructions:
+    - Land the model first- the board advertises, the phone discovers and connects, then the two trade data through characteristics, which are named value slots each side writes into or is notified from.
     - Establish which end is failing — board side (Serial Monitor) or phone side (LightBlue) — before changing anything.
     - If the name never appears in the app, have the learner power-cycle the board and rescan; remind them BLE devices skip the phone's Settings→Bluetooth pairing list and only show inside a GATT app.
     - If nothing reaches the phone, confirm they subscribed to the characteristic ending 0003; if the text is garbled, set Data Format to utf-string.

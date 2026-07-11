@@ -7,7 +7,7 @@
   "status": "published",
   "learnerProfile": "adult beginner; curious and capable; no electronics assumed",
   "estimatedTimeMinutes": 30,
-  "mission": "Build a tiny digital tape measure with the HC-SR04 ultrasonic sensor, upload the Arduino sketch, and watch distance readings appear in Serial Monitor.",
+  "mission": "Build a tiny digital tape measure with the HC-SR04 ultrasonic sensor, upload the Arduino sketch, and read live distances in Serial Monitor. The real prize is the method underneath: the sensor measures one thing — how long a sound pulse takes to fly out and echo back — and because sound travels at a known speed, that single time reading becomes a distance in centimetres. Learn that pipeline and you can measure the physical world with a stopwatch.",
   "mainPath": "Arduino/C++",
   "optionalSidePath": "MicroPython",
   "sourceMetadata": {
@@ -77,8 +77,9 @@
   ],
   "coachInstructions": [
     "Guide one physical step at a time and wait for learner confirmation before proceeding.",
-    "Offer short explanations on request; do not dump theory before the learner has a working circuit.",
-    "If the learner is stuck, check wiring, board/port, baud rate, and USB cable before changing code.",
+    "Once the circuit is reading, teach the core method: Trig sends a pulse, Echo stays HIGH for the round-trip time, pulseIn measures that time, and the fixed speed of sound converts it to distance.",
+    "Make sure the divide-by-two lands: the sound travels to the object and back, so the round trip is halved to get the one-way distance.",
+    "If a reading is 0 or frozen, check Trig, Echo, GND, and whether the target is flat and square before touching code.",
     "Preserve a working baseline before suggesting modifications.",
     "Keep the Arduino path primary; MicroPython is optional only if already set up."
   ],
@@ -95,15 +96,15 @@
     "arduino": [
       {
         "line": "#define trigPin 13",
-        "explanation": "Names GPIO 13 trigPin so the rest of the sketch reads plainly."
+        "explanation": "Gives GPIO 13 the name trigPin, so the pin's job stays readable wherever the sketch drives it."
       },
       {
         "line": "pulseIn(echoPin, HIGH, timeOut)",
-        "explanation": "Times how long Echo stays HIGH — that's the raw measurement."
+        "explanation": "Starts a stopwatch when Echo rises and stops it when Echo falls, returning the sound's round-trip time — the one measurement everything else is built from."
       },
       {
         "line": "… / 2 / 10000",
-        "explanation": "Sound goes out and back, so halve it; the / 10000 just lands the answer in centimetres."
+        "explanation": "Halves the round trip to get the one-way distance, then scales the microsecond timing down into centimetres."
       }
     ],
     "micropython": [
@@ -118,16 +119,20 @@
     ]
   },
   "theoryModel": {
-    "plainLanguage": "Send a ping, wait for the echo, measure the time, and convert time into distance.",
+    "plainLanguage": "The sensor never touches the object — it times how long a sound pulse takes to fly out and echo back, and the board turns that time into distance.",
     "formula": "distance = speed of sound × echo time ÷ 2",
     "notes": [
       {
-        "title": "Why readings wobble",
-        "body": "Real sensors react to object shape, angle, movement, and air. A little wobble is normal — watch the trend, not one number."
+        "title": "Why you divide by two",
+        "body": "The pulse makes a round trip — sensor to object, then object back to sensor. The raw echo time covers both legs, so halving it leaves the single one-way distance you actually want."
       },
       {
-        "title": "Why flat targets help",
-        "body": "Flat objects bounce more sound straight back. Curved or soft ones scatter it, so the echo gets weaker."
+        "title": "Why the speed of sound matters",
+        "body": "The whole conversion leans on sound moving at a known speed. That speed shifts slightly with air temperature, which is one reason a reading can drift by a little even when nothing has moved."
+      },
+      {
+        "title": "Why flat targets read cleaner",
+        "body": "A flat surface square to the sensor bounces most of the sound straight back, giving Echo a strong, sharp pulse to time. Curved or soft targets scatter the sound, so the return is weaker and the timing less certain."
       }
     ]
   },
@@ -165,5 +170,5 @@
       ]
     }
   ],
-  "challenge": "Measure three targets, record expected and actual distances, then choose a keep-out-zone threshold and explain why."
+  "challenge": "Measure a known distance with a ruler, compare it to the sensor's reading, then swap the flat target for a soft or angled one and watch the echo change."
 }

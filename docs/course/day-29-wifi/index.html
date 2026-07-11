@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Day 29 · Put the board on the network — TinySkiff ESP32-S3 Lab</title>
-  <meta name="description" content="Connect the ESP32-S3 to your Wi-Fi in station mode, read its IP address in Serial Monitor, then host your own network with soft-AP mode. No wiring — just WiFi.begin, your credentials, and the radio already on the board." />
+  <meta name="description" content="Connect the ESP32-S3 to Wi-Fi in station mode: the board finds your network by name, authenticates with the password, and the router assigns it an IP address you read in Serial Monitor. Then reach the board with a ping to confirm it is on your network, and see how station mode differs from access-point mode." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -16,7 +16,7 @@
       <div class="hero-copy">
         <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 29 of 30</p>
         <h1>Put the board<br />on the <em>network</em></h1>
-        <p class="lede">No wiring today — the radio is already inside the ESP32-S3. You hand the board your Wi-Fi name and password, watch it join your network, and read back the address your router assigns it. That address is the board&#x27;s berth number, and Day 30 dials it.
+        <p class="lede">No wiring today — the radio is already inside the ESP32-S3. You hand the board your Wi-Fi name and password, watch it join your network the way a phone does, and read back the address your router assigns it. That address is the board&#x27;s berth number on the local network — reach it once from your computer and you have opened the door Day 30 walks through.
 </p>
         <div class="meta-row" aria-label="Lesson facts">
           <span class="pill is-key">About 25 minutes</span><span class="pill">Arduino first</span><span class="pill">MicroPython optional</span><span class="pill">No wiring today</span>
@@ -45,7 +45,7 @@
           <a href="#parts"><span class="tick"></span>What you need</a>
           <a href="#steps"><span class="tick"></span>Build it</a>
           <a href="#code"><span class="tick"></span>Read the code</a>
-          <a href="#theory"><span class="tick"></span>One radio, two roles</a>
+          <a href="#theory"><span class="tick"></span>What it means to join a network and get an address</a>
           <a href="#test"><span class="tick"></span>Test &amp; debug</a>
           <a href="#challenge"><span class="tick"></span>Try this</a>
           <a href="#agent"><span class="tick"></span>Coach me</a>
@@ -98,7 +98,7 @@
               <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">Select your ESP32-S3 board and its port, then press <strong>Upload</strong>.</p></li>
               <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Open Serial Monitor and set the baud rate to <code>115200</code>. <button class="define" data-topic="serial">Define</button></p></li>
               <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 6 done"></button><p class="text">Watch <code>Setup start</code>, then dots while the board negotiates, then the IP address your router assigns. <button class="define" data-topic="ipAddress">Define</button></p></li>
-              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 7 done"></button><p class="text">Write that address in your logbook — Day 30 dials it.</p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 7 done"></button><p class="text">Note that address down — Day 30 dials it.</p></li>
             </ol>
             <div class="done-banner" id="doneBanner" role="status">
               <span class="icon" aria-hidden="true">📶</span>
@@ -143,9 +143,9 @@
 <span class="tok-key">void</span> <span class="tok-fn">loop</span>() {
 }</code></pre>
                 <div class="code-notes">
-                  <div class="code-note"><code>WiFi.begin(ssid_Router, password_Router)</code><span class="note-text">Asks to join your router by name — station mode — using the credentials you typed into the two strings above. <button class="define" data-topic="stationMode">Define</button></span></div>
+                  <div class="code-note"><code>WiFi.begin(ssid_Router, password_Router)</code><span class="note-text">Starts the join — the board finds your network by name and offers the password from the two strings above. This is station mode, the board acting as a guest on your network. <button class="define" data-topic="stationMode">Define</button></span></div>
                   <div class="code-note"><code>while (WiFi.status() != WL_CONNECTED)</code><span class="note-text">Waits for the router to accept the board, printing a dot every half second — and it will wait forever, so endless dots mean wrong credentials. <button class="define" data-topic="wifi">Define</button></span></div>
-                  <div class="code-note"><code>Serial.println(WiFi.localIP())</code><span class="note-text">Prints the IP address your router assigned — the board&#x27;s berth number, and the number Day 30 dials. <button class="define" data-topic="ipAddress">Define</button></span></div>
+                  <div class="code-note"><code>Serial.println(WiFi.localIP())</code><span class="note-text">Prints the IP address the router leased once the join succeeds — the board&#x27;s own number on the network, and the address Day 30 dials. <button class="define" data-topic="ipAddress">Define</button></span></div>
                 </div>
               </div>
             </div>
@@ -181,24 +181,24 @@ def <span class="tok-fn">STA_Setup</span>(ssidRouter,passwordRouter):
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">04</span> Understand, don&#x27;t memorise</p>
-              <h2>One radio, two roles</h2>
-              <p class="muted">Chapter 23 of the manual gives the radio three working modes. Today&#x27;s upload is station mode — the board joins your network the way your phone does. The challenge flips it to access-point mode, where the board hosts a network of its own.
+              <h2>What it means to join a network and get an address</h2>
+              <p class="muted">&quot;Connecting to Wi-Fi&quot; sounds like one thing, but the board runs a three-part handshake to get on, and it ends with something it did not have before: an address of its own on the local network. Today&#x27;s sketch runs this in station mode — the board joins your network the way a phone does. The same radio can play the opposite role, an access point that hosts a network instead, and knowing the difference is what makes the address make sense.
 </p>
             </div>
             <div class="theory-flow" aria-label="Measurement model">
-              <article class="flow-step"><span class="n">Ask to join</span><h3>WiFi.begin</h3><p>The board calls your router by name and offers the password.</p></article>
-              <article class="flow-step"><span class="n">Handshake</span><h3>Router checks</h3><p>The router verifies the password and accepts the board onto the network.</p></article>
-              <article class="flow-step"><span class="n">Get an address</span><h3>DHCP assigns</h3><p>The router hands the board an IP address of its own — its berth number.</p></article>
-              <article class="flow-step"><span class="n">Report</span><h3>localIP prints</h3><p>The sketch prints that address so you can write it down for Day 30.</p></article>
+              <article class="flow-step"><span class="n">1</span><h3>Associate</h3><p>The board looks for your network by its name, the SSID, and asks the router to let it join.</p></article>
+              <article class="flow-step"><span class="n">2</span><h3>Authenticate</h3><p>It offers the password you typed into the sketch; the router checks it and either accepts the board or turns it away.</p></article>
+              <article class="flow-step"><span class="n">3</span><h3>Get an address</h3><p>Once accepted, the router leases the board a free IP address — its own number on the local network, so other devices can find it.</p></article>
+              <article class="flow-step"><span class="n">4</span><h3>Report</h3><p>The sketch reads that assigned address with localIP and prints it, which is why you always use the number the board shows rather than any example.</p></article>
             </div>
             <div class="formula-card">
               <span class="label">The two modes</span>
-              <code>station = <b>join</b> a network · access point = <b>be</b> the network</code>
+              <code>station = <b>join</b> a network and be handed an address · access point = <b>be</b> the network and hand them out</code>
             </div>
             <div class="two-col" style="margin-top:14px">
-              <article class="mini-card"><h3>Where the address comes from <button class="define" data-topic="ipAddress">Define</button></h3><p>Your router runs a small harbourmaster service called DHCP. Every device that joins gets assigned a free berth — an IP address — which is why the one your board prints will differ from the one in this lesson.
+              <article class="mini-card"><h3>Why the address is the router&#x27;s to give <button class="define" data-topic="ipAddress">Define</button></h3><p>The router runs a service called DHCP that keeps a pool of free addresses and leases one to every device that joins. The board does not choose its own number, so the IP it prints will differ from the one in this lesson — always read the address the board shows, never the example.
 </p></article>
-              <article class="mini-card"><h3>Both roles at once <button class="define" data-topic="apMode">Define</button></h3><p>The third mode, AP+Station (<code>Sketch_23.3_AP_Station</code>), runs both at the same time — the board stays joined to your router while hosting its own network.
+              <article class="mini-card"><h3>Station versus access point <button class="define" data-topic="apMode">Define</button></h3><p>In station mode the board is a guest on your network, joining a router that hands out the addresses. In access-point mode it becomes the network itself — broadcasting its own name and leasing addresses to phones that join it, with no router involved. The two roles can even run at once.
 </p></article>
             </div>
           </div>
@@ -227,7 +227,7 @@ def <span class="tok-fn">STA_Setup</span>(ssidRouter,passwordRouter):
                   <li><strong>Dots marching forever?</strong> The network name or password is wrong. Fix both strings in the sketch, re-upload, and press reset — the loop has no timeout.</li>
                   <li><strong>Your network never connects at all?</strong> The board speaks 2.4 GHz Wi-Fi only. Check that your router broadcasts a 2.4 GHz band.</li>
                   <li><strong>Blank monitor?</strong> Confirm 115200 baud, then the board and port.</li>
-                  <li><strong>AP name missing from your phone&#x27;s list?</strong> The access-point password must be at least 8 characters. Re-upload Sketch_23.2 and rescan.</li>
+                  <li><strong>Ping gets no reply?</strong> Ping the exact address the monitor printed, from a computer on the same 2.4 GHz network, and allow a few seconds — the board answers once it is fully joined.</li>
                 </ul>
               </div>
             </div>
@@ -237,16 +237,16 @@ def <span class="tok-fn">STA_Setup</span>(ssidRouter,passwordRouter):
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">06</span> Make the idea yours</p>
-              <h2>Try this: be the network</h2>
-              <p class="muted">Same board, opposite role. The second official sketch turns the ESP32-S3 into an access point — a network your phone can see and join. It fits inside today&#x27;s 25 minutes.
+              <h2>Try this: reach the board across your network</h2>
+              <p class="muted">The address the monitor printed is a real, routable number — not a label the board keeps to itself. The fastest way to prove the board is truly on your network, and to set up Day 30, is to reach it from another machine that shares the same Wi-Fi.
 </p>
             </div>
             <div class="two-col">
-              <article class="mini-card"><h3>Host your own network <button class="define" data-topic="apMode">Define</button></h3><p>Upload <code>Sketch_23.2_WiFi_AP</code> — the line <code>WiFi.softAP(ssid_AP, password_AP)</code> turns the board into an access point, and the monitor prints <code>Soft-AP IP address = …</code>. Your phone&#x27;s Wi-Fi list now shows <code>WiFi_Name</code>; join it with the password <code>12345678</code>.
+              <article class="mini-card"><h3>Read the address <button class="define" data-topic="ipAddress">Define</button></h3><p>In Serial Monitor, find the line after <code>Connected, IP address:</code> — something like <code>192.168.1.23</code>. That is the board&#x27;s own number on your network, leased to it by the router. Copy it exactly.
 </p></article>
-              <article class="mini-card"><h3>Fly your own name</h3><p>Change <code>ssid_AP</code> to your boat&#x27;s name, pick a new password of 8 or more characters, and re-upload. Rescan on your phone and there it is.
+              <article class="mini-card"><h3>Ping it from your computer</h3><p>On a computer joined to the same 2.4 GHz Wi-Fi, open a terminal and run <code>ping 192.168.1.23</code>, swapping in your board&#x27;s address. Replies coming back mean the board is reachable at that address — the whole point of putting it on the network. On macOS or Linux press Ctrl-C to stop.
 </p></article>
-              <article class="mini-card"><h3>Find the board on the chart <button class="define" data-topic="ipAddress">Define</button></h3><p>Back in station mode, open your router&#x27;s device list and find your board there — the same IP address the monitor printed.
+              <article class="mini-card"><h3>Note it for Day 30 <button class="define" data-topic="ipAddress">Define</button></h3><p>Write the address down. Day 30 has your computer dial exactly this number to open a connection to the board, so keeping it handy saves a re-upload. If the board reboots you can reopen the monitor to read it again.
 </p></article>
             </div>
           </div>
@@ -265,7 +265,7 @@ def <span class="tok-fn">STA_Setup</span>(ssidRouter,passwordRouter):
             </div>
             <div class="callout" style="border-color:rgba(14,124,139,0.28);background:var(--depth-wash)">
               <div class="icon" aria-hidden="true" style="background:#cfe6e6">🧭</div>
-              <p><strong>How the agent should behave:</strong> keep credentials private — the learner edits them into the sketch locally, never into chat — and check the 2.4 GHz band, both placeholder strings, and baud rate before changing code.
+              <p><strong>How the agent should behave:</strong> teach what joining a network actually means — the board finds the network by name, authenticates with the password, and the router leases it an IP address of its own — and keep credentials private, since the learner edits them into the sketch locally, never into chat. Before touching code, check the 2.4 GHz band, both placeholder strings, and the baud rate. Have the learner read the printed address and reach the board with a ping to prove it is on the network.
 </p>
             </div>
           </div>

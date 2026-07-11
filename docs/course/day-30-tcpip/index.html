@@ -45,7 +45,7 @@
           <a href="#parts"><span class="tick"></span>What you need</a>
           <a href="#steps"><span class="tick"></span>Build it</a>
           <a href="#code"><span class="tick"></span>Read the code</a>
-          <a href="#theory"><span class="tick"></span>An address, a port, a service</a>
+          <a href="#theory"><span class="tick"></span>How two machines talk over a network</a>
           <a href="#test"><span class="tick"></span>Test &amp; debug</a>
           <a href="#challenge"><span class="tick"></span>Try this</a>
           <a href="#agent"><span class="tick"></span>Coach me</a>
@@ -164,23 +164,24 @@ conn.<span class="tok-fn">send</span>(&#x27;I am Server&#x27;)</code></pre>
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">04</span> Understand, don&#x27;t memorise</p>
-              <h2>An address, a port, a service</h2>
-              <p class="muted">Strip away the scale, and every connection on the internet is this same four-beat exchange. Today it happens entirely inside your own router.
+              <h2>How two machines talk over a network</h2>
+              <p class="muted">Yesterday the board earned an address on your network. Today it puts that address to work and holds a real conversation with another machine. Every connection on the internet — every page you load, every message you send — is the same four-beat exchange you are about to run entirely inside your own router.
 </p>
             </div>
             <div class="theory-flow" aria-label="Measurement model">
-              <article class="flow-step"><span class="n">Join</span><h3>Station mode</h3><p>The board joins your Wi-Fi and the router hands it an address.</p></article>
-              <article class="flow-step"><span class="n">Listen</span><h3>A door opens</h3><p>server.begin() waits at port 80 — one numbered door at that address.</p></article>
-              <article class="flow-step"><span class="n">Dial</span><h3>The client calls</h3><p>Your computer knocks with the exact IP and port the monitor printed.</p></article>
-              <article class="flow-step"><span class="n">Talk</span><h3>One shared line</h3><p>Both ends read and write the same stream until one hangs up.</p></article>
+              <article class="flow-step"><span class="n">Join</span><h3>The board gets an address</h3><p>In station mode the board joins your Wi-Fi and the router hands it an IP address — its number on the network, printed to Serial Monitor for you to copy.</p></article>
+              <article class="flow-step"><span class="n">Listen</span><h3>It opens a port</h3><p>Calling server.begin() makes the board wait at port 80 — a numbered door at that address. Ports are how one machine can host many services at once, each behind its own door.</p></article>
+              <article class="flow-step"><span class="n">Dial</span><h3>The other machine calls in</h3><p>Your computer takes the client role. It dials the exact IP and port the monitor printed, the board accepts, and the two are now joined.</p></article>
+              <article class="flow-step"><span class="n">Stream</span><h3>One reliable line, both ways</h3><p>Once joined, both ends read and write the same stream of bytes. TCP re-sends anything that goes missing and hands each side the bytes in the order they were sent, so you just watch whole lines of text arrive intact.</p></article>
             </div>
             <div class="formula-card">
               <span class="label">The model</span>
-              <code><b>server</b> listens at an address and port → <b>client</b> dials it → one shared line</code>
+              <code><b>server</b> listens at an address and port → <b>client</b> dials that address and port → one reliable stream, in order, both ways</code>
             </div>
             <div class="two-col" style="margin-top:14px">
-              <article class="mini-card"><h3>Day 29 gave it the address <button class="define" data-topic="ipAddress">Define</button></h3><p>Yesterday the board joined the network and the router handed it a number. Today it opens a door at that number and offers a service — an address, a port, and something listening.</p></article>
-              <article class="mini-card"><h3>What &quot;on the internet&quot; means <button class="define" data-topic="tcp">Define</button></h3><p>Every web server in the world is this same shape at larger scale — an address, a port, a service that answers when dialled. Your board now has all three.</p></article>
+              <article class="mini-card"><h3>Day 29 gave it the address <button class="define" data-topic="ipAddress">Define</button></h3><p>Yesterday the board joined the network and the router handed it a number. Today it opens a door at that number and offers a service that answers when dialled — an address, a port, and something listening.</p></article>
+              <article class="mini-card"><h3>Why the stream is reliable <button class="define" data-topic="tcp">Define</button></h3><p>Networks drop and shuffle pieces of data all the time. TCP hides that for you — it numbers each chunk, re-sends anything that goes missing, and reassembles them in order before your code ever sees them. You read clean text in the right sequence, and every web server in the world leans on exactly this.</p></article>
+              <article class="mini-card"><h3>One address, many doors</h3><p>A port is a number that picks which service you mean at an address. The board answers on 80 here, while other ports could serve other things — which is how a single machine hosts many services at once without them getting tangled.</p></article>
             </div>
           </div>
         </section>
@@ -218,13 +219,13 @@ conn.<span class="tok-fn">send</span>(&#x27;I am Server&#x27;)</code></pre>
           <div class="card-inner">
             <div class="section-head">
               <p class="section-kicker"><span class="section-index">06</span> Make the idea yours</p>
-              <h2>Try this: swap the roles</h2>
-              <p class="muted">Same network, one last idea: the roles are a choice. It fits inside today&#x27;s 30 minutes — and it closes the course.
+              <h2>Try this: dial your board from your phone</h2>
+              <p class="muted">One last experiment, and it needs nothing but the phone in your pocket. A web browser is a TCP client — the same role sketchWiFi just played. Point one at your board, watch the two talk, then teach the board to answer on its own. It fits inside today&#x27;s 30 minutes, and it closes the course.
 </p>
             </div>
             <div class="two-col">
-              <article class="mini-card"><h3>Let the board dial out <button class="define" data-topic="tcp">Define</button></h3><p>Open <code>Sketch_24.1_WiFiClient.ino</code>, put your computer&#x27;s address in <code>REMOTE_IP</code>, and run sketchWiFi in <strong>TCP SERVER</strong> mode on port 8888. The board dials in and introduces itself — &quot;Hello&quot;, then &quot;This is my IP.&quot;</p></article>
-              <article class="mini-card"><h3>Teach it a word</h3><p>Back in the server sketch, check each incoming line and have the board <code>client.print(&quot;aye\n&quot;)</code> whenever the line contains &quot;ahoy&quot;. A two-word protocol, and it&#x27;s yours.</p></article>
+              <article class="mini-card"><h3>Let your phone dial in <button class="define" data-topic="tcp">Define</button></h3><p>On your phone, joined to the same Wi-Fi, open a browser and go to <code>http://</code> followed by the board&#x27;s printed IP address. The browser dials port 80 — exactly what sketchWiFi did — and the request it sends lands in Serial Monitor as a line beginning <code>GET /</code>. Your phone just spoke to your board the way it speaks to any website.</p></article>
+              <article class="mini-card"><h3>Make it answer back</h3><p>With the browser still waiting, type a line into Serial Monitor&#x27;s send box and press Enter — it travels back down the same connection to your phone. Then, in the sketch, check each incoming line and have the board <code>client.print(&quot;aye\n&quot;)</code> whenever the line contains &quot;ahoy&quot;. A two-word protocol that answers on its own, and it&#x27;s yours.</p></article>
             </div>
           </div>
         </section>
