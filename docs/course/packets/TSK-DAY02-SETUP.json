@@ -35,7 +35,7 @@
   "steps": [
     "Download and install Arduino IDE 2 (https://www.arduino.cc/en/software/), then open it.",
     "Open Arduino IDE's settings. On macOS choose Arduino IDE → Settings… or press ⌘,. On Windows or Linux choose File → Preferences.",
-    "Scroll to Additional boards manager URLs near the bottom. Click the small button at the right of that field, paste https://espressif.github.io/arduino-esp32/package_esp32_index.json on its own line, then click OK twice. This address tells Arduino IDE where Espressif publishes ESP32 support.",
+    "Scroll to Additional boards manager URLs near the bottom. Click directly in the long text field and paste https://espressif.github.io/arduino-esp32/package_esp32_index.json. Ignore the small button beside it; that is for managing multiple URLs. Click OK once.",
     "Open Tools → Board → Boards Manager… (or click the board-shaped icon in the left sidebar). Search for esp32, find esp32 by Espressif Systems, click Install, and wait until the IDE says the platform is installed. Espressif's install guide (https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html) describes the same package.",
     "Plug the board directly into the computer with a data-capable USB-C cable. A charge-only cable can light the board up but cannot create a connection in Arduino IDE.",
     "Identify the board's port instead of guessing. Open the board selector at the top of Arduino IDE and note the list. Unplug the ESP32-S3, wait a few seconds, then plug it back in. The item that disappears and returns is the board's port; on macOS its name usually contains usbserial or usbmodem. Ignore Bluetooth, headphones, and debug-console entries.",
