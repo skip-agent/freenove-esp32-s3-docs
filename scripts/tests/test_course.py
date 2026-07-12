@@ -31,6 +31,20 @@ COURSE = lesson_schema.load_course()
 ORDER = course_build.course_day_order(COURSE)
 
 
+class CourseCssTests(unittest.TestCase):
+    def setUp(self):
+        root = SCRIPTS.parent
+        self.source = (root / "course-assets" / "course.css").read_text()
+        self.generated = (root / "docs" / "course" / "course.css").read_text()
+
+    def test_generated_course_css_matches_source(self):
+        self.assertEqual(self.generated, self.source)
+
+    def test_narrow_layout_can_shrink_below_long_inline_code(self):
+        self.assertIn(".layout { grid-template-columns: minmax(0, 1fr); }", self.source)
+        self.assertIn("overflow-wrap: anywhere;", self.source)
+
+
 class ValidationTests(unittest.TestCase):
     def test_day26_is_valid(self):
         errors = lesson_schema.validate_lesson(load_day26(), GLOSSARY_KEYS)

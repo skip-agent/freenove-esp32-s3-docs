@@ -436,6 +436,7 @@ h1, h2, h3, h4 {
    Sections / cards
    =========================================================================== */
 .card {
+  min-width: 0;
   border: 1px solid var(--line);
   border-radius: var(--r-xl);
   background: var(--paper);
@@ -519,6 +520,7 @@ h1, h2, h3, h4 {
   border-radius: 5px;
   background: var(--depth-wash);
   color: var(--depth-deep);
+  overflow-wrap: anywhere;
 }
 
 /* ===========================================================================
@@ -1250,7 +1252,7 @@ dialog.lightbox.image .lb-close {
    Responsive
    =========================================================================== */
 @media (max-width: 1040px) {
-  .layout { grid-template-columns: 1fr; }
+  .layout { grid-template-columns: minmax(0, 1fr); }
   .rail { position: static; }
   .rail-nav { grid-template-columns: repeat(2, 1fr); display: grid; gap: 2px; }
 }
