@@ -1,0 +1,62 @@
+{
+  ".codex/hooks.json": {
+    "mtime": 1783819443.5784698,
+    "ast_hash": "c9ca6d7ee11b5d1733dae088ccfe58de",
+    "semantic_hash": "c9ca6d7ee11b5d1733dae088ccfe58de"
+  },
+  ".codex/skills/tinyskiff-coach/scripts/tinyskiff_memory.py": {
+    "mtime": 1783819362.0980217,
+    "ast_hash": "d03279f8bba09a183b095b140e1a06b1",
+    "semantic_hash": "d03279f8bba09a183b095b140e1a06b1"
+  },
+  "course-assets/course.js": {
+    "mtime": 1783819339.6024525,
+    "ast_hash": "54d0223e836e24bb6b978edd5ff0fe77",
+    "semantic_hash": "54d0223e836e24bb6b978edd5ff0fe77"
+  },
+  "scripts/build_site.py": {
+    "mtime": 1783819339.633335,
+    "ast_hash": "1222159f9143e3e085f2e62a643c60da",
+    "semantic_hash": "1222159f9143e3e085f2e62a643c60da"
+  },
+  "scripts/course_build.py": {
+    "mtime": 1783819362.103042,
+    "ast_hash": "676c741ad05b5e3f121b9249b54a902e",
+    "semantic_hash": "676c741ad05b5e3f121b9249b54a902e"
+  },
+  "scripts/lesson_schema.py": {
+    "mtime": 1783819339.6335099,
+    "ast_hash": "359275d4f0a1ba67aaa6683b049b2c67",
+    "semantic_hash": "359275d4f0a1ba67aaa6683b049b2c67"
+  },
+  "scripts/tests/test_course.py": {
+    "mtime": 1783819362.103181,
+    "ast_hash": "dba230618425adb369df5b1a852bbb1b",
+    "semantic_hash": "dba230618425adb369df5b1a852bbb1b"
+  },
+  "scripts/tests/test_landing.py": {
+    "mtime": 1783819339.6336663,
+    "ast_hash": "94df295d8ecb0f882b18acb6a9919b1f",
+    "semantic_hash": "94df295d8ecb0f882b18acb6a9919b1f"
+  },
+  "scripts/validate_site.py": {
+    "mtime": 1783819339.6337094,
+    "ast_hash": "a3d5df77632c55e8d0b1af68b9b52748",
+    "semantic_hash": "a3d5df77632c55e8d0b1af68b9b52748"
+  },
+  "site-assets/app.js": {
+    "mtime": 1783819339.6337967,
+    "ast_hash": "5f242d70e3009bb8b4ab4dafe8defc3e",
+    "semantic_hash": "5f242d70e3009bb8b4ab4dafe8defc3e"
+  },
+  "source-manifest/course-assets.json": {
+    "mtime": 1783819339.6339304,
+    "ast_hash": "8256690ca9f4492e482cb0bc42b05399",
+    "semantic_hash": "8256690ca9f4492e482cb0bc42b05399"
+  },
+  "source-manifest/freenove-source.json": {
+    "mtime": 1783819339.6339822,
+    "ast_hash": "8e258ba660538d7f33d93b94e92f1a5e",
+    "semantic_hash": "8e258ba660538d7f33d93b94e92f1a5e"
+  }
+}
