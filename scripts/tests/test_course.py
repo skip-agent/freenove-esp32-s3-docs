@@ -314,6 +314,17 @@ class InlineRenderTests(unittest.TestCase):
     def test_escaping(self):
         self.assertIn("&lt;script&gt;", course_build.inline("<script>"))
 
+    def test_link_renders_as_compact_anchor(self):
+        out = course_build.inline("Install the [CH343 driver](https://example.com/driver).")
+        self.assertIn('href="https://example.com/driver"', out)
+        self.assertIn('target="_blank"', out)
+        self.assertIn(">CH343 driver</a>", out)
+        self.assertNotIn("](", out)
+
+    def test_plain_text_link_keeps_destination(self):
+        out = course_build.plain_text("Install the [CH343 driver](https://example.com/driver).")
+        self.assertEqual(out, "Install the CH343 driver (https://example.com/driver).")
+
     def test_plain_text_strips_markup(self):
         out = course_build.plain_text("Set baud to `115200`. {serial}")
         self.assertNotIn("`", out)

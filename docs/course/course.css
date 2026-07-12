@@ -977,7 +977,13 @@ h1, h2, h3, h4 {
 /* ===========================================================================
    Test + debug
    =========================================================================== */
-.test-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+.test-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+.test-grid > div { min-width: 0; }
 .readout-title, .checks-title {
   display: block;
   margin-bottom: 10px;
@@ -1072,6 +1078,7 @@ h1, h2, h3, h4 {
   font-size: 0.92rem;
 }
 .checklist li strong { color: var(--ink); }
+.checklist .resource-link { white-space: nowrap; }
 
 /* ===========================================================================
    Challenge + logbook

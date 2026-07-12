@@ -74,24 +74,52 @@ def _chip(block: dict) -> str:
     return f" {_define_chip(key)}" if key else ""
 
 
-def inline(text: object) -> str:
-    """Render a short Markdown string to inline HTML.
+LINK_RE = re.compile(r"\[([^\]]+)\]\((https?://(?:[^()\s]|\([^()\s]*\))+)\)")
+_LINK_SLOT_RE = re.compile("\x00(\\d+)\x00")
 
-    Supports `code`, **strong**, *emphasis*, and {glossary-key} define chips.
-    """
-    out = esc(text)
-    out = re.sub(r"`([^`]+)`", lambda m: f"<code>{m.group(1)}</code>", out)
+
+def _format_spans(text: str) -> str:
+    """Render inline formatting after links have been safely stashed."""
+    out = re.sub(r"`([^`]+)`", lambda m: f"<code>{m.group(1)}</code>", text)
     out = re.sub(r"\*\*([^*]+)\*\*", lambda m: f"<strong>{m.group(1)}</strong>", out)
     out = re.sub(r"\*([^*]+)\*", lambda m: f"<em>{m.group(1)}</em>", out)
     out = INLINE_TOPIC_RE.sub(lambda m: _define_chip(m.group(1)), out)
     return out
 
 
+def _strip_spans(text: str) -> str:
+    out = INLINE_TOPIC_RE.sub("", text)
+    return out.replace("`", "").replace("**", "").replace("*", "")
+
+
+def inline(text: object) -> str:
+    """Render links, code, emphasis, and glossary chips as safe inline HTML."""
+    out = esc(text)
+    stash: list[str] = []
+
+    def _stash(m: re.Match) -> str:
+        label = _format_spans(m.group(1))
+        stash.append(f'<a class="resource-link" href="{m.group(2)}" '
+                     f'target="_blank" rel="noopener noreferrer">{label}</a>')
+        return f"\x00{len(stash) - 1}\x00"
+
+    out = LINK_RE.sub(_stash, out)
+    out = _format_spans(out)
+    return _LINK_SLOT_RE.sub(lambda m: stash[int(m.group(1))], out)
+
+
 def plain_text(text: object) -> str:
-    """Strip lesson markup to plain prose for the agent packet."""
+    """Strip lesson markup while preserving link destinations in packets."""
     out = str(text if text is not None else "")
-    out = INLINE_TOPIC_RE.sub("", out)  # drop {glossary-key} define chips
-    out = out.replace("`", "").replace("**", "").replace("*", "")
+    stash: list[str] = []
+
+    def _stash(m: re.Match) -> str:
+        stash.append(f"{_strip_spans(m.group(1)).strip()} ({m.group(2)})")
+        return f"\x00{len(stash) - 1}\x00"
+
+    out = LINK_RE.sub(_stash, out)
+    out = _strip_spans(out)
+    out = _LINK_SLOT_RE.sub(lambda m: stash[int(m.group(1))], out)
     return re.sub(r"\s{2,}", " ", out).strip()
 
 
