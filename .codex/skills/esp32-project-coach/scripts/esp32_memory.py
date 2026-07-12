@@ -35,6 +35,26 @@ SOURCE_QUERY = (
     "blockers or uncertainty. Exclude transient chat and unrelated material."
 )
 
+_LOCAL_HINDSIGHT: bool | None = None
+
+
+def _use_local() -> bool:
+    """True when Hindsight answers on localhost (i.e. we are on the mini itself).
+
+    Probed once and cached. Off the mini (e.g. Galen's laptop) this is False and
+    requests tunnel over `ssh mac-mini`, so the helper works from any machine that
+    has the `mac-mini` SSH alias.
+    """
+    global _LOCAL_HINDSIGHT
+    if _LOCAL_HINDSIGHT is None:
+        probe = subprocess.run(
+            ["curl", "-fsS", "-m", "2", "-o", "/dev/null", f"{BASE}/health"],
+            capture_output=True,
+            text=True,
+        )
+        _LOCAL_HINDSIGHT = probe.returncode == 0
+    return _LOCAL_HINDSIGHT
+
 
 def _request(method: str, path: str, payload: dict | None = None, *, check: bool = True):
     url = f"{BASE}{path}"
@@ -43,8 +63,9 @@ def _request(method: str, path: str, payload: dict | None = None, *, check: bool
     if payload is not None:
         command += " -H 'Content-Type: application/json' --data-binary @-"
         stdin = json.dumps(payload)
+    argv = ["sh", "-c", command] if _use_local() else ["ssh", HOST, command]
     proc = subprocess.run(
-        ["ssh", HOST, command], input=stdin, text=True, capture_output=True
+        argv, input=stdin, text=True, capture_output=True
     )
     if check and proc.returncode:
         raise RuntimeError(proc.stderr.strip() or f"request failed: {method} {path}")

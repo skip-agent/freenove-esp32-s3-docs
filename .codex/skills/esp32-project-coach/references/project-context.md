@@ -2,7 +2,8 @@
 
 - Project/course: ESP32-S3 Lab, based on the Freenove Super Starter Kit for ESP32-S3.
 - Live site: `https://esp32.tinyskiff.xyz` on Cloudflare Pages. TinySkiff is part of the domain name only; it is not the project name.
-- Authoritative Mac mini checkout: `/Users/agent/Projects/freenove-esp32-s3-docs`, reachable as `ssh mac-mini` (user `agent`).
+- Authoritative Mac mini checkout: `/Users/agent/Projects/freenove-esp32-s3-docs`, reachable as `ssh mac-mini` (user `agent`). Hindsight and Graphify semantic refresh run on the mini.
+- Local laptop checkout (Galen's Mac, user `galenhumber`): `/Users/galenhumber/Dev/freenove-esp32-s3-docs`. The ESP32 board is physically plugged into this laptop, so hands-on hardware coaching happens locally; build/publish and semantic refresh still run on the mini. The `esp32_memory.py` helper reaches Hindsight from either machine automatically (localhost on the mini, `ssh mac-mini` from the laptop).
 - GitHub: `https://github.com/skip-agent/freenove-esp32-s3-docs`.
 - Lesson source of truth: `lessons/day-NN-slug.yml`.
 - Generated lesson: `docs/course/day-NN-slug/index.html`.
