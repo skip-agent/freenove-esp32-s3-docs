@@ -1,7 +1,7 @@
 {
   "schema": "tinyskiff.lessonPacket.v0",
   "lessonCode": "TSK-DAY08-METEOR",
-  "course": "TinySkiff ESP32-S3 Lab",
+  "course": "ESP32-S3 Lab",
   "day": 8,
   "title": "Send a comet down the bar",
   "status": "published",

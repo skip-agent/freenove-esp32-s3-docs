@@ -1,7 +1,7 @@
 {
   "schema": "tinyskiff.lessonPacket.v0",
   "lessonCode": "TSK-DAY21-SEVENSEG",
-  "course": "TinySkiff ESP32-S3 Lab",
+  "course": "ESP32-S3 Lab",
   "day": 21,
   "title": "Seven-segment display: show one clear digit",
   "status": "published",

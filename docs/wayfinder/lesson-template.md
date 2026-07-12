@@ -1,7 +1,7 @@
 # Lesson voice and repeatable day template
 
 Resolved for: [Define the lesson voice and repeatable day template](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/3)  
-Map: [Wayfinder Map: TinySkiff ESP32-S3 guided 30-day tutorial spec](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/1)
+Map: [Wayfinder Map: ESP32-S3 guided 30-day tutorial spec](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/1)
 
 ## Executive answer
 

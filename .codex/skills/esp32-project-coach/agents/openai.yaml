@@ -1,0 +1,4 @@
+interface:
+  display_name: "ESP32 Project Coach"
+  short_description: "Coach learners and improve lessons continuously"
+  default_prompt: "Use $esp32-project-coach to guide me through my current ESP32-S3 lesson."

@@ -1,7 +1,7 @@
 {
   "schema": "tinyskiff.lessonPacket.v0",
   "lessonCode": "TSK-DAY22-MOTOR",
-  "course": "TinySkiff ESP32-S3 Lab",
+  "course": "ESP32-S3 Lab",
   "day": 22,
   "title": "Motor driver: control motion safely",
   "status": "published",

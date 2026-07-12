@@ -1,7 +1,7 @@
-# TinySkiff project context
+# ESP32-S3 learning project context
 
-- Course: TinySkiff ESP32-S3 Lab, based on the Freenove Super Starter Kit for ESP32-S3.
-- Live site: `https://esp32.tinyskiff.xyz` on Cloudflare Pages.
+- Project/course: ESP32-S3 Lab, based on the Freenove Super Starter Kit for ESP32-S3.
+- Live site: `https://esp32.tinyskiff.xyz` on Cloudflare Pages. TinySkiff is part of the domain name only; it is not the project name.
 - Authoritative Mac mini checkout: `/Users/agent/Projects/freenove-esp32-s3-docs`, reachable as `ssh mac-mini` (user `agent`).
 - GitHub: `https://github.com/skip-agent/freenove-esp32-s3-docs`.
 - Lesson source of truth: `lessons/day-NN-slug.yml`.
@@ -12,6 +12,7 @@
 - Validate: `.venv/bin/python scripts/validate_site.py`.
 - Tests: `.venv/bin/python -m unittest discover -s scripts/tests`.
 - Pushes to `main` that change `docs/**` deploy through `.github/workflows/deploy.yml`.
+- `TSK-...` lesson codes and `tinyskiff.*` schema/storage keys are retained as legacy compatibility identifiers, not as the project name.
 
 ## Known coaching evidence
 

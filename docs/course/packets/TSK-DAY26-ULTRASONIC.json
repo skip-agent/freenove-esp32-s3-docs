@@ -1,7 +1,7 @@
 {
   "schema": "tinyskiff.lessonPacket.v0",
   "lessonCode": "TSK-DAY26-ULTRASONIC",
-  "course": "TinySkiff ESP32-S3 Lab",
+  "course": "ESP32-S3 Lab",
   "day": 26,
   "title": "Measure the room with sound",
   "status": "published",

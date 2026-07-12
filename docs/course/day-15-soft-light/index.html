@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Day 15 · Soft light: map input to brightness — TinySkiff ESP32-S3 Lab</title>
+  <title>Day 15 · Soft light: map input to brightness — ESP32-S3 Lab</title>
   <meta name="description" content="Wire a potentiometer and an LED to the ESP32-S3, upload the sketch, and turn the knob to set the LED&#x27;s brightness. The knob is a voltage divider, the ADC reads its midpoint, and PWM turns that number into light — one analog control loop from hand to glow." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,7 +14,7 @@
   <div class="lesson-shell">
     <header class="hero">
       <div class="hero-copy">
-        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 15 of 30</p>
+        <p class="eyebrow">ESP32-S3 Lab · Day 15 of 30</p>
         <h1>Turn the knob<br />and shade the <em>light</em></h1>
         <p class="lede">Today your hand takes the helm. You wire Day 13&#x27;s knob to one pin and Day 7&#x27;s LED to another, then upload a sketch that reads the knob and sets the brightness to match. Underneath the knob is a voltage divider — the pattern almost every analog sensor in the kit uses to reach the board — and today you watch it drive a light in real time.
 </p>
@@ -29,7 +29,7 @@
             <span class="label">Agent assist code</span>
             <code>TSK-DAY15-SOFTLIGHT</code>
           </div>
-          <button class="copy-prompt" type="button" data-copy="Use $tinyskiff-coach for TinySkiff lesson TSK-DAY15-SOFTLIGHT. Pull the lesson packet, then guide me one step at a time. Keep helping me interactively while a background sub-agent compares my questions with the lesson webpage and improves the lesson for the next learner. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <button class="copy-prompt" type="button" data-copy="Use $esp32-project-coach for ESP32-S3 lesson TSK-DAY15-SOFTLIGHT. Pull the lesson packet, then guide me one step at a time. Keep helping me interactively while a background sub-agent compares my questions with the lesson webpage and improves the lesson for the next learner. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
           <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY15-SOFTLIGHT.json">lesson packet</a> and coach you step by step.</p>
         </div>
       </div>
@@ -332,9 +332,9 @@ pwm.<span class="tok-fn">duty</span>(pwmValue)</code></pre>
       </main>
     </div>
     <footer class="colophon">
-      <p><strong>Day 15 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <p><strong>Day 15 of 30 · ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
       <div class="rule"></div>
-      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — the circuit diagram from C_Tutorial.pdf, Chapter 10, page 110; sketch <code>Sketch_10.1_SoftLight.ino</code>; MicroPython <code>09.1_Soft_LED/Soft_LED.py</code>. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — the circuit diagram from C_Tutorial.pdf, Chapter 10, page 110; sketch <code>Sketch_10.1_SoftLight.ino</code>; MicroPython <code>09.1_Soft_LED/Soft_LED.py</code>. Released under CC BY-NC-SA 3.0. This site is not affiliated with or endorsed by Freenove.</p>
     </footer>
   </div>
 

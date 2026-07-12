@@ -1,7 +1,7 @@
 {
   "schema": "tinyskiff.lessonPacket.v0",
   "lessonCode": "TSK-DAY16-SOFTCOLOUR",
-  "course": "TinySkiff ESP32-S3 Lab",
+  "course": "ESP32-S3 Lab",
   "day": 16,
   "title": "Soft colourful light: map input to colour",
   "status": "published",

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Day 19 · Joystick: read two axes and a button — TinySkiff ESP32-S3 Lab</title>
+  <title>Day 19 · Joystick: read two axes and a button — ESP32-S3 Lab</title>
   <meta name="description" content="Wire a joystick module to the ESP32-S3, read its X and Y axes with analogRead and its push button with digitalRead, and watch all three values stream in Serial Monitor." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,7 +14,7 @@
   <div class="lesson-shell">
     <header class="hero">
       <div class="hero-copy">
-        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 19 of 30</p>
+        <p class="eyebrow">ESP32-S3 Lab · Day 19 of 30</p>
         <h1>Read two axes<br />and one <em>button</em></h1>
         <p class="lede">Today you wire the control that steers every gamepad, and take it apart in your head first. Under the stick sit two potentiometers at right angles and a push button beneath them, so the same analogRead from the potentiometer day runs twice, once per axis, and the same digitalRead catches the press. Two numbers together name a point on a plane; the third is a plain button. Watch your hand become a coordinate on screen.
 </p>
@@ -29,7 +29,7 @@
             <span class="label">Agent assist code</span>
             <code>TSK-DAY19-JOYSTICK</code>
           </div>
-          <button class="copy-prompt" type="button" data-copy="Use $tinyskiff-coach for TinySkiff lesson TSK-DAY19-JOYSTICK. Pull the lesson packet, then guide me one step at a time. Keep helping me interactively while a background sub-agent compares my questions with the lesson webpage and improves the lesson for the next learner. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <button class="copy-prompt" type="button" data-copy="Use $esp32-project-coach for ESP32-S3 lesson TSK-DAY19-JOYSTICK. Pull the lesson packet, then guide me one step at a time. Keep helping me interactively while a background sub-agent compares my questions with the lesson webpage and improves the lesson for the next learner. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
           <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY19-JOYSTICK.json">lesson packet</a> and coach you step by step.</p>
         </div>
       </div>
@@ -329,9 +329,9 @@ xVal.<span class="tok-fn">width</span>(ADC.WIDTH_12BIT)
       </main>
     </div>
     <footer class="colophon">
-      <p><strong>Day 19 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <p><strong>Day 19 of 30 · ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
       <div class="rule"></div>
-      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — the circuit diagram from C_Tutorial.pdf, Chapter 13, page 128; sketch <code>Sketch_13.1_Joystick.ino</code>; MicroPython <code>12.1_Joystick/Joystick.py</code>. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — the circuit diagram from C_Tutorial.pdf, Chapter 13, page 128; sketch <code>Sketch_13.1_Joystick.ino</code>; MicroPython <code>12.1_Joystick/Joystick.py</code>. Released under CC BY-NC-SA 3.0. This site is not affiliated with or endorsed by Freenove.</p>
     </footer>
   </div>
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Day 20 · Shift register: many outputs, fewer pins — TinySkiff ESP32-S3 Lab</title>
+  <title>Day 20 · Shift register: many outputs, fewer pins — ESP32-S3 Lab</title>
   <meta name="description" content="Drive an LED bar graph through a 74HC595 shift register on the ESP32-S3. Three GPIOs carry a byte to eight outputs, and a lit LED flows along the bar and back." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,7 +14,7 @@
   <div class="lesson-shell">
     <header class="hero">
       <div class="hero-copy">
-        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 20 of 30</p>
+        <p class="eyebrow">ESP32-S3 Lab · Day 20 of 30</p>
         <h1>Eight lights<br />from three <em>wires</em></h1>
         <p class="lede">Today a chip joins the crew, and it changes the deal you&#x27;ve been working with. On Day 6 every light cost a pin — ten lights, ten wires. The 74HC595 lets you pay in time instead: you send it the eight bits one after another down a single data wire, tick them in with a clock, then flip them all on together with a latch. Three pins, eight lights — and the flowing pattern turns out to be one bit sliding along a row.
 </p>
@@ -29,7 +29,7 @@
             <span class="label">Agent assist code</span>
             <code>TSK-DAY20-SHIFTREG</code>
           </div>
-          <button class="copy-prompt" type="button" data-copy="Use $tinyskiff-coach for TinySkiff lesson TSK-DAY20-SHIFTREG. Pull the lesson packet, then guide me one step at a time. Keep helping me interactively while a background sub-agent compares my questions with the lesson webpage and improves the lesson for the next learner. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <button class="copy-prompt" type="button" data-copy="Use $esp32-project-coach for ESP32-S3 lesson TSK-DAY20-SHIFTREG. Pull the lesson packet, then guide me one step at a time. Keep helping me interactively while a background sub-agent compares my questions with the lesson webpage and improves the lesson for the next learner. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
           <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY20-SHIFTREG.json">lesson packet</a> and coach you step by step.</p>
         </div>
       </div>
@@ -368,9 +368,9 @@ while True:
       </main>
     </div>
     <footer class="colophon">
-      <p><strong>Day 20 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <p><strong>Day 20 of 30 · ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
       <div class="rule"></div>
-      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — the circuit diagram from C_Tutorial.pdf, Chapter 14, page 133; sketch <code>Sketch_14.1_FlowingLight02.ino</code>; MicroPython <code>13.1_Flowing_Water_Light/Flowing_Water_Light.py</code>. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — the circuit diagram from C_Tutorial.pdf, Chapter 14, page 133; sketch <code>Sketch_14.1_FlowingLight02.ino</code>; MicroPython <code>13.1_Flowing_Water_Light/Flowing_Water_Light.py</code>. Released under CC BY-NC-SA 3.0. This site is not affiliated with or endorsed by Freenove.</p>
     </footer>
   </div>
 

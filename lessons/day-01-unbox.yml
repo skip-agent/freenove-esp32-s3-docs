@@ -22,7 +22,7 @@ mission: >
   every later day make sense.
 unlocks: You know what a microcontroller is, can name every important part of the board on sight, understand what a GPIO pin is, and know the 3.3V rule that protects your kit.
 seoDescription: >
-  Day 1 of the TinySkiff ESP32-S3 course: what a microcontroller actually is, a
+  Day 1 of the ESP32-S3 course: what a microcontroller actually is, a
   guided tour of the board's parts, what GPIO pins are, and the 3.3V logic rule
   that keeps beginners out of trouble.
 

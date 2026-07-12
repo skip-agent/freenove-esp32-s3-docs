@@ -1,7 +1,7 @@
 # Site content model and navigation
 
 Resolved for: [Specify the site content model and navigation](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/6)
-Map: [Wayfinder Map: TinySkiff ESP32-S3 guided 30-day tutorial spec](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/1)
+Map: [Wayfinder Map: ESP32-S3 guided 30-day tutorial spec](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/1)
 
 Builds on: [lesson voice + day template](lesson-template.md) (#3), [30-day curriculum spine](curriculum-spine.md) (#4), and the approved [Day 26 guided-day prototype](guided-day-prototype-day-26-ultrasonic.md) (#5), now generated at [`/course/day-26-ultrasonic/`](../course/day-26-ultrasonic/index.html).
 

@@ -1,7 +1,7 @@
 # 30-day curriculum spine
 
 Resolved for: [Choose the 30-day curriculum spine](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/4)  
-Map: [Wayfinder Map: TinySkiff ESP32-S3 guided 30-day tutorial spec](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/1)
+Map: [Wayfinder Map: ESP32-S3 guided 30-day tutorial spec](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/1)
 
 ## Executive answer
 

@@ -1,5 +1,5 @@
 /* ===========================================================================
-   TinySkiff ESP32-S3 Lab · course behaviour (shared)
+   ESP32-S3 Lab · course behaviour (shared)
    Productised from the Day 26 prototype and made data-driven. The page injects
    its data as JSON:
      - a lesson page has  <script id="lesson-data">  (explainers, day, prev/next)

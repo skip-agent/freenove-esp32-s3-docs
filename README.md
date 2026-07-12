@@ -1,4 +1,4 @@
-# TinySkiff ESP32-S3 Lab
+# ESP32-S3 Lab
 
 A cleaner front door to the **Freenove Super Starter Kit for ESP32-S3**, served
 as one static site with two surfaces:

@@ -1,7 +1,7 @@
-# Source inventory for TinySkiff ESP32-S3 guided tutorial
+# Source inventory for ESP32-S3 guided tutorial
 
 Resolved for: [Inventory source docs, examples, and reusable images](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/2)  
-Map: [Wayfinder Map: TinySkiff ESP32-S3 guided 30-day tutorial spec](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/1)
+Map: [Wayfinder Map: ESP32-S3 guided 30-day tutorial spec](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/1)
 
 ## Executive answer
 

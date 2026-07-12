@@ -1,6 +1,6 @@
 {
   "_comment": "Provenance for every image used by the guided course. Kit-item photos are reusable across days (course-assets/assets/shared/); per-day diagrams are extracted from the official Freenove PDFs (course-assets/assets/day-NN/). Every entry records where it came from so attribution stays honest (CC BY-NC-SA 3.0). See docs/wayfinder/asset-workflow.md.",
-  "license": "CC BY-NC-SA 3.0 (Freenove); TinySkiff not affiliated.",
+  "license": "CC BY-NC-SA 3.0 (Freenove); this site is not affiliated.",
   "sourceArchive": "freenove-source.json",
   "shared": [
     {

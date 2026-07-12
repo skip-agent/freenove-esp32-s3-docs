@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Day 28 · Switch an LED from your phone — TinySkiff ESP32-S3 Lab</title>
+  <title>Day 28 · Switch an LED from your phone — ESP32-S3 Lab</title>
   <meta name="description" content="Control an LED on the ESP32-S3 from your phone over Bluetooth. Wire one LED, upload the sketch, and send led_on and led_off from LightBlue to switch the light wirelessly." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,7 +14,7 @@
   <div class="lesson-shell">
     <header class="hero">
       <div class="hero-copy">
-        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 28 of 30</p>
+        <p class="eyebrow">ESP32-S3 Lab · Day 28 of 30</p>
         <h1>Switch the light<br />from your <em>phone</em></h1>
         <p class="lede">Today your words start moving hardware. You wire a single LED and upload a sketch that waits over Bluetooth for two exact commands — write led_on and it lights, led_off and it goes dark. Underneath, each word lands in a mailbox on the board, trips a callback, and drives the pin, so the board acts the instant your message arrives. Yesterday&#x27;s pipe now carries orders.
 </p>
@@ -29,7 +29,7 @@
             <span class="label">Agent assist code</span>
             <code>TSK-DAY28-BTLED</code>
           </div>
-          <button class="copy-prompt" type="button" data-copy="Use $tinyskiff-coach for TinySkiff lesson TSK-DAY28-BTLED. Pull the lesson packet, then guide me one step at a time. Keep helping me interactively while a background sub-agent compares my questions with the lesson webpage and improves the lesson for the next learner. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <button class="copy-prompt" type="button" data-copy="Use $esp32-project-coach for ESP32-S3 lesson TSK-DAY28-BTLED. Pull the lesson packet, then guide me one step at a time. Keep helping me interactively while a background sub-agent compares my questions with the lesson webpage and improves the lesson for the next learner. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
           <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY28-BTLED.json">lesson packet</a> and coach you step by step.</p>
         </div>
       </div>
@@ -330,9 +330,9 @@ def <span class="tok-fn">on_rx</span>(rx_data):
       </main>
     </div>
     <footer class="colophon">
-      <p><strong>Day 28 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <p><strong>Day 28 of 30 · ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
       <div class="rule"></div>
-      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — the circuit diagram from C_Tutorial.pdf, Chapter 20, page 193; sketch <code>Sketch_20.2_BluetoothToLed.ino</code>; MicroPython <code>19.2_BLE_LED/BLE_LED.py</code>. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — the circuit diagram from C_Tutorial.pdf, Chapter 20, page 193; sketch <code>Sketch_20.2_BluetoothToLed.ino</code>; MicroPython <code>19.2_BLE_LED/BLE_LED.py</code>. Released under CC BY-NC-SA 3.0. This site is not affiliated with or endorsed by Freenove.</p>
     </footer>
   </div>
 

@@ -1,4 +1,0 @@
-interface:
-  display_name: "TinySkiff Coach"
-  short_description: "Coach learners and improve lessons continuously"
-  default_prompt: "Use $tinyskiff-coach to guide me through my current TinySkiff lesson."

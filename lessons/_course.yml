@@ -8,7 +8,7 @@
 # Derived from the resolved curriculum spine (issue #4).
 
 schema: tinyskiff.course.v1
-course: TinySkiff ESP32-S3 Lab
+course: ESP32-S3 Lab
 totalDays: 30
 
 arcs:

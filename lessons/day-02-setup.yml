@@ -20,7 +20,7 @@ mission: >
   later day you can reason about where in that chain it broke instead of guessing.
 unlocks: Your computer and board can talk, and you understand every stage of an upload — so troubleshooting becomes a diagnosis, not a shrug.
 seoDescription: >
-  Day 2 of the TinySkiff ESP32-S3 course: install the Arduino IDE and ESP32 board
+  Day 2 of the ESP32-S3 course: install the Arduino IDE and ESP32 board
   package, understand what uploading really does (compile, bootloader, flash,
   run), and confirm the board appears as a serial port.
 

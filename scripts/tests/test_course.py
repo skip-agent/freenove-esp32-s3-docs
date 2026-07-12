@@ -442,7 +442,7 @@ class RenderLessonTests(unittest.TestCase):
         self.assertIn("../packets/TSK-DAY26-ULTRASONIC.json", self.html)
 
     def test_coaching_prompt_invokes_self_improving_skill(self):
-        self.assertIn("Use $tinyskiff-coach for TinySkiff lesson TSK-DAY26-ULTRASONIC", self.html)
+        self.assertIn("Use $esp32-project-coach for ESP32-S3 lesson TSK-DAY26-ULTRASONIC", self.html)
         self.assertIn("Keep helping me interactively while a background sub-agent", self.html)
         self.assertIn("improves the lesson for the next learner", self.html)
 

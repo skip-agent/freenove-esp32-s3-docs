@@ -29,7 +29,7 @@ from lesson_schema import (
 )
 
 COURSE_ASSETS = ROOT / "course-assets"
-COURSE_TITLE = "TinySkiff ESP32-S3 Lab"
+COURSE_TITLE = "ESP32-S3 Lab"
 SOURCE_PREFIX = "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main"
 
 # Section scaffolding shared by every day (the consistent workshop voice). A
@@ -222,7 +222,7 @@ def _hero(lesson: dict, day: int, total: int) -> str:
     instrument = esc(hero.get("instrument", "sounder"))
     code = esc(lesson["lessonCode"])
     prompt = (
-        f"Use $tinyskiff-coach for TinySkiff lesson {lesson['lessonCode']}. "
+        f"Use $esp32-project-coach for ESP32-S3 lesson {lesson['lessonCode']}. "
         "Pull the lesson packet, then guide me one step at a time. Keep helping "
         "me interactively while a background sub-agent compares my questions "
         "with the lesson webpage and improves the lesson for the next learner. "
@@ -566,7 +566,7 @@ def _colophon(lesson: dict, day: int, total: int) -> str:
     return f"""    <footer class="colophon">
       <p><strong>Day {day} of {total} · {esc(COURSE_TITLE)}.</strong> <a href="../">Back to the course map</a>.</p>
       <div class="rule"></div>
-      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material{detail}.{license_clause} TinySkiff is not affiliated with or endorsed by Freenove.</p>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material{detail}.{license_clause} This site is not affiliated with or endorsed by Freenove.</p>
     </footer>"""
 
 

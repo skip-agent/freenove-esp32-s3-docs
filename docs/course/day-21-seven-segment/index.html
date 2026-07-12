@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Day 21 · Seven-segment display: show one clear digit — TinySkiff ESP32-S3 Lab</title>
+  <title>Day 21 · Seven-segment display: show one clear digit — ESP32-S3 Lab</title>
   <meta name="description" content="Drive a 7-segment display from the ESP32-S3 with a 74HC595 shift register. Upload the sketch and watch it count 0 through F — one byte per character, three wires from the board." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,7 +14,7 @@
   <div class="lesson-shell">
     <header class="hero">
       <div class="hero-copy">
-        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 21 of 30</p>
+        <p class="eyebrow">ESP32-S3 Lab · Day 21 of 30</p>
         <h1>Turn one byte<br />into a <em>digit</em></h1>
         <p class="lede">Today the shift register earns its keep. You wire its eight outputs to a 7-segment display and upload a sketch that sends one byte per character, and the display counts 0 through F. Each byte is an encoding: eight bits that say which of the seven bars to light. Choosing a character is choosing the right byte, and the sketch keeps a table of them so it only has to look each up — the same three wires you ran on Day 20.
 </p>
@@ -29,7 +29,7 @@
             <span class="label">Agent assist code</span>
             <code>TSK-DAY21-SEVENSEG</code>
           </div>
-          <button class="copy-prompt" type="button" data-copy="Use $tinyskiff-coach for TinySkiff lesson TSK-DAY21-SEVENSEG. Pull the lesson packet, then guide me one step at a time. Keep helping me interactively while a background sub-agent compares my questions with the lesson webpage and improves the lesson for the next learner. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <button class="copy-prompt" type="button" data-copy="Use $esp32-project-coach for ESP32-S3 lesson TSK-DAY21-SEVENSEG. Pull the lesson packet, then guide me one step at a time. Keep helping me interactively while a background sub-agent compares my questions with the lesson webpage and improves the lesson for the next learner. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
           <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY21-SEVENSEG.json">lesson packet</a> and coach you step by step.</p>
         </div>
       </div>
@@ -356,9 +356,9 @@ for count in <span class="tok-fn">range</span>(<span class="tok-num">16</span>):
       </main>
     </div>
     <footer class="colophon">
-      <p><strong>Day 21 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <p><strong>Day 21 of 30 · ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
       <div class="rule"></div>
-      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — the circuit diagram from C_Tutorial.pdf, Chapter 15, page 140; sketch <code>Sketch_15.1_1_Digit_7-Segment_Display.ino</code>; MicroPython <code>14.1_74HC595_and_7_segment_display/74HC595_and_7_segment_display.py</code>. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — the circuit diagram from C_Tutorial.pdf, Chapter 15, page 140; sketch <code>Sketch_15.1_1_Digit_7-Segment_Display.ino</code>; MicroPython <code>14.1_74HC595_and_7_segment_display/74HC595_and_7_segment_display.py</code>. Released under CC BY-NC-SA 3.0. This site is not affiliated with or endorsed by Freenove.</p>
     </footer>
   </div>
 

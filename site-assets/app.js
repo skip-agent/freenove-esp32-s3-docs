@@ -1,5 +1,5 @@
 /* ===========================================================================
-   TinySkiff ESP32-S3 Lab · landing behaviour
+   ESP32-S3 Lab · landing behaviour
    The landing is course-forward: the hero voyage instrument reflects course
    progress from localStorage (the same store the course pages write), and the
    reference Library below is a searchable browser over every official example,

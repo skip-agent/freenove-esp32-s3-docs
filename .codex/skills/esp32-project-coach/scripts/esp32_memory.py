@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Scoped TinySkiff access to Sam's Hindsight service through ssh mac-mini."""
+"""Scoped ESP32-project access to the existing Sam Hindsight bank."""
 
 from __future__ import annotations
 
@@ -15,12 +15,12 @@ from urllib.parse import quote
 
 HOST = "mac-mini"
 BASE = "http://127.0.0.1:8888"
-BANK = "sam-tinyskiff"
-STRATEGY = "tinyskiff-lessons"
-MODEL_ID = "tinyskiff-learning-journey"
+BANK = "sam-personal"
+STRATEGY = "esp32-project-lessons"
+MODEL_ID = "esp32-project-learning-journey"
 
 RETAIN_MISSION = (
-    "Extract only durable TinySkiff learning facts: concepts the learner understood, "
+    "Extract only durable ESP32-project learning facts: concepts the learner understood, "
     "verified hardware or IDE setup, lesson-specific corrections or missing steps, "
     "recurring confusion, and incidents with root cause, fix, and guardrail. Ignore "
     "greetings, transient confirmations, raw chat, full logs, secrets, credentials, "
@@ -29,8 +29,8 @@ RETAIN_MISSION = (
 )
 
 SOURCE_QUERY = (
-    "Summarize verified TinySkiff learning progress, setup, lesson corrections, recurring "
-    "confusion, and stable coaching preferences. Use the available TinySkiff observations. "
+    "Summarize verified ESP32-S3 project learning progress, setup, lesson corrections, recurring "
+    "confusion, and stable coaching preferences. Use the available ESP32-project observations. "
     "Organize by lesson ID, distinguish learner state from webpage edits, and label open "
     "blockers or uncertainty. Exclude transient chat and unrelated material."
 )
@@ -62,24 +62,17 @@ def ensure(_: argparse.Namespace) -> None:
     current = _request("GET", _bank_path("/config"))
     config = current.get("config", {})
     strategies = dict(config.get("retain_strategies") or {})
+    strategies.pop("tinyskiff-lessons", None)  # remove the incorrectly named predecessor
     strategies[STRATEGY] = {
         "retain_extraction_mode": "concise",
         "retain_chunk_size": 3000,
         "retain_mission": RETAIN_MISSION,
     }
-    _request("PATCH", _bank_path("/config"), {"updates": {
-        "reflect_mission": SOURCE_QUERY,
-        "retain_mission": RETAIN_MISSION,
-        "retain_extraction_mode": "concise",
-        "retain_chunk_size": 3000,
-        "enable_observations": True,
-        "observations_mission": (
-            "Consolidate only verified TinySkiff progress, setup, concepts, lesson "
-            "corrections, recurring confusion, and stable coaching preferences. "
-            "Never introduce unrelated project, credential, or personal material."
-        ),
-        "retain_strategies": strategies,
-    }})
+    # Add only a named strategy. Never overwrite sam-personal's global defaults,
+    # missions, model routes, or observation settings for a project integration.
+    _request("PATCH", _bank_path("/config"), {
+        "updates": {"retain_strategies": strategies}
+    })
 
     trigger = {
         "mode": "full",
@@ -96,9 +89,9 @@ def ensure(_: argparse.Namespace) -> None:
         "recall_chunks_max_tokens": 0,
     }
     payload = {
-        "name": "TinySkiff Learning Journey",
+        "name": "ESP32 Project Learning Journey",
         "source_query": SOURCE_QUERY,
-        "tags": ["tinyskiff", "learning"],
+        "tags": ["esp32-project", "learning"],
         "max_tokens": 4096,
         "trigger": trigger,
     }
@@ -124,7 +117,7 @@ def recall(args: argparse.Namespace) -> None:
         "prefer_observations": True,
         "budget": "mid",
         "max_tokens": args.max_tokens,
-        "tags": ["tinyskiff", "learning"],
+        "tags": ["esp32-project", "learning"],
         "tags_match": "all_strict",
         "trace": False,
     }
@@ -136,12 +129,14 @@ def journey(_: argparse.Namespace) -> None:
         "query": SOURCE_QUERY,
         "budget": "mid",
         "max_tokens": 4096,
-        "tags": ["tinyskiff", "learning"],
+        "types": ["world", "experience", "observation"],
+        "prefer_observations": True,
+        "tags": ["esp32-project", "learning"],
         "tags_match": "all_strict",
-        "fact_types": ["world", "experience", "observation"],
-        "exclude_mental_models": True,
+        "trace": False,
     }
-    print(json.dumps(_request("POST", _bank_path("/reflect"), payload), indent=2))
+    result = _request("POST", _bank_path("/memories/recall"), payload)
+    print(json.dumps({"mental_model_id": MODEL_ID, **result}, indent=2))
 
 
 def retain(args: argparse.Namespace) -> None:
@@ -151,22 +146,22 @@ def retain(args: argparse.Namespace) -> None:
     key = re.sub(r"[^a-z0-9-]+", "-", args.key.lower()).strip("-")
     if not key:
         raise ValueError("key must contain letters or numbers")
-    document_id = f"tinyskiff-{lesson}-{key}"
+    document_id = f"esp32-project-{lesson}-{key}"
     payload = {
         "async": False,
         "items": [{
             "content": args.summary,
             "timestamp": datetime.now().astimezone().isoformat(),
-            "context": f"TinySkiff learner-help session; verified for {lesson}",
+            "context": f"ESP32-project learner-help session; verified for {lesson}",
             "document_id": document_id,
             "metadata": {
-                "project": "TinySkiff",
+                "project": "ESP32-S3 learning project",
                 "lesson_id": lesson,
                 "source": "codex-learner-help",
                 "verification": args.verification,
             },
             "tags": [
-                "tinyskiff", "learning", f"lesson:{lesson}",
+                "esp32-project", "learning", f"lesson:{lesson}",
                 f"memory-shape:{args.shape}",
             ],
             "observation_scopes": "combined",

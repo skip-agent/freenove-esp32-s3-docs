@@ -1,9 +1,9 @@
 ---
-name: tinyskiff-coach
-description: Coach a learner through TinySkiff ESP32-S3 lessons while continuously improving the lessons from real learner questions. Use when a prompt names TinySkiff, a TSK lesson code, an ESP32-S3 course step, the TinySkiff lesson packet, or asks for help following or correcting a TinySkiff webpage.
+name: esp32-project-coach
+description: Coach a learner through this ESP32-S3 learning project's lessons while continuously improving them from real learner questions. Use when a prompt names an ESP32-S3 lesson, a legacy TSK lesson code, the ESP32 lesson packet or webpage, or asks for beginner help following or correcting this project's course.
 ---
 
-# TinySkiff Coach
+# ESP32 Project Coach
 
 Help the learner first. Improve the course in parallel without making the learner wait.
 
@@ -11,8 +11,8 @@ Help the learner first. Improve the course in parallel without making the learne
 
 1. Identify the `TSK-...` lesson code.
 2. Read the matching packet at `docs/course/packets/<CODE>.json`. If the repo is not local, use `ssh mac-mini`; the authoritative checkout is `/Users/agent/Projects/freenove-esp32-s3-docs`.
-3. Recall only tagged TinySkiff memory when the helper is available:
-   `python3 .codex/skills/tinyskiff-coach/scripts/tinyskiff_memory.py recall --query "<lesson and learner question>"`
+3. Recall only tagged ESP32-project memory when the helper is available:
+   `python3 .codex/skills/esp32-project-coach/scripts/esp32_memory.py recall --query "<lesson and learner question>"`
    Continue normally if memory is unavailable.
 4. For repository orientation, follow the repo `AGENTS.md` Graphify query-first rule. Never delay an urgent beginner answer to build or refresh a graph.
 
@@ -51,8 +51,10 @@ Do not stuff troubleshooting prose or raw URLs into cards. Prefer short actions,
 
 - Retain only verified, reusable learning: concepts learned, stable setup, lesson corrections, recurring confusion, and incidents with root cause/fix/guardrail.
 - Never retain raw chat, secrets, credentials, full logs, speculative advice, or transient confirmations such as “clicked OK.”
-- Use the `tinyskiff-lessons` concise strategy and strict tags through `tinyskiff_memory.py retain`.
-- Keep `tinyskiff-learning-journey` current through the helper's `ensure` command. Do not globally change Sam's default chunk-mode ingestion.
+- Use the `esp32-project-lessons` concise strategy and strict tags through `esp32_memory.py retain`.
+- Store project memory only in the existing `sam-personal` bank and keep `esp32-project-learning-journey` configured through the helper's `ensure` command.
+- Never create a Hindsight memory bank unless the user explicitly asks for a new bank. Do not infer permission from a request for a strategy, mental model, tags, or project memory.
+- Do not describe this project as TinySkiff. `esp32.tinyskiff.xyz` is only its current domain, and `TSK-...` is a legacy lesson-code prefix.
 
 ## Finish a lesson-help turn
 

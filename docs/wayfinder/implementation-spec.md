@@ -1,7 +1,7 @@
-# TinySkiff ESP32-S3 Lab — ready-to-implement spec
+# ESP32-S3 Lab — ready-to-implement spec
 
 Resolves: [Assemble the ready-to-implement tutorial spec](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/7)
-Map: [Wayfinder Map: TinySkiff ESP32-S3 guided 30-day tutorial spec](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/1)
+Map: [Wayfinder Map: ESP32-S3 guided 30-day tutorial spec](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/1)
 
 This is the capstone. It folds every resolved decision into one document an implementer can build from. It does not re-argue those decisions; it consolidates and makes them actionable.
 

@@ -159,7 +159,7 @@ def render_html(data: dict, ctx: dict) -> str:
         "slugs": ctx["slugs"],
         "day1Slug": ctx["day1Slug"],
     }, ensure_ascii=False).replace("</", "<\\/")
-    title = "TinySkiff ESP32-S3 Lab — learn the ESP32-S3 in 30 guided days"
+    title = "ESP32-S3 Lab — learn the ESP32-S3 in 30 guided days"
     day1_href = f"./course/{ctx['day1Slug']}/" if ctx["day1Slug"] else "./course/"
 
     legs = []
@@ -207,7 +207,7 @@ def render_html(data: dict, ctx: dict) -> str:
     <header class=\"hero\" id=\"top\">
       <div class=\"hero-grid\">
         <div class=\"hero-copy\">
-          <p class=\"eyebrow\">TinySkiff · ESP32-S3 Lab</p>
+          <p class=\"eyebrow\">ESP32-S3 Lab</p>
           <h1>Learn the ESP32-S3 in <span class=\"hl\">30 guided days</span>.</h1>
           <p class=\"lede\">A friendly, Arduino-first course built on the Freenove Super Starter Kit. Each day you wire one small circuit, run it, and understand why it works — about 30 minutes, one real win.</p>
           <div class=\"cta-row\">
@@ -275,7 +275,7 @@ def render_html(data: dict, ctx: dict) -> str:
     </main>
 
     <footer class=\"colophon\">
-      <p><strong>TinySkiff ESP32-S3 Lab.</strong> A guided course and library built on the official Freenove Super Starter Kit for ESP32-S3 material, released under CC BY-NC-SA 3.0. Not affiliated with or endorsed by Freenove.</p>
+      <p><strong>ESP32-S3 Lab.</strong> A guided course and library built on the official Freenove Super Starter Kit for ESP32-S3 material, released under CC BY-NC-SA 3.0. Not affiliated with or endorsed by Freenove.</p>
       <div class=\"src-links\">
         <a href=\"{REPO_URL}\">Official GitHub repo</a>
         <a href=\"{GITHUB_ZIP}\">Official ZIP archive</a>

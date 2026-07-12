@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Day 5 · Make a mini table lamp — TinySkiff ESP32-S3 Lab</title>
+  <title>Day 5 · Make a mini table lamp — ESP32-S3 Lab</title>
   <meta name="description" content="Turn the button-and-LED circuit into a mini table lamp. Learn the difference between a pin&#x27;s steady level and the edge of a press, hold an on/off state across loops, and debounce the switch so one press flips the lamp exactly once." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,7 +14,7 @@
   <div class="lesson-shell">
     <header class="hero">
       <div class="hero-copy">
-        <p class="eyebrow">TinySkiff ESP32-S3 Lab · Day 5 of 30</p>
+        <p class="eyebrow">ESP32-S3 Lab · Day 5 of 30</p>
         <h1>Turn a press<br />into a <em>lamp</em></h1>
         <p class="lede">Yesterday the LED glowed only while you held the button. Today it stays. The loop reads that button thousands of times a second, so the leap to a lamp is teaching it to fire on the single moment a press begins — the edge — to remember whether the light is on, and to shrug off the milliseconds a switch bounces as it closes. That&#x27;s the jump from a raw button to a product.
 </p>
@@ -29,7 +29,7 @@
             <span class="label">Agent assist code</span>
             <code>TSK-DAY05-LAMP</code>
           </div>
-          <button class="copy-prompt" type="button" data-copy="Use $tinyskiff-coach for TinySkiff lesson TSK-DAY05-LAMP. Pull the lesson packet, then guide me one step at a time. Keep helping me interactively while a background sub-agent compares my questions with the lesson webpage and improves the lesson for the next learner. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
+          <button class="copy-prompt" type="button" data-copy="Use $esp32-project-coach for ESP32-S3 lesson TSK-DAY05-LAMP. Pull the lesson packet, then guide me one step at a time. Keep helping me interactively while a background sub-agent compares my questions with the lesson webpage and improves the lesson for the next learner. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.">Copy the coaching prompt</button>
           <p class="agent-note">Hand this to an agent so it can pull the <a href="../packets/TSK-DAY05-LAMP.json">lesson packet</a> and coach you step by step.</p>
         </div>
       </div>
@@ -335,9 +335,9 @@ if not button.<span class="tok-fn">value</span>():
       </main>
     </div>
     <footer class="colophon">
-      <p><strong>Day 5 of 30 · TinySkiff ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
+      <p><strong>Day 5 of 30 · ESP32-S3 Lab.</strong> <a href="../">Back to the course map</a>.</p>
       <div class="rule"></div>
-      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — the circuit diagram from C_Tutorial.pdf, Chapter 2, page 48; sketch <code>Sketch_02.2_TableLamp.ino</code>; MicroPython <code>02.2_TableLamp/TableLamp.py</code>. Released under CC BY-NC-SA 3.0. TinySkiff is not affiliated with or endorsed by Freenove.</p>
+      <p>Based on official Freenove Super Starter Kit for ESP32-S3 material — the circuit diagram from C_Tutorial.pdf, Chapter 2, page 48; sketch <code>Sketch_02.2_TableLamp.ino</code>; MicroPython <code>02.2_TableLamp/TableLamp.py</code>. Released under CC BY-NC-SA 3.0. This site is not affiliated with or endorsed by Freenove.</p>
     </footer>
   </div>
 

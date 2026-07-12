@@ -1,7 +1,7 @@
 # Guided day prototype: Day 26 — Ultrasonic distance
 
 Prototype for: [Prototype one guided day](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/5)  
-Map: [Wayfinder Map: TinySkiff ESP32-S3 guided 30-day tutorial spec](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/1)
+Map: [Wayfinder Map: ESP32-S3 guided 30-day tutorial spec](https://github.com/skip-agent/freenove-esp32-s3-docs/issues/1)
 
 ## Prototype status
 
@@ -33,7 +33,7 @@ Agent context packet: [`/course/packets/TSK-DAY26-ULTRASONIC.json`](../course/pa
 
 Prompt idea:
 
-> I am doing TinySkiff lesson `TSK-DAY26-ULTRASONIC`. Pull the lesson packet, then guide me one step at a time. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.
+> I am doing ESP32-S3 lesson `TSK-DAY26-ULTRASONIC`. Pull the lesson packet, then guide me one step at a time. Ask me to confirm each physical step before moving on. Explain any term I ask about in beginner-friendly language.
 
 ## What you need
 
