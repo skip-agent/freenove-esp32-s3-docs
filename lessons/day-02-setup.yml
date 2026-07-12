@@ -62,14 +62,14 @@ steps:
     doing slowly once. If a step stalls, the Test & debug section below maps the
     common snags to the stage of the chain they belong to.
   items:
-    - Download and install **Arduino IDE 2** from [arduino.cc/en/software](https://www.arduino.cc/en/software/), then open it.
+    - Download and install **Arduino IDE 2** from `https://www.arduino.cc/en/software/`, then open it.
     - Open Arduino IDE's settings. On macOS choose **Arduino IDE → Settings…** or press **⌘,**. On Windows or Linux choose **File → Preferences**.
     - Scroll to **Additional boards manager URLs** near the bottom. Click the small button at the right of that field, paste `https://espressif.github.io/arduino-esp32/package_esp32_index.json` on its own line, then click **OK** twice. This address tells Arduino IDE where Espressif publishes ESP32 support. {boardPackage}
-    - Open **Tools → Board → Boards Manager…** (or click the board-shaped icon in the left sidebar). Search for `esp32`, find **esp32 by Espressif Systems**, click **Install**, and wait until the IDE says the platform is installed. [Espressif's install guide](https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html) describes the same package. {boardPackage}
+    - Open **Tools → Board → Boards Manager…** (or click the board-shaped icon in the left sidebar). Search for `esp32`, find **esp32 by Espressif Systems**, click **Install**, and wait until the IDE says the platform is installed. Espressif's install guide at `https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html` describes the same package. {boardPackage}
     - Plug the board directly into the computer with a data-capable USB-C cable. A charge-only cable can light the board up but cannot create a connection in Arduino IDE. {usbData}
     - Identify the board's port instead of guessing. Open the board selector at the top of Arduino IDE and note the list. Unplug the ESP32-S3, wait a few seconds, then plug it back in. The item that disappears and returns is the board's port; on macOS its name usually contains `usbserial` or `usbmodem`. Ignore Bluetooth, headphones, and debug-console entries. {serialPort}
     - Select that returning port. If Arduino IDE calls it **Unknown**, choose **Select other board and port…**, select the returning port on the right, search for and select **ESP32S3 Dev Module** on the left, then click **OK**. The board choice tells the IDE what chip to compile for; the port tells it which connected device should receive the program. {serialPort}
-    - If no item disappears and returns, do not guess from the list. First try another known data-capable USB cable and a different USB port. If the board is still absent, install the [CH343 USB driver](https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/CH343), restart the computer if its installer asks, and reconnect the board. {usbSerial}
+    - If no item disappears and returns, do not guess from the list. First try another known data-capable USB cable and a different USB port. If the board is still absent, install the CH343 USB driver from `https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/CH343`, restart the computer if its installer asks, and reconnect the board. {usbSerial}
   done:
     icon: "🔌"
     title: Handshake complete.
@@ -120,7 +120,7 @@ test:
   checksTitle: If it doesn't
   checks:
     - symptom: "No port appears at all?"
-      fix: "Unplug the board and watch the port list, then reconnect it. If nothing new appears, try a known data-capable cable and a different USB port before installing the [CH343 driver](https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/CH343)."
+      fix: "Unplug the board and watch the port list, then reconnect it. If nothing new appears, try a known data-capable cable and a different USB port before installing the CH343 driver from `https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/CH343`."
     - symptom: "Only a charging sound, no port?"
       fix: "The cable carries power but no data — swap in a data-capable USB-C cable."
     - symptom: "Board name missing from the list?"
