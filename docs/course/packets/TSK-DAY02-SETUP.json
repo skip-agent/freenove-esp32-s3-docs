@@ -33,11 +33,14 @@
     "There's no code to upload today — the board appearing as a port is the success condition, and it's a one-time cost."
   ],
   "steps": [
-    "Download and install the Arduino IDE from arduino.cc for your operating system.",
-    "In Preferences, add the ESP32 boards URL, then install the ESP32 package from Boards Manager. This is what teaches the IDE to compile for your chip.",
-    "If your board doesn't appear later, install the CH343 USB driver — the software for the translator chip that lets USB reach the board.",
-    "Plug the board in with a data-capable USB-C cable. A charge-only cable powers it but carries no data.",
-    "Choose your ESP32-S3 under Tools → Board (which chip to compile for), then pick its Port (which connection to talk over)."
+    "Download and install Arduino IDE 2 from https://www.arduino.cc/en/software/, then open it.",
+    "Open Arduino IDE's settings. On macOS choose Arduino IDE → Settings… or press ⌘,. On Windows or Linux choose File → Preferences.",
+    "Scroll to Additional boards manager URLs near the bottom. Click the small button at the right of that field, paste https://espressif.github.io/arduino-esp32/package_esp32_index.json on its own line, then click OK twice. This address tells Arduino IDE where Espressif publishes ESP32 support.",
+    "Open Tools → Board → Boards Manager… (or click the board-shaped icon in the left sidebar). Search for esp32, find esp32 by Espressif Systems, click Install, and wait until the IDE says the platform is installed. Espressif's install guide at https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html describes the same package.",
+    "Plug the board directly into the computer with a data-capable USB-C cable. A charge-only cable can light the board up but cannot create a connection in Arduino IDE.",
+    "Identify the board's port instead of guessing. Open the board selector at the top of Arduino IDE and note the list. Unplug the ESP32-S3, wait a few seconds, then plug it back in. The item that disappears and returns is the board's port; on macOS its name usually contains usbserial or usbmodem. Ignore Bluetooth, headphones, and debug-console entries.",
+    "Select that returning port. If Arduino IDE calls it Unknown, choose Select other board and port…, select the returning port on the right, search for and select ESP32S3 Dev Module on the left, then click OK. The board choice tells the IDE what chip to compile for; the port tells it which connected device should receive the program.",
+    "If no item disappears and returns, do not guess from the list. First try another known data-capable USB cable and a different USB port. If the board is still absent, install the CH343 USB driver from https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/CH343, restart the computer if its installer asks, and reconnect the board."
   ],
   "codeFocus": {},
   "theoryModel": {
@@ -66,7 +69,7 @@
     {
       "symptom": "No port appears at all",
       "firstChecks": [
-        "The bridge isn't reaching your computer- install the CH343 driver, then unplug and replug."
+        "Unplug the board and watch the port list, then reconnect it. If nothing new appears, try a known data-capable cable and a different USB port before installing the CH343 driver from https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/tree/main/CH343."
       ]
     },
     {
@@ -78,7 +81,7 @@
     {
       "symptom": "Board name missing from the list",
       "firstChecks": [
-        "The compile step has no target yet — re-open Boards Manager and confirm the ESP32 package finished installing."
+        "Re-open Boards Manager and confirm esp32 by Espressif Systems finished installing. Then use Select other board and port… and search for ESP32S3 Dev Module."
       ]
     }
   ],
