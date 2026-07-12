@@ -222,10 +222,12 @@ def _hero(lesson: dict, day: int, total: int) -> str:
     instrument = esc(hero.get("instrument", "sounder"))
     code = esc(lesson["lessonCode"])
     prompt = (
-        f"I am doing TinySkiff lesson {lesson['lessonCode']}. Pull the lesson "
-        "packet, then guide me one step at a time. Ask me to confirm each "
-        "physical step before moving on. Explain any term I ask about in "
-        "beginner-friendly language."
+        f"Use $tinyskiff-coach for TinySkiff lesson {lesson['lessonCode']}. "
+        "Pull the lesson packet, then guide me one step at a time. Keep helping "
+        "me interactively while a background sub-agent compares my questions "
+        "with the lesson webpage and improves the lesson for the next learner. "
+        "Ask me to confirm each physical step before moving on. Explain any term "
+        "I ask about in beginner-friendly language."
     )
     return f"""    <header class="hero">
       <div class="hero-copy">

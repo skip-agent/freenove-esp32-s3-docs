@@ -1,0 +1,16 @@
+graphify-out/
+.venv/
+source/
+converted/
+course-assets/assets/
+docs/assets/
+docs/course/
+docs/index.html
+docs/app.js
+docs/landing.css
+docs/data.json
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif

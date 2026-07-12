@@ -1,0 +1,226 @@
+#!/usr/bin/env python3
+"""Scoped TinySkiff access to Sam's Hindsight service through ssh mac-mini."""
+
+from __future__ import annotations
+
+import argparse
+from datetime import datetime
+import json
+import re
+import shlex
+import subprocess
+import sys
+import time
+from urllib.parse import quote
+
+HOST = "mac-mini"
+BASE = "http://127.0.0.1:8888"
+BANK = "sam-tinyskiff"
+STRATEGY = "tinyskiff-lessons"
+MODEL_ID = "tinyskiff-learning-journey"
+
+RETAIN_MISSION = (
+    "Extract only durable TinySkiff learning facts: concepts the learner understood, "
+    "verified hardware or IDE setup, lesson-specific corrections or missing steps, "
+    "recurring confusion, and incidents with root cause, fix, and guardrail. Ignore "
+    "greetings, transient confirmations, raw chat, full logs, secrets, credentials, "
+    "and speculation. Preserve exact verified UI labels, board and chip names, URLs, "
+    "and versions. Mark uncertainty explicitly."
+)
+
+SOURCE_QUERY = (
+    "Summarize verified TinySkiff learning progress, setup, lesson corrections, recurring "
+    "confusion, and stable coaching preferences. Use the available TinySkiff observations. "
+    "Organize by lesson ID, distinguish learner state from webpage edits, and label open "
+    "blockers or uncertainty. Exclude transient chat and unrelated material."
+)
+
+
+def _request(method: str, path: str, payload: dict | None = None, *, check: bool = True):
+    url = f"{BASE}{path}"
+    command = f"curl -fsS -X {method} {shlex.quote(url)}"
+    stdin = None
+    if payload is not None:
+        command += " -H 'Content-Type: application/json' --data-binary @-"
+        stdin = json.dumps(payload)
+    proc = subprocess.run(
+        ["ssh", HOST, command], input=stdin, text=True, capture_output=True
+    )
+    if check and proc.returncode:
+        raise RuntimeError(proc.stderr.strip() or f"request failed: {method} {path}")
+    if proc.returncode:
+        return None
+    text = proc.stdout.strip()
+    return json.loads(text) if text else {}
+
+
+def _bank_path(suffix: str) -> str:
+    return f"/v1/default/banks/{BANK}{suffix}"
+
+
+def ensure(_: argparse.Namespace) -> None:
+    current = _request("GET", _bank_path("/config"))
+    config = current.get("config", {})
+    strategies = dict(config.get("retain_strategies") or {})
+    strategies[STRATEGY] = {
+        "retain_extraction_mode": "concise",
+        "retain_chunk_size": 3000,
+        "retain_mission": RETAIN_MISSION,
+    }
+    _request("PATCH", _bank_path("/config"), {"updates": {
+        "reflect_mission": SOURCE_QUERY,
+        "retain_mission": RETAIN_MISSION,
+        "retain_extraction_mode": "concise",
+        "retain_chunk_size": 3000,
+        "enable_observations": True,
+        "observations_mission": (
+            "Consolidate only verified TinySkiff progress, setup, concepts, lesson "
+            "corrections, recurring confusion, and stable coaching preferences. "
+            "Never introduce unrelated project, credential, or personal material."
+        ),
+        "retain_strategies": strategies,
+    }})
+
+    trigger = {
+        "mode": "full",
+        # Hindsight 0.8.4 refreshes saved mental models with a low reflect budget,
+        # which can return no facts even when scoped mid-budget reflection succeeds.
+        # Keep the model definition, but use `journey` until that bug is fixed.
+        "refresh_after_consolidation": False,
+        "refresh_cron": None,
+        "fact_types": ["world", "experience", "observation"],
+        "exclude_mental_models": True,
+        "tags_match": "all_strict",
+        "include_chunks": False,
+        "recall_max_tokens": 4096,
+        "recall_chunks_max_tokens": 0,
+    }
+    payload = {
+        "name": "TinySkiff Learning Journey",
+        "source_query": SOURCE_QUERY,
+        "tags": ["tinyskiff", "learning"],
+        "max_tokens": 4096,
+        "trigger": trigger,
+    }
+    existing = _request("GET", _bank_path(f"/mental-models/{MODEL_ID}"), check=False)
+    if existing is None:
+        result = _request("POST", _bank_path("/mental-models"), {"id": MODEL_ID, **payload})
+    else:
+        result = _request("PATCH", _bank_path(f"/mental-models/{MODEL_ID}"), payload)
+    operation_id = (result or {}).get("operation_id")
+    if operation_id:
+        for _ in range(60):
+            op = _request("GET", _bank_path(f"/operations/{operation_id}"))
+            if op.get("status") in {"completed", "failed", "cancelled"}:
+                break
+            time.sleep(1)
+    status(argparse.Namespace())
+
+
+def recall(args: argparse.Namespace) -> None:
+    payload = {
+        "query": args.query,
+        "types": ["world", "experience", "observation"],
+        "prefer_observations": True,
+        "budget": "mid",
+        "max_tokens": args.max_tokens,
+        "tags": ["tinyskiff", "learning"],
+        "tags_match": "all_strict",
+        "trace": False,
+    }
+    print(json.dumps(_request("POST", _bank_path("/memories/recall"), payload), indent=2))
+
+
+def journey(_: argparse.Namespace) -> None:
+    payload = {
+        "query": SOURCE_QUERY,
+        "budget": "mid",
+        "max_tokens": 4096,
+        "tags": ["tinyskiff", "learning"],
+        "tags_match": "all_strict",
+        "fact_types": ["world", "experience", "observation"],
+        "exclude_mental_models": True,
+    }
+    print(json.dumps(_request("POST", _bank_path("/reflect"), payload), indent=2))
+
+
+def retain(args: argparse.Namespace) -> None:
+    lesson = args.lesson.upper()
+    if not re.fullmatch(r"TSK-[A-Z0-9-]+", lesson):
+        raise ValueError("lesson must be a TSK lesson code")
+    key = re.sub(r"[^a-z0-9-]+", "-", args.key.lower()).strip("-")
+    if not key:
+        raise ValueError("key must contain letters or numbers")
+    document_id = f"tinyskiff-{lesson}-{key}"
+    payload = {
+        "async": False,
+        "items": [{
+            "content": args.summary,
+            "timestamp": datetime.now().astimezone().isoformat(),
+            "context": f"TinySkiff learner-help session; verified for {lesson}",
+            "document_id": document_id,
+            "metadata": {
+                "project": "TinySkiff",
+                "lesson_id": lesson,
+                "source": "codex-learner-help",
+                "verification": args.verification,
+            },
+            "tags": [
+                "tinyskiff", "learning", f"lesson:{lesson}",
+                f"memory-shape:{args.shape}",
+            ],
+            "observation_scopes": "combined",
+            "strategy": STRATEGY,
+            "update_mode": "replace",
+        }],
+    }
+    result = _request("POST", _bank_path("/memories"), payload)
+    print(json.dumps({"document_id": document_id, "result": result}, indent=2))
+
+
+def status(_: argparse.Namespace) -> None:
+    config = _request("GET", _bank_path("/config"))
+    model = _request("GET", _bank_path(f"/mental-models/{MODEL_ID}?detail=full"), check=False)
+    resolved = config.get("config") or {}
+    strategies = resolved.get("retain_strategies") or {}
+    output = {
+        "strategy": strategies.get(STRATEGY),
+        "default_strategy": resolved.get("retain_default_strategy"),
+        "mental_model": None if model is None else {
+            key: model.get(key) for key in (
+                "id", "name", "tags", "max_tokens", "trigger",
+                "last_refreshed_at", "is_stale", "content",
+            )
+        },
+    }
+    print(json.dumps(output, indent=2))
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    sub = parser.add_subparsers(dest="command", required=True)
+    sub.add_parser("ensure").set_defaults(func=ensure)
+    sub.add_parser("status").set_defaults(func=status)
+    rec = sub.add_parser("recall")
+    rec.add_argument("--query", required=True)
+    rec.add_argument("--max-tokens", type=int, default=2048)
+    rec.set_defaults(func=recall)
+    sub.add_parser("journey").set_defaults(func=journey)
+    ret = sub.add_parser("retain")
+    ret.add_argument("--lesson", required=True)
+    ret.add_argument("--key", required=True)
+    ret.add_argument("--summary", required=True)
+    ret.add_argument("--shape", choices=["concept", "setup", "correction", "incident", "preference"], required=True)
+    ret.add_argument("--verification", default="learner-confirmed-and-source-checked")
+    ret.set_defaults(func=retain)
+    args = parser.parse_args()
+    try:
+        args.func(args)
+    except (RuntimeError, ValueError, json.JSONDecodeError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

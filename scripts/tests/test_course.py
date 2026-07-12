@@ -427,6 +427,11 @@ class RenderLessonTests(unittest.TestCase):
     def test_packet_link(self):
         self.assertIn("../packets/TSK-DAY26-ULTRASONIC.json", self.html)
 
+    def test_coaching_prompt_invokes_self_improving_skill(self):
+        self.assertIn("Use $tinyskiff-coach for TinySkiff lesson TSK-DAY26-ULTRASONIC", self.html)
+        self.assertIn("Keep helping me interactively while a background sub-agent", self.html)
+        self.assertIn("improves the lesson for the next learner", self.html)
+
     def test_voyage_fill(self):
         self.assertIn("--voyage-fill", self.html)
 
