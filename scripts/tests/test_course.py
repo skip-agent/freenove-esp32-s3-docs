@@ -419,6 +419,12 @@ class RenderLessonTests(unittest.TestCase):
                        "../course.css", "../course.js", "lesson-data"]:
             self.assertIn(needle, self.html, f"missing {needle!r}")
 
+    def test_course_stylesheet_is_cache_busted(self):
+        self.assertIn(
+            f'../course.css?v={course_build.COURSE_CSS_VERSION}',
+            self.html,
+        )
+
     def test_no_nav_to_unpublished_neighbours(self):
         # Day 26 is the only published day, so no prev/next links are emitted.
         self.assertNotIn("day-25", self.html)

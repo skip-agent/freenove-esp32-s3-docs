@@ -30,6 +30,7 @@ from lesson_schema import (
 
 COURSE_ASSETS = ROOT / "course-assets"
 COURSE_TITLE = "ESP32-S3 Lab"
+COURSE_CSS_VERSION = "20260711-3"
 SOURCE_PREFIX = "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main"
 
 # Section scaffolding shared by every day (the consistent workshop voice). A
@@ -648,7 +649,7 @@ def render_lesson(lesson: dict, glossary: dict, order: list[dict],
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../course.css" />
+  <link rel="stylesheet" href="../course.css?v={COURSE_CSS_VERSION}" />
 </head>
 <body>
   <div class="lesson-shell">
@@ -770,7 +771,7 @@ def render_course_index(course: dict, lessons: list[Lesson]) -> str:
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./course.css" />
+  <link rel="stylesheet" href="./course.css?v={COURSE_CSS_VERSION}" />
 </head>
 <body>
   <div class="lesson-shell">
