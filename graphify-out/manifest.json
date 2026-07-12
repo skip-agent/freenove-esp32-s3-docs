@@ -1,61 +1,56 @@
 {
-  ".codex/hooks.json": {
-    "mtime": 1783819443.5784698,
-    "ast_hash": "c9ca6d7ee11b5d1733dae088ccfe58de",
-    "semantic_hash": "c9ca6d7ee11b5d1733dae088ccfe58de"
-  },
-  ".codex/skills/tinyskiff-coach/scripts/tinyskiff_memory.py": {
-    "mtime": 1783819362.0980217,
-    "ast_hash": "d03279f8bba09a183b095b140e1a06b1",
-    "semantic_hash": "d03279f8bba09a183b095b140e1a06b1"
+  ".codex/skills/esp32-project-coach/scripts/esp32_memory.py": {
+    "mtime": 1783821127.7213304,
+    "ast_hash": "3763884e222f447f7383de084ff9cc4c",
+    "semantic_hash": "3763884e222f447f7383de084ff9cc4c"
   },
   "course-assets/course.js": {
-    "mtime": 1783819339.6024525,
-    "ast_hash": "54d0223e836e24bb6b978edd5ff0fe77",
-    "semantic_hash": "54d0223e836e24bb6b978edd5ff0fe77"
+    "mtime": 1783821127.7557442,
+    "ast_hash": "40dd9277ffdb93ea149a2ba64d0388be",
+    "semantic_hash": "40dd9277ffdb93ea149a2ba64d0388be"
   },
   "scripts/build_site.py": {
-    "mtime": 1783819339.633335,
-    "ast_hash": "1222159f9143e3e085f2e62a643c60da",
-    "semantic_hash": "1222159f9143e3e085f2e62a643c60da"
+    "mtime": 1783821127.8015401,
+    "ast_hash": "92ea189d2131e560333fa1578e68ea30",
+    "semantic_hash": "92ea189d2131e560333fa1578e68ea30"
   },
   "scripts/course_build.py": {
-    "mtime": 1783819362.103042,
-    "ast_hash": "676c741ad05b5e3f121b9249b54a902e",
-    "semantic_hash": "676c741ad05b5e3f121b9249b54a902e"
+    "mtime": 1783821127.8016498,
+    "ast_hash": "346c674e1b5791dbae8fa94029161baa",
+    "semantic_hash": "346c674e1b5791dbae8fa94029161baa"
   },
   "scripts/lesson_schema.py": {
-    "mtime": 1783819339.6335099,
+    "mtime": 1783821127.801961,
     "ast_hash": "359275d4f0a1ba67aaa6683b049b2c67",
     "semantic_hash": "359275d4f0a1ba67aaa6683b049b2c67"
   },
   "scripts/tests/test_course.py": {
-    "mtime": 1783819362.103181,
-    "ast_hash": "dba230618425adb369df5b1a852bbb1b",
-    "semantic_hash": "dba230618425adb369df5b1a852bbb1b"
+    "mtime": 1783821127.8021708,
+    "ast_hash": "7b20472aaa0c326a0739636f4c451bce",
+    "semantic_hash": "7b20472aaa0c326a0739636f4c451bce"
   },
   "scripts/tests/test_landing.py": {
-    "mtime": 1783819339.6336663,
+    "mtime": 1783821127.8022523,
     "ast_hash": "94df295d8ecb0f882b18acb6a9919b1f",
     "semantic_hash": "94df295d8ecb0f882b18acb6a9919b1f"
   },
   "scripts/validate_site.py": {
-    "mtime": 1783819339.6337094,
-    "ast_hash": "a3d5df77632c55e8d0b1af68b9b52748",
-    "semantic_hash": "a3d5df77632c55e8d0b1af68b9b52748"
+    "mtime": 1783821127.8023012,
+    "ast_hash": "6728490f32d5f03028db2bd53dec67e4",
+    "semantic_hash": "6728490f32d5f03028db2bd53dec67e4"
   },
   "site-assets/app.js": {
-    "mtime": 1783819339.6337967,
-    "ast_hash": "5f242d70e3009bb8b4ab4dafe8defc3e",
-    "semantic_hash": "5f242d70e3009bb8b4ab4dafe8defc3e"
+    "mtime": 1783821127.8024812,
+    "ast_hash": "7223bc29eb6b178a8d930e82bf8a2dbf",
+    "semantic_hash": "7223bc29eb6b178a8d930e82bf8a2dbf"
   },
   "source-manifest/course-assets.json": {
-    "mtime": 1783819339.6339304,
-    "ast_hash": "8256690ca9f4492e482cb0bc42b05399",
-    "semantic_hash": "8256690ca9f4492e482cb0bc42b05399"
+    "mtime": 1783821127.8026514,
+    "ast_hash": "4d7fcbaa5184210c6fde782c91abbf04",
+    "semantic_hash": "4d7fcbaa5184210c6fde782c91abbf04"
   },
   "source-manifest/freenove-source.json": {
-    "mtime": 1783819339.6339822,
+    "mtime": 1783821127.8027341,
     "ast_hash": "8e258ba660538d7f33d93b94e92f1a5e",
     "semantic_hash": "8e258ba660538d7f33d93b94e92f1a5e"
   }
