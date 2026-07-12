@@ -150,7 +150,7 @@
               <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">Compare every wire to the chart, then plug in USB.</p></li>
               <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Open <code>Sketch_20.2_BluetoothToLed.ino</code> in Arduino IDE and upload it.</p></li>
               <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 6 done"></button><p class="text">Open Serial Monitor at <code>115200</code> and look for the &quot;device started&quot; line. <button class="define" data-topic="serial">Define</button></p></li>
-              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 7 done"></button><p class="text">On your phone, open LightBlue and connect to <code>ESP32S3_Bluetooth</code>, exactly as you did on Day 27. <button class="define" data-topic="ble">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 7 done"></button><p class="text">On your phone, open <a class="resource-link" href="https://apps.apple.com/us/app/lightblue/id557428110" target="_blank" rel="noopener noreferrer">LightBlue</a> (<a class="resource-link" href="https://play.google.com/store/apps/details?id=com.punchthrough.lightblueexplorer" target="_blank" rel="noopener noreferrer">Android</a>) and connect to <code>ESP32S3_Bluetooth</code>, exactly as you did on Day 27. <button class="define" data-topic="ble">Define</button></p></li>
               <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 8 done"></button><p class="text">Find the write characteristic, set the format to utf-string, and write <code>led_on</code> — underscore, exact spelling. <button class="define" data-topic="bleCharacteristic">Define</button></p></li>
               <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 9 done"></button><p class="text">Watch the LED light, then write <code>led_off</code> to put it out.</p></li>
             </ol>
@@ -224,7 +224,7 @@ def <span class="tok-fn">on_rx</span>(rx_data):
                   <div class="code-note"><code>led.value(1)</code><span class="note-text">Drives GPIO 2 HIGH and the LED lights.</span></div>
                 </div>
               </div>
-              <p class="micropython-note">Same pin, same wiring. Copy <code>ble_advertising.py</code> onto the board alongside this file. The Python version broadcasts as <code>ESP32S3</code>, so look for that name in LightBlue. Run it in Thonny if MicroPython is set up; otherwise skip it — it should never block the Arduino-first path.
+              <p class="micropython-note">Same pin, same wiring. Copy <code>ble_advertising.py</code> onto the board alongside this file. The Python version broadcasts as <code>ESP32S3</code>, so look for that name in LightBlue. Run it in <a class="resource-link" href="https://thonny.org" target="_blank" rel="noopener noreferrer">Thonny</a> if MicroPython is set up; otherwise skip it — it should never block the Arduino-first path.
 </p>
             </div>
           </div>

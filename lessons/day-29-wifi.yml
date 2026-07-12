@@ -154,7 +154,7 @@ code:
         text: Returns the board's network details once connected — the first value is its IP address.
     note: >
       Same radio, same credentials — replace both '********' strings before you
-      run it in Thonny. If MicroPython isn't set up yet, skip this — it should
+      run it in [Thonny](https://thonny.org). If MicroPython isn't set up yet, skip this — it should
       never block the Arduino-first day.
 
 theory:

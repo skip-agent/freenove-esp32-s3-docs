@@ -183,7 +183,7 @@ code:
       - code: Rt=10*voltage/(3.3-voltage)
         text: The same divider arithmetic as the Arduino sketch — volts back into kilo-ohms.
     note: >
-      Same pin, same maths, same printout. Run it in Thonny and compare the
+      Same pin, same maths, same printout. Run it in [Thonny](https://thonny.org) and compare the
       temperature with the Arduino version. If MicroPython isn't set up yet,
       skip this — it should never block the Arduino-first day.
 

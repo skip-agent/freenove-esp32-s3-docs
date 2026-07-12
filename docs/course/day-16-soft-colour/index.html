@@ -252,7 +252,7 @@ pwm2.<span class="tok-fn">duty</span>(<span class="tok-num">1023</span>-<span cl
                   <div class="code-note"><code>pwm0.duty(1023-remap(adc0.read(),0,4095,0,1023))</code><span class="note-text">The whole chain in one line — read the knob, rescale to the 10-bit duty range, and subtract for the common-anode dome.</span></div>
                 </div>
               </div>
-              <p class="micropython-note">Same wiring, one difference to expect: Freenove&#x27;s Python version pairs the knobs to the colours in the reverse order — the knob on GPIO 12 drives the leg on GPIO 40 — and both pairings work fine. Run it in Thonny if MicroPython is set up; otherwise skip it — it should never block the Arduino-first path.
+              <p class="micropython-note">Same wiring, one difference to expect: Freenove&#x27;s Python version pairs the knobs to the colours in the reverse order — the knob on GPIO 12 drives the leg on GPIO 40 — and both pairings work fine. Run it in <a class="resource-link" href="https://thonny.org" target="_blank" rel="noopener noreferrer">Thonny</a> if MicroPython is set up; otherwise skip it — it should never block the Arduino-first path.
 </p>
             </div>
           </div>

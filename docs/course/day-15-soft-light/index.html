@@ -226,7 +226,7 @@ pwm.<span class="tok-fn">duty</span>(pwmValue)</code></pre>
                   <div class="code-note"><code>remap(adcValue,0,4095,0,1023)</code><span class="note-text">MicroPython&#x27;s duty here is 10-bit, so the reading is squeezed from 0–4095 down to 0–1023 before it drives the LED.</span></div>
                 </div>
               </div>
-              <p class="micropython-note">Same pins, same wiring. MicroPython&#x27;s duty runs 0–1023, so this version remaps the reading down before writing it; the Arduino sketch matches the two resolutions so the number passes straight through. Run it in Thonny if MicroPython is set up; otherwise skip it — it should never block the Arduino-first path.
+              <p class="micropython-note">Same pins, same wiring. MicroPython&#x27;s duty runs 0–1023, so this version remaps the reading down before writing it; the Arduino sketch matches the two resolutions so the number passes straight through. Run it in <a class="resource-link" href="https://thonny.org" target="_blank" rel="noopener noreferrer">Thonny</a> if MicroPython is set up; otherwise skip it — it should never block the Arduino-first path.
 </p>
             </div>
           </div>

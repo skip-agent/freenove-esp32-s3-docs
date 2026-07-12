@@ -80,7 +80,7 @@
     "Compare every wire to the chart, then plug in USB.",
     "Open Sketch_20.2_BluetoothToLed.ino in Arduino IDE and upload it.",
     "Open Serial Monitor at 115200 and look for the \"device started\" line.",
-    "On your phone, open LightBlue and connect to ESP32S3_Bluetooth, exactly as you did on Day 27.",
+    "On your phone, open LightBlue (https://apps.apple.com/us/app/lightblue/id557428110) (Android (https://play.google.com/store/apps/details?id=com.punchthrough.lightblueexplorer)) and connect to ESP32S3_Bluetooth, exactly as you did on Day 27.",
     "Find the write characteristic, set the format to utf-string, and write led_on — underscore, exact spelling.",
     "Watch the LED light, then write led_off to put it out."
   ],

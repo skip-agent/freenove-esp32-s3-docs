@@ -179,7 +179,7 @@ code:
         text: The button pin with the internal pull-up — 1 at rest, 0 while pressed.
     note: >
       Same pins, same three values. This version prints once a second where the
-      Arduino sketch prints twice. Run it in Thonny if MicroPython is set up;
+      Arduino sketch prints twice. Run it in [Thonny](https://thonny.org) if MicroPython is set up;
       otherwise skip it — it should never block the Arduino-first path.
 
 theory:

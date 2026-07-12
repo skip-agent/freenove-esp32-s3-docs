@@ -186,7 +186,7 @@ code:
     note: >
       Same pin, same wiring. MicroPython here uses a 10-bit duty (0–1023), so the
       numbers differ from Arduino's 0–255 while the idea is identical. Run it in
-      Thonny if MicroPython is set up; otherwise skip it — it should never block
+      [Thonny](https://thonny.org) if MicroPython is set up; otherwise skip it — it should never block
       the Arduino-first path.
 
 theory:

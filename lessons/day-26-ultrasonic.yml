@@ -167,7 +167,7 @@ code:
       - code: Pin(14, Pin.IN, 0)
         text: Sets GPIO 14 as the echo **input** — where the return pulse arrives.
     note: >
-      Same pins, same behaviour. Run it in Thonny and compare the printed
+      Same pins, same behaviour. Run it in [Thonny](https://thonny.org) and compare the printed
       distance with the Arduino version. If MicroPython isn't set up yet, skip
       this — it should never block the Arduino-first day.
 

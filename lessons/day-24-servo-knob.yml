@@ -213,7 +213,7 @@ code:
         text: The helper in `myservo.py` builds the matching pulse and sends it to GPIO 21.
     note: >
       Same pins, same behaviour. Copy `myservo.py` onto the board alongside the
-      script — the import needs it there. Run it in Thonny if MicroPython is
+      script — the import needs it there. Run it in [Thonny](https://thonny.org) if MicroPython is
       set up; otherwise skip it — it should never block the Arduino-first path.
 
 theory:

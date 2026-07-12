@@ -154,7 +154,7 @@
               <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 3 done"></button><p class="text">Slide female jumper ends onto GND and VCC, then land them on the board&#x27;s GND and 5V pins.</p></li>
               <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 4 done"></button><p class="text">Wire SDA to GPIO 14 and SCL to GPIO 13. <button class="define" data-topic="i2c">Define</button></p></li>
               <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 5 done"></button><p class="text">Compare every wire to the chart before you plug in USB.</p></li>
-              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 6 done"></button><p class="text">In Arduino IDE choose Sketch → Include Library → Add .ZIP Library… and pick <code>LiquidCrystal_I2C-1.1.2.zip</code> from the kit download&#x27;s <code>C/Libraries</code> folder — you install it once and it stays. <button class="define" data-topic="arduino">Define</button></p></li>
+              <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 6 done"></button><p class="text">In Arduino IDE choose Sketch → Include Library → Add .ZIP Library… and pick <a class="resource-link" href="https://github.com/Freenove/Freenove_Super_Starter_Kit_for_ESP32_S3/blob/main/C/Libraries/LiquidCrystal_I2C-1.1.2.zip" target="_blank" rel="noopener noreferrer"><code>LiquidCrystal_I2C-1.1.2.zip</code></a> from the kit download&#x27;s <code>C/Libraries</code> folder — you install it once and it stays. <button class="define" data-topic="arduino">Define</button></p></li>
               <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 7 done"></button><p class="text">Open <code>Sketch_18.1_Display_the_string_on_LCD1602.ino</code> and upload it. (<code>Wire.h</code>, the I2C library, ships with the board package.)</p></li>
               <li class="step"><button class="box" type="button" aria-pressed="false" aria-label="Mark step 8 done"></button><p class="text">Watch row 0 greet you and row 1 start counting seconds.</p></li>
             </ol>
@@ -243,7 +243,7 @@ while True:
                   <div class="code-note"><code>lcd.putstr(&quot;Counter:%d&quot; %(count))</code><span class="note-text">Rewrites row 1 with the running count once a second.</span></div>
                 </div>
               </div>
-              <p class="micropython-note">Same pins, same wiring. This path needs two helper modules — <code>I2C_LCD.py</code> and <code>LCD_API.py</code> from the same kit folder — copied onto the board before it runs. Run it in Thonny if MicroPython is set up; otherwise skip it — it should never block the Arduino-first path.
+              <p class="micropython-note">Same pins, same wiring. This path needs two helper modules — <code>I2C_LCD.py</code> and <code>LCD_API.py</code> from the same kit folder — copied onto the board before it runs. Run it in <a class="resource-link" href="https://thonny.org" target="_blank" rel="noopener noreferrer">Thonny</a> if MicroPython is set up; otherwise skip it — it should never block the Arduino-first path.
 </p>
             </div>
           </div>
