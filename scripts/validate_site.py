@@ -6,6 +6,7 @@ import re
 import sys
 from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import lesson_schema
 
@@ -50,7 +51,8 @@ for key,min_count in checks.items():
     if n < min_count: fail(f'{key} too small: {n}')
 parser=LinkParser(); parser.feed(text)
 for rel in parser.scripts + parser.styles:
-    if rel.startswith('./') and not (DOCS/rel[2:]).exists(): fail(f'missing asset {rel}')
+    path = urlsplit(rel).path
+    if path.startswith('./') and not (DOCS/path[2:]).exists(): fail(f'missing asset {rel}')
 for img in ['assets/Super.jpg','assets/ESP32S3_Pinout.png']:
     if not (DOCS/img).exists(): fail(f'missing image {img}')
 
@@ -87,7 +89,8 @@ for ls in published:
     page_text = page.read_text(encoding='utf-8')
     p2 = LinkParser(); p2.feed(page_text)
     for rel in p2.scripts + p2.styles:
-        if rel.startswith('../') and not (COURSE / rel[3:]).exists():
+        path = urlsplit(rel).path
+        if path.startswith('../') and not (COURSE / path[3:]).exists():
             fail(f'{slug}: missing asset {rel}')
 
 print('OK site validation passed')
