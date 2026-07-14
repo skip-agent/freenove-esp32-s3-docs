@@ -42,6 +42,10 @@ MODEL = "qwen3-coder:480b-cloud"
 # streaming began, so failures can't be an HTTP status any more).
 STREAM_ERROR_MARK = "\x00"
 
+# A legitimate chat request is a few KB once the widget's fields are bounded;
+# refuse anything larger so a huge Content-Length can't be buffered into memory.
+MAX_BODY_BYTES = 256 * 1024
+
 SYSTEM_TEMPLATE = (
     "You are the ESP32-S3 Lab tutor — a patient firmware coach helping Sam, a "
     "beginner, work through this Arduino-first course for the Freenove Super "
@@ -199,6 +203,16 @@ class CourseHandler(http.server.SimpleHTTPRequestHandler):
             return
         try:
             length = int(self.headers.get("Content-Length") or 0)
+        except ValueError:
+            self.send_error(400, "Invalid Content-Length")
+            return
+        # A well-formed request is a few KB (context is bounded server-side); cap
+        # the body so a huge Content-Length can't be read wholesale into memory
+        # and exhaust the process (which also serves the static site).
+        if length < 0 or length > MAX_BODY_BYTES:
+            self.send_error(413, "Request body too large")
+            return
+        try:
             body = json.loads(self.rfile.read(length) or b"{}")
         except (ValueError, json.JSONDecodeError):
             self.send_error(400, "Invalid JSON body")
@@ -228,6 +242,8 @@ class CourseHandler(http.server.SimpleHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", "text/plain; charset=utf-8")
         self.end_headers()
+        done_seen = False
+        stream_failed = False
         try:
             with resp:
                 for line in resp:
@@ -242,6 +258,7 @@ class CourseHandler(http.server.SimpleHTTPRequestHandler):
                     # surface it instead of silently leaving the widget on "…".
                     err = obj.get("error")
                     if err:
+                        stream_failed = True
                         self.wfile.write(
                             f"{STREAM_ERROR_MARK}[Model error: {err}]".encode("utf-8")
                         )
@@ -252,7 +269,15 @@ class CourseHandler(http.server.SimpleHTTPRequestHandler):
                         self.wfile.write(chunk.encode("utf-8"))
                         self.wfile.flush()
                     if obj.get("done"):
+                        done_seen = True
                         break
+            # A clean HTTP EOF before any `done` frame is still a truncated answer;
+            # flag it out-of-band so the widget doesn't record a partial/empty turn.
+            if not done_seen and not stream_failed:
+                self.wfile.write(
+                    f"{STREAM_ERROR_MARK}[The model stopped before finishing.]".encode("utf-8")
+                )
+                self.wfile.flush()
         except Exception as exc:  # noqa: BLE001 - a drop mid-stream (200 already sent)
             try:
                 self.wfile.write(
