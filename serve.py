@@ -36,6 +36,12 @@ DIRECTORY = sys.argv[2] if len(sys.argv) > 2 else os.path.join(ROOT, "docs")
 OLLAMA_URL = "http://127.0.0.1:11434/api/chat"
 MODEL = "qwen3-coder:480b-cloud"
 
+# A NUL byte can't occur in normal model text, so the widget uses it as an
+# out-of-band signal: everything after it is a stream-failure notice to SHOW the
+# learner but NOT record as an assistant turn (the 200 was already committed once
+# streaming began, so failures can't be an HTTP status any more).
+STREAM_ERROR_MARK = "\x00"
+
 SYSTEM_TEMPLATE = (
     "You are the ESP32-S3 Lab tutor — a patient firmware coach helping Sam, a "
     "beginner, work through this Arduino-first course for the Freenove Super "
@@ -125,6 +131,11 @@ def build_messages(body):
         for m in raw
         if isinstance(m, dict) and m.get("role") in ("user", "assistant")
     ][-12:]
+    # The window can start on an assistant reply whose question was trimmed off,
+    # leaving it orphaned after the system prompt; drop leading assistant turns
+    # so the retained history always begins with a user message.
+    while convo and convo[0]["role"] != "user":
+        convo.pop(0)
     system = SYSTEM_TEMPLATE.format(title=title, context=context, progress=progress)
     return [{"role": "system", "content": system}] + convo
 
@@ -231,7 +242,9 @@ class CourseHandler(http.server.SimpleHTTPRequestHandler):
                     # surface it instead of silently leaving the widget on "…".
                     err = obj.get("error")
                     if err:
-                        self.wfile.write(f"\n\n[Model error: {err}]".encode("utf-8"))
+                        self.wfile.write(
+                            f"{STREAM_ERROR_MARK}[Model error: {err}]".encode("utf-8")
+                        )
                         self.wfile.flush()
                         break
                     chunk = (obj.get("message") or {}).get("content", "")
@@ -243,7 +256,7 @@ class CourseHandler(http.server.SimpleHTTPRequestHandler):
         except Exception as exc:  # noqa: BLE001 - a drop mid-stream (200 already sent)
             try:
                 self.wfile.write(
-                    f"\n\n[Connection to the model dropped: {exc}]".encode("utf-8")
+                    f"{STREAM_ERROR_MARK}[Connection to the model dropped: {exc}]".encode("utf-8")
                 )
             except OSError:
                 pass

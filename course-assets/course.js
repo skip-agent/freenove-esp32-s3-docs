@@ -334,6 +334,10 @@ async function initLessonChat() {
   // Only lesson pages carry lesson-data with a day; the course map does not.
   if (!lessonData || lessonData.day == null) return;
 
+  // Out-of-band signal from serve.py: text after a NUL byte is a stream-failure
+  // notice to show but not record as an assistant turn (see STREAM_ERROR_MARK).
+  const STREAM_ERROR_MARK = " ";
+
   function lessonTitle() {
     return (document.title || "this lesson")
       .replace(/\s*[—–|]\s*ESP32-S3 Lab.*$/i, "")
@@ -472,10 +476,17 @@ async function initLessonChat() {
         const { value, done } = await reader.read();
         if (done) break;
         answer += decoder.decode(value, { stream: true });
-        botEl.innerHTML = render(answer);
+        botEl.innerHTML = render(answer.replace(STREAM_ERROR_MARK, "\n\n"));
         log.scrollTop = log.scrollHeight;
       }
-      history.push({ role: "assistant", content: answer });
+      if (answer.includes(STREAM_ERROR_MARK)) {
+        // A mid-stream failure the server flagged out-of-band: show it, but keep
+        // it (and any partial text) out of history so it isn't resent as context.
+        history.pop();
+        botEl.innerHTML = render(answer.replace(STREAM_ERROR_MARK, "\n\n"));
+      } else {
+        history.push({ role: "assistant", content: answer });
+      }
     } catch (err) {
       // No assistant reply landed — drop the unanswered user turn so the next
       // request doesn't resend it as stale/duplicated context.
