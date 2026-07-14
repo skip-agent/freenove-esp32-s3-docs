@@ -59,9 +59,12 @@ SYSTEM_TEMPLATE = (
     "selection (the connected device, e.g. /dev/cu.usbmodem...) crisp.\n\n"
     "Hardware safety — state these when relevant, never contradict them: check "
     "the wiring against the diagram BEFORE applying power; the ESP32-S3 GPIO is "
-    "3.3 V logic, so never feed a pin 5 V; never short a pin directly to 3V3 or "
-    "GND; always use a current-limiting resistor with an LED. If something could "
-    "damage the board or a part, say so plainly.\n\n"
+    "3.3 V logic, so never feed a pin 5 V; never connect an OUTPUT pin that's "
+    "driven HIGH straight to GND (or one driven LOW straight to 3V3) — that "
+    "shorts the driver; always use a current-limiting resistor with an LED. "
+    "(Tying an INPUT pin to GND or 3V3 through a button is normal and expected — "
+    "that's how the button lessons work, especially with INPUT_PULLUP.) If "
+    "something could damage the board or a part, say so plainly.\n\n"
     "When you give Arduino/C code or a shell command, show it in a fenced code "
     "block and briefly say what it does. Base your answer on the lesson context "
     "below; if the lesson doesn't cover something, say so instead of inventing "
@@ -89,34 +92,47 @@ PACKET_FIELDS = (
 
 
 CONTEXT_BUDGET = 9000     # total chars of lesson context sent to the model
-FIELD_CAP = 3000          # per-section cap so no one field crowds out the rest
+
+
+def _truncate(text, limit):
+    """Trim text to a char limit at a whitespace boundary, marking the cut."""
+    if len(text) <= limit:
+        return text
+    cut = text[: max(0, limit - 14)].rstrip()
+    return cut + " …[truncated]"
 
 
 def context_from_packet(packet):
     """Flatten selected lesson-packet fields into a bounded text block.
 
-    Truncates at section boundaries (and caps individual fields) rather than
-    slicing the joined string, so a long early field can't cut a later section
-    mid-JSON or drop it entirely — every included section stays whole and later
-    sections still get a fair share of the budget.
+    Keeps EVERY present section represented rather than dropping later ones
+    wholesale: if the sections fit the budget they're included whole, otherwise
+    each section gets an equal share of the budget and is trimmed to fit. This
+    guarantees a small-but-important section (e.g. troubleshooting) isn't skipped
+    just because earlier sections were large.
     """
     if not isinstance(packet, dict):
         return ""
-    chunks = []
-    used = 0
+    sections = []
     for key, label in PACKET_FIELDS:
         value = packet.get(key)
         if not value:
             continue
         rendered = value if isinstance(value, str) else json.dumps(value, ensure_ascii=False)
-        if len(rendered) > FIELD_CAP:
-            rendered = rendered[:FIELD_CAP].rstrip() + " …[truncated]"
-        section = f"## {label}\n{rendered}"
-        if used + len(section) > CONTEXT_BUDGET:
-            continue  # skip whole sections that don't fit; keep the rest intact
-        chunks.append(section)
-        used += len(section) + 2  # +2 for the "\n\n" join
-    return "\n\n".join(chunks)
+        sections.append((label, rendered))
+    if not sections:
+        return ""
+
+    joined = [f"## {label}\n{body}" for label, body in sections]
+    total = sum(len(s) for s in joined) + 2 * (len(joined) - 1)
+    if total > CONTEXT_BUDGET:
+        # Fair share per section (reserve room for the "## label\n" header + join).
+        share = CONTEXT_BUDGET // len(sections) - 2
+        joined = [
+            f"## {label}\n{_truncate(body, max(40, share - len(label) - 4))}"
+            for label, body in sections
+        ]
+    return "\n\n".join(joined)
 
 
 def build_messages(body):
