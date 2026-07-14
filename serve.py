@@ -78,18 +78,35 @@ PACKET_FIELDS = (
 )
 
 
+CONTEXT_BUDGET = 9000     # total chars of lesson context sent to the model
+FIELD_CAP = 3000          # per-section cap so no one field crowds out the rest
+
+
 def context_from_packet(packet):
-    """Flatten selected lesson-packet fields into a bounded text block."""
+    """Flatten selected lesson-packet fields into a bounded text block.
+
+    Truncates at section boundaries (and caps individual fields) rather than
+    slicing the joined string, so a long early field can't cut a later section
+    mid-JSON or drop it entirely — every included section stays whole and later
+    sections still get a fair share of the budget.
+    """
     if not isinstance(packet, dict):
         return ""
     chunks = []
+    used = 0
     for key, label in PACKET_FIELDS:
         value = packet.get(key)
         if not value:
             continue
         rendered = value if isinstance(value, str) else json.dumps(value, ensure_ascii=False)
-        chunks.append(f"## {label}\n{rendered}")
-    return "\n\n".join(chunks)[:9000]
+        if len(rendered) > FIELD_CAP:
+            rendered = rendered[:FIELD_CAP].rstrip() + " …[truncated]"
+        section = f"## {label}\n{rendered}"
+        if used + len(section) > CONTEXT_BUDGET:
+            continue  # skip whole sections that don't fit; keep the rest intact
+        chunks.append(section)
+        used += len(section) + 2  # +2 for the "\n\n" join
+    return "\n\n".join(chunks)
 
 
 def build_messages(body):
@@ -100,7 +117,9 @@ def build_messages(body):
     if not context:
         context = str(body.get("lessonText") or "")[:9000]
     progress = str(body.get("progress") or "unknown")[:600]
-    raw = body.get("messages") or []
+    raw = body.get("messages")
+    if not isinstance(raw, list):  # a non-list "messages" would break iteration
+        raw = []
     convo = [
         {"role": m.get("role"), "content": str(m.get("content", ""))[:4000]}
         for m in raw
@@ -186,11 +205,20 @@ class CourseHandler(http.server.SimpleHTTPRequestHandler):
             OLLAMA_URL, data=payload, headers={"Content-Type": "application/json"}
         )
 
+        # Open the upstream BEFORE committing 200: if Ollama is offline or
+        # rejects the model, fail with a real non-2xx so the widget shows an
+        # error and doesn't record the failure text as a valid assistant turn.
+        try:
+            resp = urllib.request.urlopen(req, timeout=180)
+        except Exception as exc:  # noqa: BLE001 - connection refused, HTTP error, timeout…
+            self.send_error(502, f"Model backend unavailable: {exc}")
+            return
+
         self.send_response(200)
         self.send_header("Content-Type", "text/plain; charset=utf-8")
         self.end_headers()
         try:
-            with urllib.request.urlopen(req, timeout=180) as resp:
+            with resp:
                 for line in resp:
                     line = line.strip()
                     if not line:
@@ -212,10 +240,10 @@ class CourseHandler(http.server.SimpleHTTPRequestHandler):
                         self.wfile.flush()
                     if obj.get("done"):
                         break
-        except Exception as exc:  # noqa: BLE001 - surface any model/proxy error to the widget
+        except Exception as exc:  # noqa: BLE001 - a drop mid-stream (200 already sent)
             try:
                 self.wfile.write(
-                    f"\n\n[Could not reach the model: {exc}]".encode("utf-8")
+                    f"\n\n[Connection to the model dropped: {exc}]".encode("utf-8")
                 )
             except OSError:
                 pass
