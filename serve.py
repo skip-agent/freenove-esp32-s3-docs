@@ -46,6 +46,17 @@ STREAM_ERROR_MARK = "\x00"
 # refuse anything larger so a huge Content-Length can't be buffered into memory.
 MAX_BODY_BYTES = 256 * 1024
 
+# DNS-rebinding defence: POSTs are only accepted when the Host/Origin the browser
+# used is a KNOWN-TRUSTED hostname, not merely self-consistent (a rebound attacker
+# host equals itself). Defaults cover local direct access; the served tailnet host
+# (and any future Cloudflare Access host) is added via LESSON_CHAT_ALLOWED_HOSTS
+# in the launchd job. Value is a comma-separated list of host[:port].
+ALLOWED_HOSTS = {f"127.0.0.1:{PORT}", f"localhost:{PORT}", f"[::1]:{PORT}"} | {
+    h.strip().lower()
+    for h in os.environ.get("LESSON_CHAT_ALLOWED_HOSTS", "").split(",")
+    if h.strip()
+}
+
 SYSTEM_TEMPLATE = (
     "You are the ESP32-S3 Lab tutor — a patient firmware coach helping Sam, a "
     "beginner, work through this Arduino-first course for the Freenove Super "
@@ -167,21 +178,23 @@ class CourseHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Expires", "0")
         super().end_headers()
 
-    def _origin_is_same_host(self, origin):
-        """True if the request's Origin host matches the host we're served on.
+    def _request_host_trusted(self):
+        """True if the host the browser targeted is on the trusted allowlist.
 
-        Tolerant of the reverse proxy (tsdash/tailscale serve): the served host
-        can arrive as Host or X-Forwarded-Host, so accept the Origin if its host
-        matches any of them. Only a genuinely different Origin host is rejected.
+        Behind the tailscale/tsdash proxy the browser-facing host arrives as
+        X-Forwarded-Host (falling back to Host for direct local access). Checking
+        it against an explicit allowlist — rather than comparing Host to Origin —
+        is what defeats DNS rebinding, where the attacker host matches itself.
         """
-        origin_host = urllib.parse.urlsplit(origin).netloc.lower()
-        if not origin_host:
-            return False
-        candidates = {
-            (self.headers.get("Host") or "").lower(),
-            (self.headers.get("X-Forwarded-Host") or "").lower(),
-        }
-        return origin_host in {c for c in candidates if c}
+        host = (self.headers.get("X-Forwarded-Host") or self.headers.get("Host") or "")
+        return host.split(",")[0].strip().lower() in ALLOWED_HOSTS
+
+    def _origin_trusted(self):
+        """True if there's no Origin, or its host is on the trusted allowlist."""
+        origin = self.headers.get("Origin")
+        if origin is None:
+            return True
+        return urllib.parse.urlsplit(origin).netloc.lower() in ALLOWED_HOSTS
 
     def do_GET(self):
         # Health probe. The widget mounts only when this responds with our
@@ -203,18 +216,22 @@ class CourseHandler(http.server.SimpleHTTPRequestHandler):
         if self.path.split("?")[0] != "/api/chat":
             self.send_error(404, "Not found")
             return
-        # CSRF defence: a site the learner visits while on the tailnet could fire
-        # a "simple" cross-origin POST (text/plain, no preflight) and spend cloud
-        # tokens under their Tailscale identity. Require application/json — which
-        # forces a CORS preflight this server never approves — and reject any
-        # Origin that isn't this host. The widget always sends application/json
-        # same-origin, so it is unaffected.
+        # CSRF + DNS-rebinding defence. A site the learner visits while on the
+        # tailnet could fire a "simple" cross-origin POST (text/plain, no
+        # preflight) and spend cloud tokens under their Tailscale identity, or use
+        # a rebound hostname to reach this port. So: require application/json
+        # (forces a CORS preflight this server never approves), require the
+        # browser-facing host to be on the trusted allowlist, and reject any
+        # off-allowlist Origin. The widget always sends application/json to a
+        # trusted host, so it is unaffected.
         ctype = (self.headers.get("Content-Type") or "").split(";")[0].strip().lower()
         if ctype != "application/json":
             self.send_error(415, "Unsupported Media Type")
             return
-        origin = self.headers.get("Origin")
-        if origin is not None and not self._origin_is_same_host(origin):
+        if not self._request_host_trusted():
+            self.send_error(403, "Untrusted host")
+            return
+        if not self._origin_trusted():
             self.send_error(403, "Cross-origin request refused")
             return
         try:

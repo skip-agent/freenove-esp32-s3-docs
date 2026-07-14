@@ -10,6 +10,14 @@
     <string>/Users/agent/projects/freenove-esp32-s3-docs/serve.py</string>
     <string>3013</string>
   </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <!-- Hosts the chat POST endpoint trusts (DNS-rebinding allowlist). The
+         tailnet served host; add the Cloudflare Access hostname here too when
+         the public door is set up. Local 127.0.0.1/localhost are always allowed. -->
+    <key>LESSON_CHAT_ALLOWED_HOSTS</key>
+    <string>agents-mac-mini.tail2b5984.ts.net:8456</string>
+  </dict>
   <key>RunAtLoad</key>
   <true/>
   <key>KeepAlive</key>

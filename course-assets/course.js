@@ -466,7 +466,13 @@ async function initLessonChat() {
           lessonPacket: packet,
           lessonText: packet ? undefined : lessonText(),
           progress: progressSummary(),
-          messages: history,
+          // Mirror the server's window (last dozen turns, content bounded) so a
+          // long session can't grow the request past the body cap and wedge the
+          // chat on a permanent 413.
+          messages: history.slice(-16).map((m) => ({
+            role: m.role,
+            content: m.content.length > 4000 ? m.content.slice(0, 4000) : m.content,
+          })),
         }),
       });
       if (!res.ok || !res.body) throw new Error(`server responded ${res.status}`);
@@ -486,6 +492,9 @@ async function initLessonChat() {
         botEl.innerHTML = render(answer.replace(STREAM_ERROR_MARK, "\n\n"));
       } else {
         history.push({ role: "assistant", content: answer });
+        // Keep the in-memory transcript from growing without bound over a very
+        // long session (the server only ever uses the recent window anyway).
+        if (history.length > 40) history.splice(0, history.length - 40);
       }
     } catch (err) {
       // No assistant reply landed — drop the unanswered user turn so the next
