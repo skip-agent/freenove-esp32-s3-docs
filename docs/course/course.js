@@ -478,18 +478,29 @@ async function initLessonChat() {
       if (!res.ok || !res.body) throw new Error(`server responded ${res.status}`);
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
+      const paint = () => {
+        botEl.innerHTML = render(answer.replace(STREAM_ERROR_MARK, "\n\n"));
+        log.scrollTop = log.scrollHeight;
+      };
+      let lastPaint = 0;
       for (;;) {
         const { value, done } = await reader.read();
         if (done) break;
         answer += decoder.decode(value, { stream: true });
-        botEl.innerHTML = render(answer.replace(STREAM_ERROR_MARK, "\n\n"));
-        log.scrollTop = log.scrollHeight;
+        // render() reparses the whole accumulated answer, so repainting on every
+        // chunk is O(n²) and freezes the page on long replies. Throttle to ~12fps
+        // during streaming; the final paint below always shows the full text.
+        const now = performance.now();
+        if (now - lastPaint > 80) {
+          paint();
+          lastPaint = now;
+        }
       }
+      paint(); // final, complete render
       if (answer.includes(STREAM_ERROR_MARK)) {
         // A mid-stream failure the server flagged out-of-band: show it, but keep
         // it (and any partial text) out of history so it isn't resent as context.
         history.pop();
-        botEl.innerHTML = render(answer.replace(STREAM_ERROR_MARK, "\n\n"));
       } else {
         history.push({ role: "assistant", content: answer });
         // Keep the in-memory transcript from growing without bound over a very

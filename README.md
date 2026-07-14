@@ -32,15 +32,34 @@ button, nothing broken) and lights up automatically wherever the backend is serv
 ### Making it public later (Cloudflare + Access) — no app changes
 
 Because auth lives at the edge, sharing the chat publicly (e.g. with family) needs
-**zero changes to `serve.py`, the widget, or the build**. Put a Cloudflare Access
-front door in front of the same local port:
+**zero changes to `serve.py`, the widget, or the build** — only a new front door
+and one config value. Put a named Cloudflare Tunnel + Access in front of the same
+local port:
 
-1. Run a named tunnel to the backend: `cloudflared tunnel --url http://127.0.0.1:3013`
-   (or a persistent tunnel with a `config.yml` ingress to `127.0.0.1:3013`), mapped
-   to a hostname like `esp32-chat.<domain>`.
-2. In Cloudflare Zero Trust, add an **Access** application for that hostname with a
-   policy (email allow-list / one-time PIN) so only invited people get in.
-3. Leave Ollama bound to `127.0.0.1:11434`; only `serve.py`'s port is exposed, and
+1. Create and route a **named** tunnel to a hostname you own (a Quick Tunnel with
+   `--url` only gives a random `trycloudflare.com` host, which Access can't target):
+   ```bash
+   cloudflared tunnel login
+   cloudflared tunnel create esp32-chat
+   cloudflared tunnel route dns esp32-chat esp32-chat.<domain>
+   # ~/.cloudflared/config.yml:
+   #   tunnel: esp32-chat
+   #   credentials-file: /Users/agent/.cloudflared/<tunnel-id>.json
+   #   ingress:
+   #     - hostname: esp32-chat.<domain>
+   #       service: http://127.0.0.1:3013
+   #     - service: http_status:404
+   cloudflared tunnel run esp32-chat      # (run as a service to make it permanent)
+   ```
+2. In Cloudflare Zero Trust, add an **Access** application for `esp32-chat.<domain>`
+   with a policy (email allow-list / one-time PIN) so only invited people get in.
+3. **Add the new hostname to the backend's trusted-host allowlist** (the DNS-rebind
+   guard), or every send returns 403 even though the widget mounts. Append it to
+   `LESSON_CHAT_ALLOWED_HOSTS` in `deploy/com.skipper.esp32-lab.plist` (comma-
+   separated, include the port the browser uses — `esp32-chat.<domain>:443`), then
+   reload: `launchctl bootout gui/$(id -u)/com.skipper.esp32-lab && launchctl
+   bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.skipper.esp32-lab.plist`.
+4. Leave Ollama bound to `127.0.0.1:11434`; only `serve.py`'s port is exposed, and
    only behind Access. The tailnet serve and the public Access door can run at once.
 
 ## How a lesson works
