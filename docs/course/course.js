@@ -425,6 +425,7 @@ async function initLessonChat() {
   function close() {
     panel.hidden = true;
     fab.hidden = false;
+    fab.focus(); // return focus to the trigger, not the now-hidden panel
   }
   fab.addEventListener("click", open);
   panel.querySelector(".lchat__close").addEventListener("click", close);
@@ -495,11 +496,14 @@ async function initLessonChat() {
   });
 }
 
-// Backend-aware mount: only wire the widget in if a chat backend answers.
+// Backend-aware mount: only wire the widget in if our chat backend answers.
+// A static host (e.g. Cloudflare Pages) serves its HTML fallback with 200 for
+// unknown routes, so res.ok alone is NOT enough — require serve.py's sentinel
+// header, which a static fallback can't produce. Keeps the public build clean.
 (async () => {
   try {
     const res = await fetch("/api/chat", { method: "GET" });
-    if (res.ok) initLessonChat();
+    if (res.ok && res.headers.get("X-Lesson-Chat") === "ok") initLessonChat();
   } catch {
     /* no backend (e.g. the public static host) — no chat button, nothing broken */
   }

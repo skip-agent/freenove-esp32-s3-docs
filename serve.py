@@ -24,6 +24,7 @@ import json
 import os
 import socketserver
 import sys
+import urllib.parse
 import urllib.request
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -70,6 +71,7 @@ PACKET_FIELDS = (
     ("steps", "Build steps"),
     ("codeFocus", "Code focus"),
     ("theoryModel", "Theory / how it works"),
+    ("test", "Expected result / how to tell it worked"),
     ("coachInstructions", "Coaching notes"),
     ("troubleshooting", "Troubleshooting"),
     ("challenge", "Try-it challenge"),
@@ -115,12 +117,33 @@ class CourseHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Expires", "0")
         super().end_headers()
 
+    def _origin_is_same_host(self, origin):
+        """True if the request's Origin host matches the host we're served on.
+
+        Tolerant of the reverse proxy (tsdash/tailscale serve): the served host
+        can arrive as Host or X-Forwarded-Host, so accept the Origin if its host
+        matches any of them. Only a genuinely different Origin host is rejected.
+        """
+        origin_host = urllib.parse.urlsplit(origin).netloc.lower()
+        if not origin_host:
+            return False
+        candidates = {
+            (self.headers.get("Host") or "").lower(),
+            (self.headers.get("X-Forwarded-Host") or "").lower(),
+        }
+        return origin_host in {c for c in candidates if c}
+
     def do_GET(self):
-        # Health probe: the widget only renders when this returns ok, so the
-        # identical build stays clean on backend-less hosts.
+        # Health probe. The widget mounts only when this responds with our
+        # sentinel HEADER, not merely 200 — a static host (e.g. Cloudflare Pages)
+        # serves its HTML fallback with 200 for unknown routes, so an "ok" status
+        # or body alone would wrongly mount the widget there. The custom header
+        # can't appear in a static host's fallback, so it reliably identifies
+        # this backend and keeps the public build clean.
         if self.path.split("?")[0] == "/api/chat":
             self.send_response(200)
             self.send_header("Content-Type", "text/plain; charset=utf-8")
+            self.send_header("X-Lesson-Chat", "ok")
             self.end_headers()
             self.wfile.write(b"ok")
             return
@@ -129,6 +152,20 @@ class CourseHandler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         if self.path.split("?")[0] != "/api/chat":
             self.send_error(404, "Not found")
+            return
+        # CSRF defence: a site the learner visits while on the tailnet could fire
+        # a "simple" cross-origin POST (text/plain, no preflight) and spend cloud
+        # tokens under their Tailscale identity. Require application/json — which
+        # forces a CORS preflight this server never approves — and reject any
+        # Origin that isn't this host. The widget always sends application/json
+        # same-origin, so it is unaffected.
+        ctype = (self.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+        if ctype != "application/json":
+            self.send_error(415, "Unsupported Media Type")
+            return
+        origin = self.headers.get("Origin")
+        if origin is not None and not self._origin_is_same_host(origin):
+            self.send_error(403, "Cross-origin request refused")
             return
         try:
             length = int(self.headers.get("Content-Length") or 0)
