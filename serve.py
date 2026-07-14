@@ -51,9 +51,25 @@ MAX_BODY_BYTES = 256 * 1024
 # host equals itself). Defaults cover local direct access; the served tailnet host
 # (and any future Cloudflare Access host) is added via LESSON_CHAT_ALLOWED_HOSTS
 # in the launchd job. Value is a comma-separated list of host[:port].
-ALLOWED_HOSTS = {f"127.0.0.1:{PORT}", f"localhost:{PORT}", f"[::1]:{PORT}"} | {
-    h.strip().lower()
-    for h in os.environ.get("LESSON_CHAT_ALLOWED_HOSTS", "").split(",")
+def _norm_host(host):
+    """Lowercase and drop a default port so `host`, `host:443`, `host:80` match.
+
+    A browser omits the port from Host/Origin on standard 443/80, so an allowlist
+    entry written either way (e.g. `esp32-chat.example.com` or `…:443`) matches.
+    """
+    host = (host or "").strip().lower()
+    for default in (":443", ":80"):
+        if host.endswith(default):
+            return host[: -len(default)]
+    return host
+
+
+ALLOWED_HOSTS = {
+    _norm_host(h)
+    for h in (
+        [f"127.0.0.1:{PORT}", f"localhost:{PORT}", f"[::1]:{PORT}"]
+        + os.environ.get("LESSON_CHAT_ALLOWED_HOSTS", "").split(",")
+    )
     if h.strip()
 }
 
@@ -187,14 +203,14 @@ class CourseHandler(http.server.SimpleHTTPRequestHandler):
         is what defeats DNS rebinding, where the attacker host matches itself.
         """
         host = (self.headers.get("X-Forwarded-Host") or self.headers.get("Host") or "")
-        return host.split(",")[0].strip().lower() in ALLOWED_HOSTS
+        return _norm_host(host.split(",")[0]) in ALLOWED_HOSTS
 
     def _origin_trusted(self):
         """True if there's no Origin, or its host is on the trusted allowlist."""
         origin = self.headers.get("Origin")
         if origin is None:
             return True
-        return urllib.parse.urlsplit(origin).netloc.lower() in ALLOWED_HOSTS
+        return _norm_host(urllib.parse.urlsplit(origin).netloc) in ALLOWED_HOSTS
 
     def do_GET(self):
         # Health probe. The widget mounts only when this responds with our

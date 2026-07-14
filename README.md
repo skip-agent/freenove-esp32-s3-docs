@@ -54,11 +54,17 @@ local port:
 2. In Cloudflare Zero Trust, add an **Access** application for `esp32-chat.<domain>`
    with a policy (email allow-list / one-time PIN) so only invited people get in.
 3. **Add the new hostname to the backend's trusted-host allowlist** (the DNS-rebind
-   guard), or every send returns 403 even though the widget mounts. Append it to
-   `LESSON_CHAT_ALLOWED_HOSTS` in `deploy/com.skipper.esp32-lab.plist` (comma-
-   separated, include the port the browser uses — `esp32-chat.<domain>:443`), then
-   reload: `launchctl bootout gui/$(id -u)/com.skipper.esp32-lab && launchctl
-   bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.skipper.esp32-lab.plist`.
+   guard), or every send returns 403 even though the widget mounts. Append
+   `esp32-chat.<domain>` to `LESSON_CHAT_ALLOWED_HOSTS` (comma-separated; the
+   default `:443` port is optional — the backend normalizes it). Edit the repo
+   plist, copy it over the installed one, and reload so the running process picks
+   up the change:
+   ```bash
+   # after editing deploy/com.skipper.esp32-lab.plist:
+   cp deploy/com.skipper.esp32-lab.plist ~/Library/LaunchAgents/com.skipper.esp32-lab.plist
+   launchctl bootout   gui/$(id -u)/com.skipper.esp32-lab
+   launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.skipper.esp32-lab.plist
+   ```
 4. Leave Ollama bound to `127.0.0.1:11434`; only `serve.py`'s port is exposed, and
    only behind Access. The tailnet serve and the public Access door can run at once.
 
