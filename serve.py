@@ -119,24 +119,58 @@ PACKET_FIELDS = (
 
 
 CONTEXT_BUDGET = 9000     # total chars of lesson context sent to the model
+_MARK = " …[truncated]"   # appended when a section body is trimmed
 
 
 def _truncate(text, limit):
-    """Trim text to a char limit at a whitespace boundary, marking the cut."""
+    """Trim text to `limit` chars, backtracking to a real boundary.
+
+    Slicing serialized JSON at an arbitrary index leaves a mid-token fragment
+    (rstrip won't help — there's often no trailing space). So back up to the last
+    natural boundary (whitespace or JSON punctuation) within a lookback window,
+    and mark the cut so the model knows the section is partial.
+    """
     if len(text) <= limit:
         return text
-    cut = text[: max(0, limit - 14)].rstrip()
-    return cut + " …[truncated]"
+    keep = max(0, limit - len(_MARK))
+    window = text[:keep]
+    boundary = max(window.rfind(c) for c in " \n\t,]}\"")
+    if boundary >= keep - 200:  # only honour a boundary that's reasonably close
+        window = window[: boundary + 1]
+    return window.rstrip() + _MARK
+
+
+def _allocate(lengths, budget):
+    """Water-fill: give each item min(len, fair share), redistributing surplus.
+
+    Items shorter than their share keep their full length; the budget they don't
+    use is redistributed among the still-oversized items until it settles. So a
+    packet full of short sections plus a few big ones spends the whole budget
+    instead of truncating everyone to an equal (and mostly wasted) slice.
+    """
+    alloc = [None] * len(lengths)
+    remaining = budget
+    pending = list(range(len(lengths)))
+    while pending:
+        share = remaining // len(pending)
+        fitted = [i for i in pending if lengths[i] <= share]
+        if not fitted:  # everyone left is oversized — split what's left evenly
+            for i in pending:
+                alloc[i] = share
+            break
+        for i in fitted:
+            alloc[i] = lengths[i]
+            remaining -= lengths[i]
+        pending = [i for i in pending if i not in fitted]
+    return alloc
 
 
 def context_from_packet(packet):
     """Flatten selected lesson-packet fields into a bounded text block.
 
-    Keeps EVERY present section represented rather than dropping later ones
-    wholesale: if the sections fit the budget they're included whole, otherwise
-    each section gets an equal share of the budget and is trimmed to fit. This
-    guarantees a small-but-important section (e.g. troubleshooting) isn't skipped
-    just because earlier sections were large.
+    Keeps EVERY present section represented (never drops one wholesale) and, when
+    the packet exceeds the budget, water-fills the allowance so short sections
+    stay whole and only genuinely-oversized ones are trimmed — at a real boundary.
     """
     if not isinstance(packet, dict):
         return ""
@@ -150,16 +184,18 @@ def context_from_packet(packet):
     if not sections:
         return ""
 
-    joined = [f"## {label}\n{body}" for label, body in sections]
-    total = sum(len(s) for s in joined) + 2 * (len(joined) - 1)
-    if total > CONTEXT_BUDGET:
-        # Fair share per section (reserve room for the "## label\n" header + join).
-        share = CONTEXT_BUDGET // len(sections) - 2
-        joined = [
-            f"## {label}\n{_truncate(body, max(40, share - len(label) - 4))}"
-            for label, body in sections
-        ]
-    return "\n\n".join(joined)
+    headers = [f"## {label}\n" for label, _ in sections]
+    overhead = sum(len(h) for h in headers) + 2 * (len(sections) - 1)
+    body_budget = CONTEXT_BUDGET - overhead
+    total_body = sum(len(body) for _, body in sections)
+
+    if total_body <= body_budget or body_budget <= 0:
+        bodies = [body for _, body in sections]
+    else:
+        alloc = _allocate([len(body) for _, body in sections], body_budget)
+        bodies = [_truncate(body, alloc[i]) for i, (_, body) in enumerate(sections)]
+
+    return "\n\n".join(h + b for h, b in zip(headers, bodies))
 
 
 def build_messages(body):

@@ -368,7 +368,19 @@ async function initLessonChat() {
     for (let d = 1; d <= total; d += 1) {
       if (progress.isDone(d)) done += 1;
     }
-    return `Currently on Day ${lessonData.day} of ${total}. Days marked complete: ${done}.`;
+    let line = `Currently on Day ${lessonData.day} of ${total}. Days marked complete: ${done}.`;
+    // Per-step state for THIS lesson, so the tutor can resume at the first
+    // unfinished step instead of repeating completed ones.
+    const steps = progress.get(lessonData.day).steps;
+    if (Array.isArray(steps) && steps.length) {
+      const stepsDone = steps.filter(Boolean).length;
+      const nextStep = steps.findIndex((s) => !s);
+      line += ` This lesson: ${stepsDone} of ${steps.length} steps checked off`;
+      line += nextStep === -1
+        ? " (all steps done)."
+        : ` (next unfinished is step ${nextStep + 1}).`;
+    }
+    return line;
   }
 
   // Minimal, safe rendering: escape HTML, then reveal `inline` and ```fenced``` code.
