@@ -442,8 +442,13 @@ async function initLessonChat() {
 
   async function ask(question) {
     if (busy || !question.trim()) return;
+    // Accepted — safe to clear the composer now (clearing before this guard
+    // would silently drop a question typed while a reply is still streaming).
+    input.value = "";
+    input.style.height = "auto";
     busy = true;
     sendBtn.disabled = true;
+    input.disabled = true;
     addMsg("user", question);
     history.push({ role: "user", content: question });
     const botEl = addMsg("bot", "…");
@@ -472,20 +477,21 @@ async function initLessonChat() {
       }
       history.push({ role: "assistant", content: answer });
     } catch (err) {
+      // No assistant reply landed — drop the unanswered user turn so the next
+      // request doesn't resend it as stale/duplicated context.
+      history.pop();
       botEl.innerHTML = render(`Sorry — I couldn't reach the model. (${err.message})`);
     } finally {
       busy = false;
       sendBtn.disabled = false;
+      input.disabled = false;
       input.focus();
     }
   }
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    const q = input.value;
-    input.value = "";
-    input.style.height = "auto";
-    ask(q);
+    ask(input.value);
   });
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); }

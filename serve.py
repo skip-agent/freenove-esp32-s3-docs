@@ -173,6 +173,11 @@ class CourseHandler(http.server.SimpleHTTPRequestHandler):
         except (ValueError, json.JSONDecodeError):
             self.send_error(400, "Invalid JSON body")
             return
+        # A scalar/array is valid JSON but build_messages() expects a mapping;
+        # reject it here as a controlled 400 rather than a proxied 502 + traceback.
+        if not isinstance(body, dict):
+            self.send_error(400, "JSON body must be an object")
+            return
 
         payload = json.dumps(
             {"model": MODEL, "messages": build_messages(body), "stream": True}
@@ -194,6 +199,13 @@ class CourseHandler(http.server.SimpleHTTPRequestHandler):
                         obj = json.loads(line)
                     except json.JSONDecodeError:
                         continue
+                    # Ollama can report a mid-stream failure as an `error` field;
+                    # surface it instead of silently leaving the widget on "…".
+                    err = obj.get("error")
+                    if err:
+                        self.wfile.write(f"\n\n[Model error: {err}]".encode("utf-8"))
+                        self.wfile.flush()
+                        break
                     chunk = (obj.get("message") or {}).get("content", "")
                     if chunk:
                         self.wfile.write(chunk.encode("utf-8"))
