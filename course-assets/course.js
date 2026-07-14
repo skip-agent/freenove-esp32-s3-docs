@@ -337,6 +337,7 @@ async function initLessonChat() {
   // Out-of-band signal from serve.py: text after a NUL byte is a stream-failure
   // notice to show but not record as an assistant turn (see STREAM_ERROR_MARK).
   const STREAM_ERROR_MARK = " ";
+  const STREAM_OK_MARK = "";
 
   function lessonTitle() {
     return (document.title || "this lesson")
@@ -490,8 +491,11 @@ async function initLessonChat() {
       if (!res.ok || !res.body) throw new Error(`server responded ${res.status}`);
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
+      // Strip both out-of-band markers before display: NUL prefixes a failure
+      // notice, ETX is the success terminator.
+      const clean = (a) => a.replace(STREAM_ERROR_MARK, "\n\n").split(STREAM_OK_MARK)[0];
       const paint = () => {
-        botEl.innerHTML = render(answer.replace(STREAM_ERROR_MARK, "\n\n"));
+        botEl.innerHTML = render(clean(answer));
         log.scrollTop = log.scrollHeight;
       };
       let lastPaint = 0;
@@ -509,15 +513,21 @@ async function initLessonChat() {
         }
       }
       paint(); // final, complete render
-      if (answer.includes(STREAM_ERROR_MARK)) {
-        // A mid-stream failure the server flagged out-of-band: show it, but keep
-        // it (and any partial text) out of history so it isn't resent as context.
-        history.pop();
-      } else {
-        history.push({ role: "assistant", content: answer });
+      const failed = answer.includes(STREAM_ERROR_MARK);
+      const complete = answer.includes(STREAM_OK_MARK);
+      if (!failed && complete) {
+        history.push({ role: "assistant", content: clean(answer) });
         // Keep the in-memory transcript from growing without bound over a very
         // long session (the server only ever uses the recent window anyway).
         if (history.length > 40) history.splice(0, history.length - 40);
+      } else {
+        // A flagged failure, OR a stream that ended without the success
+        // terminator (the backend died mid-reply) — show what arrived but keep
+        // the partial/empty answer out of history so it isn't resent as context.
+        history.pop();
+        if (!failed) {
+          botEl.innerHTML = render(clean(answer) + "\n\n_[The reply was cut off — please ask again.]_");
+        }
       }
     } catch (err) {
       // No assistant reply landed — drop the unanswered user turn so the next

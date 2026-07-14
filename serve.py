@@ -41,6 +41,10 @@ MODEL = "qwen3-coder:480b-cloud"
 # learner but NOT record as an assistant turn (the 200 was already committed once
 # streaming began, so failures can't be an HTTP status any more).
 STREAM_ERROR_MARK = "\x00"
+# Success is signalled EXPLICITLY too: only written after Ollama's `done` frame.
+# Its absence (a bare EOF — e.g. serve.py restarted mid-reply) tells the widget
+# the answer was truncated, so a partial reply is never recorded as complete.
+STREAM_OK_MARK = "\x03"
 
 # A legitimate chat request is a few KB once the widget's fields are bounded;
 # refuse anything larger so a huge Content-Length can't be buffered into memory.
@@ -356,9 +360,17 @@ class CourseHandler(http.server.SimpleHTTPRequestHandler):
                     if obj.get("done"):
                         done_seen = True
                         break
-            # A clean HTTP EOF before any `done` frame is still a truncated answer;
-            # flag it out-of-band so the widget doesn't record a partial/empty turn.
-            if not done_seen and not stream_failed:
+            if stream_failed:
+                pass  # error marker already written
+            elif done_seen:
+                # Explicit success terminator: only a reply that reached `done`
+                # earns it, so the widget can tell a complete answer from one cut
+                # short by a bare EOF (e.g. this process restarting mid-reply).
+                self.wfile.write(STREAM_OK_MARK.encode("utf-8"))
+                self.wfile.flush()
+            else:
+                # A clean HTTP EOF before any `done` frame is still a truncated
+                # answer; flag it so the widget doesn't record a partial/empty turn.
                 self.wfile.write(
                     f"{STREAM_ERROR_MARK}[The model stopped before finishing.]".encode("utf-8")
                 )
