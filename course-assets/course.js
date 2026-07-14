@@ -528,7 +528,10 @@ async function initLessonChat() {
       busy = false;
       sendBtn.disabled = false;
       input.disabled = false;
-      input.focus();
+      // Only refocus the composer if the panel is still open — if the learner
+      // closed it mid-reply, focus belongs on the floating button, not a hidden
+      // textarea (which would swallow keystrokes and hide the focus ring).
+      if (!panel.hidden) input.focus();
     }
   }
 
