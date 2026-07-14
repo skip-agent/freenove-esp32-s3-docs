@@ -11,6 +11,38 @@ as one static site with two surfaces:
 The site is static HTML/CSS/JS built by a Python script and deployed to
 Cloudflare Pages. No backend, no accounts; progress lives in the browser.
 
+## In-page lesson chat (optional backend)
+
+Every lesson page carries a floating **"Ask about this lesson"** widget backed by
+a local Ollama cloud model (`qwen3-coder:480b-cloud`). It is **backend-aware**: on
+load it health-checks `GET /api/chat` and only mounts if a backend answers. So the
+*same generated build* is safe on the public Pages host (no backend there → no
+button, nothing broken) and lights up automatically wherever the backend is served.
+
+- **Backend:** `serve.py` at the repo root serves `docs/` plus `GET/POST /api/chat`.
+  It binds to `127.0.0.1` and knows nothing about who is allowed in — **auth is an
+  edge concern, never in the app.** The model is fixed server-side; Ollama stays
+  private on `127.0.0.1:11434` and is never proxied.
+- **On the Mac mini:** it runs as launchd job `com.skipper.esp32-lab`
+  (`deploy/com.skipper.esp32-lab.plist`) on `127.0.0.1:3013`, served to the
+  **tailnet only** via `tsdash serve` (never raw `tailscale serve`, **never
+  Funnel**). Tailscale identity is the login, so no anonymous visitor can spend
+  tokens. Lesson context comes from each lesson's packet JSON.
+
+### Making it public later (Cloudflare + Access) — no app changes
+
+Because auth lives at the edge, sharing the chat publicly (e.g. with family) needs
+**zero changes to `serve.py`, the widget, or the build**. Put a Cloudflare Access
+front door in front of the same local port:
+
+1. Run a named tunnel to the backend: `cloudflared tunnel --url http://127.0.0.1:3013`
+   (or a persistent tunnel with a `config.yml` ingress to `127.0.0.1:3013`), mapped
+   to a hostname like `esp32-chat.<domain>`.
+2. In Cloudflare Zero Trust, add an **Access** application for that hostname with a
+   policy (email allow-list / one-time PIN) so only invited people get in.
+3. Leave Ollama bound to `127.0.0.1:11434`; only `serve.py`'s port is exposed, and
+   only behind Access. The tailnet serve and the public Access door can run at once.
+
 ## How a lesson works
 
 Each day is **one source-of-truth file** — `lessons/day-NN-slug.yml`

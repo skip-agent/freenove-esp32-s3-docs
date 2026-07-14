@@ -30,7 +30,7 @@ from lesson_schema import (
 
 COURSE_ASSETS = ROOT / "course-assets"
 COURSE_TITLE = "ESP32-S3 Lab"
-COURSE_CSS_VERSION = "20260711-3"
+COURSE_CSS_VERSION = "20260714-1"
 SOURCE_PREFIX = "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main"
 
 # Section scaffolding shared by every day (the consistent workshop voice). A
@@ -630,6 +630,9 @@ def render_lesson(lesson: dict, glossary: dict, order: list[dict],
         "day": day,
         "totalDays": total,
         "slug": lesson["slug"],
+        # lessonCode lets the in-page chat widget fetch this lesson's packet
+        # (docs/course/packets/<CODE>.json) for structured context.
+        "lessonCode": code,
         "explainers": _resolve_explainers(lesson, glossary),
         "prev": prev_day,
         "next": next_day,

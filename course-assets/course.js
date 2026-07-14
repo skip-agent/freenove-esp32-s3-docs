@@ -320,3 +320,187 @@ document.querySelectorAll("[data-copy]").forEach((btn) => {
     }
   });
 });
+
+/* --------------------------------------------------------------------------
+   Lesson chat widget — a floating "ask about this lesson" panel.
+   Backed by a local model proxy (POST /api/chat in serve.py). The widget is
+   BACKEND-AWARE: it health-checks GET /api/chat first and only mounts when a
+   backend answers. So the identical generated build is safe on the public
+   Cloudflare Pages host (no backend there -> no button, nothing broken) and
+   lights up wherever this backend is served (the tailnet today; a
+   Cloudflare-Access origin later) with no rebuild. Only mounts on lesson pages.
+   -------------------------------------------------------------------------- */
+async function initLessonChat() {
+  // Only lesson pages carry lesson-data with a day; the course map does not.
+  if (!lessonData || lessonData.day == null) return;
+
+  function lessonTitle() {
+    return (document.title || "this lesson")
+      .replace(/\s*[—–|]\s*ESP32-S3 Lab.*$/i, "")
+      .trim() || "this lesson";
+  }
+
+  // Structured lesson packet is the preferred context (mission, wiring, steps,
+  // coaching notes, troubleshooting); fall back to the page text if it's absent.
+  async function loadPacket() {
+    if (!lessonData.lessonCode) return null;
+    try {
+      const res = await fetch(`../packets/${encodeURIComponent(lessonData.lessonCode)}.json`);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  }
+
+  function lessonText() {
+    const main = document.querySelector(".lesson-main") || document.querySelector("main") || document.body;
+    return (main.innerText || "").replace(/\s+\n/g, "\n").trim().slice(0, 9000);
+  }
+
+  function progressSummary() {
+    const total = lessonData.totalDays || 30;
+    let done = 0;
+    for (let d = 1; d <= total; d += 1) {
+      if (progress.isDone(d)) done += 1;
+    }
+    return `Currently on Day ${lessonData.day} of ${total}. Days marked complete: ${done}.`;
+  }
+
+  // Minimal, safe rendering: escape HTML, then reveal `inline` and ```fenced``` code.
+  function render(text) {
+    const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+    const parts = text.split(/```(?:\w+)?\n?([\s\S]*?)```/g);
+    return parts
+      .map((part, i) =>
+        i % 2
+          ? `<pre><code>${esc(part.replace(/\n$/, ""))}</code></pre>`
+          : esc(part).replace(/`([^`]+)`/g, "<code>$1</code>")
+      )
+      .join("");
+  }
+
+  const packet = await loadPacket();
+  const history = [];
+  let busy = false;
+
+  const fab = document.createElement("button");
+  fab.className = "lchat-fab";
+  fab.type = "button";
+  fab.innerHTML = '<span class="lchat-fab__icon" aria-hidden="true">💬</span> Ask about this lesson';
+  fab.setAttribute("aria-label", "Ask a question about this lesson");
+
+  const panel = document.createElement("section");
+  panel.className = "lchat";
+  panel.hidden = true;
+  panel.setAttribute("aria-label", "Lesson chat");
+  panel.innerHTML = `
+    <div class="lchat__head">
+      <div>
+        <p class="lchat__title">Ask about ${lessonTitle().replace(/[<>&]/g, "")}</p>
+        <p class="lchat__sub">ESP32 tutor · qwen3-coder · runs on Skipper's tailnet</p>
+      </div>
+      <button class="lchat__close" type="button" aria-label="Close chat">×</button>
+    </div>
+    <div class="lchat__log" role="log" aria-live="polite">
+      <div class="lchat-msg lchat-msg--hint">Ask anything about this lesson — the wiring, the code, or a term you don't recognise. Nothing here touches your board.</div>
+    </div>
+    <form class="lchat__form">
+      <textarea class="lchat__input" rows="1" placeholder="e.g. why does the LED need a resistor?" aria-label="Your question"></textarea>
+      <button class="lchat__send" type="submit">Send</button>
+    </form>`;
+
+  document.body.append(fab, panel);
+
+  const log = panel.querySelector(".lchat__log");
+  const form = panel.querySelector(".lchat__form");
+  const input = panel.querySelector(".lchat__input");
+  const sendBtn = panel.querySelector(".lchat__send");
+
+  function open() {
+    panel.hidden = false;
+    fab.hidden = true;
+    input.focus();
+  }
+  function close() {
+    panel.hidden = true;
+    fab.hidden = false;
+  }
+  fab.addEventListener("click", open);
+  panel.querySelector(".lchat__close").addEventListener("click", close);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !panel.hidden) close(); });
+
+  function addMsg(role, text) {
+    const el = document.createElement("div");
+    el.className = `lchat-msg lchat-msg--${role}`;
+    el.innerHTML = render(text);
+    log.append(el);
+    log.scrollTop = log.scrollHeight;
+    return el;
+  }
+
+  async function ask(question) {
+    if (busy || !question.trim()) return;
+    busy = true;
+    sendBtn.disabled = true;
+    addMsg("user", question);
+    history.push({ role: "user", content: question });
+    const botEl = addMsg("bot", "…");
+    let answer = "";
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lessonTitle: lessonTitle(),
+          lessonPacket: packet,
+          lessonText: packet ? undefined : lessonText(),
+          progress: progressSummary(),
+          messages: history,
+        }),
+      });
+      if (!res.ok || !res.body) throw new Error(`server responded ${res.status}`);
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        answer += decoder.decode(value, { stream: true });
+        botEl.innerHTML = render(answer);
+        log.scrollTop = log.scrollHeight;
+      }
+      history.push({ role: "assistant", content: answer });
+    } catch (err) {
+      botEl.innerHTML = render(`Sorry — I couldn't reach the model. (${err.message})`);
+    } finally {
+      busy = false;
+      sendBtn.disabled = false;
+      input.focus();
+    }
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const q = input.value;
+    input.value = "";
+    input.style.height = "auto";
+    ask(q);
+  });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); }
+  });
+  input.addEventListener("input", () => {
+    input.style.height = "auto";
+    input.style.height = Math.min(input.scrollHeight, 112) + "px";
+  });
+}
+
+// Backend-aware mount: only wire the widget in if a chat backend answers.
+(async () => {
+  try {
+    const res = await fetch("/api/chat", { method: "GET" });
+    if (res.ok) initLessonChat();
+  } catch {
+    /* no backend (e.g. the public static host) — no chat button, nothing broken */
+  }
+})();
