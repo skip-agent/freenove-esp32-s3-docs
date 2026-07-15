@@ -44,7 +44,7 @@
     {
       "name": "220 Ω resistor",
       "imageAsset": "docs/course/assets/shared/item-resistor.png",
-      "explanation": "A resistor limits how much current flows. Placed in series with the LED, the 220 Ω one keeps the current gentle enough to light the LED instead of burning it out. The bands of colour print its value, and it has no direction."
+      "explanation": "A resistor is a small component whose whole job is to limit how much current flows through a wire. Current is the flow of electricity through the circuit; a resistor throttles that flow down to a safe amount. Its strength is measured in ohms (Ω) — a larger number resists harder and lets less current through. A LED wired straight to power pulls far more current than it can survive and burns out at once, so it always sits in series with a resistor. The 220 Ω value here holds the current gentle enough to light the LED and keep it alive. The coloured bands print the resistor's value, and it works the same either way round — a resistor has no positive or negative end."
     },
     {
       "name": "10 kΩ resistor",

@@ -240,10 +240,16 @@ led:
 resistor:
   title: Resistor
   body: >
-    A resistor limits how much current flows. Placed in series with the LED, the
-    220 Ω one keeps the current gentle enough to light the LED instead of burning
-    it out. The bands of colour print its value, and it has no direction.
-  shortcut: The 220 Ω resistor protects the LED; either way round is fine.
+    A resistor is a small component whose whole job is to limit how much current
+    flows through a wire. Current is the flow of electricity through the circuit;
+    a resistor throttles that flow down to a safe amount. Its strength is measured
+    in ohms (Ω) — a larger number resists harder and lets less current through. A
+    LED wired straight to power pulls far more current than it can survive and
+    burns out at once, so it always sits in series with a resistor. The 220 Ω value
+    here holds the current gentle enough to light the LED and keep it alive. The
+    coloured bands print the resistor's value, and it works the same either way
+    round — a resistor has no positive or negative end.
+  shortcut: A resistor throttles current; the 220 Ω one keeps the LED from burning out, either way round.
 
 pushButton:
   title: Push button
@@ -256,10 +262,15 @@ pushButton:
 pullResistor:
   title: Pull resistor (10 kΩ)
   body: >
-    An input pin left floating drifts between HIGH and LOW and reads at random.
-    A 10 kΩ resistor gently ties the pin to a known level, so it reads a steady
-    value until a button press forces the other one.
-  shortcut: The 10 kΩ resistors stop GPIO 13 from guessing while the button is idle.
+    This is the same kind of component as the 220 Ω resistor, put to a different
+    job. Rather than limiting current to a LED, it ties an input pin to a known
+    voltage. An input pin with nothing wired to it floats — it drifts between HIGH
+    and LOW and reads at random. The 10 kΩ resistor holds GPIO 13 up at 3.3V so it
+    rests at a steady HIGH. Its value is large on purpose: it pulls just firmly
+    enough to set that resting level, yet gently enough that pressing the button —
+    a near-zero-resistance path to ground — easily overrules it and drags the pin
+    to LOW.
+  shortcut: A 10 kΩ resistor holds GPIO 13 at a steady level until a press overrules it.
 
 digitalRead:
   title: digitalRead()
