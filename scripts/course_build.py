@@ -30,7 +30,7 @@ from lesson_schema import (
 
 COURSE_ASSETS = ROOT / "course-assets"
 COURSE_TITLE = "ESP32-S3 Lab"
-COURSE_CSS_VERSION = "20260714-3"
+COURSE_CSS_VERSION = "20260714-4"
 SOURCE_PREFIX = "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main"
 
 # Shared theme control — one self-contained inline script placed in every page's

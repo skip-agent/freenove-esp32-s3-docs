@@ -1279,14 +1279,33 @@ dialog.lightbox[open] { animation: dialog-in 200ms cubic-bezier(0.2, 0.7, 0.2, 1
   padding-top: 2px;
 }
 
-/* image-zoom variant */
-dialog.lightbox.image { width: min(1000px, calc(100vw - 32px)); }
+/* image-zoom variant — the whole figure fits the viewport, caption included.
+   The base .lightbox caps height at 720px and hides overflow, which clipped
+   tall circuit diagrams. Here the image height is capped in viewport units with
+   space reserved for the caption (--cap-space), so the diagram and its caption
+   both stay on screen at any viewport — including short or landscape phones —
+   with no scrolling. */
+dialog.lightbox.image {
+  --cap-space: 6rem; /* room for the caption + its padding, even wrapped to 3 lines */
+  width: auto;
+  max-width: min(1100px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  overflow: hidden;
+}
 dialog.lightbox.image .lb-body { padding: 0; }
-dialog.lightbox.image img { display: block; width: 100%; height: auto; }
+dialog.lightbox.image img {
+  display: block;
+  margin: 0 auto;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: calc(100vh - 24px - var(--cap-space));
+}
 dialog.lightbox.image .lb-cap {
   padding: 14px 22px 20px;
   color: var(--ink-faint);
   font-size: 0.82rem;
+  text-align: center;
 }
 dialog.lightbox.image .lb-close {
   position: absolute; top: 14px; right: 14px; z-index: 2;
