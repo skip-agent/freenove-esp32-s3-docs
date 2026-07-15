@@ -30,7 +30,7 @@ from lesson_schema import (
 
 COURSE_ASSETS = ROOT / "course-assets"
 COURSE_TITLE = "ESP32-S3 Lab"
-COURSE_CSS_VERSION = "20260714-2"
+COURSE_CSS_VERSION = "20260714-3"
 SOURCE_PREFIX = "source/Freenove_Super_Starter_Kit_for_ESP32_S3-main"
 
 # Shared theme control — one self-contained inline script placed in every page's
@@ -616,6 +616,27 @@ def _colophon(lesson: dict, day: int, total: int) -> str:
     </footer>"""
 
 
+def _complete(day: int) -> str:
+    """The explicit 'mark this day complete' control.
+
+    Writes the same per-day ``done`` flag the course map and landing voyage
+    already read, so completing a lesson lights it up everywhere. Its state is
+    hydrated and toggled by course.js; the markup ships the light (incomplete)
+    state so it reads correctly before the script runs.
+    """
+    return f"""        <section class="lesson-complete" id="lessonComplete" aria-labelledby="completeTitle">
+          <div class="complete-copy">
+            <p class="section-kicker">Keep your place</p>
+            <h2 class="complete-title" id="completeTitle">Finished Day {day}?</h2>
+            <p class="complete-note" id="completeNote">Mark it complete — it shows on your course map, and your place is saved on this device.</p>
+          </div>
+          <button class="complete-btn" id="completeBtn" type="button" aria-pressed="false">
+            <span class="complete-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <span class="complete-btn-label" id="completeBtnLabel">Mark Day {day} complete</span>
+          </button>
+        </section>"""
+
+
 def _day_nav(prev_day: dict | None, next_day: dict | None) -> str:
     if not prev_day and not next_day:
         return ""
@@ -707,6 +728,7 @@ def render_lesson(lesson: dict, glossary: dict, order: list[dict],
 {_rail(present, day, total)}
       <main class="lesson-main">
 {chr(10).join(body_sections)}
+{_complete(day)}
 {_day_nav(prev_day, next_day)}
       </main>
     </div>

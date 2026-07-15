@@ -1477,6 +1477,75 @@ dialog.lightbox.image .lb-close {
   width: 100%; height: 100%;
 }
 
+/* ===========================================================================
+   Lesson completion — the explicit "mark this day complete" control.
+   Sits at the foot of the lesson, above the prev/next nav. Its done state is
+   the same flag the course map + landing voyage read.
+   =========================================================================== */
+.lesson-complete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px 24px;
+  margin-top: 30px;
+  padding: 22px clamp(20px, 3vw, 30px);
+  border-radius: var(--r-xl);
+  border: 1px solid var(--line);
+  background: var(--paper);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.lesson-complete .complete-copy { flex: 1 1 260px; }
+.complete-title { font-size: 1.4rem; margin: 6px 0 0; color: var(--ink); }
+.complete-note { margin: 8px 0 0; color: var(--ink-soft); font-size: 0.96rem; }
+.complete-note a { color: var(--depth-deep); font-weight: 600; white-space: nowrap; }
+
+.complete-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.72rem 1.25rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--sounder);
+  background: transparent;
+  color: var(--sounder-deep);
+  font-family: var(--display);
+  font-size: 1rem;
+  font-weight: 620;
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease, transform 0.12s ease;
+}
+.complete-btn:hover { background: var(--depth-wash); }
+.complete-btn:active { transform: scale(0.97); }
+.complete-btn:focus-visible { outline: 2px solid var(--sounder); outline-offset: 3px; }
+.complete-tick {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 1.5px solid currentColor;
+  transition: background 0.16s ease, border-color 0.16s ease;
+}
+.complete-tick svg { width: 14px; height: 14px; opacity: 0; transition: opacity 0.16s ease; }
+
+/* Completed state — filled, with the tick shown. */
+.complete-btn.is-complete {
+  border-color: var(--sounder);
+  background: var(--sounder);
+  color: #fff;
+}
+.complete-btn.is-complete:hover { background: var(--sounder-deep); border-color: var(--sounder-deep); }
+.complete-btn.is-complete .complete-tick { background: rgba(255, 255, 255, 0.22); border-color: transparent; }
+.complete-btn.is-complete .complete-tick svg { opacity: 1; }
+.lesson-complete:has(.complete-btn.is-complete) {
+  border-color: color-mix(in srgb, var(--sounder) 40%, var(--line));
+  background: var(--depth-wash);
+}
+@media print { .lesson-complete { display: none; } }
+
 /* prev / next day navigation at the foot of a lesson */
 .day-nav {
   display: grid;
