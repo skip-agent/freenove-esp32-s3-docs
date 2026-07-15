@@ -50,6 +50,77 @@
   color-scheme: light;
 }
 
+/* ===========================================================================
+   Dark theme — a single calm dark skin, driven by the same tokens.
+   Set by the theme toggle (data-theme="dark" on <html>), and adopted from the
+   OS preference on first visit. Genuine terminals (code panel, serial monitor)
+   were already dark and keep their own colours; here we retune the paper,
+   ink, hairlines and accent so the reading surfaces read well on a dark page.
+   =========================================================================== */
+html[data-theme="dark"] {
+  --abyss: #05070b;          /* terminals — deepest, still distinct from page */
+  --abyss-2: #0d1017;
+  --abyss-line: #232a36;
+  --chart: #0d1117;          /* page background */
+  --paper: #161b24;          /* reading card surface */
+  --ink: #e7eaf1;            /* primary text */
+  --ink-soft: #aab2c0;       /* secondary text */
+  --ink-faint: #838c9b;      /* captions, meta */
+  --line: #262d3a;           /* hairlines */
+  --line-strong: #333c4c;
+  --sounder: #6d8bff;        /* primary accent — brightened for dark */
+  --sounder-deep: #92a9ff;
+  --depth: #7ea3ff;          /* links, structure */
+  --depth-deep: #9fbcff;
+  --depth-wash: #182236;     /* accent tint surface */
+  --phosphor: #8fc9ff;
+  --hazard: #e2a75c;         /* safety callouts */
+  --hazard-wash: #2a2113;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.36), 0 1px 3px rgba(0, 0, 0, 0.44);
+  --shadow-md: 0 6px 22px rgba(0, 0, 0, 0.48);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.6);
+  --shadow-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+
+  color-scheme: dark;
+}
+/* The faint breadboard-dot motif is dark ink on light; invert it on dark. */
+html[data-theme="dark"] .hero::before {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1.4px);
+}
+/* The caution callout is a warm light tint with hard-coded trim; retune for dark. */
+html[data-theme="dark"] .callout { border-color: #5c4a24; }
+html[data-theme="dark"] .callout .icon { background: #3a2c12; }
+html[data-theme="dark"] .callout strong { color: #e2a75c; }
+
+/* ---------------------------------------------------------------------------
+   Theme toggle — a small floating control present on every page. Created by
+   the inline theme script; styled here so it matches each surface's system.
+   --------------------------------------------------------------------------- */
+.theme-toggle {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink-soft);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+.theme-toggle:hover { color: var(--sounder); border-color: color-mix(in srgb, var(--sounder) 40%, var(--line)); }
+.theme-toggle:active { transform: scale(0.94); }
+.theme-toggle:focus-visible { outline: 2px solid var(--sounder); outline-offset: 2px; }
+.theme-toggle svg { width: 20px; height: 20px; display: block; }
+@media print { .theme-toggle { display: none; } }
+
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 
@@ -474,7 +545,7 @@ h1, h2, h3, h4 {
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
-  background: #fff;
+  background: var(--paper);
   transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
 }
 .part-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--line-strong); }
@@ -584,7 +655,7 @@ h1, h2, h3, h4 {
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
-  background: #fff;
+  background: var(--paper);
 }
 .image-frame button.zoom {
   display: block;
@@ -632,7 +703,7 @@ h1, h2, h3, h4 {
   padding: 12px 14px;
   border: 1px solid var(--line);
   border-radius: var(--r-md);
-  background: #fff;
+  background: var(--paper);
   transition: border-color 130ms ease, box-shadow 130ms ease, background 130ms ease;
 }
 .pin-row:hover, .pin-row.lit {
@@ -689,7 +760,7 @@ h1, h2, h3, h4 {
   padding: 12px 15px;
   border-radius: var(--r-md);
   border: 1px dashed var(--line-strong);
-  background: #fff;
+  background: var(--paper);
 }
 .steps-progress .bar {
   flex: 1;
@@ -724,7 +795,7 @@ h1, h2, h3, h4 {
   padding: 14px 16px;
   border: 1px solid var(--line);
   border-radius: var(--r-md);
-  background: #fff;
+  background: var(--paper);
   transition: border-color 140ms ease, background 140ms ease;
 }
 .step:hover { border-color: var(--line-strong); }
@@ -735,7 +806,7 @@ h1, h2, h3, h4 {
   padding: 0;
   border-radius: 9px;
   border: 2px solid var(--line-strong);
-  background: #fff;
+  background: var(--paper);
   color: var(--ink-faint);
   font-family: var(--mono);
   font-size: 0.85rem;
@@ -781,7 +852,7 @@ h1, h2, h3, h4 {
   margin-bottom: 14px;
   border-radius: 999px;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--paper);
 }
 .tab {
   border: 0;
@@ -900,7 +971,7 @@ h1, h2, h3, h4 {
   position: relative;
   padding: 18px 16px 16px;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--paper);
   counter-increment: flow;
 }
 .flow-step:first-child { border-radius: var(--r-lg) 0 0 var(--r-lg); }
@@ -963,7 +1034,7 @@ h1, h2, h3, h4 {
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
-  background: #fff;
+  background: var(--paper);
 }
 .mini-card h3 {
   display: flex;
@@ -1076,7 +1147,7 @@ h1, h2, h3, h4 {
   border: 1px solid var(--line);
   border-left: 3px solid var(--sounder);
   border-radius: var(--r-md);
-  background: #fff;
+  background: var(--paper);
   font-size: 0.92rem;
 }
 .checklist li strong { color: var(--ink); }
@@ -1094,7 +1165,7 @@ h1, h2, h3, h4 {
   border: 1px solid var(--line);
   background:
     repeating-linear-gradient(180deg, transparent 0 37px, rgba(53, 87, 240, 0.06) 37px 38px),
-    #fff;
+    var(--paper);
 }
 .logbook .logbook-head {
   display: flex; align-items: center; gap: 9px;
@@ -1108,7 +1179,7 @@ h1, h2, h3, h4 {
   border: 1px solid var(--line-strong);
   border-radius: var(--r-md);
   padding: 11px 12px;
-  background: #fffdfa;
+  background: var(--paper);
   color: var(--ink);
   font-family: var(--body);
 }
@@ -1177,7 +1248,7 @@ dialog.lightbox[open] { animation: dialog-in 200ms cubic-bezier(0.2, 0.7, 0.2, 1
   width: 34px; height: 34px;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
-  background: #fff;
+  background: var(--paper);
   color: var(--ink-soft);
   font-size: 1.2rem;
   line-height: 1;
@@ -1362,7 +1433,7 @@ dialog.lightbox.image .lb-close {
   padding: 16px 16px 15px;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
-  background: #fff;
+  background: var(--paper);
   text-decoration: none;
   color: var(--ink);
   transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
@@ -1391,7 +1462,7 @@ dialog.lightbox.image .lb-close {
   width: 18px; height: 18px;
   border-radius: 50%;
   border: 2px solid var(--line-strong);
-  background: #fff;
+  background: var(--paper);
   transition: all 150ms ease;
 }
 .day-tile.is-done { border-color: rgba(14, 124, 139, 0.35); background: var(--depth-wash); }
@@ -1405,6 +1476,75 @@ dialog.lightbox.image .lb-close {
   color: #fff; font-size: 0.7rem; font-weight: 700;
   width: 100%; height: 100%;
 }
+
+/* ===========================================================================
+   Lesson completion — the explicit "mark this day complete" control.
+   Sits at the foot of the lesson, above the prev/next nav. Its done state is
+   the same flag the course map + landing voyage read.
+   =========================================================================== */
+.lesson-complete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px 24px;
+  margin-top: 30px;
+  padding: 22px clamp(20px, 3vw, 30px);
+  border-radius: var(--r-xl);
+  border: 1px solid var(--line);
+  background: var(--paper);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.lesson-complete .complete-copy { flex: 1 1 260px; }
+.complete-title { font-size: 1.4rem; margin: 6px 0 0; color: var(--ink); }
+.complete-note { margin: 8px 0 0; color: var(--ink-soft); font-size: 0.96rem; }
+.complete-note a { color: var(--depth-deep); font-weight: 600; white-space: nowrap; }
+
+.complete-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.72rem 1.25rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--sounder);
+  background: transparent;
+  color: var(--sounder-deep);
+  font-family: var(--display);
+  font-size: 1rem;
+  font-weight: 620;
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease, transform 0.12s ease;
+}
+.complete-btn:hover { background: var(--depth-wash); }
+.complete-btn:active { transform: scale(0.97); }
+.complete-btn:focus-visible { outline: 2px solid var(--sounder); outline-offset: 3px; }
+.complete-tick {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 1.5px solid currentColor;
+  transition: background 0.16s ease, border-color 0.16s ease;
+}
+.complete-tick svg { width: 14px; height: 14px; opacity: 0; transition: opacity 0.16s ease; }
+
+/* Completed state — filled, with the tick shown. */
+.complete-btn.is-complete {
+  border-color: var(--sounder);
+  background: var(--sounder);
+  color: #fff;
+}
+.complete-btn.is-complete:hover { background: var(--sounder-deep); border-color: var(--sounder-deep); }
+.complete-btn.is-complete .complete-tick { background: rgba(255, 255, 255, 0.22); border-color: transparent; }
+.complete-btn.is-complete .complete-tick svg { opacity: 1; }
+.lesson-complete:has(.complete-btn.is-complete) {
+  border-color: color-mix(in srgb, var(--sounder) 40%, var(--line));
+  background: var(--depth-wash);
+}
+@media print { .lesson-complete { display: none; } }
 
 /* prev / next day navigation at the foot of a lesson */
 .day-nav {

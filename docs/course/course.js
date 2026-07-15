@@ -178,6 +178,10 @@ const steps = Array.from(document.querySelectorAll(".step"));
 const stepBar = document.querySelector("#stepBar");
 const stepCount = document.querySelector("#stepCount");
 const doneBanner = document.querySelector("#doneBanner");
+// Set by the completion controller below, so ticking the final step keeps the
+// "mark complete" button in sync without a reload. Guarded — a lesson with no
+// steps never calls it, and it may not be wired yet on first paint.
+let syncCompleteUI = null;
 
 function refreshSteps() {
   if (!steps.length) return;
@@ -187,7 +191,12 @@ function refreshSteps() {
   if (stepCount) stepCount.textContent = `${done} / ${steps.length} done`;
   if (doneBanner) doneBanner.classList.toggle("show", done === steps.length);
   if (lessonData) {
-    progress.set(lessonData.day, { steps: state, done: done === steps.length && steps.length > 0 });
+    const allChecked = done === steps.length && steps.length > 0;
+    // Completion is sticky: finishing every step marks the day done, but a
+    // later untick (or nothing) never silently un-does an explicit completion.
+    const isDone = progress.isDone(lessonData.day) || allChecked;
+    progress.set(lessonData.day, { steps: state, done: isDone });
+    if (syncCompleteUI) syncCompleteUI(isDone);
   }
 }
 
@@ -218,6 +227,47 @@ if (steps.length) {
     });
   });
   refreshSteps();
+}
+
+/* --------------------------------------------------------------------------
+   Lesson completion — explicit "mark this day complete", persisted per day.
+   Writes the same `done` flag the course map + landing voyage read, so a day
+   lights up everywhere the moment it's marked. Works on days with no build
+   steps too (theory / challenge days), where it's the only way to finish.
+   -------------------------------------------------------------------------- */
+const completeBtn = document.querySelector("#completeBtn");
+if (completeBtn && lessonData) {
+  const cDay = lessonData.day;
+  const cLabel = document.querySelector("#completeBtnLabel");
+  const cNote = document.querySelector("#completeNote");
+  const nextDay = lessonData.next;
+
+  function renderComplete(done) {
+    completeBtn.classList.toggle("is-complete", done);
+    completeBtn.setAttribute("aria-pressed", String(done));
+    if (cLabel) cLabel.textContent = done ? `Day ${cDay} complete` : `Mark Day ${cDay} complete`;
+    if (cNote) {
+      if (done && nextDay) {
+        cNote.innerHTML = `Nice work — saved on this device. <a href="../${nextDay.slug}/">Continue to Day ${nextDay.day} →</a>`;
+      } else if (done) {
+        cNote.textContent = "That's every published day complete — the whole voyage. 🎉";
+      } else {
+        cNote.textContent = "Mark it complete — it shows on your course map, and your place is saved on this device.";
+      }
+    }
+  }
+
+  // Keep the button in sync when the final build step auto-completes the day.
+  syncCompleteUI = renderComplete;
+
+  function setComplete(done) {
+    const cur = progress.get(cDay);
+    progress.set(cDay, { steps: cur.steps || [], done: done });
+    renderComplete(done);
+  }
+
+  renderComplete(progress.isDone(cDay));
+  completeBtn.addEventListener("click", () => setComplete(!progress.isDone(cDay)));
 }
 
 /* --------------------------------------------------------------------------
