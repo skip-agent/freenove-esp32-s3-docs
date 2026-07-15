@@ -201,6 +201,7 @@ def render_html(data: dict, ctx: dict) -> str:
   <title>{title}</title>
   {FONTS_HEAD}
   <link rel=\"stylesheet\" href=\"./landing.css\" />
+{course_build.THEME_HEAD}
 </head>
 <body>
   <div class=\"page\">

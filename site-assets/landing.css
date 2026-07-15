@@ -37,7 +37,70 @@
   --shadow-md: 0 6px 22px rgba(18, 22, 33, .07);
 
   --wrap: 1080px;
+
+  color-scheme: light;
 }
+
+/* ===========================================================================
+   Dark theme — same tokens, retuned. Set by the theme toggle
+   (data-theme="dark" on <html>) and adopted from the OS preference on first
+   visit. Keeps the one calm blue accent, brightened for a dark background.
+   =========================================================================== */
+html[data-theme="dark"] {
+  --bg:        #0d1117;
+  --card:      #161b24;
+  --surface:   #12161f;
+  --surface-2: #1b212c;
+  --line:      #262d3a;
+  --line-soft: #1f2632;
+
+  --ink:   #e7eaf1;
+  --ink-2: #aab2c0;
+  --ink-3: #838c9b;
+
+  --accent:        #6d8bff;
+  --accent-strong: #92a9ff;
+  --accent-tint:   #182236;
+  --accent-ink:    #9fbcff;
+  --c-hue:   #9fbcff;   --c-tint:  #182236;
+  --py-hue:  #4fc3cd;   --py-tint: #12262a;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4), 0 1px 3px rgba(0, 0, 0, .5);
+  --shadow-md: 0 6px 22px rgba(0, 0, 0, .5);
+
+  color-scheme: dark;
+}
+/* The faint breadboard-dot motif is dark ink on light; invert it on dark. */
+html[data-theme="dark"] .hero::before {
+  background-image: radial-gradient(rgba(255, 255, 255, .05) 1px, transparent 1.4px);
+}
+
+/* ---------------------------------------------------------------------------
+   Theme toggle — a small floating control, created by the inline theme script.
+   --------------------------------------------------------------------------- */
+.theme-toggle {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink-2);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: color .15s ease, border-color .15s ease, background .15s ease, transform .15s ease;
+}
+.theme-toggle:hover { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+.theme-toggle:active { transform: scale(.94); }
+.theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.theme-toggle svg { width: 20px; height: 20px; display: block; }
+@media print { .theme-toggle { display: none; } }
 
 * { box-sizing: border-box; }
 
