@@ -39,12 +39,12 @@
     {
       "name": "220 Ω resistor",
       "imageAsset": "docs/course/assets/shared/item-resistor.png",
-      "explanation": "A resistor is a small component whose whole job is to limit how much current flows through a wire. Current is the flow of electricity through the circuit; a resistor throttles that flow down to a safe amount. Its strength is measured in ohms (Ω) — a larger number resists harder and lets less current through. A LED wired straight to power pulls far more current than it can survive and burns out at once, so it always sits in series with a resistor. The 220 Ω value here holds the current gentle enough to light the LED and keep it alive. The coloured bands print the resistor's value, and it works the same either way round — a resistor has no positive or negative end."
+      "explanation": "A resistor is a small component whose whole job is to limit how much current flows through a wire. Current is the flow of electricity through the circuit; a resistor throttles that flow down to a safe amount. Its strength is measured in ohms (Ω) — a larger number resists harder and lets less current through. A part like a LED wired straight to power pulls far more current than it can survive and burns out at once, so it sits in series with a resistor whose value is chosen to hold the current gentle enough to keep it alive. The coloured bands print the resistor's value, and it works the same either way round — a resistor has no positive or negative end."
     },
     {
       "name": "2 × 10 kΩ resistors",
       "imageAsset": "docs/course/assets/shared/item-resistor.png",
-      "explanation": "This is the same kind of component as the 220 Ω resistor, put to a different job. Rather than limiting current to a LED, it ties an input pin to a known voltage. An input pin with nothing wired to it floats — it drifts between HIGH and LOW and reads at random. The 10 kΩ resistor holds GPIO 13 up at 3.3V so it rests at a steady HIGH. Its value is large on purpose: it pulls just firmly enough to set that resting level, yet gently enough that pressing the button — a near-zero-resistance path to ground — easily overrules it and drags the pin to LOW."
+      "explanation": "A pull resistor is a resistor put to a different job than limiting current: it ties an input pin to a known voltage. An input pin with nothing wired to it floats — it drifts between HIGH and LOW and reads at random. A 10 kΩ resistor holds the pin at a steady resting level. Its value is large on purpose: it pulls just firmly enough to set that resting level, yet gently enough that pressing the button — a near-zero-resistance path — easily overrules it and flips the pin the other way."
     },
     {
       "name": "Push button",
