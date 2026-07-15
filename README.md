@@ -11,6 +11,63 @@ as one static site with two surfaces:
 The site is static HTML/CSS/JS built by a Python script and deployed to
 Cloudflare Pages. No backend, no accounts; progress lives in the browser.
 
+## In-page lesson chat (optional backend)
+
+Every lesson page carries a floating **"Ask about this lesson"** widget backed by
+a local Ollama cloud model (`qwen3-coder:480b-cloud`). It is **backend-aware**: on
+load it health-checks `GET /api/chat` and only mounts if a backend answers. So the
+*same generated build* is safe on the public Pages host (no backend there → no
+button, nothing broken) and lights up automatically wherever the backend is served.
+
+- **Backend:** `serve.py` at the repo root serves `docs/` plus `GET/POST /api/chat`.
+  It binds to `127.0.0.1` and knows nothing about who is allowed in — **auth is an
+  edge concern, never in the app.** The model is fixed server-side; Ollama stays
+  private on `127.0.0.1:11434` and is never proxied.
+- **On the Mac mini:** it runs as launchd job `com.skipper.esp32-lab`
+  (`deploy/com.skipper.esp32-lab.plist`) on `127.0.0.1:3013`, served to the
+  **tailnet only** via `tsdash serve` (never raw `tailscale serve`, **never
+  Funnel**). Tailscale identity is the login, so no anonymous visitor can spend
+  tokens. Lesson context comes from each lesson's packet JSON.
+
+### Making it public later (Cloudflare + Access) — no app changes
+
+Because auth lives at the edge, sharing the chat publicly (e.g. with family) needs
+**zero changes to `serve.py`, the widget, or the build** — only a new front door
+and one config value. Put a named Cloudflare Tunnel + Access in front of the same
+local port:
+
+1. Create and route a **named** tunnel to a hostname you own (a Quick Tunnel with
+   `--url` only gives a random `trycloudflare.com` host, which Access can't target):
+   ```bash
+   cloudflared tunnel login
+   cloudflared tunnel create esp32-chat
+   cloudflared tunnel route dns esp32-chat esp32-chat.<domain>
+   # ~/.cloudflared/config.yml:
+   #   tunnel: esp32-chat
+   #   credentials-file: /Users/agent/.cloudflared/<tunnel-id>.json
+   #   ingress:
+   #     - hostname: esp32-chat.<domain>
+   #       service: http://127.0.0.1:3013
+   #     - service: http_status:404
+   cloudflared tunnel run esp32-chat      # (run as a service to make it permanent)
+   ```
+2. In Cloudflare Zero Trust, add an **Access** application for `esp32-chat.<domain>`
+   with a policy (email allow-list / one-time PIN) so only invited people get in.
+3. **Add the new hostname to the backend's trusted-host allowlist** (the DNS-rebind
+   guard), or every send returns 403 even though the widget mounts. Append
+   `esp32-chat.<domain>` to `LESSON_CHAT_ALLOWED_HOSTS` (comma-separated; the
+   default `:443` port is optional — the backend normalizes it). Edit the repo
+   plist, copy it over the installed one, and reload so the running process picks
+   up the change:
+   ```bash
+   # after editing deploy/com.skipper.esp32-lab.plist:
+   cp deploy/com.skipper.esp32-lab.plist ~/Library/LaunchAgents/com.skipper.esp32-lab.plist
+   launchctl bootout   gui/$(id -u)/com.skipper.esp32-lab
+   launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.skipper.esp32-lab.plist
+   ```
+4. Leave Ollama bound to `127.0.0.1:11434`; only `serve.py`'s port is exposed, and
+   only behind Access. The tailnet serve and the public Access door can run at once.
+
 ## How a lesson works
 
 Each day is **one source-of-truth file** — `lessons/day-NN-slug.yml`

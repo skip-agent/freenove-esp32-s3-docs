@@ -320,3 +320,253 @@ document.querySelectorAll("[data-copy]").forEach((btn) => {
     }
   });
 });
+
+/* --------------------------------------------------------------------------
+   Lesson chat widget — a floating "ask about this lesson" panel.
+   Backed by a local model proxy (POST /api/chat in serve.py). The widget is
+   BACKEND-AWARE: it health-checks GET /api/chat first and only mounts when a
+   backend answers. So the identical generated build is safe on the public
+   Cloudflare Pages host (no backend there -> no button, nothing broken) and
+   lights up wherever this backend is served (the tailnet today; a
+   Cloudflare-Access origin later) with no rebuild. Only mounts on lesson pages.
+   -------------------------------------------------------------------------- */
+async function initLessonChat() {
+  // Only lesson pages carry lesson-data with a day; the course map does not.
+  if (!lessonData || lessonData.day == null) return;
+
+  // Out-of-band signal from serve.py: text after a NUL byte is a stream-failure
+  // notice to show but not record as an assistant turn (see STREAM_ERROR_MARK).
+  const STREAM_ERROR_MARK = " ";
+  const STREAM_OK_MARK = "";
+
+  function lessonTitle() {
+    return (document.title || "this lesson")
+      .replace(/\s*[—–|]\s*ESP32-S3 Lab.*$/i, "")
+      .trim() || "this lesson";
+  }
+
+  // Structured lesson packet is the preferred context (mission, wiring, steps,
+  // coaching notes, troubleshooting); fall back to the page text if it's absent.
+  async function loadPacket() {
+    if (!lessonData.lessonCode) return null;
+    try {
+      const res = await fetch(`../packets/${encodeURIComponent(lessonData.lessonCode)}.json`);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  }
+
+  function lessonText() {
+    const main = document.querySelector(".lesson-main") || document.querySelector("main") || document.body;
+    return (main.innerText || "").replace(/\s+\n/g, "\n").trim().slice(0, 9000);
+  }
+
+  function progressSummary() {
+    const total = lessonData.totalDays || 30;
+    let done = 0;
+    for (let d = 1; d <= total; d += 1) {
+      if (progress.isDone(d)) done += 1;
+    }
+    let line = `Currently on Day ${lessonData.day} of ${total}. Days marked complete: ${done}.`;
+    // Per-step state for THIS lesson, so the tutor can resume at the first
+    // unfinished step instead of repeating completed ones.
+    const steps = progress.get(lessonData.day).steps;
+    if (Array.isArray(steps) && steps.length) {
+      const stepsDone = steps.filter(Boolean).length;
+      const nextStep = steps.findIndex((s) => !s);
+      line += ` This lesson: ${stepsDone} of ${steps.length} steps checked off`;
+      line += nextStep === -1
+        ? " (all steps done)."
+        : ` (next unfinished is step ${nextStep + 1}).`;
+    }
+    return line;
+  }
+
+  // Minimal, safe rendering: escape HTML, then reveal `inline` and ```fenced``` code.
+  function render(text) {
+    const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+    const parts = text.split(/```(?:\w+)?\n?([\s\S]*?)```/g);
+    return parts
+      .map((part, i) =>
+        i % 2
+          ? `<pre><code>${esc(part.replace(/\n$/, ""))}</code></pre>`
+          : esc(part).replace(/`([^`]+)`/g, "<code>$1</code>")
+      )
+      .join("");
+  }
+
+  const packet = await loadPacket();
+  const history = [];
+  let busy = false;
+
+  const fab = document.createElement("button");
+  fab.className = "lchat-fab";
+  fab.type = "button";
+  fab.innerHTML = '<span class="lchat-fab__icon" aria-hidden="true">💬</span> Ask about this lesson';
+  fab.setAttribute("aria-label", "Ask a question about this lesson");
+
+  const panel = document.createElement("section");
+  panel.className = "lchat";
+  panel.hidden = true;
+  panel.setAttribute("aria-label", "Lesson chat");
+  panel.innerHTML = `
+    <div class="lchat__head">
+      <div>
+        <p class="lchat__title">Ask about ${lessonTitle().replace(/[<>&]/g, "")}</p>
+        <p class="lchat__sub">ESP32 tutor · qwen3-coder · runs on Skipper's tailnet</p>
+      </div>
+      <button class="lchat__close" type="button" aria-label="Close chat">×</button>
+    </div>
+    <div class="lchat__log" role="log" aria-live="polite">
+      <div class="lchat-msg lchat-msg--hint">Ask anything about this lesson — the wiring, the code, or a term you don't recognise. Nothing here touches your board.</div>
+    </div>
+    <form class="lchat__form">
+      <textarea class="lchat__input" rows="1" placeholder="e.g. why does the LED need a resistor?" aria-label="Your question"></textarea>
+      <button class="lchat__send" type="submit">Send</button>
+    </form>`;
+
+  document.body.append(fab, panel);
+
+  const log = panel.querySelector(".lchat__log");
+  const form = panel.querySelector(".lchat__form");
+  const input = panel.querySelector(".lchat__input");
+  const sendBtn = panel.querySelector(".lchat__send");
+
+  function open() {
+    panel.hidden = false;
+    fab.hidden = true;
+    input.focus();
+  }
+  function close() {
+    panel.hidden = true;
+    fab.hidden = false;
+    fab.focus(); // return focus to the trigger, not the now-hidden panel
+  }
+  fab.addEventListener("click", open);
+  panel.querySelector(".lchat__close").addEventListener("click", close);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !panel.hidden) close(); });
+
+  function addMsg(role, text) {
+    const el = document.createElement("div");
+    el.className = `lchat-msg lchat-msg--${role}`;
+    el.innerHTML = render(text);
+    log.append(el);
+    log.scrollTop = log.scrollHeight;
+    return el;
+  }
+
+  async function ask(question) {
+    if (busy || !question.trim()) return;
+    // Accepted — safe to clear the composer now (clearing before this guard
+    // would silently drop a question typed while a reply is still streaming).
+    input.value = "";
+    input.style.height = "auto";
+    busy = true;
+    sendBtn.disabled = true;
+    input.disabled = true;
+    addMsg("user", question);
+    history.push({ role: "user", content: question });
+    const botEl = addMsg("bot", "…");
+    let answer = "";
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lessonTitle: lessonTitle(),
+          lessonPacket: packet,
+          lessonText: packet ? undefined : lessonText(),
+          progress: progressSummary(),
+          // Mirror the server's window (last dozen turns, content bounded) so a
+          // long session can't grow the request past the body cap and wedge the
+          // chat on a permanent 413.
+          messages: history.slice(-16).map((m) => ({
+            role: m.role,
+            content: m.content.length > 4000 ? m.content.slice(0, 4000) : m.content,
+          })),
+        }),
+      });
+      if (!res.ok || !res.body) throw new Error(`server responded ${res.status}`);
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      // Strip both out-of-band markers before display: NUL prefixes a failure
+      // notice, ETX is the success terminator.
+      const clean = (a) => a.replace(STREAM_ERROR_MARK, "\n\n").split(STREAM_OK_MARK)[0];
+      const paint = () => {
+        botEl.innerHTML = render(clean(answer));
+        log.scrollTop = log.scrollHeight;
+      };
+      let lastPaint = 0;
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        answer += decoder.decode(value, { stream: true });
+        // render() reparses the whole accumulated answer, so repainting on every
+        // chunk is O(n²) and freezes the page on long replies. Throttle to ~12fps
+        // during streaming; the final paint below always shows the full text.
+        const now = performance.now();
+        if (now - lastPaint > 80) {
+          paint();
+          lastPaint = now;
+        }
+      }
+      paint(); // final, complete render
+      const failed = answer.includes(STREAM_ERROR_MARK);
+      const complete = answer.includes(STREAM_OK_MARK);
+      if (!failed && complete) {
+        history.push({ role: "assistant", content: clean(answer) });
+        // Keep the in-memory transcript from growing without bound over a very
+        // long session (the server only ever uses the recent window anyway).
+        if (history.length > 40) history.splice(0, history.length - 40);
+      } else {
+        // A flagged failure, OR a stream that ended without the success
+        // terminator (the backend died mid-reply) — show what arrived but keep
+        // the partial/empty answer out of history so it isn't resent as context.
+        history.pop();
+        if (!failed) {
+          botEl.innerHTML = render(clean(answer) + "\n\n_[The reply was cut off — please ask again.]_");
+        }
+      }
+    } catch (err) {
+      // No assistant reply landed — drop the unanswered user turn so the next
+      // request doesn't resend it as stale/duplicated context.
+      history.pop();
+      botEl.innerHTML = render(`Sorry — I couldn't reach the model. (${err.message})`);
+    } finally {
+      busy = false;
+      sendBtn.disabled = false;
+      input.disabled = false;
+      // Only refocus the composer if the panel is still open — if the learner
+      // closed it mid-reply, focus belongs on the floating button, not a hidden
+      // textarea (which would swallow keystrokes and hide the focus ring).
+      if (!panel.hidden) input.focus();
+    }
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    ask(input.value);
+  });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); }
+  });
+  input.addEventListener("input", () => {
+    input.style.height = "auto";
+    input.style.height = Math.min(input.scrollHeight, 112) + "px";
+  });
+}
+
+// Backend-aware mount: only wire the widget in if our chat backend answers.
+// A static host (e.g. Cloudflare Pages) serves its HTML fallback with 200 for
+// unknown routes, so res.ok alone is NOT enough — require serve.py's sentinel
+// header, which a static fallback can't produce. Keeps the public build clean.
+(async () => {
+  try {
+    const res = await fetch("/api/chat", { method: "GET" });
+    if (res.ok && res.headers.get("X-Lesson-Chat") === "ok") initLessonChat();
+  } catch {
+    /* no backend (e.g. the public static host) — no chat button, nothing broken */
+  }
+})();

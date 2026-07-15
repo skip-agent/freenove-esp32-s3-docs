@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.skipper.esp32-lab</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/python3</string>
+    <string>/Users/agent/projects/freenove-esp32-s3-docs/serve.py</string>
+    <string>3013</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <!-- Hosts the chat POST endpoint trusts (DNS-rebinding allowlist). The
+         tailnet served host; add the Cloudflare Access hostname here too when
+         the public door is set up. Local 127.0.0.1/localhost are always allowed. -->
+    <key>LESSON_CHAT_ALLOWED_HOSTS</key>
+    <string>agents-mac-mini.tail2b5984.ts.net:8456</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/Users/agent/Library/Logs/esp32-lab.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/agent/Library/Logs/esp32-lab.log</string>
+</dict>
+</plist>

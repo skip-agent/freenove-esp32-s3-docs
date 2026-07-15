@@ -1444,3 +1444,118 @@ dialog.lightbox.image .lb-close {
   .day-nav { grid-template-columns: 1fr; }
   .day-nav-link.next { text-align: left; }
 }
+
+/* ===========================================================================
+   Lesson chat widget — floating "ask about this lesson" panel.
+   Mounted by course.js only when a chat backend answers (see initLessonChat).
+   =========================================================================== */
+.lchat-fab {
+  position: fixed;
+  right: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1rem, 3vw, 2rem);
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.72rem 1.05rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--sounder);
+  color: #fff;
+  font: 600 0.95rem/1 var(--body);
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(53, 87, 240, 0.35), 0 8px 22px rgba(53, 87, 240, 0.28);
+  transition: transform 140ms ease, background 140ms ease;
+}
+.lchat-fab:hover { transform: translateY(-1px); background: var(--sounder-deep); }
+.lchat-fab:focus-visible { outline: 2px solid var(--sounder-deep); outline-offset: 2px; }
+.lchat-fab__icon { font-size: 1.05rem; line-height: 1; }
+.lchat-fab[hidden] { display: none; }
+
+.lchat {
+  position: fixed;
+  right: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1rem, 3vw, 2rem);
+  z-index: 1001;
+  width: min(28rem, calc(100vw - 2rem));
+  height: min(34rem, calc(100vh - 2rem));
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+.lchat[hidden] { display: none; }
+
+.lchat__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--chart);
+}
+.lchat__title { margin: 0; font: 600 0.95rem/1.3 var(--body); color: var(--ink); }
+.lchat__sub { margin: 0.15rem 0 0; font-size: 0.75rem; color: var(--ink-faint); }
+.lchat__close {
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: var(--r-sm);
+}
+.lchat__close:hover { color: var(--ink); background: var(--depth-wash); }
+
+.lchat__log {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.lchat-msg { max-width: 90%; padding: 0.6rem 0.8rem; border-radius: var(--r-md); font-size: 0.9rem; line-height: 1.55; white-space: pre-wrap; word-wrap: break-word; }
+.lchat-msg code { font-family: var(--mono); font-size: 0.85em; background: var(--abyss); color: var(--phosphor); padding: 0.05em 0.35em; border-radius: 5px; }
+.lchat-msg pre { margin: 0.5rem 0 0; padding: 0.6rem 0.7rem; background: var(--abyss); color: var(--phosphor); border-radius: var(--r-sm); overflow-x: auto; }
+.lchat-msg pre code { background: none; padding: 0; color: inherit; }
+.lchat-msg--user { align-self: flex-end; background: var(--sounder); color: #fff; }
+.lchat-msg--user code, .lchat-msg--user pre { background: rgba(0, 0, 0, 0.28); color: #fff; }
+.lchat-msg--bot { align-self: flex-start; background: var(--chart); color: var(--ink); border: 1px solid var(--line); }
+.lchat-msg--hint { align-self: center; color: var(--ink-faint); font-size: 0.8rem; text-align: center; max-width: 100%; }
+
+.lchat__form { display: flex; gap: 0.5rem; padding: 0.75rem; border-top: 1px solid var(--line); background: var(--chart); }
+.lchat__input {
+  flex: 1;
+  resize: none;
+  min-height: 2.5rem;
+  max-height: 7rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 0.9rem/1.5 var(--body);
+}
+.lchat__input:focus-visible { outline: 2px solid var(--sounder); outline-offset: 1px; }
+.lchat__send {
+  align-self: flex-end;
+  padding: 0.6rem 1rem;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: var(--sounder);
+  color: #fff;
+  font: 600 0.9rem/1 var(--body);
+  cursor: pointer;
+}
+.lchat__send:hover { background: var(--sounder-deep); }
+.lchat__send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+@media print {
+  .lchat, .lchat-fab { display: none !important; }
+}
